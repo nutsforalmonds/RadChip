@@ -94,6 +94,10 @@ Mesh* m_pMesh;
 Mesh* m_pMesh2;
 
 MD5Model* md5;
+MD5Model* md50;
+MD5Model* md51;
+MD5Model* md52;
+MD5Model* md53;
 MD5Model* md6;
 
 JSON_Parser *map_info;
@@ -204,6 +208,10 @@ void Window::idleCallback(void)
 	anim_time += diff;
 	if (anim_time > 1 / 30.0){
 		md5->Update(anim_time);
+		md50->Update(anim_time);
+		md51->Update(anim_time);
+		md52->Update(anim_time);
+		md53->Update(anim_time);
 		md6->Update(anim_time);
 		anim_time = 0;
 	}
@@ -343,7 +351,7 @@ void server_update(int value){
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
 	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
-	(*sendVec)[2] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
+	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
 	cli->write(*sendVec);
 	io_service.poll();
 	cam_dx = 0;
@@ -351,6 +359,14 @@ void server_update(int value){
 	// RECEIVE STUFF
 	recvVec = cli->read();
 	io_service.poll();
+	
+	std::cout << "pair 0: " << ((*recvVec)[0].first.c_str()) << std::endl;
+	std::cout << "pair 1: " << ((*recvVec)[1].first.c_str()) << std::endl;
+	std::cout << "pair 2: " << ((*recvVec)[2].first.c_str()) << std::endl;
+	std::cout << "pair 3: " << ((*recvVec)[3].first.c_str()) << std::endl;
+
+
+
 	mats[atoi((*recvVec)[0].first.c_str())] = (*recvVec)[0].second;
 	mats[atoi((*recvVec)[1].first.c_str())] = (*recvVec)[1].second;
 	mats[atoi((*recvVec)[2].first.c_str())] = (*recvVec)[2].second;
@@ -813,7 +829,44 @@ void initialize(int argc, char *argv[])
 
 	setupShaders();
 
-	Cube* cube0 = new Cube();
+	md50 = new MD5Model();
+	md50->LoadModel("Model/monky_MD5_try1.md5mesh");
+	md50->LoadAnim("Model/monky_MD5_try1.md5anim");
+	md50->setShader(sdrCtl.getShader("basic_texture"));
+	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md50->setShininess(30);
+	md50->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	player_list.push_back(md50);
+
+	md51 = new MD5Model();
+	md51->LoadModel("Model/monky_MD5_try1.md5mesh");
+	md51->LoadAnim("Model/monky_MD5_try1.md5anim");
+	md51->setShader(sdrCtl.getShader("basic_texture"));
+	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md51->setShininess(30);
+	md51->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	player_list.push_back(md51);
+
+	md52 = new MD5Model();
+	md52->LoadModel("Model/monky_MD5_try1.md5mesh");
+	md52->LoadAnim("Model/monky_MD5_try1.md5anim");
+	md52->setShader(sdrCtl.getShader("basic_texture"));
+	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md52->setShininess(30);
+	md52->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	player_list.push_back(md52);
+
+	md53 = new MD5Model();
+	md53->LoadModel("Model/monky_MD5_try1.md5mesh");
+	md53->LoadAnim("Model/monky_MD5_try1.md5anim");
+	md53->setShader(sdrCtl.getShader("basic_texture"));
+	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md53->setShininess(30);
+	md53->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	player_list.push_back(md53);
+
+
+	/*Cube* cube0 = new Cube();
 	cube0->setKd(vec3(0.8, 0.0, 0.0));
 	cube0->setKa(vec3(0.3, 0.0, 0.0));
 	cube0->setKs(vec3(0.4, 0.0, 0.0));
@@ -875,7 +928,7 @@ void initialize(int argc, char *argv[])
 	cube3->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	cube3->setType("Cube");
 	cube3->setName("Test cube3");
-	player_list.push_back(cube3);
+	player_list.push_back(cube3);*/
 
 
 	ground = new Ground();

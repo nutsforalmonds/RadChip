@@ -186,8 +186,8 @@ int main(int argc, char *argv[])
 		{
 			playerID = atoi((*recvVec)[0].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 1].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 2].second[0][0]);
+			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
 
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
@@ -195,16 +195,16 @@ int main(int argc, char *argv[])
 		{
 			playerID = atoi((*recvVec)[numOfVecs - 1] .first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 1].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 2].second[0][0]);
+			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
 
 		if (strcmp((*recvVec)[numOfVecs * 2 - 1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 2 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 1].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 2].second[0][0]);
+			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
 
 		if (strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
@@ -234,6 +234,13 @@ int main(int argc, char *argv[])
 		(*sendVec)[1] = std::make_pair("1", m[1]);
 		(*sendVec)[2] = std::make_pair("2", m[2]);
 		(*sendVec)[3] = std::make_pair("3", m[3]);
+
+
+		std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
+		std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
+		std::cout << "pair 2: " << ((*sendVec)[2].first.c_str()) << std::endl;
+		std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
+
 
 		server->send(*sendVec);
 		io_service.poll();

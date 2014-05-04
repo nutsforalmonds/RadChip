@@ -374,7 +374,7 @@ public:
 	void initialize(){
 
 
-		Cube* cube0 = new Cube();
+		/*Cube* cube0 = new Cube();
 		cube0->setSpeed(5);
 		cube0->postTrans(glm::translate(vec3(0, 0.5, 7)));
 		cube0->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
@@ -404,7 +404,39 @@ public:
 		cube3->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 		cube3->setType("Cube");
 		cube3->setName("Test cube3");
-		addPlayer(cube3);
+		addPlayer(cube3);*/
+
+		MD5Model* md50 = new MD5Model();
+		md50->setSpeed(5);
+		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
+		md50->setType("Model");
+		md50->setName("Player Model");
+		addPlayer(md50);
+
+		MD5Model* md51 = new MD5Model();
+		md51->setSpeed(5);
+		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
+		md51->setType("Model");
+		md51->setName("Player Model");
+		addPlayer(md51);
+
+		MD5Model* md52 = new MD5Model();
+		md52->setSpeed(5);
+		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
+		md52->setType("Model");
+		md52->setName("Player Model");
+		addPlayer(md52);
+
+		MD5Model* md53 = new MD5Model();
+		md53->setSpeed(5);
+		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
+		md53->setType("Model");
+		md53->setName("Player Model");
+		addPlayer(md53);
 
 
 		Ground* ground = new Ground();

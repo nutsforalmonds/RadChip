@@ -25,7 +25,8 @@ public:
 		return pointer(new tcp_connection(io_service));
 	}*/
 
-	tcp_connection(boost::asio::io_service& io_service, std::set<tcp_connection_ptr>& clients)
+	tcp_connection(boost::asio::io_service& io_service,
+		std::vector<tcp_connection_ptr>& clients)
 		: socket_(io_service), clients_(clients)
 	{
 		ret_.push_back(std::make_pair("", mat4(0.0f)));
@@ -75,7 +76,7 @@ public:
 		// Else remove player from server
 		else
 		{
-			clients_.erase(shared_from_this());
+			//clients_.erase(shared_from_this());
 		}
 	}
 
@@ -91,7 +92,7 @@ public:
 		{
 			//std::cout << "Error sending from connection to client:" << error << std::endl;
 			//system("pause");
-			clients_.erase(shared_from_this());
+			//clients_.erase(shared_from_this());
 			socket_.close();
 		}
 	}
@@ -102,7 +103,7 @@ public:
 
 
 private:
-	std::set<tcp_connection_ptr>& clients_;
+	std::vector<tcp_connection_ptr>& clients_;
 	tcp::socket socket_;
 	std::vector <pair<string, mat4>> ret_;
 
@@ -181,13 +182,13 @@ public:
 	void join(tcp_connection_ptr player)
 	{
 		std::cout << "added client to players" << std::endl;
-		clients_.insert(player);
+		clients_.push_back(player);
 	}
 
 	// If a player leaves? Probably will never be used.
 	void leave(tcp_connection_ptr player)
 	{
-		clients_.erase(player);
+		//clients_.erase(player);
 	}
 
 	void send(std::vector <pair<string, mat4>>& obj)
@@ -228,7 +229,7 @@ private:
 	int pID;
 	tcp::acceptor acceptor_;
 	boost::asio::io_service& io_service_;
-	std::set<tcp_connection_ptr> clients_;
+	std::vector <tcp_connection_ptr> clients_;
 	std::vector <pair<string, mat4>> emptyRet;
 	std::vector <pair<string, mat4>> retVec_;
 	int i = 0;
