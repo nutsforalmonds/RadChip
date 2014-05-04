@@ -1,0 +1,103 @@
+{
+    "map_name": "Test 1",
+    "num_shaders": 5,
+    "shaders": [
+        {
+            "name": "basic_skybox",
+            "vert": "Shaders/basic_skybox.vert",
+            "frag": "Shaders/basic_skybox.frag"
+        },
+        {
+            "name": "basic_reflect_refract",
+            "vert": "Shaders/basic_reflect_refract.vert",
+            "frag": "Shaders/basic_reflect_refract.frag"
+        },
+        {
+            "name": "grid_ground",
+            "vert": "Shaders/grid_ground.vert",
+            "frag": "Shaders/grid_ground.frag"
+        },
+        {
+            "name": "basic_model",
+            "vert": "Shaders/basic_model.vert",
+            "frag": "Shaders/basic_model.frag"
+        },
+        {
+            "name": "basic_texture",
+            "vert": "Shaders/basic_texture_with_moss_potential.vert",
+            "frag": "Shaders/basic_texture_with_moss_potential.frag"
+        }
+    ],
+    "num_audio": 6,
+    "audio": [
+        {
+            "name": "Jump Wav",
+            "path": "Sound/jump.wav"
+        },
+        {
+            "name": "Jump Ogg",
+            "path": "Sound/jump.ogg"
+        },
+        {
+            "name": "Vegeta",
+            "path": "Sound/vegetaover9000.wav"
+        },
+        {
+            "name": "Disc Fire",
+            "path": "Sound/disc_fire.ogg"
+        },
+        {
+            "name": "Strong Punch",
+            "path": "Sound/strongpunch.ogg"
+        },
+        {
+            "name": "Pre Punch",
+            "path": "Sound/prepunch1.ogg"
+        }
+    ],
+    "num_texture": 6,
+    "texture": [
+        {
+            "name": "Cloth",
+            "path": "img/cloth.jpg",
+            "type": "JPG",
+            "ext": ".jpg",
+            "cube": 0
+        },
+        {
+            "name": "Moss",
+            "path": "img/moss.png",
+            "type": "PNG",
+            "ext": ".png",
+            "cube": 0
+        },
+        {
+            "name": "Stormy Days",
+            "path": "img/stormydays",
+            "type": "JPG",
+            "ext": ".jpg",
+            "cube": 1
+        },
+        {
+            "name": "Deep Space",
+            "path": "img/deep_space_blue/space",
+            "type": "PNG",
+            "ext": ".png",
+            "cube": 1
+        },
+        {
+            "name": "Lake1",
+            "path": "img/lake_pe1/lake_pe1",
+            "type": "JPG",
+            "ext": ".jpg",
+            "cube": 1
+        },
+        {
+            "name": "Lake 100",
+            "path": "img/lake_pe100/lake_pe100",
+            "type": "JPG",
+            "ext": ".jpg",
+            "cube": 1
+        }
+    ]
+}
