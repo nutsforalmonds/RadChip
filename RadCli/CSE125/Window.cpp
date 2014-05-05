@@ -140,6 +140,10 @@ GLuint fboHandle;
 
 string configBuf;
 
+//time used in idleCallback
+LARGE_INTEGER freq, last, current;
+double delta;
+
 //Mouse press flags
 int left_mouse_up = 1;
 int right_mouse_up = 1;
@@ -198,14 +202,13 @@ void Window::idleCallback(void)
 		cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
 	}
 	cam->setPendingRot(0);
+	
+	QueryPerformanceCounter(&current);
+	delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
+	last = current;
 
-	static time_t tick = clock();
-	float diff = (float)(clock() - tick)/CLOCKS_PER_SEC;
-	tick = clock();
-	//scene->simulate(diff, 1.0 / 100);
-
-	static float anim_time = 0;
-	anim_time += diff;
+	static double anim_time = 0;
+	anim_time += delta;
 	if (anim_time > 1 / 30.0){
 		md5->Update(anim_time);
 		md50->Update(anim_time);
@@ -217,7 +220,7 @@ void Window::idleCallback(void)
 	}
 
 	vector<mat4> Transforms;
-	m_pMesh2->BoneTransform((float)clock()/CLOCKS_PER_SEC, Transforms);
+	m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
 	GLSLProgram* sd = sdrCtl.getShader("basic_model");
 	for (int i = 0; i < Transforms.size(); i++){
 		char Name[128];
@@ -770,6 +773,9 @@ void setupShaders()
 }
 void initialize(int argc, char *argv[])
 {
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&last);
+
 	draw_list.clear();
 
 	GLenum err = glewInit();
