@@ -177,6 +177,7 @@ int counter = 0;
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
 int keyState = 0;
 int mouseState = 0;
+int projectile_counter = 0;
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
@@ -185,6 +186,70 @@ boost::asio::io_service io_service;
 tcp_client* cli;
 
 boost::array<mat4, 4> mats;
+
+void projectileAttack(int playerID, Camera * cam)
+{
+	mat4 test = cam->getCamM();
+	vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
+	mat4 player1 = player_list[playerID]->getModelM();
+	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
+
+	Projectile* cubeT = new Projectile(player_list.size());
+	cubeT->setKd(vec3(0.8, 0.0, 0.0));
+	cubeT->setKa(vec3(0.3, 0.0, 0.0));
+	cubeT->setKs(vec3(0.4, 0.0, 0.0));
+	cubeT->setShininess(100);
+	cubeT->setReflectFactor(vec2(0.2, 0.5));
+	cubeT->setEta(0.5);
+	cubeT->setCubeMapUnit(3);
+	cubeT->setSpeed(5);
+	cubeT->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
+	cubeT->setModelM(player1*glm::translate(vec3(0, 0, -1)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+	AABB hold = cubeT->getAABB();
+	cubeT->setStartX(hold.max[0]);
+	cubeT->setStartY(hold.max[2]);
+
+	//Name and type
+	cubeT->setType("Cube");
+	cubeT->setName("Test Cube" + std::to_string(projectile_counter));
+	projectile_counter++;
+	//Add Cube to the draw list
+	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
+	projectile_list.push_back(cubeT);
+	cubeT->setSpeed(50);
+	//cubeT->setHMove((holder[0] / 4));
+	cubeT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
+	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
+}
+
+void despawnProjectile()
+{
+	for (int i = 0; i < projectile_list.size(); i++)
+	{
+		float startX = projectile_list[i]->getStartX();
+		float startY = projectile_list[i]->getStartY();
+		AABB curr = projectile_list[i]->getAABB();
+		int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+
+		//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
+		if (distance > 30)
+		{
+			////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+			projectile_list.erase(projectile_list.begin() + i);
+		}
+	}
+}
+
+void simulateProjectile(float t)
+{
+	for (int i = 0; i < projectile_list.size(); i++){
+		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
+		projectile_list[i]->postTrans(glm::translate(projectile_list[i]->getVelocity()*t));
+	}
+}
 
 void Window::idleCallback(void)
 {
@@ -230,6 +295,8 @@ void Window::idleCallback(void)
 		sd->setUniform(Name, Transforms[i]);
 	}
 
+
+	simulateProjectile(delta);
 
 	/*vector<mat4> playerMs = scene->getPlayerMats();
 	for (int i = 0; i < player_list.size(); i++){
@@ -304,6 +371,10 @@ void Window::displayCallback(void)
 	for (int i = 0; i < stationary_list.size(); ++i)
 	{
 		stationary_list[i]->draw();
+	}
+	for (int i = 0; i < projectile_list.size(); ++i)
+	{
+		projectile_list[i]->draw();
 	}
 
 	md5->draw();
@@ -380,7 +451,7 @@ void server_update(int value){
 	player_list[2]->setModelM(mats[2]);
 	player_list[3]->setModelM(mats[3]);
 
-
+	despawnProjectile();
 	//Have to reset timer after
 	glutTimerFunc(15, server_update, 0);
 }
@@ -659,7 +730,7 @@ void mouseFunc(int button, int state, int x, int y)
 
 				testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
-				//scene->projectileAttack(playerID, cam);
+				projectileAttack(playerID, cam);
 			}
 		}
 		if (button == GLUT_MIDDLE_BUTTON){
