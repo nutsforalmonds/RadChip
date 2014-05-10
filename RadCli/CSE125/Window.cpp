@@ -747,12 +747,16 @@ void mouseFunc(int button, int state, int x, int y)
 
 	if (state == GLUT_DOWN){
 		if (button == GLUT_LEFT_BUTTON){
-			mouseState = mouseState | 1;
 			if (left_mouse_up){
 				left_mouse_up = 0;
+				mouseState = mouseState | 1;
 
 				testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				///scene->basicAttack(playerID);
+			}
+			else
+			{
+				mouseState = mouseState & ~1;
 			}
 		}
 		if (button == GLUT_RIGHT_BUTTON){
@@ -766,29 +770,33 @@ void mouseFunc(int button, int state, int x, int y)
 			}
 			else
 			{
-				keyState = keyState & ~(1 << 1);
+				mouseState = mouseState & ~(1 << 1);
 			}
 		}
 		if (button == GLUT_MIDDLE_BUTTON){
-			mouseState = mouseState | 1 << 2;
 			if (middle_mouse_up){
 				middle_mouse_up = 0;
+				mouseState = mouseState | 1 << 2;
 
 				testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			}
+			else
+			{
+				mouseState = mouseState & ~(1 << 2);
 			}
 		}
 	}
 	if (state == GLUT_UP){
 		if (button == GLUT_LEFT_BUTTON){
-			keyState = keyState & ~1;
+			mouseState = mouseState & ~1;
 			left_mouse_up = 1;
 		}
 		if (button == GLUT_RIGHT_BUTTON){
-			//keyState = keyState & ~(1 << 1);
+			mouseState = mouseState & ~(1 << 1);
 			right_mouse_up = 1;
 		}
 		if (button == GLUT_MIDDLE_BUTTON){
-			keyState = keyState & ~(1 << 2);
+			mouseState = mouseState & ~(1 << 2);
 			middle_mouse_up = 1;
 		}
 	}

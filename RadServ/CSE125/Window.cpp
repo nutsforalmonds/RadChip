@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
 	double diff;
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&last);
+	string p0, p1, p2, p3;
 
 	while (true){
 		QueryPerformanceCounter(&current);
@@ -183,7 +184,7 @@ int main(int argc, char *argv[])
 		player2shoot = false;
 		player3shoot = false;
 		player4shoot = false;
-		if (strcmp((*recvVec)[0].first.c_str(), ""))
+		if (!strcmp((*recvVec)[0].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[0].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
@@ -192,24 +193,27 @@ int main(int argc, char *argv[])
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
-		if (strcmp((*recvVec)[numOfVecs - 1].first.c_str(), ""))
+		if (!strcmp((*recvVec)[numOfVecs - 1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
 			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
-		if (strcmp((*recvVec)[numOfVecs * 2 - 1].first.c_str(), ""))
+		if (!strcmp((*recvVec)[numOfVecs * 2 - 1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 2 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
 			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
-		if (strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
+		if (!strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 3 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
 			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
@@ -226,28 +230,27 @@ int main(int argc, char *argv[])
 		cout << (m[0])[2][0] << (m[0])[2][1] << (m[0])[2][2] << (m[0])[2][3] << endl;
 		cout << (m[0])[3][0] << (m[0])[3][1] << (m[0])[3][2] << (m[0])[3][3] << endl;
 		*/
-		string p1, p2, p3, p4;
 		if (player1shoot == true)
-			p1 = "0s";
+			p0 = "0s";
 		else
-			p1 = "0S";
+			p0 = "0S";
 		if (player2shoot == true)
-			p2 = "1s";
+			p1 = "1s";
 		else
-			p2 = "1S";
+			p1 = "1S";
 		if (player3shoot == true)
-			p2 = "2s";
+			p3 = "2s";
 		else
 			p2 = "2S";
 		if (player4shoot == true)
-			p2 = "3s";
+			p3 = "3s";
 		else
-			p2 = "3S";
+			p3 = "3S";
 
-		(*sendVec)[0] = std::make_pair("0", m[0]);
-		(*sendVec)[1] = std::make_pair("1", m[1]);
-		(*sendVec)[2] = std::make_pair("2", m[2]);
-		(*sendVec)[3] = std::make_pair("3", m[3]);
+		(*sendVec)[0] = std::make_pair(p0.c_str(), m[0]);
+		(*sendVec)[1] = std::make_pair(p1.c_str(), m[1]);
+		(*sendVec)[2] = std::make_pair(p2.c_str(), m[2]);
+		(*sendVec)[3] = std::make_pair(p3.c_str(), m[3]);
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
 		//std::cout << "pair 2: " << ((*sendVec)[2].first.c_str()) << std::endl;
