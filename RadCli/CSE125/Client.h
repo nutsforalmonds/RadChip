@@ -40,8 +40,8 @@ public:
 
 	void write(std::vector <std::pair<string, mat4>>& in)
 	{
-		std::cout << "write called" << std::endl;
-		std::cout << "sendVec string:" << in.front().first << std::endl;
+		//std::cout << "write called" << std::endl;
+		//std::cout << "sendVec string:" << in.front().first << std::endl;
 		/*std::cout << "sendVec dat:" << in.front().second[0][0] <<
 			in.front().second[0][1] <<
 			in.front().second[0][2] <<
@@ -101,7 +101,7 @@ private:
 		if (!error)
 		{
 			pID_ready = 1;
-			std::cout << "Reading" << std::endl;
+			//std::cout << "Reading" << std::endl;
 			boost::asio::async_read(socket_,
 				boost::asio::buffer(ret_, 2048),
 				boost::bind(&tcp_client::handle_read, this,
@@ -161,7 +161,7 @@ private:
 	{
 		if (!error)
 		{
-			std::cout << "sent data" << std::endl;
+			//std::cout << "sent data" << std::endl;
 		}
 		else
 		{

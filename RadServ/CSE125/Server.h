@@ -67,7 +67,7 @@ public:
 	{
 		if (!error)
 		{
-			//std::cout << "Handling read" << std::endl;
+			std::cout << "Handling read" << std::endl;
 			boost::asio::async_read(socket_,
 				boost::asio::buffer(ret_, 2048),
 				boost::bind(&tcp_connection::handle_read, shared_from_this(),
@@ -84,7 +84,7 @@ public:
 	{
 		if (!error)
 		{
-			//std::cout << "connection sent data to client" << std::endl;
+			std::cout << "connection sent data to client" << std::endl;
 			// all these pops might not be useful at all
 		}
 		// Else remove player from server
@@ -122,36 +122,36 @@ public:
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 
 
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
 
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
 
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
 
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
-		retVec_.push_back(std::make_pair("", mat4(0.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
+		retVec_.push_back(std::make_pair("", mat4(3.0f)));
 
 		pID = 0;
 		start_accept();
@@ -195,7 +195,7 @@ public:
 	{
 		if (clients_.empty())
 		{
-			std::cout << "no clients to send to" << std::endl;
+			//std::cout << "no clients to send to" << std::endl;
 		}
 		else
 		{
@@ -210,12 +210,12 @@ public:
 	{
 		if (clients_.empty())
 		{
-			std::cout << "getting state but no clients" << std::endl;
+			///std::cout << "getting state but no clients" << std::endl;
 			return &emptyRet;
 		}
 		for each(tcp_connection_ptr client in clients_)
 		{
-			std::cout << "getting from a client" << std::endl;
+			//std::cout << "getting from a client" << std::endl;
 			retVec_[i++] = (*client->getState())[0];
 			retVec_[i++] = (*client->getState())[1];
 			retVec_[i++] = (*client->getState())[2];

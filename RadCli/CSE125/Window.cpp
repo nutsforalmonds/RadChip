@@ -175,6 +175,7 @@ int counter = 0;
 // Stuff Erik added
 
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
+int stateID = -1;
 int keyState = 0;
 int mouseState = 0;
 int projectile_counter = 0;
@@ -275,25 +276,25 @@ void Window::idleCallback(void)
 	static double anim_time = 0;
 	anim_time += delta;
 	if (anim_time > 1 / 30.0){
-		md5->Update(anim_time);
+		//md5->Update(anim_time);
 		md50->Update(anim_time);
 		md51->Update(anim_time);
 		md52->Update(anim_time);
 		md53->Update(anim_time);
-		md6->Update(anim_time);
+		//md6->Update(anim_time);
 		anim_time = 0;
 	}
 
-	vector<mat4> Transforms;
-	m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
-	GLSLProgram* sd = sdrCtl.getShader("basic_model");
-	for (int i = 0; i < Transforms.size(); i++){
-		char Name[128];
-		memset(Name, 0, sizeof(Name));
-		SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
-		//sd->setUniform(Name, glm::transpose(Transforms[i]));
-		sd->setUniform(Name, Transforms[i]);
-	}
+	//vector<mat4> Transforms;
+	//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+	//GLSLProgram* sd = sdrCtl.getShader("basic_model");
+	//for (int i = 0; i < Transforms.size(); i++){
+	//	char Name[128];
+	//	memset(Name, 0, sizeof(Name));
+	//	SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+	//	//sd->setUniform(Name, glm::transpose(Transforms[i]));
+	//	sd->setUniform(Name, Transforms[i]);
+	//}
 
 
 	simulateProjectile(delta);
@@ -358,7 +359,7 @@ void Window::displayCallback(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_pMesh2->draw();
+	//m_pMesh2->draw();
 
 	for (int i = 0; i < draw_list.size(); ++i)
 	{
@@ -377,12 +378,12 @@ void Window::displayCallback(void)
 		projectile_list[i]->draw();
 	}
 
-	md5->draw();
+//	md5->draw();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE,GL_ONE);
 	glDepthMask(GL_FALSE); // without it some part of model will cover other part of model which looks weird
-	md6->draw();
+//	md6->draw();
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 
@@ -434,17 +435,48 @@ void server_update(int value){
 	recvVec = cli->read();
 	io_service.poll();
 	
-	std::cout << "pair 0: " << ((*recvVec)[0].first.c_str()) << std::endl;
-	std::cout << "pair 1: " << ((*recvVec)[1].first.c_str()) << std::endl;
-	std::cout << "pair 2: " << ((*recvVec)[2].first.c_str()) << std::endl;
-	std::cout << "pair 3: " << ((*recvVec)[3].first.c_str()) << std::endl;
+	std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
+	std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
+	std::cout << "pair 2: " << atoi(&((*recvVec)[2].first.c_str())[0]) << std::endl;
+	std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
+
+	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
+
+	if ( (*recvVec)[0].first.c_str()[1] == 's' )
+	{
+		std::cout << "Projectile fire" << std::endl;
+		projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
+	}
+
+	//stateID = ((*recvVec)[1].first.c_str()[0]);
+
+	if ((*recvVec)[1].first.c_str()[1] == 's')
+	{
+		std::cout << "Projectile fire" << std::endl;
+		projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
+	}
+
+//	stateID = ((*recvVec)[2].first.c_str()[0]);
+
+	if ((*recvVec)[2].first.c_str()[1] == 's')
+	{
+		std::cout << "Projectile fire" << std::endl;
+		projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
+	}
+
+	//stateID = ((*recvVec)[3].first.c_str()[0]);
+
+	if ((*recvVec)[3].first.c_str()[1] == 's')
+	{
+		std::cout << "Projectile fire" << std::endl;
+		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
+	}
 
 
-
-	mats[atoi((*recvVec)[0].first.c_str())] = (*recvVec)[0].second;
-	mats[atoi((*recvVec)[1].first.c_str())] = (*recvVec)[1].second;
-	mats[atoi((*recvVec)[2].first.c_str())] = (*recvVec)[2].second;
-	mats[atoi((*recvVec)[3].first.c_str())] = (*recvVec)[3].second;
+	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
+	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
+	mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
+	mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
 
 	player_list[0]->setModelM(mats[0]);
 	player_list[1]->setModelM(mats[1]);
@@ -724,13 +756,17 @@ void mouseFunc(int button, int state, int x, int y)
 			}
 		}
 		if (button == GLUT_RIGHT_BUTTON){
-			mouseState = mouseState | 1 << 1;
 			if (right_mouse_up){
 				right_mouse_up = 0;
+				mouseState = mouseState | 1 << 1;
 
 				testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
-				projectileAttack(playerID, cam);
+				//projectileAttack(playerID, cam);
+			}
+			else
+			{
+				keyState = keyState & ~(1 << 1);
 			}
 		}
 		if (button == GLUT_MIDDLE_BUTTON){
@@ -748,7 +784,7 @@ void mouseFunc(int button, int state, int x, int y)
 			left_mouse_up = 1;
 		}
 		if (button == GLUT_RIGHT_BUTTON){
-			keyState = keyState & ~(1 << 1);
+			//keyState = keyState & ~(1 << 1);
 			right_mouse_up = 1;
 		}
 		if (button == GLUT_MIDDLE_BUTTON){
@@ -910,7 +946,7 @@ void initialize(int argc, char *argv[])
 	md50->LoadModel("Model/monky_MD5_try1.md5mesh");
 	md50->LoadAnim("Model/monky_MD5_try1.md5anim");
 	md50->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
 	md50->setShininess(30);
 	md50->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
 	player_list.push_back(md50);
@@ -919,7 +955,7 @@ void initialize(int argc, char *argv[])
 	md51->LoadModel("Model/monky_MD5_try1.md5mesh");
 	md51->LoadAnim("Model/monky_MD5_try1.md5anim");
 	md51->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
 	md51->setShininess(30);
 	md51->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
 	player_list.push_back(md51);
@@ -928,7 +964,7 @@ void initialize(int argc, char *argv[])
 	md52->LoadModel("Model/monky_MD5_try1.md5mesh");
 	md52->LoadAnim("Model/monky_MD5_try1.md5anim");
 	md52->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
 	md52->setShininess(30);
 	md52->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
 	player_list.push_back(md52);
@@ -937,7 +973,7 @@ void initialize(int argc, char *argv[])
 	md53->LoadModel("Model/monky_MD5_try1.md5mesh");
 	md53->LoadAnim("Model/monky_MD5_try1.md5anim");
 	md53->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+	md50->postTrans(glm::translate(vec3(20, 0.5, 7)));
 	md53->setShininess(30);
 	md53->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
 	player_list.push_back(md53);
@@ -957,56 +993,7 @@ void initialize(int argc, char *argv[])
 	cube0->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	cube0->setType("Cube");
 	cube0->setName("Test cube0");
-	player_list.push_back(cube0);
-
-	Cube* cube1 = new Cube();
-	cube1->setKd(vec3(0.8, 0.0, 0.0));
-	cube1->setKa(vec3(0.3, 0.0, 0.0));
-	cube1->setKs(vec3(0.4, 0.0, 0.0));
-	cube1->setShininess(100);
-	cube1->setReflectFactor(vec2(0.2, 0.5));
-	cube1->setEta(0.5);
-	cube1->setCubeMapUnit(3);
-	cube1->setSpeed(5);
-	cube1->postTrans(glm::translate(vec3(0, 0.5, 10)));
-	cube1->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	cube1->setShader(sdrCtl.getShader("basic_reflect_refract"));
-	cube1->setType("Cube");
-	cube1->setName("Test cube1");
-	player_list.push_back(cube1);
-
-	Cube* cube2 = new Cube();
-	cube2->setKd(vec3(0.8, 0.0, 0.0));
-	cube2->setKa(vec3(0.3, 0.0, 0.0));
-	cube2->setKs(vec3(0.4, 0.0, 0.0));
-	cube2->setShininess(100);
-	cube2->setReflectFactor(vec2(0.2, 0.5));
-	cube2->setEta(0.5);
-	cube2->setCubeMapUnit(3);
-	cube2->setSpeed(5);
-	cube2->postTrans(glm::translate(vec3(0, 0.5, 13)));
-	cube2->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	cube2->setShader(sdrCtl.getShader("basic_reflect_refract"));
-	cube2->setType("Cube");
-	cube2->setName("Test cube2");
-	player_list.push_back(cube2);
-
-	Cube* cube3 = new Cube();
-	cube3->setKd(vec3(0.8, 0.0, 0.0));
-	cube3->setKa(vec3(0.3, 0.0, 0.0));
-	cube3->setKs(vec3(0.4, 0.0, 0.0));
-	cube3->setShininess(100);
-	cube3->setReflectFactor(vec2(0.2, 0.5));
-	cube3->setEta(0.5);
-	cube3->setCubeMapUnit(3);
-	cube3->setSpeed(5);
-	cube3->postTrans(glm::translate(vec3(0, 0.5, 16)));
-	cube3->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	cube3->setShader(sdrCtl.getShader("basic_reflect_refract"));
-	cube3->setType("Cube");
-	cube3->setName("Test cube3");
-	player_list.push_back(cube3);*/
-
+	player_list.push_back(cube0);*/
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("grid_ground"));
@@ -1033,28 +1020,28 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
-	m_pMesh2 = new Mesh();
-	m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
-	m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
-	m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	//m_pMesh2 = new Mesh();
+	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
+	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
+	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));*/
 
-	md5 = new MD5Model();
-	md5->LoadModel("Model/monky_MD5_try1.md5mesh");
-	md5->LoadAnim("Model/monky_MD5_try1.md5anim");
-	md5->setShader(sdrCtl.getShader("basic_texture"));
-	md5->setShininess(30);
-	md5->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	//player_list.push_back(md5);
+	///*md5 = new MD5Model();
+	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");
+	//md5->LoadAnim("Model/monky_MD5_try1.md5anim");
+	//md5->setShader(sdrCtl.getShader("basic_texture"));
+	//md5->setShininess(30);
+	//md5->setAdjustM(glm::translate(vec3(-15.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	////player_list.push_back(md5);*/
 
-	md6 = new MD5Model();
-	md6->LoadModel("Model/fleurOptonl.md5mesh");
-	md6->LoadAnim("Model/fleurOptonl.md5anim");
-	md6->setShader(sdrCtl.getShader("basic_texture"));
-	md6->setShininess(30);
-	md6->setAdjustM(glm::translate(vec3(0.0, 1.7, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.05, 0.05, 0.05)));
-	md6->setModelM(glm::translate(vec3(1.0, 0.0, 0.0)));
-	md6->setType("Model");
-	md6->setName("Player Model");
+	//md6 = new MD5Model();
+	//md6->LoadModel("Model/fleurOptonl.md5mesh");
+	//md6->LoadAnim("Model/fleurOptonl.md5anim");
+	//md6->setShader(sdrCtl.getShader("basic_texture"));
+	//md6->setShininess(30);
+	//md6->setAdjustM(glm::translate(vec3(0.0, 1.7, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.05, 0.05, 0.05)));
+	//md6->setModelM(glm::translate(vec3(10.0, 0.0, 0.0)));
+	//md6->setType("Model");
+	//md6->setName("Player Model");
 
 	//AUDIO START!
 	if (loadAudio()){

@@ -130,7 +130,8 @@ public:
 				if ((pBox.max[2] <= sBox.max[2] ) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0] ) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(j))
 				{
 					player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
-					player[j]->setHealth(-1);
+					//TODO set health damage to zero
+					//////////////////////player[j]->setHealth(-1);
 					(*projectile[i]).setHit(j);
 					if (player[j]->getHealth() < 1)
 					{
@@ -142,7 +143,7 @@ public:
 				else if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(j))
 				{
 					player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
-					player[j]->setHealth(-1);
+					////////////////////////////////player[j]->setHealth(-1);
 					(*projectile[i]).setHit(j);
 					if (player[j]->getHealth() < 1)
 					{
@@ -155,7 +156,7 @@ public:
 				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(j))
 				{
 					player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
-					player[j]->setHealth(-1);
+					/////////////////////////////////player[j]->setHealth(-1);
 					(*projectile[i]).setHit(j);
 					if (player[j]->getHealth() < 1)
 					{
@@ -168,7 +169,7 @@ public:
 				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2] + 1) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(j))
 				{
 					player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
-					player[j]->setHealth(-1);
+					//////////////////////////////////player[j]->setHealth(-1);
 					(*projectile[i]).setHit(j);
 					if (player[j]->getHealth() < 1)
 					{
@@ -308,9 +309,9 @@ public:
 
 	}
 
-	void projectileAttack(int playerID, Camera * cam)
+	void projectileAttack(int playerID, mat4 * cam)
 	{
-		mat4 test = cam->getCamM();
+		mat4 test = *cam; //cam->getCamM();
 		vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
 		mat4 player1 = player[playerID]->getModelM();
 		vec4 playerHolder = player1*vec4(0, 0, 0, 1);
@@ -408,7 +409,7 @@ public:
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md50->postTrans(glm::translate(vec3(-20, 0.5, -20)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
 		md50->setName("Player Model");
@@ -416,7 +417,7 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model");
@@ -424,7 +425,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model");
@@ -432,7 +433,7 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(0, 0.5, 7)));
+		md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model");
@@ -461,12 +462,12 @@ public:
 		//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
 		//m_pMesh2->setAABB();
 
-		MD5Model* md5 = new MD5Model();
+		/*MD5Model* md5 = new MD5Model();
 		md5->setSpeed(5);
-		md5->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
+		md5->setAABB(AABB(vec3(-25.25, 0.0, -10.25), vec3(0.25, 1.5, 0.25)));
 		md5->setType("Model");
 		md5->setName("Player Model");
-		//addPlayer(md5);
+		//addPlayer(md5);*/
 
 		//md6 = new MD5Model();
 		//md6->LoadModel("Model/fleurOptonl.md5mesh");
