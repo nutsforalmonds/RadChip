@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
-		if (!strcmp((*recvVec)[numOfVecs - 1].first.c_str(), ""))
+		if (!strcmp((*recvVec)[numOfVecs].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 		}
-		if (!strcmp((*recvVec)[numOfVecs * 2 - 1].first.c_str(), ""))
+		if (!strcmp((*recvVec)[numOfVecs * 2].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 2 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 		else
 			p1 = "1S";
 		if (player3shoot == true)
-			p3 = "2s";
+			p2 = "2s";
 		else
 			p2 = "2S";
 		if (player4shoot == true)
