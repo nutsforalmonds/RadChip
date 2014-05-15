@@ -173,50 +173,62 @@ int main(int argc, char *argv[])
 	QueryPerformanceCounter(&last);
 	string p0, p1, p2, p3;
 
+	bool newData[4] = { false };
 	while (true){
 		QueryPerformanceCounter(&current);
 		diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 		last = current;
 		recvVec = server->getState();
 		io_service.poll();
-		//std::cout << "recvVec key string:" << recvVec->front().first << std::endl; 
+		server->getDataState(newData);
+		server->age();//tell server the data is deprecated
 		player1shoot = false;
 		player2shoot = false;
 		player3shoot = false;
 		player4shoot = false;
-		if (!strcmp((*recvVec)[0].first.c_str(), ""))
+		if (strcmp((*recvVec)[0].first.c_str(), ""))
 		{
-			playerID = atoi((*recvVec)[0].first.c_str());
+			playerID = atoi((*recvVec)[0].first.c_str()); 
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			if (newData[0]){
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			}
 		}
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
-		if (!strcmp((*recvVec)[numOfVecs].first.c_str(), ""))
+		if (strcmp((*recvVec)[numOfVecs].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			if (newData[1]){
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			}
+			
 		}
-		if (!strcmp((*recvVec)[numOfVecs * 2].first.c_str(), ""))
+		if (strcmp((*recvVec)[numOfVecs * 2].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 2 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			if (newData[2]){
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			}
 		}
-		if (!strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
+		if (strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 3 - 1].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-			handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-			handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			if (newData[3]){
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+			}
 		}
+
 		scene->simulate(diff, 1.0 / 100);
 		boost::array<mat4, 4> m;
 		m[0] = scene->getPlayerMats()[0];
@@ -261,7 +273,9 @@ int main(int argc, char *argv[])
 		//limit the speed of server
 		QueryPerformanceCounter(&loop_end);
 		diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
-		Sleep(15 - diff);
+		if (diff < 15){
+			Sleep(15 - diff);
+		}
 	}
 	return 0;
 }

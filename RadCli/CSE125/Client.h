@@ -105,7 +105,7 @@ private:
 			boost::asio::async_read(socket_,
 				boost::asio::buffer(ret_, 2048),
 				boost::bind(&tcp_client::handle_read, this,
-				boost::asio::placeholders::error));
+				boost::asio::placeholders::error));//
 		}
 		else
 		{

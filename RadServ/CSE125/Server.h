@@ -67,7 +67,7 @@ public:
 	{
 		if (!error)
 		{
-			//std::cout << "Handling read" << std::endl;
+			ripe = true;
 			boost::asio::async_read(socket_,
 				boost::asio::buffer(ret_, 2048),
 				boost::bind(&tcp_connection::handle_read, shared_from_this(),
@@ -101,11 +101,19 @@ public:
 		return &ret_;
 	}
 
+	//tell server the data is deprecated
+	void age(){
+		ripe = false;
+	}
+	bool isRipe(){
+		return ripe;
+	}
 
 private:
 	std::vector<tcp_connection_ptr>& clients_;
 	tcp::socket socket_;
 	std::vector <pair<string, mat4>> ret_;
+	bool ripe;//determines if the received message is read or not
 
 };
 
@@ -215,7 +223,6 @@ public:
 		}
 		for each(tcp_connection_ptr client in clients_)
 		{
-			//std::cout << "getting from a client" << std::endl;
 			retVec_[i++] = (*client->getState())[0];
 			retVec_[i++] = (*client->getState())[1];
 			retVec_[i++] = (*client->getState())[2];
@@ -223,6 +230,27 @@ public:
 		}
 		i = 0;
 		return &retVec_;
+	}
+
+	//tell server the data is deprecated
+	void age(){
+		for each(tcp_connection_ptr client in clients_)
+		{
+			client->age();
+		}
+	}
+
+	bool isRipe(int cliID){
+		if (cliID < clients_.size())
+			return clients_[cliID]->isRipe();
+		else
+			return false;
+	}
+
+	void getDataState(bool* state){
+		for (int i = 0; i < 4; i++){
+			state[i] = isRipe(i);
+		}
 	}
 
 private:
