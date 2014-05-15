@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <boost/asio.hpp>
 #include "Client.h"
 #include "Window.h"
@@ -28,28 +28,22 @@
 #include "ConfigSettings.h"
 #include "Sound.h"
 #include "MD5Model.h"
-
 #include "JSON_Parse.h"
-
-#include <CEGUI/CEGUI.h>
-/* for release 0.4.X use:
-* #include <renderers/OpenGLGUIRenderer/openglrenderer.h>
-*/
-#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
-
-//CEGUI::OpenGL3Renderer *GUI_renderer;
-//CEGUI::OpenGL3Renderer& GUI_renderer;
-
-
 #include "billboard_list.h"
+#include "UI.h"
+//#include "GameState.h"
 
-BillboardList m_billboardList;
-
-#include "particle_system.h"
 #include <assert.h>
-
-ParticleSystem m_particleSystem;
+#include "ParticleSystem.h"
+ParticleSystem* particle;
+ParticleSystem* particle2;
+ParticleSystem* particle3;
+ParticleSystem* particle4;
+ParticleSystem* particle5;
+ParticleSystem* particle6;
+ParticleSystem* particle7;
 long long m_currentTimeMillis;
+
 
 enum {
 	MENU_LIGHTING = 1,
@@ -100,6 +94,11 @@ MD5Model* md52;
 MD5Model* md53;
 MD5Model* md6;
 
+BillboardList m_billboardList;
+BillboardList m_billboardList2;
+BillboardList m_billboardList3;
+BillboardList m_billboardList4;
+
 JSON_Parser *map_info;
 
 int Window::width  = 800;   // set window width in pixels here
@@ -113,6 +112,17 @@ vec3 CenterPoint = vec3(0,0,0);
 mat4 Projection;
 mat4 View = glm::lookAt(EyePoint,CenterPoint, vec3(0,1,0));
 mat4 MVP;
+mat4 LightView;
+mat4 LightProjection;
+mat4 ScaleBias = mat4(vec4(0.5, 0.0, 0.0, 0.0),
+	vec4(0.0, 0.5, 0.0, 0.0),
+	vec4(0.0, 0.0, 0.5, 0.0),
+	vec4(0.5, 0.5, 0.5, 1.0));
+
+//mat4 ScaleBias = mat4(vec4(0.5, 0.0, 0.0, 0.5),
+//	vec4(0.0, 0.5, 0.0, 0.5),
+//	vec4(0.0, 0.0, 0.5, 0.5),
+//	vec4(0.0, 0.0, 0.0, 1.0));
 
 ShaderController sdrCtl;
 
@@ -137,6 +147,10 @@ float cam_sp = 0.1;
 float cam_dx = 0;
 
 GLuint fboHandle;
+GLuint depth_fbo;
+GLsizei depth_texture_width = 1024;
+GLsizei depth_texture_height = 1024;
+GLuint shadow_map_id = 10;//shadow map stored in GL_TEXTURE10
 
 string configBuf;
 
@@ -171,6 +185,38 @@ int loadAudio();
 void updateSound();
 
 int counter = 0;
+
+Cube* cube2D;
+Cube* cube2D_2;
+Cube* cube2D_3;
+Cube* cube2D_4;
+
+float x1_l = -2.0; //life
+float x2_l = 2.0;
+float y1_l = -2.0;
+float y2_l = 2.0;
+
+float x1_o = -2.0; // overheat bar
+float x2_o = 2.0;
+float y1_o = -2.0;
+float y2_o = -2.0;
+
+float less_life = 0;
+float overheat = 0;
+float shots = 0;
+float damage_taken = 100; //set to default 1/7 of the life bar
+float life_bar = x2_l - x1_l;
+float heat_bar = x2_o - x1_o;
+float health = 700; //arbitrary health number
+
+time_t over_de; //rate of decay of overheat bar
+
+Texture * shadow;
+char buf[255];
+int myFPS = 0;
+
+//GameState* myGameState;
+float awesome_time = 0.5;
 
 // Stuff Erik added
 
@@ -256,167 +302,326 @@ void Window::idleCallback(void)
 {
 	//print fps
 	static time_t timer = clock();
-	if(clock()-timer>=CLOCKS_PER_SEC){
-		//cout<<"FPS: "<<counter<<endl;
-		timer = clock();
-		counter=0;
-	}
-	counter++;
+	static time_t tick = clock();
+	float diff;
+	static float anim_time = 0;
+	vector<mat4> Transforms;
+	GLSLProgram* sd;
+	vector<mat4> playerMs;
 
-	cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
-	if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
-		cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
-	}
-	cam->setPendingRot(0);
-	
-	QueryPerformanceCounter(&current);
-	delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
-	last = current;
+	//switch (myGameState->getState()){
+	switch (1){
+	case 0:
+		break;
+	case 1:
 
-	static double anim_time = 0;
-	anim_time += delta;
-	if (anim_time > 1 / 30.0){
-		//md5->Update(anim_time);
-		md50->Update(anim_time);
-		md51->Update(anim_time);
-		md52->Update(anim_time);
-		md53->Update(anim_time);
-		//md6->Update(anim_time);
-		anim_time = 0;
-	}
+		if (clock() - timer >= CLOCKS_PER_SEC){
+			//cout<<"FPS: "<<counter<<endl;
+			myFPS = counter;
+			sprintf_s(buf, "%s %d", "FPS ", myFPS);
+			timer = clock();
+			counter = 0;
+		}
+		counter++;
 
-	//vector<mat4> Transforms;
-	//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
-	//GLSLProgram* sd = sdrCtl.getShader("basic_model");
-	//for (int i = 0; i < Transforms.size(); i++){
-	//	char Name[128];
-	//	memset(Name, 0, sizeof(Name));
-	//	SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
-	//	//sd->setUniform(Name, glm::transpose(Transforms[i]));
-	//	sd->setUniform(Name, Transforms[i]);
-	//}
+		cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
+		if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
+			cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
+		}
+		cam->setPendingRot(0);
+
+		QueryPerformanceCounter(&current);
+		delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
+		last = current;
+
+		anim_time += delta;
+		if (anim_time > 1 / 30.0){
+			//md5->Update(anim_time);
+			md50->Update(anim_time);
+			md51->Update(anim_time);
+			md52->Update(anim_time);
+			md53->Update(anim_time);
+			//md6->Update(anim_time);
+			anim_time = 0;
+		}
+
+		//vector<mat4> Transforms;
+		//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		//GLSLProgram* sd = sdrCtl.getShader("basic_model");
+		//for (int i = 0; i < Transforms.size(); i++){
+		//	char Name[128];
+		//	memset(Name, 0, sizeof(Name));
+		//	SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+		//	//sd->setUniform(Name, glm::transpose(Transforms[i]));
+		//	sd->setUniform(Name, Transforms[i]);
+		//}
 
 
-	simulateProjectile(delta);
+		simulateProjectile(delta);
 
-	/*vector<mat4> playerMs = scene->getPlayerMats();
-	for (int i = 0; i < player_list.size(); i++){
+		/*vector<mat4> playerMs = scene->getPlayerMats();
+		for (int i = 0; i < player_list.size(); i++){
 		player_list[i]->setModelM(playerMs[i]);
-	}*/
+		}*/
 
-	if ((keyState & 1 << 2) && (keyState & 1)){//up left
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0),45.0f,vec3(0.0,1.0,0.0)));
-	}
-	else if ((keyState & 1 << 2) && (keyState & 1 << 1)){//up right
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if ((keyState & 1 << 3) && (keyState & 1)){//down left
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if ((keyState & 1 << 3) && (keyState & 1 << 1)){//down right
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if (keyState & 1 << 2){//up
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if (keyState & 1 << 3){//down
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if (keyState & 1){//left
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
-	}
-	else if (keyState & 1 << 1){//right
-		cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
+		if ((keyState & 1 << 2) && (keyState & 1)){//up left
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 45.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if ((keyState & 1 << 2) && (keyState & 1 << 1)){//up right
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if ((keyState & 1 << 3) && (keyState & 1)){//down left
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if ((keyState & 1 << 3) && (keyState & 1 << 1)){//down right
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if (keyState & 1 << 2){//up
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if (keyState & 1 << 3){//down
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if (keyState & 1){//left
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+		}
+		else if (keyState & 1 << 1){//right
+			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
+		}
+
+		View = cam->getViewM();
+		break;
+	default:
+		break;
 	}
 
-	View = cam->getViewM();
 	updateShaders();
 
 	updateSound();
-
-	/*
-	try
-	{
-	// do some cegui code
-	}
-	catch (CEGUI::Exception& e)
-	{
-	fprintf(stderr, "CEGUI Exception occured: %s", e.getMessage().c_str());
-	// you could quit here
-	}*/
 
     displayCallback();  
 }
 void Window::reshapeCallback(int w, int h)
 {
-  width = w;
-  height = h;
-  glViewport(0, 0, w, h);  // set new view port size
-  Projection = glm::perspective(fov, (float)w/h, nearClip, farClip);
-  updateShaders();
+	//switch (myGameState->getState()){
+	switch (1){
+	case 0:
+		width = w;
+		height = h;
+		glViewport(0, 0, w, h);  // set new view port size
+	case 1:
+		width = w;
+		height = h;
+		glViewport(0, 0, w, h);  // set new view port size
+		Projection = glm::perspective(fov, (float)w / h, nearClip, farClip);
+		updateShaders();
+		break;
+	default:
+		break;
+	}
 }
 void Window::displayCallback(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	unsigned char m_Test[] = "Look Ma! I'm printing!";
+	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	//switch (myGameState->getState()){
+	switch (1){
+	case 0:
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, m_Test2, vec3(1.0f, 1.0f, 1.0f));
+		glEnable(GL_DEPTH_TEST);
+		break;
+	case 1:
+		/*
+		///////  1st pass: render into depth map //////////
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, depth_fbo);
+		glViewport(0, 0, depth_texture_width, depth_texture_height);
+		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-	//m_pMesh2->draw();
+		m_pMesh2->draw(LightProjection, LightView);
+		for (int i = 0; i < player_list.size(); ++i)
+		{
+		player_list[i]->draw(LightProjection, LightView);
+		}
+		for (int i = 0; i < stationary_list.size(); ++i)
+		{
+		stationary_list[i]->draw(LightProjection, LightView);
+		}
+		*/
 
-	for (int i = 0; i < draw_list.size(); ++i)
-	{
-		draw_list[i]->draw();
+		///////  2nd pass: render onto screen ////////////
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glViewport(0, 0, width, height);
+		//shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+
+		//m_pMesh2->draw();
+
+		for (int i = 0; i < draw_list.size(); ++i)
+		{
+			draw_list[i]->draw();
+		}
+		for (int i = 0; i < player_list.size(); ++i)
+		{
+			player_list[i]->draw();
+		}
+		for (int i = 0; i < stationary_list.size(); ++i)
+		{
+			stationary_list[i]->draw();
+		}
+		for (int i = 0; i < projectile_list.size(); ++i)
+		{
+			projectile_list[i]->draw();
+		}
+
+		//	md5->draw();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(GL_FALSE); // without it some part of model will cover other part of model which looks weird
+		//	md6->draw();
+		glDisable(GL_BLEND);
+		glDepthMask(GL_TRUE);
+
+		m_billboardList.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
+		m_billboardList2.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
+		m_billboardList3.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
+		m_billboardList4.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
+
+		awesome_time += 1.0;
+		if (awesome_time > 50.0){
+			awesome_time = 1.0;
+		}
+
+		glEnable(GL_POINT_SPRITE);
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		particle->draw(Projection, View, awesome_time);
+		particle2->draw(Projection, View, awesome_time);
+		particle3->draw(Projection, View, awesome_time);
+		particle4->draw(Projection, View, awesome_time);
+		particle5->draw(Projection, View, awesome_time);
+		particle6->draw(Projection, View, awesome_time);
+		particle7->draw(Projection, View, awesome_time);
+		glDisable(GL_BLEND);
+
+		glDisable(GL_DEPTH_TEST);
+
+		//UI BARS
+
+		if (less_life == 1)
+		{
+			cube2D_2->Cube::~Cube();
+
+			x2_l = x2_l - (life_bar*(1 - (health - damage_taken) / health));
+
+
+			if (x2_l <= -2)
+			{
+				x2_l = -2.0;
+			}
+
+			cube2D_2 = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
+			cube2D_2->setColor(vec3(0.0, 1.0, 0.0));
+			cube2D_2->setShader(sdrCtl.getShader("basic_2D"));
+			cube2D_2->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
+
+			less_life = 0;
+
+		}
+
+		// gun overheating
+
+		if (shots == 1 && overheat == 0)
+		{
+			cube2D_4->Cube::~Cube();
+
+			y2_o = y2_o + (heat_bar / 7.0); //# of shots
+
+			if (y2_o >= 2.0)
+			{
+				overheat = 1;
+				y2_o = 2;
+			}
+
+			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
+			cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
+			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
+			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+
+			shots = 0;
+			over_de = clock();
+		}
+
+
+
+		else if (shots == 0 && overheat == 0)
+		{
+			cube2D_4->Cube::~Cube();
+
+			if (y2_o > -2 && (clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
+			{
+				y2_o = y2_o - (heat_bar / 60.0);
+				over_de = clock();
+			}
+
+			if (y2_o < -2)
+			{
+				y2_o = -2;
+			}
+
+			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
+			cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
+			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
+			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+		}
+
+		else if (overheat == 1)
+		{
+			cube2D_4->Cube::~Cube();
+
+			if ((clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
+			{
+				y2_o = y2_o - (heat_bar / 60.0);
+				over_de = clock();
+			}
+
+			if (y2_o < -2)
+			{
+				overheat = 0;
+				y2_o = -2;
+			}
+
+			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
+			cube2D_4->setColor(vec3(1.0, 0.0, 0.0));
+			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
+			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+
+		}
+
+
+		cube2D->draw();
+		cube2D_2->draw();
+		cube2D_3->draw();
+		cube2D_4->draw();
+
+		//2D cube setColor() is changing the color of the text...
+		//Problem with the currently bound shader me thinks
+		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
+
+		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
+
+		glEnable(GL_DEPTH_TEST);
+
+		glFlush();
+
+		break;
+	default:
+		break;
 	}
-	for (int i = 0; i < player_list.size(); ++i)
-	{
-		player_list[i]->draw();
-	}
-	for (int i = 0; i < stationary_list.size(); ++i)
-	{
-		stationary_list[i]->draw();
-	}
-	for (int i = 0; i < projectile_list.size(); ++i)
-	{
-		projectile_list[i]->draw();
-	}
-
-//	md5->draw();
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE,GL_ONE);
-	glDepthMask(GL_FALSE); // without it some part of model will cover other part of model which looks weird
-//	md6->draw();
-	glDisable(GL_BLEND);
-	glDepthMask(GL_TRUE);
-
-	m_billboardList.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-
-	
-
-	glFlush();  
-
-	//CEGUI::System::getSingleton().renderGUI();
-
-	// make sure that before calling renderAllGUIContexts, that any bound textures
-	// and shaders used to render the scene above are disabled using
-	//glBindTexture(0) and glUseProgram(0) respectively also set
-	// glActiveTexture(GL_TEXTURE_0) 
-	// draw GUI
-	// NB: When not using >=3.2 core profile, this call should not occur
-	// between glBegin/glEnd calls.
-
-	//glBindTexture(0);
-	//glUseProgram(0);
-	//glActiveTexture(GL_TEXTURE_0);
-
-	//CEGUI::System::getSingleton().renderAllGUIContexts();
-
-	/*
-	long long TimeNowMillis = GetCurrentTimeMillis();
-	assert(TimeNowMillis >= m_currentTimeMillis);
-	unsigned int DeltaTimeMillis = (unsigned int)(TimeNowMillis - m_currentTimeMillis);
-	m_currentTimeMillis = TimeNowMillis;
-	m_particleSystem.Render(DeltaTimeMillis, Projection, viewM, vec3((glm::inverse(viewM)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*viewM, 0, sdrCtl);
-	*/
-
 	glutSwapBuffers();
 }
 
@@ -566,6 +771,7 @@ int main(int argc, char *argv[])
 	//glutFullScreen();
   }
   
+  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
   glEnable(GL_DEPTH_TEST);            	      // enable depth buffering
   glClear(GL_DEPTH_BUFFER_BIT);       	      // clear depth buffer
@@ -603,14 +809,6 @@ int main(int argc, char *argv[])
   glutSpecialFunc(specialKeyboardFunc);
 
   glutSetCursor(GLUT_CURSOR_NONE);
-
-  //CEGUI::OpenGLRenderer* GUI_renderer = new CEGUI::OpenGLRenderer(0);
-  //new CEGUI::System(GUI_renderer);
-
-  //CEGUI::OpenGL3Renderer& GUI_renderer = CEGUI::OpenGL3Renderer::create();
-  //CEGUI::System::create(GUI_renderer);
-
-  //CEGUI::OpenGL3Renderer& GUI_renderer = CEGUI::OpenGL3Renderer::bootstrapSystem();
 
   BuildPopupMenu();
   glutAttachMenu(GLUT_MIDDLE_BUTTON);
@@ -819,7 +1017,15 @@ void mouseFunc(int button, int state, int x, int y)
 }
 void motionFunc(int x, int y)
 {
-	passiveMotionFunc(x, y);
+	//switch (myGameState->getState()){
+	switch (1){
+	case 0:
+
+	case 1:
+		passiveMotionFunc(x, y);
+	default:
+		break;
+	}
 }
 void passiveMotionFunc(int x, int y){
 	static int lastX = 0;
@@ -860,30 +1066,20 @@ void specialKeyboardFunc(int key, int x, int y){
 
 void updateShaders(){
 
-	sdrCtl.setUniform("basic_reflect_refract","light[0].type",light[0].type);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].pos",light[0].pos);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].specular",light[0].specular);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].diffuse",light[0].diffuse);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].ambient",light[0].ambient);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].dir",light[0].dir);
-	sdrCtl.setUniform("basic_reflect_refract","light[0].spotCutOff",light[0].spotCutOff);
-
-	sdrCtl.setUniform("basic_texture", "light[0].type", light[0].type);
-	sdrCtl.setUniform("basic_texture", "light[0].pos", light[0].pos);
-	sdrCtl.setUniform("basic_texture", "light[0].specular", light[0].specular);
-	sdrCtl.setUniform("basic_texture", "light[0].diffuse", light[0].diffuse);
-	sdrCtl.setUniform("basic_texture", "light[0].ambient", light[0].ambient);
-	sdrCtl.setUniform("basic_texture", "light[0].dir", light[0].dir);
-	sdrCtl.setUniform("basic_texture", "light[0].spotCutOff", light[0].spotCutOff);
-
-	sdrCtl.setUniform("grid_ground", "light[0].type", light[0].type);
-	sdrCtl.setUniform("grid_ground", "light[0].pos", light[0].pos);
-	sdrCtl.setUniform("grid_ground", "light[0].specular", light[0].specular);
-	sdrCtl.setUniform("grid_ground", "light[0].diffuse", light[0].diffuse);
-	sdrCtl.setUniform("grid_ground", "light[0].ambient", light[0].ambient);
-	sdrCtl.setUniform("grid_ground", "light[0].dir", light[0].dir);
-	sdrCtl.setUniform("grid_ground", "light[0].spotCutOff", light[0].spotCutOff);
-
+	GLSLProgram* p[4];
+	p[0] = sdrCtl.getShader("basic_reflect_refract");
+	p[1] = sdrCtl.getShader("basic_texture");
+	p[2] = sdrCtl.getShader("grid_ground");
+	p[3] = sdrCtl.getShader("basic_model");
+	for (int i = 0; i < 4; i++){
+		p[i]->setUniform("light[0].type", light[0].type);
+		p[i]->setUniform("light[0].pos", light[0].pos);
+		p[i]->setUniform("light[0].specular", light[0].specular);
+		p[i]->setUniform("light[0].diffuse", light[0].diffuse);
+		p[i]->setUniform("light[0].ambient", light[0].ambient);
+		p[i]->setUniform("light[0].dir", light[0].dir);
+		p[i]->setUniform("light[0].spotCutOff", light[0].spotCutOff);
+	}
 }
 void setupShaders()
 {
@@ -893,12 +1089,28 @@ void setupShaders()
 		string vert = map_info->GetShaderVert(i);
 		string frag = map_info->GetShaderFrag(i);
 		printf("Loading Shader: %s...", name.c_str());
+
+		sprintf_s(buf, "%s %s %s", "Loading Shader: ", name.c_str(), "...");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
+
 		sdrCtl.createVFShader(name, vert.c_str(), frag.c_str());
 		printf("done!\n");
+
+		printf("Loading Shader: %s...", name.c_str());
+
+		sprintf_s(buf, "%s %s %s", "Loading Shader: ", name.c_str(), "...done!");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
 	}
 
 	sdrCtl.createVGFShader("billboard", "Shaders/billboard.vert", "Shaders/billboard.geom", "Shaders/billboard.frag");
-	sdrCtl.createVGFShader("ps_update", "Shaders/ps_update.vert", "Shaders/ps_update.geom", "Shaders/ps_update.frag");
 
 	updateShaders();
 }
@@ -916,11 +1128,37 @@ void initialize(int argc, char *argv[])
 			glewGetErrorString(err) );
 	}
 
+	//Clear window to black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glutSwapBuffers();
+
 	//Init the JSON parser for the map
 	map_info = new JSON_Parser("Maps/Test1.json");
 	printf("Loading Map: %s\n", map_info->GetMapName().c_str());
+	sprintf_s(buf, "%s %s", "Loading Map:", map_info->GetMapName().c_str());
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+	glutSwapBuffers();
 
 	loadTextures();
+
+	/*
+	//depth buffer initialization
+	glGenFramebuffers(1, &depth_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow->getTexID(), 0);
+	// Disable writes to the color buffer
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (Status != GL_FRAMEBUFFER_COMPLETE) {
+		printf("FB error, status: 0x%x\n", Status);
+		system("pause");
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	*/
 
 	//// fbo texture
 	//GLuint renderTex;
@@ -959,6 +1197,8 @@ void initialize(int argc, char *argv[])
 	light[0].ambient = vec3(0.4, 0.4, 0.4);
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
+	LightView = glm::lookAt(vec3(0, 40, 0), vec3(0, 0, 0), vec3(1, 0, 0));
+	LightProjection = glm::frustum(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1000.0f);
 
 	//fog.maxDist=4;
 	//fog.minDist=3;
@@ -1019,6 +1259,29 @@ void initialize(int argc, char *argv[])
 	cube0->setName("Test cube0");
 	player_list.push_back(cube0);*/
 
+	//life bars
+	cube2D = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
+	cube2D->setColor(vec3(1.0, 0.0, 0.0));
+	cube2D->setShader(sdrCtl.getShader("basic_2D"));
+	cube2D->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
+
+	cube2D_2 = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
+	cube2D_2->setColor(vec3(0.0, 1.0, 0.0));
+	cube2D_2->setShader(sdrCtl.getShader("basic_2D"));
+	cube2D_2->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
+
+	//overheat bars
+	cube2D_3 = new Cube(x1_o, x2_o, y1_o, y2_l, 0, 0);
+	cube2D_3->setColor(vec3(1.0, 1.0, 1.0));
+	cube2D_3->setShader(sdrCtl.getShader("basic_2D"));
+	cube2D_3->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
+
+	cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
+	cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
+	cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
+	cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+
+
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("grid_ground"));
 	ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
@@ -1076,6 +1339,98 @@ void initialize(int argc, char *argv[])
 	}
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList.AddBoard(vec3(9.0f, 1.0f, 9.0f));
+	m_billboardList.AddBoard(vec3(-9.0f, 1.0f, -9.0f));
+	m_billboardList.AddBoard(vec3(-9.0f, 1.0f, 9.0f));
+	m_billboardList.AddBoard(vec3(9.0f, 1.0f, -9.0f));
+	m_billboardList.BindBoards();
+
+	m_billboardList2.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList2.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList2.AddBoard(vec3(1.0f, 1.0f, 9.0f));
+	m_billboardList2.BindBoards();
+
+	m_billboardList3.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList3.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList3.AddBoard(vec3(1.0f, 1.0f, -9.0f));
+	m_billboardList3.BindBoards();
+
+	m_billboardList4.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList4.AddBoard(vec3(1.0f, 1.0f, -6.0f));
+	m_billboardList4.BindBoards();
+
+	particle = new ParticleSystem();
+	particle->setShader(sdrCtl.getShader("emitter"));
+	particle->setType("Particle_System");
+	particle->setName("Particle_Test");
+	particle->setK(24.0f);
+	particle->setColor(vec3(1.0, 0.0, 0.0));
+	particle->setShade(vec3(1.0, 0.0, 0.0));
+	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
+
+	particle2 = new ParticleSystem();
+	particle2->setShader(sdrCtl.getShader("emitter"));
+	particle2->setType("Particle_System");
+	particle2->setName("Particle_Test");
+	particle2->setK(14.0f);
+	particle2->setColor(vec3(0.0, 1.0, 0.0));
+	particle2->setShade(vec3(0.0, 1.0, 0.0));
+	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
+
+	particle3 = new ParticleSystem();
+	particle3->setShader(sdrCtl.getShader("emitter"));
+	particle3->setType("Particle_System");
+	particle3->setName("Particle_Test");
+	particle3->setK(4.0f);
+	particle3->setColor(vec3(0.0, 0.0, 1.0));
+	particle3->setShade(vec3(0.0, 0.0, 1.0));
+	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
+
+	particle4 = new ParticleSystem();
+	particle4->setShader(sdrCtl.getShader("emitter"));
+	particle4->setType("Particle_System");
+	particle4->setName("Particle_Test");
+	particle4->setK(1.0f);
+	particle4->setColor(vec3(1.0, 1.0, 1.0));
+	particle4->setShade(vec3(1.0, 1.0, 1.0));
+	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	particle5 = new ParticleSystem();
+	particle5->setShader(sdrCtl.getShader("emitter"));
+	particle5->setType("Particle_System");
+	particle5->setName("Particle_Test");
+	particle5->setK(4.0f);
+	particle5->setColor(vec3(1.0, 1.0, 0.0));
+	particle5->setShade(vec3(1.0, 1.0, 0.0));
+	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
+
+	particle6 = new ParticleSystem();
+	particle6->setShader(sdrCtl.getShader("emitter"));
+	particle6->setType("Particle_System");
+	particle6->setName("Particle_Test");
+	particle6->setK(14.0f);
+	particle6->setColor(vec3(1.0, 0.0, 1.0));
+	particle6->setShade(vec3(1.0, 0.0, 1.0));
+	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
+
+	particle7 = new ParticleSystem();
+	particle7->setShader(sdrCtl.getShader("emitter"));
+	particle7->setType("Particle_System");
+	particle7->setName("Particle_Test");
+	particle7->setK(24.0f);
+	particle7->setColor(vec3(0.0, 1.0, 1.0));
+	particle7->setShade(vec3(0.0, 1.0, 1.0));
+	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
+
 
 
 	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
@@ -1105,7 +1460,6 @@ void initialize(int argc, char *argv[])
 	cam->attach(player_list[playerID]);
 	cam->postTrans(glm::translate(vec3(0, 1, 4)));
 
-	//m_particleSystem.InitParticleSystem(vec3(0.0f, 0.0f, 1.0f), sdrCtl);
 }
 
 void updateSound(){
@@ -1191,9 +1545,26 @@ int loadAudio(){
 		string name = map_info->GetAudioName(i);
 		string path = map_info->GetAudioPath(i);
 		printf("Loading %s Audio File...", name.c_str());
+
+		//Print to game Window
+		sprintf_s(buf, "%s %s %s", "Loading ", name.c_str(), "Audio File...");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
+
 		testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
 		sound_list.push_back(testSound[0]);
 		printf("done!\n");
+
+		//Print to game window
+		sprintf_s(buf, "%s %s %s", "Loading ", name.c_str(), "Audio File...done!");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
 	}
 
 	return 0;
@@ -1211,6 +1582,14 @@ void loadTextures(){
 		bool cube	= map_info->GetTextureCube(i);
 		printf("Loading %s Texture File...", name.c_str());
 		
+		//Printing to game window
+		sprintf_s(buf, "%s %s %s", "Loading ", name.c_str(), "Texture File...");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
+
 		if (cube){
 			Texture* testTexture = new Texture(GL_TEXTURE_CUBE_MAP, path.c_str(), type.c_str());
 			testTexture->Bind(GL_TEXTURE0 + i);
@@ -1224,7 +1603,19 @@ void loadTextures(){
 			texture_list.push_back(testTexture);
 		}
 		printf("done!\n");
+		sprintf_s(buf, "%s %s %s", "Loading ", name.c_str(), "Texture File...done!");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
 	}
+	/*
+	shadow = new Texture(GL_TEXTURE_2D);
+	shadow->LoadDepthTexture(depth_texture_width, depth_texture_height);
+	//shadow->LoadDepthTexture(Window::width, Window::height);
+	shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+	*/
 }
 
 void Window::addDrawList(Object* obj)

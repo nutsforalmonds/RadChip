@@ -30,11 +30,16 @@ uniform	sampler2D colorTex;
 uniform sampler2D occlusionTex;
 uniform sampler2D specularTex;
 uniform sampler2D normalTex;
+uniform sampler2D shadowMap;
+//uniform sampler2DShadow shadowMap;
 
 in vec3 position;//position in world
 in vec3 normal;//normal in world
 in vec2 texCor;
 flat in vec3 cam;//camera in world
+
+in vec3 shadow_coord;
+float lit;
 
 layout (location=0) out vec4 FragColor;
 
@@ -59,18 +64,21 @@ vec4 myads(){
 	r = reflect(-s,n);
 	if( light[0].type!=2 ){//direction light and point light
 		ads += max( vec4(light[0].ambient*texDiffuse,1.0), 
-		            vec4(light[0].diffuse*texDiffuse*max(dot(s,n),0.0),1.0) 
-		            + vec4(light[0].specular*texSpecular*pow(max(dot(r,v),0.0), 10),1.0)); //Shininess = 10
+		            vec4(light[0].diffuse*texDiffuse*max(dot(s,n),0.0)*lit,1.0)
+		            + vec4(light[0].specular*texSpecular*pow(max(dot(r,v),0.0), 10)*lit,1.0)); //Shininess = 10
 	}else if( light[0].type==2 && dot(normalize(vec3(-light[0].dir)),s) >= light[0].spotCutOff){//spot light
 		ads += (dot(normalize(vec3(-light[0].dir)),s)-light[0].spotCutOff)/(1-light[0].spotCutOff)//to make soft edge
 			   * max( vec4(light[0].ambient*texDiffuse,1.0),  
-			          vec4(light[0].diffuse*texDiffuse*max(dot(s,n),0.0),1.0) 
-			          + vec4(light[0].specular*texSpecular*pow(max(dot(r,v),0.0), 10),1.0)); //Shininess = 10
+			          vec4(light[0].diffuse*texDiffuse*max(dot(s,n),0.0)*lit,1.0)
+			          + vec4(light[0].specular*texSpecular*pow(max(dot(r,v),0.0), 10)*lit,1.0)); //Shininess = 10
 	}
 
 	return vec4(ads.xyz*texOcc.xyz,1.0);
 	//return ads;
 }
+
+//uniform float Depth[5];
+//uniform int num = 5;
 
 void main()
 {
@@ -91,9 +99,57 @@ void main()
 	texSpecular = st.xyz;
 	texOcc = ot.xyz;
 
-	FragColor = myads(); 
+  	float depth = texture(shadowMap,vec2(shadow_coord[0],shadow_coord[1])).x;
+  	if(shadow_coord[2]<=depth+0.0001)
+	  	lit=1;
+	else
+		lit=0;
 
-	//FragColor = vec4(normal,1.0);
+	  // lit=0;
+	  // float depth;
+	  // for(float i=-1.5/1024;i<=1.5/1024;i+=1.0/1024){
+	  // 	for(float j=-1.5/1024;j<=1.5/1024;j+=1.0/1024){
+	  // 		depth = texture(shadowMap,vec2(shadow_coord[0]+i,shadow_coord[1]+j)).x;
+	  // 		if(shadow_coord[2]<=depth+0.00015)
+	  // 			lit+=1;
+	  // 	}
+	  // }
+	  // lit = lit/16.0;
+
+	  // lit=0;
+	  // float depth;
+
+	  // float midv =  shadow_coord[1]-mod(shadow_coord[1],1/1024.0) + 0.5/1024.0;
+	  // float midh =  shadow_coord[0]-mod(shadow_coord[0],1/1024.0) + 0.5/1024.0;
+
+	  // int hc = 0;
+	  // float hor[3];
+	  // for(float i=-1.0/1024;i<=1.0/1024;i+=1.0/1024){
+	  // 	int vc = 0;
+	  // 	float ver[3];
+	  // 	for(float j=-1.0/1024;j<=1.0/1024;j+=1.0/1024){
+	  // 		depth = texture(shadowMap,vec2(shadow_coord[0]+i,shadow_coord[1]+j)).x;
+	  // 		if(shadow_coord[2]<=depth+0.0001){
+	  // 			ver[vc] = 1;
+	  // 		}else{
+	  // 			ver[vc] = 0;
+	  // 		}
+	  // 		vc++;
+	  // 	}
+	  // 	if(shadow_coord[1]>=midv){
+	  // 		hor[hc] = ver[1] + (shadow_coord[1]-midv)/(0.5/1024)*(ver[2]/2.0 - ver[1]/2.0); 
+	  // 	}else{
+			// hor[hc] = ver[1] + (midv-shadow_coord[1])/(0.5/1024)*(ver[0]/2.0 - ver[1]/2.0); 
+	  // 	}
+	  // 	hc++;
+	  // }
+	  // if(shadow_coord[0]>=midh){
+	  // 		lit = hor[1] + (shadow_coord[0]-midh)/(0.5/1024)*(hor[2]/2.0 - hor[1]/2.0); 
+	  // 	}else{
+			// lit = hor[1] + (midh-shadow_coord[0])/(0.5/1024)*(hor[0]/2.0 - hor[1]/2.0); 
+	  // 	}
+
+	FragColor = myads(); 
 
 	/* UNCOMMENT FOR SKYBOX REFLECTION (2/2) */
 	/* //apply skybox reflection

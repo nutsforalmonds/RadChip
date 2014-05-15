@@ -27,6 +27,10 @@ in vec3 position;//position in world
 in vec3 normal;//normal in world
 flat in vec3 cam;//camera in world
 
+uniform sampler2D shadowMap;
+in vec3 shadow_coord;//shadow 
+float lit;
+
 layout (location=0) out vec4 FragColor;
 
 vec3 norm;//norm based on facing, decided in main()
@@ -46,13 +50,13 @@ vec4 myads(){
 	r = reflect(-s,n);
 	if( light[0].type!=2 ){//direction light and point light
 		ads += max( vec4(light[0].ambient*material.Ka,1.0), 
-		            vec4(light[0].diffuse*material.Kd*max(dot(s,n),0.0),1.0) 
-		            + vec4(light[0].specular*material.Ks*pow(max(dot(r,v),0.0), material.Shininess),1.0));
+		            vec4(light[0].diffuse*material.Kd*max(dot(s,n),0.0)*lit,1.0) 
+		            + vec4(light[0].specular*material.Ks*pow(max(dot(r,v),0.0), material.Shininess)*lit,1.0));
 	}else if( light[0].type==2 && dot(normalize(vec3(-light[0].dir)),s) >= light[0].spotCutOff){//spot light
 		ads += (dot(normalize(vec3(-light[0].dir)),s)-light[0].spotCutOff)/(1-light[0].spotCutOff)//to make soft edge
 			   * max( vec4(light[0].ambient*material.Ka,1.0),  
-			          vec4(light[0].diffuse*material.Kd*max(dot(s,n),0.0),1.0) 
-			          + vec4(light[0].specular*material.Ks*pow(max(dot(r,v),0.0), material.Shininess),1.0));
+			          vec4(light[0].diffuse*material.Kd*max(dot(s,n),0.0)*lit,1.0) 
+			          + vec4(light[0].specular*material.Ks*pow(max(dot(r,v),0.0), material.Shininess)*lit,1.0));
 	}
 
 	return ads;
@@ -68,6 +72,12 @@ void main()
 		norm = -normal;
 	}
 
+	float depth = texture(shadowMap,vec2(shadow_coord[0],shadow_coord[1])).x;
+  	if(shadow_coord[2]<=depth+0.0002)
+	  	lit=1;
+	 else
+	 	lit=0;
+
 	//apply skybox reflection
 	vec3 reflectDir = reflect(position-cam,normalize(norm));
 	vec4 reflectColor = texture(CubeMapTex,reflectDir);
@@ -77,7 +87,7 @@ void main()
 	vec4 refractColor = texture(CubeMapTex,refractDir);
 
 	//ads += mix(refractColor, reflectColor, material.ReflectFactor[0]); //simper. ignores material color
-	vec4 reColor = mix(refractColor, reflectColor, material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
+	//vec4 reColor = mix(refractColor, reflectColor, material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
 	ads += mix(myads(),reflectColor,material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
 	//ads += mix(ads(),reColor,material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
 

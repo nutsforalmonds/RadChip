@@ -59,7 +59,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glut32.lib;glu32.lib;glew32.lib;QtCored4.lib;QtOpenGL4.lib;QtGui4.lib;assimpD.lib;DevIL.lib;ILU.lib;ILUT.lib;OpenAL32.lib;fmodex_vc.lib;SOIL.lib;CEGUIBase-0_d.lib;CEGUIOpenGLRenderer-0_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;freeglut.lib;glu32.lib;glew32.lib;QtCored4.lib;QtOpenGL4.lib;QtGui4.lib;assimpD.lib;DevIL.lib;ILU.lib;ILUT.lib;OpenAL32.lib;fmodex_vc.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,7 +100,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="Octree.h" />
     <ClInclude Include="ogldev_util.h" />
-    <ClInclude Include="particle_system.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="random_texture.h" />
     <ClInclude Include="Scene.h" />
@@ -126,7 +126,6 @@
     <ClCompile Include="MD5ModelLoaderPCH.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ogldev_util.cpp" />
-    <ClCompile Include="particle_system.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="random_texture.cpp" />
     <ClCompile Include="ShaderController.cpp" />

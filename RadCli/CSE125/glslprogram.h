@@ -57,6 +57,16 @@ public:
     void   setUniform( const char *name, int val );
     void   setUniform( const char *name, bool val );
 	void   setUniformSubroutine( const char *name, GLenum shadertype);//need to be called after use() is called to affect current shader.
+	int    getUniformLoc(const char *name);
+	void   setUniform(int loc, float x, float y, float z);
+	void   setUniform(int loc, const vec2 & v);
+	void   setUniform(int loc, const vec3 & v);
+	void   setUniform(int loc, const vec4 & v);
+	void   setUniform(int loc, const mat4 & m);
+	void   setUniform(int loc, const mat3 & m);
+	void   setUniform(int loc, float val);
+	void   setUniform(int loc, int val);
+	void   setUniform(int loc, bool val);
 
     void   printActiveUniforms();
     void   printActiveAttribs();

@@ -1,6 +1,6 @@
 {
     "map_name": "Test 1",
-    "num_shaders": 5,
+    "num_shaders": 7,
     "shaders": [
         {
             "name": "basic_skybox",
@@ -23,9 +23,19 @@
             "frag": "Shaders/basic_model.frag"
         },
         {
+            "name": "basic_2D",
+            "vert": "Shaders/basic_flat.vert",
+            "frag": "Shaders/basic_flat.frag"
+        },
+        {
             "name": "basic_texture",
             "vert": "Shaders/basic_texture_with_moss_potential.vert",
             "frag": "Shaders/basic_texture_with_moss_potential.frag"
+        },
+		{
+            "name": "emitter",
+            "vert": "Shaders/emitter.vert",
+            "frag": "Shaders/emitter.frag"
         }
     ],
     "num_audio": 6,

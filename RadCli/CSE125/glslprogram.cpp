@@ -343,3 +343,60 @@ void GLSLProgram::setUniformSubroutine( const char *name, GLenum shadertype )
 	GLuint subIndex = glGetSubroutineIndex(handle,shadertype,name);
 	glUniformSubroutinesuiv(shadertype,1,&subIndex);
 }
+
+int GLSLProgram::getUniformLoc(const char *name)
+{
+	int loc = getUniformLocation(name);
+	if (PRINT_ERROR && loc<0)
+	{
+		fprintf(stderr, "Uniform variable %s not found!\n", name);
+		return -1;
+	}
+	return loc;
+}
+
+
+void GLSLProgram::setUniform(int loc, float x, float y, float z)
+{
+	glProgramUniform3f(handle, loc, x, y, z);
+}
+
+void GLSLProgram::setUniform(int loc, const vec2 & v)
+{
+	glProgramUniform2f(handle, loc, v.x, v.y);
+}
+
+void GLSLProgram::setUniform(int loc, const vec3 & v)
+{
+	this->setUniform(loc, v.x, v.y, v.z);
+}
+
+void GLSLProgram::setUniform(int loc, const vec4 & v)
+{
+	glProgramUniform4f(handle, loc, v.x, v.y, v.z, v.w);
+}
+
+void GLSLProgram::setUniform(int loc, const mat4 & m)
+{
+	glProgramUniformMatrix4fv(handle, loc, 1, GL_FALSE, &m[0][0]);
+}
+
+void GLSLProgram::setUniform(int loc, const mat3 & m)
+{
+	glProgramUniformMatrix3fv(handle, loc, 1, GL_FALSE, &m[0][0]);
+}
+
+void GLSLProgram::setUniform(int loc, float val)
+{
+	glProgramUniform1f(handle, loc, val);
+}
+
+void GLSLProgram::setUniform(int loc, int val)
+{
+	glProgramUniform1i(handle, loc, val);
+}
+
+void GLSLProgram::setUniform(int loc, bool val)
+{
+	glProgramUniform1i(handle, loc, val);
+}

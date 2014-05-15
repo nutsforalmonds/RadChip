@@ -4,9 +4,14 @@
 #include "Structures.h"
 #include "Object.h"
 #include <array>
+#include <vector>
+using namespace std;
 
 extern mat4 Projection;
 extern mat4 View;
+extern mat4 LightView;
+extern mat4 LightProjection;
+extern mat4 ScaleBias;
 
 class Cube: public Object
 {
@@ -31,35 +36,81 @@ public:
 	}
 	~Cube(void){}
 	void draw(){
-		shader->setUniform("ViewMatrix", View);
-		shader->setUniform("ProjectionMatrix", Projection);
-		shader->setUniform("ModelMatrix", getModelM());
-		shader->setUniform("MVP", Projection*View*getModelM());
-		shader->setUniform("material.Kd", material.Kd);
-		shader->setUniform("material.Ka", material.Ka);
-		shader->setUniform("material.Ks", material.Ks);
-		shader->setUniform("material.Shininess", material.Shininess);
-		shader->setUniform("material.ReflectFactor", material.ReflectFactor);
-		shader->setUniform("material.Eta", material.Eta);
-		shader->setUniform("CubeMapTex", CubeMapUnit);
+		shader->setUniform(uniformLoc[0], View);
+		shader->setUniform(uniformLoc[1], Projection);
+		shader->setUniform(uniformLoc[2], getModelM());
+		shader->setUniform(uniformLoc[3], Projection*View*getModelM());
+		shader->setUniform(uniformLoc[4], material.Kd);
+		shader->setUniform(uniformLoc[5], material.Ka);
+		shader->setUniform(uniformLoc[6], material.Ks);
+		shader->setUniform(uniformLoc[7], material.Shininess);
+		shader->setUniform(uniformLoc[8], material.ReflectFactor);
+		shader->setUniform(uniformLoc[9], material.Eta);
+		shader->setUniform(uniformLoc[10], CubeMapUnit);
+		shader->setUniform(uniformLoc[11], color);
+		shader->setUniform(uniformLoc[12], shadowTex);
+		shader->setUniform(uniformLoc[13], LightView);
+		shader->setUniform(uniformLoc[14], LightProjection);
+		shader->setUniform(uniformLoc[15], ScaleBias);
 		shader->use();
 		vao.draw();
+		glUseProgram(0);
 	}
-	void setShader(GLSLProgram* shader){ this->shader=shader;}
-	void setKd(vec3 v){ material.Kd=v; }
+	void draw(mat4& projection, mat4& view){
+		shader->setUniform(uniformLoc[0], view);
+		shader->setUniform(uniformLoc[1], projection);
+		shader->setUniform(uniformLoc[2], getModelM());
+		shader->setUniform(uniformLoc[3], projection*view*getModelM());
+		shader->setUniform(uniformLoc[4], material.Kd);
+		shader->setUniform(uniformLoc[5], material.Ka);
+		shader->setUniform(uniformLoc[6], material.Ks);
+		shader->setUniform(uniformLoc[7], material.Shininess);
+		shader->setUniform(uniformLoc[8], material.ReflectFactor);
+		shader->setUniform(uniformLoc[9], material.Eta);
+		shader->setUniform(uniformLoc[10], CubeMapUnit);
+		shader->setUniform(uniformLoc[11], color);
+		shader->setUniform(uniformLoc[12], shadowTex);
+		shader->setUniform(uniformLoc[13], LightView);
+		shader->setUniform(uniformLoc[14], LightProjection);
+		shader->setUniform(uniformLoc[15], ScaleBias);
+		shader->use();
+		vao.draw();
+		glUseProgram(0);
+	}
+	void setShader(GLSLProgram* shader){
+		this->shader = shader;
+		uniformLoc.push_back(shader->getUniformLoc("ViewMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("ProjectionMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("ModelMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("MVP"));
+		uniformLoc.push_back(shader->getUniformLoc("material.Kd"));
+		uniformLoc.push_back(shader->getUniformLoc("material.Ka"));
+		uniformLoc.push_back(shader->getUniformLoc("material.Ks"));
+		uniformLoc.push_back(shader->getUniformLoc("material.Shininess"));
+		uniformLoc.push_back(shader->getUniformLoc("material.ReflectFactor"));
+		uniformLoc.push_back(shader->getUniformLoc("material.Eta"));
+		uniformLoc.push_back(shader->getUniformLoc("CubeMapTex"));
+		uniformLoc.push_back(shader->getUniformLoc("color"));
+		uniformLoc.push_back(shader->getUniformLoc("shadowMap"));
+		uniformLoc.push_back(shader->getUniformLoc("LightView"));
+		uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
+		uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+	}
+	void setKd(vec3 v){ material.Kd = v; }
 	vec3 getKd(){ return material.Kd; }
-	void setKa(vec3 v){ material.Ka=v; }
+	void setKa(vec3 v){ material.Ka = v; }
 	vec3 getKa(){ return material.Ka; }
-	void setKs(vec3 v){ material.Ks=v; }
+	void setKs(vec3 v){ material.Ks = v; }
 	vec3 getKs(){ return material.Ks; }
-	void setShininess(float f){ material.Shininess=f; }
+	void setShininess(float f){ material.Shininess = f; }
 	float getShininess(){ return material.Shininess; }
-	void setReflectFactor(vec2 v){ material.ReflectFactor=v; }
+	void setReflectFactor(vec2 v){ material.ReflectFactor = v; }
 	vec2 getReflectFactor(){ return material.ReflectFactor; }
-	void setEta(float f){ material.Eta=f; }
+	void setEta(float f){ material.Eta = f; }
 	float getEta(){ return material.Eta; }
-	void setCubeMapUnit(int u){ CubeMapUnit=u;}
+	void setCubeMapUnit(int u){ CubeMapUnit = u; }
 	int getCubeMapUnit(){ return CubeMapUnit; }
+	void setColor(vec3 c){ color = c; }
 
 	void physicsSimulation(float time, float substep){
 		if ((modelM*vec4(0, -0.5, 0, 1))[1] == 0.0 && jumpVelocity==0)
@@ -125,5 +176,8 @@ private:
 	std::array<float,72> vertex_normals;
 	std::array<int,36> triangle_indices;
 	int CubeMapUnit;
+	vec3 color;
+	int shadowTex;
+	vector<int> uniformLoc;
 };
 
