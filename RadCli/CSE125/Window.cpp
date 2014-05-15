@@ -31,7 +31,7 @@
 #include "JSON_Parse.h"
 #include "billboard_list.h"
 #include "UI.h"
-//#include "GameState.h"
+#include "ClientState.h"
 
 #include <assert.h>
 #include "ParticleSystem.h"
@@ -101,8 +101,8 @@ BillboardList m_billboardList4;
 
 JSON_Parser *map_info;
 
-int Window::width  = 800;   // set window width in pixels here
-int Window::height = 600;   // set window height in pixels here
+int Window::width = 1280;   // set window width in pixels here
+int Window::height = 720;   // set window height in pixels here
 float nearClip = 0.1;
 float farClip = 1000.0;
 float fov = 55.0;
@@ -215,7 +215,7 @@ Texture * shadow;
 char buf[255];
 int myFPS = 0;
 
-//GameState* myGameState;
+ClientState* myClientState;
 float awesome_time = 0.5;
 
 // Stuff Erik added
@@ -309,8 +309,7 @@ void Window::idleCallback(void)
 	GLSLProgram* sd;
 	vector<mat4> playerMs;
 
-	//switch (myGameState->getState()){
-	switch (1){
+	switch (myClientState->getState()){
 	case 0:
 		break;
 	case 1:
@@ -403,8 +402,7 @@ void Window::idleCallback(void)
 }
 void Window::reshapeCallback(int w, int h)
 {
-	//switch (myGameState->getState()){
-	switch (1){
+	switch (myClientState->getState()){
 	case 0:
 		width = w;
 		height = h;
@@ -424,8 +422,7 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
-	//switch (myGameState->getState()){
-	switch (1){
+	switch (myClientState->getState()){
 	case 0:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
@@ -842,114 +839,139 @@ int main(int argc, char *argv[])
 }
 
 void keyboard(unsigned char key, int, int){
-	if (key == 'a'){
-		keyState = keyState | 1;
-	}
-	if (key == 'd'){
-		keyState = keyState | 1 << 1;
-	}
-	if (key == 'w'){
-		keyState = keyState | 1 << 2;
-	}
-	if (key == 's'){
-		keyState = keyState | 1 << 3;
-	}
-	if (key == 27){
-		exit(0);
-	}
-	if (key == ' '){
-		keyState = keyState | 1 << 4;
-
-		if (space_up){
-			space_up = 0;
-
-			testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+	switch (myClientState->getState()){
+	case 0:
+		if (key == ' '){
+			if (space_up){
+				//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				myClientState->setState(1);
+			}
 		}
-	}
+		break;
+	case 1:
 
-	//Added for sound debugging
-	if (key == 'f'){
-		testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-	}
-	if (key == 13)
-	{
-		mat4 player = player_list[playerID]->getModelM();
-		vec4 playerHolder = player*vec4(0, 0, 0, 1);
+		if (key == 'a'){
+			keyState = keyState | 1;
+		}
+		if (key == 'd'){
+			keyState = keyState | 1 << 1;
+		}
+		if (key == 'w'){
+			keyState = keyState | 1 << 2;
+		}
+		if (key == 's'){
+			keyState = keyState | 1 << 3;
+		}
+		if (key == 27){
+			exit(0);
+		}
+		if (key == ' '){
+			keyState = keyState | 1 << 4;
 
-		Cube* cube6 = new Cube();
-		cube6->setKd(vec3(0.8, 0.0, 0.0));
-		cube6->setKa(vec3(0.3, 0.0, 0.0));
-		cube6->setKs(vec3(0.4, 0.0, 0.0));
-		cube6->setShininess(100);
-		cube6->setReflectFactor(vec2(0.2, 0.5));
-		cube6->setEta(0.5);
-		cube6->setCubeMapUnit(3);
-		cube6->setSpeed(5);
-		cube6->postTrans(glm::translate(vec3(playerHolder[0] + 2, playerHolder[1], playerHolder[2] + 2)));
-		cube6->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-		cube6->setShader(sdrCtl.getShader("basic_reflect_refract"));
-		cube6->setType("Cube");
-		cube6->setName("Test Cube6");
-		//player_list.push_back(cube6);
-		//scene->addPlayer(cube6);
+			if (space_up){
+				space_up = 0;
 
-	}
-	if (key == 0x30)
-	{
-		draw_list.clear();
-		initialize(1,(char **)1);
-	}
+				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			}
+		}
 
-	if (key == 'l'){
-		SelectFromMenu(MENU_LIGHTING);
-	}
-	if (key == 'p'){
-		SelectFromMenu(MENU_POLYMODE);
-	}
-	if (key == 't'){
-		SelectFromMenu(MENU_TEXTURING);
+		//Added for sound debugging
+		if (key == 'f'){
+			testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+		}
+		if (key == 13)
+		{
+			mat4 player = player_list[playerID]->getModelM();
+			vec4 playerHolder = player*vec4(0, 0, 0, 1);
+
+			Cube* cube6 = new Cube();
+			cube6->setKd(vec3(0.8, 0.0, 0.0));
+			cube6->setKa(vec3(0.3, 0.0, 0.0));
+			cube6->setKs(vec3(0.4, 0.0, 0.0));
+			cube6->setShininess(100);
+			cube6->setReflectFactor(vec2(0.2, 0.5));
+			cube6->setEta(0.5);
+			cube6->setCubeMapUnit(3);
+			cube6->setSpeed(5);
+			cube6->postTrans(glm::translate(vec3(playerHolder[0] + 2, playerHolder[1], playerHolder[2] + 2)));
+			cube6->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+			cube6->setShader(sdrCtl.getShader("basic_reflect_refract"));
+			cube6->setType("Cube");
+			cube6->setName("Test Cube6");
+			//player_list.push_back(cube6);
+			//scene->addPlayer(cube6);
+
+		}
+		if (key == 0x30)
+		{
+			draw_list.clear();
+			initialize(1, (char **)1);
+		}
+
+		if (key == 'l'){
+			SelectFromMenu(MENU_LIGHTING);
+		}
+		if (key == 'p'){
+			SelectFromMenu(MENU_POLYMODE);
+		}
+		if (key == 't'){
+			SelectFromMenu(MENU_TEXTURING);
+		}
+		break;
+	default:
+		break;
 	}
 }
 
 void keyUp (unsigned char key, int x, int y) {  
-	if (key == 'a'){
-		keyState = keyState & ~1;
-	}
-	if (key == 'd'){
-		keyState = keyState & ~(1 << 1);
-	}
-	if (key == 'w'){
-		// These vars need to become arrays for each player
-		// and all this needs to move into the server
-		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
-			if (sprint_up >= 10){
-				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-				//scene->jump(playerID);
-			} 
-			if (sprint_up > 0){
-				sprint_up--;
+	
+	switch (myClientState->getState()){
+	case 0:
+		break;
+	case 1:
+
+		if (key == 'a'){
+			keyState = keyState & ~1;
+		}
+		if (key == 'd'){
+			keyState = keyState & ~(1 << 1);
+		}
+		if (key == 'w'){
+			// These vars need to become arrays for each player
+			// and all this needs to move into the server
+			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
+				if (sprint_up >= 10){
+					testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//scene->jump(playerID);
+				}
+				if (sprint_up > 0){
+					sprint_up--;
+				}
+				else{
+					sprint_up = 0;
+				}
+			}
+			keyState = keyState & ~(1 << 2);
+		}
+		if (key == 's'){
+			keyState = keyState & ~(1 << 3);
+		}
+		if (key == ' '){
+			keyState = keyState & ~(1 << 4);
+			space_up = 1;
+		}
+		// This goes into server
+		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
+			if (sprint_up < 10){
+				sprint_up++;
 			}
 			else{
-				sprint_up = 0;
+				sprint_up = 10;
 			}
 		}
-		keyState = keyState & ~(1 << 2);
-	}
-	if (key == 's'){
-		keyState = keyState & ~(1 << 3);
-	}
-	if (key == ' '){
-		keyState = keyState & ~(1 << 4);
-		space_up = 1;
-	}
-	// This goes into server
-	if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
-		if (sprint_up < 10){
-			sprint_up++;
-		}
-		else{
-			sprint_up = 10;
-		}
+		break;
+	default:
+		break;
 	}
 }
 void mouseFunc(int button, int state, int x, int y)
@@ -959,66 +981,74 @@ void mouseFunc(int button, int state, int x, int y)
 	mouseDown = (state == GLUT_DOWN);
 	mouseButton = button;
 
-	if (state == GLUT_DOWN){
-		if (button == GLUT_LEFT_BUTTON){
-			if (left_mouse_up){
-				left_mouse_up = 0;
-				mouseState = mouseState | 1;
+	switch (myClientState->getState()){
+	case 0:
+		break;
+	case 1:
 
-				testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-				///scene->basicAttack(playerID);
+		if (state == GLUT_DOWN){
+			if (button == GLUT_LEFT_BUTTON){
+				if (left_mouse_up){
+					left_mouse_up = 0;
+					mouseState = mouseState | 1;
+
+					testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					///scene->basicAttack(playerID);
+				}
+				else
+				{
+					mouseState = mouseState & ~1;
+				}
 			}
-			else
-			{
+			if (button == GLUT_RIGHT_BUTTON){
+				if (right_mouse_up){
+					right_mouse_up = 0;
+					mouseState = mouseState | 1 << 1;
+
+					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+
+					//projectileAttack(playerID, cam);
+				}
+				else
+				{
+					mouseState = mouseState & ~(1 << 1);
+				}
+			}
+			if (button == GLUT_MIDDLE_BUTTON){
+				if (middle_mouse_up){
+					middle_mouse_up = 0;
+					mouseState = mouseState | 1 << 2;
+
+					testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				}
+				else
+				{
+					mouseState = mouseState & ~(1 << 2);
+				}
+			}
+		}
+		if (state == GLUT_UP){
+			if (button == GLUT_LEFT_BUTTON){
 				mouseState = mouseState & ~1;
+				left_mouse_up = 1;
 			}
-		}
-		if (button == GLUT_RIGHT_BUTTON){
-			if (right_mouse_up){
-				right_mouse_up = 0;
-				mouseState = mouseState | 1 << 1;
-
-				testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-
-				//projectileAttack(playerID, cam);
-			}
-			else
-			{
+			if (button == GLUT_RIGHT_BUTTON){
 				mouseState = mouseState & ~(1 << 1);
+				right_mouse_up = 1;
 			}
-		}
-		if (button == GLUT_MIDDLE_BUTTON){
-			if (middle_mouse_up){
-				middle_mouse_up = 0;
-				mouseState = mouseState | 1 << 2;
-
-				testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-			}
-			else
-			{
+			if (button == GLUT_MIDDLE_BUTTON){
 				mouseState = mouseState & ~(1 << 2);
+				middle_mouse_up = 1;
 			}
 		}
-	}
-	if (state == GLUT_UP){
-		if (button == GLUT_LEFT_BUTTON){
-			mouseState = mouseState & ~1;
-			left_mouse_up = 1;
-		}
-		if (button == GLUT_RIGHT_BUTTON){
-			mouseState = mouseState & ~(1 << 1);
-			right_mouse_up = 1;
-		}
-		if (button == GLUT_MIDDLE_BUTTON){
-			mouseState = mouseState & ~(1 << 2);
-			middle_mouse_up = 1;
-		}
+		break;
+	default:
+		break;
 	}
 }
 void motionFunc(int x, int y)
 {
-	//switch (myGameState->getState()){
-	switch (1){
+	switch (myClientState->getState()){
 	case 0:
 
 	case 1:
@@ -1036,31 +1066,49 @@ void passiveMotionFunc(int x, int y){
 	lastX = x;
 	lastY = y;
 
-	if (fabs(dx) < 250 && fabs(dy) < 250){
-		//cam->preRotate(glm::rotate(mat4(1.0), cam_sp*dy, vec3(1, 0, 0)));
-		//cube->postRotate(glm::rotate(mat4(1.0), -cam_sp*dx, vec3(0, 1, 0)));
-		cam->pushRot(cam_sp*dy);
-		cam_dx += dx;
-	}
+	switch (myClientState->getState()){
+	case 0:
+		break;
+	case 1:
 
-	if (abs(Window::width / 2 - lastX)>25 || abs(Window::height / 2 - lastY)>25){
-		lastX = Window::width / 2;
-		lastY = Window::height / 2;
-		glutWarpPointer(Window::width / 2, Window::height / 2);
+		if (fabs(dx) < 250 && fabs(dy) < 250){
+			//cam->preRotate(glm::rotate(mat4(1.0), cam_sp*dy, vec3(1, 0, 0)));
+			//cube->postRotate(glm::rotate(mat4(1.0), -cam_sp*dx, vec3(0, 1, 0)));
+			cam->pushRot(cam_sp*dy);
+			cam_dx += dx;
+		}
+
+		if (abs(Window::width / 2 - lastX)>25 || abs(Window::height / 2 - lastY)>25){
+			lastX = Window::width / 2;
+			lastY = Window::height / 2;
+			glutWarpPointer(Window::width / 2, Window::height / 2);
+		}
+		break;
+	default:
+		break;
 	}
 }
 void specialKeyboardFunc(int key, int x, int y){
-	if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
-		if (sprint_up >= 10){
-			testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-			//scene->jump(playerID);
+	
+	switch (myClientState->getState()){
+	case 0:
+		break;
+	case 1:
+		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
+			if (sprint_up >= 10){
+				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//scene->jump(playerID);
+			}
+			if (sprint_up > 0){
+				sprint_up--;
+			}
+			else{
+				sprint_up = 0;
+			}
 		}
-		if (sprint_up > 0){
-			sprint_up--;
-		}
-		else{
-			sprint_up = 0;
-		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -1116,6 +1164,8 @@ void setupShaders()
 }
 void initialize(int argc, char *argv[])
 {
+	myClientState = new ClientState();
+
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&last);
 
