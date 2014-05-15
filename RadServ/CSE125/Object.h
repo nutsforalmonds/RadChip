@@ -72,7 +72,7 @@ public:
 
 	void jump(){
 		if (onGround){
-			velocity[1] += 1;
+			velocity[1] = 10;
 		}
 	}
 

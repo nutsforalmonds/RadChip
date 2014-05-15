@@ -91,7 +91,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error " << error << std::endl;
+			std::cout << "handle_connect Error " << error << std::endl;
 			socket_.close();
 		}
 	}
@@ -109,7 +109,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error " << error << std::endl;
+			std::cout << "handle_PID Error " << error << std::endl;
 			socket_.close();
 		}
 	}
@@ -144,7 +144,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error " << error << std::endl;
+			std::cout << "handle_read Error " << error << std::endl;
 			socket_.close();
 		}
 	}
@@ -165,7 +165,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error" << std::endl;
+			std::cout << "handle_write Error" << std::endl;
 			socket_.close();
 		}
 	}

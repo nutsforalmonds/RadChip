@@ -67,7 +67,7 @@ public:
 	{
 		if (!error)
 		{
-			std::cout << "Handling read" << std::endl;
+			//std::cout << "Handling read" << std::endl;
 			boost::asio::async_read(socket_,
 				boost::asio::buffer(ret_, 2048),
 				boost::bind(&tcp_connection::handle_read, shared_from_this(),
@@ -84,7 +84,7 @@ public:
 	{
 		if (!error)
 		{
-			std::cout << "connection sent data to client" << std::endl;
+			//std::cout << "connection sent data to client" << std::endl;
 			// all these pops might not be useful at all
 		}
 		// Else remove player from server

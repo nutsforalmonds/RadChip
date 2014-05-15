@@ -141,7 +141,7 @@ GLuint fboHandle;
 string configBuf;
 
 //time used in idleCallback
-LARGE_INTEGER freq, last, current;
+LARGE_INTEGER freq, last, current, loop_begin, loop_end;
 double delta;
 
 //Mouse press flags
@@ -420,7 +420,15 @@ void Window::displayCallback(void)
 	glutSwapBuffers();
 }
 
+
+LARGE_INTEGER asdf, jkl;
 void server_update(int value){
+	QueryPerformanceCounter(&asdf);
+	double fjfj = (double)((double)(asdf.QuadPart - jkl.QuadPart) / (double)freq.QuadPart * 1000);
+	jkl = asdf;
+	cout << fjfj << endl;
+
+	QueryPerformanceCounter(&loop_begin);
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
@@ -444,7 +452,7 @@ void server_update(int value){
 
 	if ( (*recvVec)[0].first.c_str()[1] == 's' )
 	{
-		std::cout << "Projectile fire" << std::endl;
+		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
 	}
 
@@ -452,7 +460,7 @@ void server_update(int value){
 
 	if ((*recvVec)[1].first.c_str()[1] == 's')
 	{
-		std::cout << "Projectile fire" << std::endl;
+		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
 	}
 
@@ -460,7 +468,7 @@ void server_update(int value){
 
 	if ((*recvVec)[2].first.c_str()[1] == 's')
 	{
-		std::cout << "Projectile fire" << std::endl;
+		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
 	}
 
@@ -468,7 +476,7 @@ void server_update(int value){
 
 	if ((*recvVec)[3].first.c_str()[1] == 's')
 	{
-		std::cout << "Projectile fire" << std::endl;
+		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
 	}
 
@@ -485,7 +493,15 @@ void server_update(int value){
 
 	despawnProjectile();
 	//Have to reset timer after
-	glutTimerFunc(15, server_update, 0);
+	QueryPerformanceCounter(&loop_end);
+	int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
+	if (diff > 15){
+		glutTimerFunc(0, server_update, 0);
+		cout << "server_update() exceded 15ms mark"<< endl;
+	}
+	else{
+		glutTimerFunc(15-diff, server_update, 0);
+	}
 }
 
 void SelectFromMenu(int idCommand)
@@ -547,7 +563,7 @@ int main(int argc, char *argv[])
   bool buf;
   ConfigSettings::config->getValue("FullScreen", buf);
   if (buf){
-	glutFullScreen();
+	//glutFullScreen();
   }
   
 

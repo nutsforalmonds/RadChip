@@ -39,7 +39,7 @@ using glm::mat3;
 using glm::quat;
 using namespace std;
 Ground* ground;
-float cam_sp = 0.01;
+float cam_sp = 0.1;
 string configBuf;
 int counter = 0;
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
@@ -58,7 +58,7 @@ void handle_mouse_state(int pid, int mouseState){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		std::cout << "projectile attack from client" << std::endl;
+		//std::cout << "projectile attack from client" << std::endl;
 		if (pid == 0)
 			player1shoot = true;
 		else if (pid == 1)
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 		std::cerr << e.what() << std::endl;
 	}
 
-	LARGE_INTEGER freq, last, current;
+	LARGE_INTEGER freq, last, current, loop_end;
 	double diff;
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&last);
@@ -257,6 +257,11 @@ int main(int argc, char *argv[])
 		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
 		server->send(*sendVec);
 		io_service.poll();
+
+		//limit the speed of server
+		QueryPerformanceCounter(&loop_end);
+		diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
+		Sleep(15 - diff);
 	}
 	return 0;
 }
