@@ -10,9 +10,11 @@
 class Texture
 {
 public:
+	Texture(GLenum TextureTarget);//constructor that'll be used for depth texture
 	Texture(GLenum TextureTarget, const char* FileName, const char* FileType);
 	bool Load();
 	bool LoadCube(const char* FilePre, const char* FileSuf);
+	bool LoadDepthTexture(GLsizei width,GLsizei height);
 
 	void Bind(GLenum TextureUnit);
 

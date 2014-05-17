@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
 		if (strcmp((*recvVec)[numOfVecs].first.c_str(), ""))
 		{
-			playerID = atoi((*recvVec)[numOfVecs - 1].first.c_str());
+			playerID = atoi((*recvVec)[numOfVecs].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
 			if (newData[1]){
 				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
@@ -210,19 +210,9 @@ int main(int argc, char *argv[])
 		}
 		if (strcmp((*recvVec)[numOfVecs * 2].first.c_str(), ""))
 		{
-			playerID = atoi((*recvVec)[numOfVecs * 2 - 1].first.c_str());
+			playerID = atoi((*recvVec)[numOfVecs * 2].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
 			if (newData[2]){
-				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
-			}
-		}
-		if (strcmp((*recvVec)[numOfVecs * 3 - 1].first.c_str(), ""))
-		{
-			playerID = atoi((*recvVec)[numOfVecs * 3 - 1].first.c_str());
-			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
-			if (newData[3]){
 				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
 				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);

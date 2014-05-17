@@ -136,6 +136,7 @@ public:
 			return;
 		}
 	}
+	void setShadowTex(int t){ shadowTex = t; }
 private:
 	void generate(float negx,float posx,float negy,float posy,float negz,float posz){
 		std::array<float,72> positions = {

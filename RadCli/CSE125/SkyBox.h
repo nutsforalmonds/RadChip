@@ -18,15 +18,19 @@ public:
 	~SkyBox(void){}
 	void setShader(GLSLProgram* shader){
 		this->shader = shader;
+		uniformLoc.push_back(shader->getUniformLoc("ViewMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("ProjectionMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("CubeMapTex"));
 	}
 	void setTexUnit(int u){ texUnit = u; }
 	int getTexUnit(){ return texUnit; }
 	void draw(){
-		shader->setUniform("ViewMatrix", View);
-		shader->setUniform("ProjectionMatrix", Projection);
-		shader->setUniform("CubeMapTex", texUnit);
+		shader->setUniform(uniformLoc[0], View);
+		shader->setUniform(uniformLoc[1], Projection);
+		shader->setUniform(uniformLoc[2], texUnit);
 		shader->use();
 		vao.draw();
+		glUseProgram(0);
 	}
 
 private:
@@ -62,5 +66,6 @@ private:
 	std::array<float, 24> skybox_positions;
 	std::array<int, 36> skybox_indices;
 	int texUnit;
+	vector<int> uniformLoc;
 };
 

@@ -6,6 +6,9 @@
 
 extern mat4 Projection;
 extern mat4 View;
+extern mat4 LightView;
+extern mat4 LightProjection;
+extern mat4 ScaleBias;
 
 MD5Model::MD5Model()
 : m_iMD5Version(-1)
@@ -356,28 +359,62 @@ void MD5Model::Update( float fDeltaTime )
     }
 }
 
+void MD5Model::setShader(GLSLProgram* shader)
+{
+	this->shader = shader;
+	uniformLoc.push_back(shader->getUniformLoc("Projection"));
+	uniformLoc.push_back(shader->getUniformLoc("View"));
+	uniformLoc.push_back(shader->getUniformLoc("Model"));
+	uniformLoc.push_back(shader->getUniformLoc("TexID"));
+	uniformLoc.push_back(shader->getUniformLoc("material.Shininess"));
+	uniformLoc.push_back(shader->getUniformLoc("material.ReflectFactor"));
+	uniformLoc.push_back(shader->getUniformLoc("shadowMap"));
+	uniformLoc.push_back(shader->getUniformLoc("LightView"));
+	uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
+	uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+}
+
+
 void MD5Model::draw()
 {
 	shader->use();
-	shader->setUniform("Projection",Projection);
-	shader->setUniform("View", View);
-	shader->setUniform("Model",getModelM()*getRotation()*adjustM);
-	shader->setUniform("TexID",0);
-	shader->setUniform("material.Shininess", Shininess);
-	shader->setUniform("material.ReflectFactor", ReflectFactor);
+	shader->setUniform(uniformLoc[0],Projection);
+	shader->setUniform(uniformLoc[1], View);
+	shader->setUniform(uniformLoc[2], getModelM()*getRotation()*adjustM);
+	shader->setUniform(uniformLoc[3], 0);
+	shader->setUniform(uniformLoc[4], Shininess);
+	shader->setUniform(uniformLoc[5], ReflectFactor);
+	shader->setUniform(uniformLoc[6], shadowTex);
+	shader->setUniform(uniformLoc[7], LightView);
+	shader->setUniform(uniformLoc[8], LightProjection);
+	shader->setUniform(uniformLoc[9], ScaleBias);
     // Render the meshes
     for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
     {
         RenderMesh( *(m_Meshes[i]) );
     }
-    
-    //m_Animation.Render();
+	glUseProgram(0);
+}
 
-    //for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
-    //{
-    //    RenderNormals( m_Meshes[i] );
-    //}
-
+void MD5Model::draw(mat4& projection, mat4& view)
+{
+	shader->use();
+	shader->setUniform(uniformLoc[0], projection);
+	shader->setUniform(uniformLoc[1], view);
+	shader->setUniform(uniformLoc[2], getModelM()*getRotation()*adjustM);
+	shader->setUniform(uniformLoc[3], 0);
+	shader->setUniform(uniformLoc[4], Shininess);
+	shader->setUniform(uniformLoc[5], ReflectFactor);
+	shader->setUniform(uniformLoc[6], shadowTex);
+	shader->setUniform(uniformLoc[7], LightView);
+	shader->setUniform(uniformLoc[8], LightProjection);
+	shader->setUniform(uniformLoc[9], ScaleBias);
+	// Render the meshes
+	for (unsigned int i = 0; i < m_Meshes.size(); ++i)
+	{
+		RenderMesh(*(m_Meshes[i]));
+	}
+	glUseProgram(0);
 }
 
 void MD5Model::RenderMesh( const Mesh& mesh )

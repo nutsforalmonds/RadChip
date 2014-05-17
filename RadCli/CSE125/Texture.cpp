@@ -15,6 +15,11 @@ Texture::Texture(GLenum TextureTarget, const char* FileName, const char* FileTyp
 	//glGenTextures(1, &m_textureObj);
 }
 
+Texture::Texture(GLenum TextureTarget)
+{
+	m_textureTarget = TextureTarget;
+}
+
 bool Texture::Load()
 {
 	timg = QGLWidget::convertToGLFormat(QImage(m_fileName, m_fileType));
@@ -59,6 +64,21 @@ bool Texture::LoadCube(const char* FilePre, const char* FileSuf)
 	glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return true;
+}
+
+bool Texture::LoadDepthTexture(GLsizei width, GLsizei height)
+{
+	glGenTextures(1, &m_textureObj);
+	glBindTexture(GL_TEXTURE_2D, m_textureObj);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 	return true;
 }

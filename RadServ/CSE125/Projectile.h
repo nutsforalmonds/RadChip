@@ -9,6 +9,7 @@ protected:
 	float startX;
 	float startY;
 	std::vector<int> playersHit;
+	int playerID;
 
 public:
 	Projectile(int numPlayers);
@@ -18,6 +19,8 @@ public:
 	float getStartY();
 	bool checkHit(int i);
 	void setHit(int i);
+	void setPlayerID(int id){ playerID = id; }
+	int getPlayerID(){ return playerID; }
 };
 
 #endif

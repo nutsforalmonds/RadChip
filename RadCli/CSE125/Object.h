@@ -24,6 +24,7 @@ public:
 	}
 	~Object(){}
 	virtual void draw(){/* This is a placeholder*/ }
+	virtual void draw(mat4& projection, mat4& view){}
 
 	void setType(string t){type = t;}
 	string getType(){return type;}

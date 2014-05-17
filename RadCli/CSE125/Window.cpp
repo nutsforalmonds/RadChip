@@ -257,6 +257,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = cubeT->getAABB();
 	cubeT->setStartX(hold.max[0]);
 	cubeT->setStartY(hold.max[2]);
+	cubeT->setShadowTex(shadow_map_id);
 
 	//Name and type
 	cubeT->setType("Cube");
@@ -430,29 +431,33 @@ void Window::displayCallback(void)
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
-		/*
+		
 		///////  1st pass: render into depth map //////////
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, depth_fbo);
 		glViewport(0, 0, depth_texture_width, depth_texture_height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		m_pMesh2->draw(LightProjection, LightView);
+		//m_pMesh2->draw(LightProjection, LightView);
 		for (int i = 0; i < player_list.size(); ++i)
 		{
-		player_list[i]->draw(LightProjection, LightView);
+			player_list[i]->draw(LightProjection, LightView);
 		}
 		for (int i = 0; i < stationary_list.size(); ++i)
 		{
-		stationary_list[i]->draw(LightProjection, LightView);
+			stationary_list[i]->draw(LightProjection, LightView);
 		}
-		*/
+		for (int i = 0; i < projectile_list.size(); ++i)
+		{
+			projectile_list[i]->draw(LightProjection, LightView);
+		}
+		
 
 		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//glViewport(0, 0, width, height);
-		//shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+		glViewport(0, 0, width, height);
+		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
 
 		//m_pMesh2->draw();
 
@@ -637,6 +642,7 @@ void server_update(int value){
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
 	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
 	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
+	mouseState = 0;
 	cli->write(*sendVec);
 	io_service.poll();
 	cam_dx = 0;
@@ -765,7 +771,7 @@ int main(int argc, char *argv[])
   bool buf;
   ConfigSettings::config->getValue("FullScreen", buf);
   if (buf){
-	//glutFullScreen();
+	glutFullScreen();
   }
   
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -1194,7 +1200,7 @@ void initialize(int argc, char *argv[])
 
 	loadTextures();
 
-	/*
+	
 	//depth buffer initialization
 	glGenFramebuffers(1, &depth_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
@@ -1208,46 +1214,16 @@ void initialize(int argc, char *argv[])
 		system("pause");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	*/
+	
 
-	//// fbo texture
-	//GLuint renderTex;
-	//glGenTextures(1, &renderTex);
-	//glActiveTexture(GL_TEXTURE6); // Use texture unit 0
-	//glBindTexture(GL_TEXTURE_2D, renderTex);
-	//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texScreenWidth,texScreenHeight,0,GL_RGBA,
-	//	GL_UNSIGNED_BYTE,NULL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-	//	GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-	//	GL_LINEAR);
-	//glGenFramebuffers(1,&fboHandle);
-	//glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
-	//	GL_TEXTURE_2D, renderTex, 0);
-	//GLuint depthBuf;
-	//glGenRenderbuffers(1, &depthBuf);
-	//glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
-	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 
-	//	texScreenWidth,texScreenHeight);
-	//// Bind the depth buffer to the FBO
-	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-	//	GL_RENDERBUFFER, depthBuf);
-	//GLenum drawBufs[] = {GL_COLOR_ATTACHMENT0};
-	//glDrawBuffers(1, drawBufs);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//scene = new Scene();
-	//scene->setGravity(vec3(0.0, -9.8, 0.0));
-
-	light[0].type=0;
-	light[0].pos = vec4(10,10,0,1);
-	light[0].specular = vec3(0.6,0.6,0.6);
-	light[0].diffuse = vec3(0.8, 0.8, 0.8);
-	light[0].ambient = vec3(0.4, 0.4, 0.4);
+	light[0].type=1;
+	light[0].pos = vec4(0,40,0,1);
+	light[0].specular = vec3(0.2,0.2,0.2);
+	light[0].diffuse = vec3(0.9, 0.9, 0.9);
+	light[0].ambient = vec3(0.5, 0.5, 0.5);
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
-	LightView = glm::lookAt(vec3(0, 40, 0), vec3(0, 0, 0), vec3(1, 0, 0));
+	LightView = glm::lookAt(vec3(0,40,0), vec3(0, 0, 0), vec3(1, 0, 0));
 	LightProjection = glm::frustum(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1000.0f);
 
 	//fog.maxDist=4;
@@ -1263,6 +1239,7 @@ void initialize(int argc, char *argv[])
 	md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
 	md50->setShininess(30);
 	md50->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	md50->setShadowTex(shadow_map_id);
 	player_list.push_back(md50);
 
 	md51 = new MD5Model();
@@ -1272,6 +1249,7 @@ void initialize(int argc, char *argv[])
 	md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
 	md51->setShininess(30);
 	md51->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	md51->setShadowTex(shadow_map_id);
 	player_list.push_back(md51);
 
 	md52 = new MD5Model();
@@ -1281,6 +1259,7 @@ void initialize(int argc, char *argv[])
 	md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
 	md52->setShininess(30);
 	md52->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	md52->setShadowTex(shadow_map_id);
 	player_list.push_back(md52);
 
 	md53 = new MD5Model();
@@ -1290,6 +1269,7 @@ void initialize(int argc, char *argv[])
 	md50->postTrans(glm::translate(vec3(20, 0.5, 7)));
 	md53->setShininess(30);
 	md53->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	md53->setShadowTex(shadow_map_id);
 	player_list.push_back(md53);
 
 
@@ -1305,6 +1285,7 @@ void initialize(int argc, char *argv[])
 	cube0->postTrans(glm::translate(vec3(0, 0.5, 7)));
 	cube0->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	cube0->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	cube0->setShadowTex(shadow_map_id);
 	cube0->setType("Cube");
 	cube0->setName("Test cube0");
 	player_list.push_back(cube0);*/
@@ -1344,6 +1325,7 @@ void initialize(int argc, char *argv[])
 	ground->setRow(501);
 	ground->setColumn(501);
 	ground->setHeight(1 / 1.0);
+	ground->setShadowTex(shadow_map_id);
 	ground->generate();
 	ground->setType("Ground");
 	ground->setName("Ground");
@@ -1358,9 +1340,16 @@ void initialize(int argc, char *argv[])
 	draw_list.push_back(skybox);
 
 	//m_pMesh2 = new Mesh();
+	//m_pMesh2->LoadMesh("Model/OctopusTower1_8_textures3.dae");
+	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
+	////m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0)));
+
+	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
 	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));*/
+	//m_pMesh2->setShadowTex(shadow_map_id);
 
 	///*md5 = new MD5Model();
 	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");
@@ -1368,6 +1357,7 @@ void initialize(int argc, char *argv[])
 	//md5->setShader(sdrCtl.getShader("basic_texture"));
 	//md5->setShininess(30);
 	//md5->setAdjustM(glm::translate(vec3(-15.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	//md5->setShadowTex(shadow_map_id);
 	////player_list.push_back(md5);*/
 
 	//md6 = new MD5Model();
@@ -1377,6 +1367,7 @@ void initialize(int argc, char *argv[])
 	//md6->setShininess(30);
 	//md6->setAdjustM(glm::translate(vec3(0.0, 1.7, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.05, 0.05, 0.05)));
 	//md6->setModelM(glm::translate(vec3(10.0, 0.0, 0.0)));
+	//md6->setShadowTex(shadow_map_id);
 	//md6->setType("Model");
 	//md6->setName("Player Model");
 
@@ -1660,12 +1651,12 @@ void loadTextures(){
 
 		glutSwapBuffers();
 	}
-	/*
+	
 	shadow = new Texture(GL_TEXTURE_2D);
 	shadow->LoadDepthTexture(depth_texture_width, depth_texture_height);
 	//shadow->LoadDepthTexture(Window::width, Window::height);
 	shadow->Bind(GL_TEXTURE0 + shadow_map_id);
-	*/
+	
 }
 
 void Window::addDrawList(Object* obj)

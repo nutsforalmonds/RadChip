@@ -2,6 +2,9 @@
 
 #include "Object.h"
 #include "MD5Animation.h"
+#include <vector>
+
+using namespace std;
 
 class MD5Model : public Object
 {
@@ -13,12 +16,14 @@ public:
     bool LoadAnim( const std::string& filename );
     void Update( float fDeltaTime );
     void draw();
+	void draw(mat4& projection, mat4& view);
 
-	void setShader(GLSLProgram* shader){ this->shader = shader; }
+	void setShader(GLSLProgram* shader);
 
 	void setAdjustM(mat4 m){ adjustM = m; }
 	void setShininess(float f){ Shininess = f; }
 	void setReflectFactor(float f){ ReflectFactor = f; }
+	void setShadowTex(int t){ shadowTex = t; }
 
 protected:
     typedef std::vector<glm::vec3> PositionBuffer;
@@ -111,5 +116,6 @@ private:
 	mat4 adjustM;
 	float Shininess;
 	float ReflectFactor;
-
+	int shadowTex;
+	vector<int> uniformLoc;
 };

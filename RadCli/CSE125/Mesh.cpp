@@ -12,6 +12,9 @@
 
 extern mat4 Projection;
 extern mat4 View;
+extern mat4 LightView;
+extern mat4 LightProjection;
+extern mat4 ScaleBias;
 
 void Mesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
 {
@@ -376,12 +379,31 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 	return Ret;
 }
 
+void Mesh::setShader(GLSLProgram* s)
+{
+	shader = s;
+	uniformLoc.push_back(shader->getUniformLoc("Projection"));
+	uniformLoc.push_back(shader->getUniformLoc("View"));
+	uniformLoc.push_back(shader->getUniformLoc("Model"));
+	uniformLoc.push_back(shader->getUniformLoc("material.Shininess"));
+	uniformLoc.push_back(shader->getUniformLoc("TexID"));
+	uniformLoc.push_back(shader->getUniformLoc("shadowMap"));
+	uniformLoc.push_back(shader->getUniformLoc("LightView"));
+	uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
+	uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+}
+
 void Mesh::draw()
 {
-	shader->setUniform("projMatrix", Projection);
-	shader->setUniform("viewMatrix", View);
-	shader->setUniform("modelMatrix", getModelM()*getRotation()*adjustM);
-	shader->setUniform("texUnit", 0);
+	shader->setUniform(uniformLoc[0], Projection);
+	shader->setUniform(uniformLoc[1], View);
+	shader->setUniform(uniformLoc[2], getModelM()*getRotation()*adjustM);
+	shader->setUniform(uniformLoc[3], 1000);
+	shader->setUniform(uniformLoc[4], 0);
+	shader->setUniform(uniformLoc[5], shadowTex);
+	shader->setUniform(uniformLoc[6], LightView);
+	shader->setUniform(uniformLoc[7], LightProjection);
+	shader->setUniform(uniformLoc[8], ScaleBias);
 	shader->use();
 
 	glBindVertexArray(m_VAO);
@@ -410,6 +432,49 @@ void Mesh::draw()
 
 	// Make sure the VAO is not changed from the outside    
 	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+void Mesh::draw(mat4& projection, mat4& view)
+{
+	shader->setUniform(uniformLoc[0], projection);
+	shader->setUniform(uniformLoc[1], view);
+	shader->setUniform(uniformLoc[2], getModelM()*getRotation()*adjustM);
+	shader->setUniform(uniformLoc[3], 1000);
+	shader->setUniform(uniformLoc[4], 0);
+	shader->setUniform(uniformLoc[5], shadowTex);
+	shader->setUniform(uniformLoc[6], LightView);
+	shader->setUniform(uniformLoc[7], LightProjection);
+	shader->setUniform(uniformLoc[8], ScaleBias);
+	shader->use();
+
+	glBindVertexArray(m_VAO);
+
+	for (unsigned int i = 0; i < m_Entries.size(); i++) {
+		const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+
+		assert(MaterialIndex < m_Textures.size());
+
+		//		if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]) {
+		//			m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+		//		}
+
+		//		m_Entries[i].draw();
+
+		if (m_Textures[MaterialIndex]) {
+			m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+		}
+
+		glDrawElementsBaseVertex(GL_TRIANGLES,
+			m_Entries[i].NumIndices,
+			GL_UNSIGNED_INT,
+			(void*)(sizeof(uint)* m_Entries[i].BaseIndex),
+			m_Entries[i].BaseVertex);
+	}
+
+	// Make sure the VAO is not changed from the outside    
+	glBindVertexArray(0);
+	glUseProgram(0);
 }
 
 uint Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)

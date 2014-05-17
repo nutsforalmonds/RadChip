@@ -121,7 +121,9 @@ public:
 		//player-stationary detection
 		for (int i = 0; i < projectile.size(); i++){
 			bool touchGround1 = projectile[i]->getTouchGround();
-			for (int j = 1; j < player.size(); j++){
+			for (int j = 0; j < player.size(); j++){
+				if (projectile[i]->getPlayerID() == j)
+					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
 				bool touchGround2 = player[j]->getTouchGround();
@@ -262,7 +264,9 @@ public:
 
 	void basicAttack(int playerID)
 	{
-		for (int j = 1; j < player.size(); j++){
+		for (int j = 0; j < player.size(); j++){
+			if (j == playerID)
+				continue;
 			AABB pBox = player[playerID]->getAABB();
 			AABB sBox = player[j]->getAABB();
 			vector<int> holder;
@@ -331,6 +335,7 @@ public:
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
 		cubeT->setStartY(hold.max[2]);
+		cubeT->setPlayerID(playerID);
 
 		//Name and type
 		cubeT->setType("Cube");

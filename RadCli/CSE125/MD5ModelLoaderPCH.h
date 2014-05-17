@@ -9,7 +9,7 @@
 #include <boost/filesystem/fstream.hpp>
 namespace fs = boost::filesystem;
 
-#include <gl/glut.h>
+#include <gl/freeglut.h>
 
 #define GLM_SWIZZLE_XYZW
 #include <glm/glm.hpp>

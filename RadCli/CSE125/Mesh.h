@@ -53,6 +53,7 @@ public:
 	bool LoadMesh(const std::string& Filename);
 
 	void draw();
+	void draw(mat4& projection, mat4& view);
 
 	uint NumBones() const
 	{
@@ -61,8 +62,9 @@ public:
 
 	void BoneTransform(float TimeInSeconds, vector<mat4>& Transforms);
 
-	void setShader(GLSLProgram* s){ shader = s; }
+	void setShader(GLSLProgram* s);
 	void setAdjustM(mat4 m){ adjustM = m; }
+	void setShadowTex(int t){ shadowTex = t; }
 
 private:
 
@@ -208,6 +210,9 @@ private:
 
 	GLSLProgram* shader;
 	mat4 adjustM;
+
+	int shadowTex;
+	vector<int> uniformLoc;
 };
 
 

@@ -9,6 +9,9 @@ using namespace std;
 
 extern mat4 Projection;
 extern mat4 View;
+extern mat4 LightView;
+extern mat4 LightProjection;
+extern mat4 ScaleBias;
 
 double ground_positionsf[] ={-10,0,10,
 	-10,0,-10,
@@ -41,18 +44,36 @@ public:
 	}
 	void setShader(GLSLProgram* shader){
 		this->shader=shader;
+		uniformLoc.push_back(shader->getUniformLoc("ViewMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("ProjectionMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("ModelMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("MVP"));
+		uniformLoc.push_back(shader->getUniformLoc("dispHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("colorTex"));
+		uniformLoc.push_back(shader->getUniformLoc("normalTex"));
+		uniformLoc.push_back(shader->getUniformLoc("displacementTex"));
+		uniformLoc.push_back(shader->getUniformLoc("occlusionTex"));
+		uniformLoc.push_back(shader->getUniformLoc("specularTex"));
+		uniformLoc.push_back(shader->getUniformLoc("shadowMap"));
+		uniformLoc.push_back(shader->getUniformLoc("LightView"));
+		uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
+		uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
 	}
 	void draw(){
-		shader->setUniform("ViewMatrix", View);
-		shader->setUniform("ProjectionMatrix", Projection);
-		shader->setUniform("ModelMatrix", mat4(1.0));
-		shader->setUniform("MVP", Projection*View);
-		shader->setUniform("dispHeight", dispHeight);
-		shader->setUniform("colorTex",0);
-		shader->setUniform("normalTex", 1);//vertex shader
-		shader->setUniform("displacementTex", 2);//vertex shader
-		shader->setUniform("occlusionTex", 3);
-		shader->setUniform("specularTex", 4);
+		shader->setUniform(uniformLoc[0], View);
+		shader->setUniform(uniformLoc[1], Projection);
+		shader->setUniform(uniformLoc[2], mat4(1.0));
+		shader->setUniform(uniformLoc[3], Projection*View);
+		shader->setUniform(uniformLoc[4], dispHeight);
+		shader->setUniform(uniformLoc[5], 0);
+		shader->setUniform(uniformLoc[6], 1);//vertex shader
+		shader->setUniform(uniformLoc[7], 2);//vertex shader
+		shader->setUniform(uniformLoc[8], 3);
+		shader->setUniform(uniformLoc[9], 4);
+		shader->setUniform(uniformLoc[10], shadowTex);
+		shader->setUniform(uniformLoc[11], LightView);
+		shader->setUniform(uniformLoc[12], LightProjection);
+		shader->setUniform(uniformLoc[13], ScaleBias);
 		colorTex->Bind(GL_TEXTURE0);
 		normalTex->Bind(GL_TEXTURE1);
 		displacementTex->Bind(GL_TEXTURE2);
@@ -60,6 +81,31 @@ public:
 		specularTex->Bind(GL_TEXTURE4);
 		shader->use();
 		vao.draw();
+		glUseProgram(0);
+	}
+	void draw(mat4& projection, mat4& view){
+		shader->setUniform(uniformLoc[0], view);
+		shader->setUniform(uniformLoc[1], projection);
+		shader->setUniform(uniformLoc[2], mat4(1.0));
+		shader->setUniform(uniformLoc[3], projection*view);
+		shader->setUniform(uniformLoc[4], dispHeight);
+		shader->setUniform(uniformLoc[5], 0);
+		shader->setUniform(uniformLoc[6], 1);//vertex shader
+		shader->setUniform(uniformLoc[7], 2);//vertex shader
+		shader->setUniform(uniformLoc[8], 3);
+		shader->setUniform(uniformLoc[9], 4);
+		shader->setUniform(uniformLoc[10], shadowTex);
+		shader->setUniform(uniformLoc[11], LightView);
+		shader->setUniform(uniformLoc[12], LightProjection);
+		shader->setUniform(uniformLoc[13], ScaleBias);
+		colorTex->Bind(GL_TEXTURE0);
+		normalTex->Bind(GL_TEXTURE1);
+		displacementTex->Bind(GL_TEXTURE2);
+		occlusionTex->Bind(GL_TEXTURE3);
+		specularTex->Bind(GL_TEXTURE4);
+		shader->use();
+		vao.draw();
+		glUseProgram(0);
 	}
 	void setKd(vec3 v){
 		Kd=v;
@@ -155,6 +201,7 @@ public:
 		return (uint)(DispIMG[4 * ((DispH-1-t)*DispW + s)]) / 255.0 *dispHeight;
 	}
 	void setHeight(float f){ dispHeight = f; }
+	void setShadowTex(int t){ shadowTex = t; }
 
 private:
 	VAO vao;
@@ -177,5 +224,7 @@ private:
 	GLint DispW, DispH;
 	GLubyte* DispIMG;
 	float dispHeight;
+	int shadowTex;
+	vector<int> uniformLoc;
 };
 
