@@ -1410,6 +1410,13 @@ void initialize(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
 
+	sprintf_s(buf, "%s", "Attempting to connect to server...");
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+	glutSwapBuffers();
+
 	try
 	{
 		cli = new tcp_client(io_service, "localhost", "13");
@@ -1417,12 +1424,26 @@ void initialize(int argc, char *argv[])
 		io_service.run_one();
 		playerID = cli->pID();
 		std::cout << "pid: " << playerID << std::endl;
-		system("pause");
+		//system("pause");
 	}
 	catch (std::exception& e)
 	{
+		sprintf_s(buf, "%s", "Error connecting to server!");
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+		glutSwapBuffers();
+
 		std::cerr << e.what() << std::endl;
 	}
+
+	sprintf_s(buf, "%s", "Attempting to connect to server...done!");
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+	glutSwapBuffers();
 
 	cam = new Camera();
 	cam->attach(player_list[playerID]);
