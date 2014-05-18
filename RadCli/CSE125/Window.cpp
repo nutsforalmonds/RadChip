@@ -186,28 +186,32 @@ void updateSound();
 
 int counter = 0;
 
-Cube* cube2D;
-Cube* cube2D_2;
-Cube* cube2D_3;
-Cube* cube2D_4;
+void healthBar(float damage);
+void overheatBar(int fired, int hot, int style);
 
-float x1_l = -2.0; //life
-float x2_l = 2.0;
-float y1_l = -2.0;
-float y2_l = 2.0;
+Cube* life_back;
+Cube* life_front;
+Cube* heat_back;
+Cube* heat_front;
 
-float x1_o = -2.0; // overheat bar
-float x2_o = 2.0;
-float y1_o = -2.0;
-float y2_o = -2.0;
+float x1_life = -2.0; //life
+float x2_life = 2.0;
+float y1_life = -2.0;
+float y2_life = 2.0;
+
+float x1_heat = -2.0; // overheat bar
+float x2_heat = 2.0;
+float y1_heat = -2.0;
+float y2_heat = -2.0;
+
+int lock = 0;
 
 float less_life = 0;
 float overheat = 0;
 float shots = 0;
-float damage_taken = 100; //set to default 1/7 of the life bar
-float life_bar = x2_l - x1_l;
-float heat_bar = x2_o - x1_o;
-float health = 700; //arbitrary health number
+float damage_taken = .1; //set to default 1/7 of the life bar
+float health_bar_size = x2_life - x1_life;
+float heat_bar_size = x2_heat - x1_heat;
 
 time_t over_de; //rate of decay of overheat bar
 
@@ -512,103 +516,21 @@ void Window::displayCallback(void)
 
 		glDisable(GL_DEPTH_TEST);
 
-		//UI BARS
 
-		if (less_life == 1)
+		//Status Bars
+		if (less_life)
 		{
-			cube2D_2->Cube::~Cube();
-
-			x2_l = x2_l - (life_bar*(1 - (health - damage_taken) / health));
-
-
-			if (x2_l <= -2)
-			{
-				x2_l = -2.0;
-			}
-
-			cube2D_2 = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
-			cube2D_2->setColor(vec3(0.0, 1.0, 0.0));
-			cube2D_2->setShader(sdrCtl.getShader("basic_2D"));
-			cube2D_2->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
-
+			healthBar(damage_taken);
 			less_life = 0;
-
 		}
+		
+		life_back->draw();
+		life_front->draw();
 
-		// gun overheating
-
-		if (shots == 1 && overheat == 0)
-		{
-			cube2D_4->Cube::~Cube();
-
-			y2_o = y2_o + (heat_bar / 7.0); //# of shots
-
-			if (y2_o >= 2.0)
-			{
-				overheat = 1;
-				y2_o = 2;
-			}
-
-			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
-			cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
-			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
-			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-
-			shots = 0;
-			over_de = clock();
-		}
-
-
-
-		else if (shots == 0 && overheat == 0)
-		{
-			cube2D_4->Cube::~Cube();
-
-			if (y2_o > -2 && (clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
-			{
-				y2_o = y2_o - (heat_bar / 60.0);
-				over_de = clock();
-			}
-
-			if (y2_o < -2)
-			{
-				y2_o = -2;
-			}
-
-			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
-			cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
-			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
-			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-		}
-
-		else if (overheat == 1)
-		{
-			cube2D_4->Cube::~Cube();
-
-			if ((clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
-			{
-				y2_o = y2_o - (heat_bar / 60.0);
-				over_de = clock();
-			}
-
-			if (y2_o < -2)
-			{
-				overheat = 0;
-				y2_o = -2;
-			}
-
-			cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
-			cube2D_4->setColor(vec3(1.0, 0.0, 0.0));
-			cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
-			cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-
-		}
-
-
-		cube2D->draw();
-		cube2D_2->draw();
-		cube2D_3->draw();
-		cube2D_4->draw();
+		overheatBar(shots, overheat, 2);
+		
+		heat_back->draw();
+		heat_front->draw();
 
 		//2D cube setColor() is changing the color of the text...
 		//Problem with the currently bound shader me thinks
@@ -1000,6 +922,10 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					///scene->basicAttack(playerID);
+					
+					//UI testing purposes
+					less_life = 1;
+					shots = 1;
 				}
 				else
 				{
@@ -1014,6 +940,7 @@ void mouseFunc(int button, int state, int x, int y)
 					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
 					//projectileAttack(playerID, cam);
+					
 				}
 				else
 				{
@@ -1291,26 +1218,26 @@ void initialize(int argc, char *argv[])
 	player_list.push_back(cube0);*/
 
 	//life bars
-	cube2D = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
-	cube2D->setColor(vec3(1.0, 0.0, 0.0));
-	cube2D->setShader(sdrCtl.getShader("basic_2D"));
-	cube2D->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
+	life_back = new Cube(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_back->setColor(vec3(1.0, 0.0, 0.0));
+	life_back->setShader(sdrCtl.getShader("basic_2D"));
+	life_back->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
 
-	cube2D_2 = new Cube(x1_l, x2_l, y1_l, y2_l, 0, 0);
-	cube2D_2->setColor(vec3(0.0, 1.0, 0.0));
-	cube2D_2->setShader(sdrCtl.getShader("basic_2D"));
-	cube2D_2->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
+	life_front = new Cube(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_front->setColor(vec3(0.0, 1.0, 0.0));
+	life_front->setShader(sdrCtl.getShader("basic_2D"));
+	life_front->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
 
 	//overheat bars
-	cube2D_3 = new Cube(x1_o, x2_o, y1_o, y2_l, 0, 0);
-	cube2D_3->setColor(vec3(1.0, 1.0, 1.0));
-	cube2D_3->setShader(sdrCtl.getShader("basic_2D"));
-	cube2D_3->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
+	heat_back = new Cube(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat), 0, 0);
+	heat_back->setColor(vec3(1.0, 1.0, 1.0));
+	heat_back->setShader(sdrCtl.getShader("basic_2D"));
+	heat_back->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
 
-	cube2D_4 = new Cube(x1_o, x2_o, y1_o, y2_o, 0, 0);
-	cube2D_4->setColor(vec3(0.0, 1.0, 0.0));
-	cube2D_4->setShader(sdrCtl.getShader("basic_2D"));
-	cube2D_4->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+	heat_front = new Cube(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+	heat_front->setColor(vec3(0.0, 1.0, 0.0));
+	heat_front->setShader(sdrCtl.getShader("basic_2D"));
+	heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
 
 
 	ground = new Ground();
@@ -1670,5 +1597,106 @@ void Window::removeDrawList(const std::string& name)
 	{
 		if ((*draw_list[j]).getName() == name)
 			draw_list.erase(draw_list.begin() + j);
+	}
+}
+
+void healthBar(float damage)
+{
+	life_front->Cube::~Cube();
+
+	x2_life = x2_life - health_bar_size*damage;
+
+	if (x2_life <= x1_life)
+	{
+		x2_life = x1_life;
+	}
+
+	life_front = new Cube(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_front->setColor(vec3(0.0, 1.0, 0.0));
+	life_front->setShader(sdrCtl.getShader("basic_2D"));
+	life_front->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
+
+}
+
+void overheatBar(int fired, int hot, int style)
+{
+	//style will state what class character is meele or range 1 been meele, more cases can be added later
+	if (style == 1)
+	{
+		if (lock == 0)
+		{
+			heat_back->Cube::~Cube();
+			heat_front->Cube::~Cube();
+			lock = 1;
+		}
+	}
+
+	else
+	{
+		if (fired == 1 && hot == 0)
+		{
+			heat_front->Cube::~Cube();
+
+			y2_heat = y2_heat + ((heat_bar_size) / 7.0); //# of shots
+
+			if (y2_heat >= 2.0)
+			{
+				y2_heat = 2;
+				overheat = 1;
+			}
+
+			heat_front = new Cube(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front->setColor(vec3(0.0, 1.0, 0.0));
+			heat_front->setShader(sdrCtl.getShader("basic_2D"));
+			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+
+			over_de = clock();
+			shots = 0;
+		}
+
+
+		else if (fired == 0 && hot == 0)
+		{
+			heat_front->Cube::~Cube();
+
+			if (y2_heat > y1_heat && (clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
+			{
+				y2_heat = y2_heat - ((heat_bar_size) / 60.0);
+				over_de = clock();
+			}
+
+			if (y2_heat <= y1_heat)
+			{
+				y2_heat = y1_heat;
+			}
+
+			heat_front = new Cube(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front->setColor(vec3(0.0, 1.0, 0.0));
+			heat_front->setShader(sdrCtl.getShader("basic_2D"));
+			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+		}
+
+		else if (hot == 1)
+		{
+			heat_front->Cube::~Cube();
+
+			if ((clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
+			{
+				y2_heat = y2_heat - ((heat_bar_size) / 60.0);
+				over_de = clock();
+			}
+
+			if (y2_heat < y1_heat)
+			{
+				y2_heat = y1_heat;
+				overheat = 0;
+			}
+
+			heat_front = new Cube(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front->setColor(vec3(1.0, 0.0, 0.0));
+			heat_front->setShader(sdrCtl.getShader("basic_2D"));
+			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+
+		}
 	}
 }
