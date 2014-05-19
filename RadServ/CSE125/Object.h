@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std;
 
-#define BASE_JUMPS 5
+#define BASE_JUMPS 10
 
 static int iohjworihorhi = 0;
 
@@ -96,9 +96,10 @@ public:
 	}
 
 	void jump(){
+		cout << numJumps << endl;
 		if (numJumps > 0)
 		{
-			velocity[1] += 5;
+			velocity[1] += 1;
 			numJumps--;
 		}
 	}

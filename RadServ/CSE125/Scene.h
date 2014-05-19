@@ -511,7 +511,7 @@ public:
 		md50->postTrans(glm::translate(vec3(-20, 0.5, -20)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
-		md50->setName("Player Model");
+		md50->setName("Player Model0");
 		md50->setPlayerID(numPlayers());
 		addPlayer(md50);
 
@@ -520,7 +520,7 @@ public:
 		md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
-		md51->setName("Player Model");
+		md51->setName("Player Model1");
 		md51->setPlayerID(numPlayers());
 		addPlayer(md51);
 
@@ -529,7 +529,7 @@ public:
 		md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
-		md52->setName("Player Model");
+		md52->setName("Player Model2");
 		md52->setPlayerID(numPlayers());
 		addPlayer(md52);
 
@@ -538,7 +538,7 @@ public:
 		md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
-		md53->setName("Player Model");
+		md53->setName("Player Model3");
 		md53->setPlayerID(numPlayers());
 		addPlayer(md53);
 

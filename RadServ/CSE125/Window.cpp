@@ -104,6 +104,10 @@ void handle_key_state(int pid, int keyState){
 		//cout << "jump" << endl;
 		scene->jump(pid);
 	}
+	else
+	{
+
+	}
 	if (keyState & 1 << 5){ //'W' for sprint
 		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
 	}
@@ -227,10 +231,14 @@ int main(int argc, char *argv[])
 
 		scene->simulate(diff, 1.0 / 100);
 		boost::array<mat4, 4> m;
-		m[0] = scene->getPlayerMats()[0];
-		m[1] = scene->getPlayerMats()[1];
-		m[2] = scene->getPlayerMats()[2];
-		m[3] = scene->getPlayerMats()[3];
+		if (scene->getPlayerObj(0) != NULL)
+			m[0] = scene->getPlayerMats()[0];
+		if (scene->getPlayerObj(1) != NULL)
+			m[1] = scene->getPlayerMats()[1];
+		if (scene->getPlayerObj(2) != NULL)
+			m[2] = scene->getPlayerMats()[2];
+		if (scene->getPlayerObj(3) != NULL)
+			m[3] = scene->getPlayerMats()[3];
 		// Print out matrix contents
 		/*
 		cout << (m[0])[0][0] << (m[0])[0][1] << (m[0])[0][2] << (m[0])[0][3] << endl;

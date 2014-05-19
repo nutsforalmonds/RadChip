@@ -256,7 +256,7 @@ void projectileAttack(int playerID, Camera * cam)
 	cubeT->setSpeed(5);
 	cubeT->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	cubeT->setModelM(player1*glm::translate(vec3(0, 0, -1)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 	cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	AABB hold = cubeT->getAABB();
 	cubeT->setStartX(hold.max[0]);
@@ -945,7 +945,7 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
-					//projectileAttack(playerID, cam);
+					projectileAttack(playerID, cam);
 					
 				}
 				else
