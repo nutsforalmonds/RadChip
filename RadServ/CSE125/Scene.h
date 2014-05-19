@@ -13,6 +13,11 @@
 using namespace std;
 
 
+#define RESPAWN_COUNTER 100
+#define MAX_SPEED 100
+#define MAX_DISTANCE 100
+
+
 class Scene
 {
 public:
@@ -33,6 +38,18 @@ public:
 		}
 		player.clear();
 	}
+
+	Object * getPlayerObj(int playerID)
+	{
+		for (int i = 0; i < player.size(); i++)
+		{
+			if (player[i]->getPlayerID() == playerID)
+				return player[i];
+		}
+		return NULL;
+	}
+
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -43,6 +60,8 @@ public:
 			collisionDetectionPlayer();
 			collisionDetectionProjectile();
 			despawnProjectile();
+			rechargeJump();
+			respawnPlayer();
 		}
 		resolvePlayerTransition(t);
 		////octree here
@@ -50,6 +69,8 @@ public:
 		collisionDetectionPlayer();
 		collisionDetectionProjectile();
 		despawnProjectile();
+		rechargeJump();
+		respawnPlayer();
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -117,71 +138,6 @@ public:
 		}
 	}
 
-	void collisionDetectionProjectile(){
-		//player-stationary detection
-		for (int i = 0; i < projectile.size(); i++){
-			bool touchGround1 = projectile[i]->getTouchGround();
-			for (int j = 0; j < player.size(); j++){
-				if (projectile[i]->getPlayerID() == j)
-					continue;
-				AABB pBox = projectile[i]->getAABB();
-				AABB sBox = player[j]->getAABB();
-				bool touchGround2 = player[j]->getTouchGround();
-				bool collide = false;
-				//[p][s]
-				if ((pBox.max[2] <= sBox.max[2] ) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0] ) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(j))
-				{
-					player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
-					//TODO set health damage to zero
-					//////////////////////player[j]->setHealth(-1);
-					(*projectile[i]).setHit(j);
-					if (player[j]->getHealth() < 1)
-					{
-						//Window::removeDrawList((*player[j]).getName());//////////////////////////////////////////////////////////////////
-						player.erase(player.begin() + j);
-					}
-				}
-				//[s][p]
-				else if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(j))
-				{
-					player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
-					////////////////////////////////player[j]->setHealth(-1);
-					(*projectile[i]).setHit(j);
-					if (player[j]->getHealth() < 1)
-					{
-						//Window::removeDrawList((*player[j]).getName());////////////////////////////////////////////////////////////////////
-						player.erase(player.begin() + j);
-					}
-				}
-				//[p]
-				//[s]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(j))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
-					/////////////////////////////////player[j]->setHealth(-1);
-					(*projectile[i]).setHit(j);
-					if (player[j]->getHealth() < 1)
-					{
-						//Window::removeDrawList((*player[j]).getName());
-						player.erase(player.begin() + j);
-					}
-				}
-				//[s]
-				//[p]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2] + 1) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(j))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
-					//////////////////////////////////player[j]->setHealth(-1);
-					(*projectile[i]).setHit(j);
-					if (player[j]->getHealth() < 1)
-					{
-						//Window::removeDrawList((*player[j]).getName());
-						player.erase(player.begin() + j);
-					}
-				}
-			}
-		}
-	}
 
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
 		float Rewind[3];
@@ -254,73 +210,172 @@ public:
 		}
 	}
 
-	void setHMove(int playerID, int m){ player[playerID]->setHMove(m); }
-	void cancelHMove(int playerID, int m){ player[playerID]->cancelHMove(m); }
-	void setVMove(int playerID, int m){ player[playerID]->setVMove(m); }
-	void cancelVMove(int playerID, int m){ player[playerID]->cancelVMove(m); }
-	void setPendingRot(int playerID, float f){ player[playerID]->setPendingRot(f); }
-	void pushRot(int playerID, float f){ player[playerID]->pushRot(f); }
-	void jump(int playerID){ player[playerID]->jump(); }
+	void setHMove(int playerID, int m){ getPlayerObj(playerID)->setHMove(m); }
+	void cancelHMove(int playerID, int m){ getPlayerObj(playerID)->cancelHMove(m); }
+	void setVMove(int playerID, int m){ getPlayerObj(playerID)->setVMove(m); }
+	void cancelVMove(int playerID, int m){ getPlayerObj(playerID)->cancelVMove(m); }
+
+
+	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
+	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
+	void jump(int playerID){ getPlayerObj(playerID)->jump(); }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void respawnPlayer()
+	{
+		for (int i = 0; i < respawn.size(); i++)
+		{
+			Object * holder = respawn[i];
+			holder->setRespawn(holder->getRespawn() - 1);
+			cout << holder->getName() << " " << holder->getRespawn() << endl;
+			if (holder->getRespawn() < 1)
+			{
+				//Window::addDrawList(holder);
+				//Window::addPlayerList(holder);
+				Window::respawnPlayer(holder->getName());
+				player.push_back(holder);
+				holder->setHealth(7);
+				respawn.erase(respawn.begin() + i);
+				cout << "" << endl;
+			}
+		}
+	}
+
+
+	void collisionDetectionProjectile(){
+		//player-stationary detection
+		for (int i = 0; i < projectile.size(); i++)
+		{
+			bool touchGround1 = projectile[i]->getTouchGround();
+			for (int j = 0; j < player.size(); j++)
+			{
+				if (projectile[i]->getPlayerID() == player[j]->getPlayerID())
+					continue;
+				AABB pBox = projectile[i]->getAABB();
+				AABB sBox = player[j]->getAABB();
+				bool touchGround2 = player[j]->getTouchGround();
+				bool collide = false;
+				//[p][s]
+				if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
+				{
+					player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
+					(*projectile[i]).setHit(player[j]->getPlayerID());
+					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				}
+				//[s][p]
+				else if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
+				{
+					player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
+					(*projectile[i]).setHit(player[j]->getPlayerID());
+					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				}
+				//[p]
+				//[s]
+				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
+				{
+					player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
+					(*projectile[i]).setHit(player[j]->getPlayerID());
+					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				}
+				//[s]
+				//[p]
+				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2] + 1) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
+				{
+					player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
+					(*projectile[i]).setHit(player[j]->getPlayerID());
+					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				}
+			}
+		}
+	}
+
+	void damagePlayer(int targetId, int playerId)
+	{
+		Object * playerHolder = getPlayerObj(playerId);
+		Object * targetHolder = getPlayerObj(targetId);
+		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		if (targetHolder->getHealth() < 1)
+		{
+			int dist, spd, dmg;
+			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
+			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
+			//restricting speed and distance
+			if (dist > MAX_DISTANCE)
+				dist = MAX_DISTANCE;
+			if (spd > MAX_SPEED)
+				spd = MAX_SPEED;
+			 
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			Window::removeDrawList((*targetHolder).getName());
+			Window::removePlayerList((*targetHolder).getName());
+			respawn.push_back(targetHolder);
+			for (int i = 0; i < player.size(); i++)
+			{
+				if (player[i]->getPlayerID() == targetId)
+					player.erase(player.begin() + i);
+			}
+			RangeWeapon * newItem = new RangeWeapon(dist,
+													spd,
+													((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2);
+			playerHolder->setWeapon(newItem);
+			playerHolder->setKills(1);
+			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
+			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
+		}
+	}
 
 	void basicAttack(int playerID)
 	{
-		for (int j = 0; j < player.size(); j++){
-			if (j == playerID)
-				continue;
-			AABB pBox = player[playerID]->getAABB();
-			AABB sBox = player[j]->getAABB();
-			vector<int> holder;
-			//[p][s]
-			if ((pBox.max[2] <= sBox.max[2] + 5) && (pBox.max[2] >= sBox.max[2] - 5)  && pBox.max[0] == sBox.min[0])
-			{
-				player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
-				player[j]->setHealth(-1);
-				if (player[j]->getHealth() < 1)
-					player.erase(player.begin() + j);
-			}
-			//[s][p]
-			else if ((pBox.max[2] <= sBox.max[2] + 5) && (pBox.max[2] >= sBox.max[2] - 5) && pBox.min[0] == sBox.max[0])
-			{
-				player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
-				player[j]->setHealth(-1);
-				if (player[j]->getHealth() < 1)
-					player.erase(player.begin() + j);
-			}
-			//[p]
-			//[s]
-			else if ((pBox.max[0] <= sBox.max[0] + 5) && (pBox.max[0] >= sBox.max[0] - 5) && pBox.min[2] == sBox.max[2])
-			{
-				player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
-				player[j]->setHealth(-1);
-				if (player[j]->getHealth() < 1)
-					player.erase(player.begin() + j);
-			}
-			//[s]
-			//[p]
-			else if ((pBox.max[0] <= sBox.max[0] + 5) && (pBox.max[0] >= sBox.max[0] - 5) && pBox.max[2] == sBox.min[2])
-			{
-				//setVMove(j, -1);
-				//holder.push_back(j);
-				//holder.push_back(1);
-				//holder.push_back(-1);
-				//prevAttacked.push_back(holder);
-				player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
-				player[j]->setHealth(-1);
-				if (player[j]->getHealth() < 1)
-					player.erase(player.begin() + j);
-			}
-		}
-
+	  for (int j = 0; j < player.size(); j++)
+	    {
+	    if (j == playerID)
+	      continue;
+	    AABB pBox = player[playerID]->getAABB();
+	    AABB sBox = player[j]->getAABB();
+	    vector<int> holder;	
+	    //[p][s]
+	    if ((pBox.max[2] <= sBox.max[2] + 5) && (pBox.max[2] >= sBox.max[2] - 5)  && pBox.max[0] == sBox.min[0])
+	      {
+		player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
+		damagePlayer(j, playerID);
+	      }
+	    //[s][p]
+	    else if ((pBox.max[2] <= sBox.max[2] + 5) && (pBox.max[2] >= sBox.max[2] - 5) && pBox.min[0] == sBox.max[0])
+	      {
+		player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
+		damagePlayer(j, playerID);
+	      }
+	    //[p]
+	    //[s]
+	    else if ((pBox.max[0] <= sBox.max[0] + 5) && (pBox.max[0] >= sBox.max[0] - 5) && pBox.min[2] == sBox.max[2])
+	      {
+		player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
+		damagePlayer(j, playerID);
+	      }
+	    //[s]
+	    //[p]
+	    else if ((pBox.max[0] <= sBox.max[0] + 5) && (pBox.max[0] >= sBox.max[0] - 5) && pBox.max[2] == sBox.min[2])
+	      {
+		player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
+		damagePlayer(j, playerID);
+	      }
+	    }
+	  
 	}
 
 	void projectileAttack(int playerID, mat4 * cam)
 	{
 		mat4 test = *cam; //cam->getCamM();
 		vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
-		mat4 player1 = player[playerID]->getModelM();
+		mat4 player1 = getPlayerObj(playerID)->getModelM();
 		vec4 playerHolder = player1*vec4(0, 0, 0, 1);
+		Cube * playerObject = ((Cube *)getPlayerObj(playerID));
+		Object * playerHold = getPlayerObj(playerID);
 
-		Projectile* cubeT = new Projectile(player.size());
+		Projectile* cubeT = new Projectile(player.size() + respawn.size());
 		cubeT->setKd(vec3(0.8, 0.0, 0.0));
 		cubeT->setKa(vec3(0.3, 0.0, 0.0));
 		cubeT->setKs(vec3(0.4, 0.0, 0.0));
@@ -330,7 +385,7 @@ public:
 		cubeT->setCubeMapUnit(3);
 		cubeT->setSpeed(5);
 		//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-		cubeT->setModelM(player1*glm::translate(vec3(0, 0, -1)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+		cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 		cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
@@ -341,12 +396,13 @@ public:
 		cubeT->setType("Cube");
 		cubeT->setName("Test Cube" + std::to_string(projectile_counter));
 		projectile_counter++;
+		cube6->setDistance(((RangeWeapon *)(playerHold)->getWeapon())->getDistance());
 		//Add Cube to the draw list
 		////////////////////////////////////////////////////////Window::addDrawList(cubeT);
 		projectile.push_back(cubeT);
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
-		cubeT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cube6->setVelocity(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
@@ -361,13 +417,47 @@ public:
 			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
 
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
-			if (distance > 30)
+			if (distance >= (*projectile[i]).getDistance())
 			{
 				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
 				projectile.erase(projectile.begin() + i);
 			}
 		}
 	}
+
+	void recover(int playerId)
+	{
+		getPlayerObj(playerId)->jump(20);
+	}
+
+	void rechargeJump()
+	{
+		for (int i = 0; i < player.size(); i++)
+		{
+			if (player[i]->getTouchGround() && player[i]->getNumJumps() < player[i]->getTotalJumps())
+				player[i]->incNumJumps();
+		}
+	}
+
+	void takeItem()
+	{
+
+	}
+
+	void resetVelocity(int playerId)
+	{
+		player[playerId]->resetVelocity();
+	}
+
+	int numPlayers()
+	{
+		return player.size();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////// END OF PLAYER ACTIONS ///////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	vector<mat4> getPlayerMats(){
 		vector<mat4> m;
@@ -377,6 +467,10 @@ public:
 		return m;
 	}
 
+	Object * getPlayer(int i)
+	{
+		return getPlayerObj(i);
+	}
 	void initialize(){
 
 
@@ -418,6 +512,7 @@ public:
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
 		md50->setName("Player Model");
+		md50->setPlayerID(numPlayers());
 		addPlayer(md50);
 
 		MD5Model* md51 = new MD5Model();
@@ -426,6 +521,7 @@ public:
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model");
+		md50->setPlayerID(numPlayers());
 		addPlayer(md51);
 
 		MD5Model* md52 = new MD5Model();
@@ -434,6 +530,7 @@ public:
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model");
+		md50->setPlayerID(numPlayers());
 		addPlayer(md52);
 
 		MD5Model* md53 = new MD5Model();
@@ -442,6 +539,7 @@ public:
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model");
+		md50->setPlayerID(numPlayers());
 		addPlayer(md53);
 
 
@@ -494,10 +592,12 @@ public:
 protected:
 	vector<Object*> stationary;
 	vector<Object*> player;
+	vector<Object*> respawn;
 	vector<Object*> tower;
 	vector<Object*> skillShot;
 	vector<Object*> virtualTower;
 	vector<Projectile*> projectile;
+	vector<Item *> items;
 	vector<mat4> camM;
 	vec3 gravity;
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
