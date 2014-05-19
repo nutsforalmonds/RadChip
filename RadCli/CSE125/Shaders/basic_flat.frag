@@ -17,6 +17,12 @@ void main()
 	if(textureMeBaby == 1)
 	{
 		vec4 texColor = texture( colorTex, texCor );
+		
 		FragColor = texColor;
+		
+		if(FragColor.a<0.1)
+		{
+			discard;
+		} 
 	}
 }

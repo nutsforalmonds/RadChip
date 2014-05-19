@@ -527,11 +527,13 @@ void Window::displayCallback(void)
 		
 		life_back->draw();
 		life_front->draw();
+		life_frame->draw();
 
 		overheatBar(shots, overheat, 2);
 		
 		heat_back->draw();
 		heat_front->draw();
+		heat_frame->draw();
 
 		//2D cube setColor() is changing the color of the text...
 		//Problem with the currently bound shader me thinks
@@ -1217,33 +1219,46 @@ void initialize(int argc, char *argv[])
 	cube0->setType("Cube");
 	cube0->setName("Test cube0");
 	player_list.push_back(cube0);*/
-
+	
 	//life bars
-	life_back = new UI_Panel(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_back = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
 	life_back->setColor(vec3(1.0, 0.0, 0.0));
 	life_back->setShader(sdrCtl.getShader("basic_2D"));
 	//life_back->loadColorTex("img/UI_TEST.png", "PNG");
 	life_back->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
 
-	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
 	life_front->setColor(vec3(0.0, 1.0, 0.0));
 	life_front->setShader(sdrCtl.getShader("basic_2D"));
 	//life_front->loadColorTex("img/UI_TEST.png", "PNG");
 	life_front->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
 
+	life_frame = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
+	life_frame->setColor(vec3(1.0, 0.0, 0.0));
+	life_frame->setShader(sdrCtl.getShader("basic_2D"));
+	life_frame->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+	life_frame->setTex(true);
+	life_frame->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
+
 	//overheat bars
-	heat_back = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat), 0, 0);
+	heat_back = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
 	heat_back->setColor(vec3(1.0, 1.0, 1.0));
 	heat_back->setShader(sdrCtl.getShader("basic_2D"));
 	//heat_back->loadColorTex("img/UI_TEST.png", "PNG");
 	heat_back->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
 
-	heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+	heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 	heat_front->setColor(vec3(0.0, 1.0, 0.0));
 	heat_front->setShader(sdrCtl.getShader("basic_2D"));
 	//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
 	heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
 
+	heat_frame = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
+	heat_frame->setColor(vec3(1.0, 1.0, 1.0));
+	heat_frame->setShader(sdrCtl.getShader("basic_2D"));
+	heat_frame->loadColorTex("img/UI_FRAME_VERT.png", "PNG");
+	heat_frame->setTex(true);
+	heat_frame->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("grid_ground"));
@@ -1638,7 +1653,7 @@ void healthBar(float damage)
 		x2_life = x1_life;
 	}
 
-	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life, 0, 0);
+	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
 	life_front->setColor(vec3(0.0, 1.0, 0.0));
 	life_front->setShader(sdrCtl.getShader("basic_2D"));
 	//life_front->loadColorTex("img/UI_TEST.png", "PNG");
@@ -1673,7 +1688,7 @@ void overheatBar(int fired, int hot, int style)
 				overheat = 1;
 			}
 
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 			heat_front->setColor(vec3(0.0, 1.0, 0.0));
 			heat_front->setShader(sdrCtl.getShader("basic_2D"));
 			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
@@ -1699,7 +1714,7 @@ void overheatBar(int fired, int hot, int style)
 				y2_heat = y1_heat;
 			}
 
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 			heat_front->setColor(vec3(0.0, 1.0, 0.0));
 			heat_front->setShader(sdrCtl.getShader("basic_2D"));
 			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
@@ -1722,7 +1737,7 @@ void overheatBar(int fired, int hot, int style)
 				overheat = 0;
 			}
 
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat, 0, 0);
+			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 			heat_front->setColor(vec3(1.0, 0.0, 0.0));
 			heat_front->setShader(sdrCtl.getShader("basic_2D"));
 			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");

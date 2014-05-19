@@ -88,7 +88,7 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, 8 * sizeof(float), &tex_positions, GL_STATIC_DRAW, 1, 2, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.setDrawMode(GL_TRIANGLES, 6, GL_UNSIGNED_INT, &triangle_indices);
 	}
-	UI_Panel(float negx, float posx, float negy, float posy, float negz, float posz){
+	UI_Panel(float negx, float posx, float negy, float posy){
 		texBool = 0;
 		generate(negx, posx, negy, posy);
 		setModelM(mat4(1.0));
