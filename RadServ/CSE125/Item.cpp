@@ -15,5 +15,5 @@ void Item::setHealth(int val)
 	health = val;
 }
 
-bool Item::isWeapon(){	return false;}
+bool Item::isWeapon(){ return false; }
 bool Item::isBoots(){ return false; }

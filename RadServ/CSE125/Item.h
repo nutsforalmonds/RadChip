@@ -12,7 +12,7 @@ public:
 	void setHealth(int val);
 	bool isWeapon();
 	bool isBoots();
-	
+
 protected:
 	int health;
 };
