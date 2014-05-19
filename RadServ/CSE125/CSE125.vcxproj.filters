@@ -49,6 +49,21 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Boots.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="RangeWeapon.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerChar.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -139,6 +154,21 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="VAO.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Boots.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="RangeWeapon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerChar.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

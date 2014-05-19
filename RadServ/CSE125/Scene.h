@@ -235,7 +235,7 @@ public:
 			{
 				//Window::addDrawList(holder);
 				//Window::addPlayerList(holder);
-				Window::respawnPlayer(holder->getName());
+				//Window::respawnPlayer(holder->getName());
 				player.push_back(holder);
 				holder->setHealth(7);
 				respawn.erase(respawn.begin() + i);
@@ -309,8 +309,8 @@ public:
 				spd = MAX_SPEED;
 			 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
-			Window::removeDrawList((*targetHolder).getName());
-			Window::removePlayerList((*targetHolder).getName());
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
 			respawn.push_back(targetHolder);
 			for (int i = 0; i < player.size(); i++)
 			{
@@ -396,13 +396,13 @@ public:
 		cubeT->setType("Cube");
 		cubeT->setName("Test Cube" + std::to_string(projectile_counter));
 		projectile_counter++;
-		cube6->setDistance(((RangeWeapon *)(playerHold)->getWeapon())->getDistance());
+		cubeT->setDistance(((RangeWeapon *)(playerHold)->getWeapon())->getDistance());
 		//Add Cube to the draw list
 		////////////////////////////////////////////////////////Window::addDrawList(cubeT);
 		projectile.push_back(cubeT);
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
-		cube6->setVelocity(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cubeT->setVelocity(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
@@ -521,7 +521,7 @@ public:
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model");
-		md50->setPlayerID(numPlayers());
+		md51->setPlayerID(numPlayers());
 		addPlayer(md51);
 
 		MD5Model* md52 = new MD5Model();
@@ -530,7 +530,7 @@ public:
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model");
-		md50->setPlayerID(numPlayers());
+		md52->setPlayerID(numPlayers());
 		addPlayer(md52);
 
 		MD5Model* md53 = new MD5Model();
@@ -539,7 +539,7 @@ public:
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model");
-		md50->setPlayerID(numPlayers());
+		md53->setPlayerID(numPlayers());
 		addPlayer(md53);
 
 

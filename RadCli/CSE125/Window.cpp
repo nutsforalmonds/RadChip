@@ -287,7 +287,7 @@ void despawnProjectile()
 		int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
 
 		//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
-		if (distance > 30)
+		if (distance >= (*projectile_list[i]).getDistance())
 		{
 			////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
 			projectile_list.erase(projectile_list.begin() + i);
@@ -790,6 +790,9 @@ void keyboard(unsigned char key, int, int){
 		if (key == 's'){
 			keyState = keyState | 1 << 3;
 		}
+		if (key == 'W'){
+			keyState = keyState | 1 << 5;
+		}
 		if (key == 27){
 			exit(0);
 		}
@@ -883,6 +886,9 @@ void keyUp (unsigned char key, int x, int y) {
 		}
 		if (key == 's'){
 			keyState = keyState & ~(1 << 3);
+		}
+		if (key == 'W'){
+			keyState = keyState & ~(1 << 5);
 		}
 		if (key == ' '){
 			keyState = keyState & ~(1 << 4);
