@@ -467,6 +467,11 @@ public:
 		return m;
 	}
 
+	Object * getPlayerElement(int i)
+	{
+		return player[i];
+	}
+
 	Object * getPlayer(int i)
 	{
 		return getPlayerObj(i);
@@ -512,7 +517,7 @@ public:
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
 		md50->setName("Player Model0");
-		md50->setPlayerID(numPlayers());
+		md50->setPlayerID(0);
 		addPlayer(md50);
 
 		MD5Model* md51 = new MD5Model();
@@ -521,7 +526,7 @@ public:
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model1");
-		md51->setPlayerID(numPlayers());
+		md51->setPlayerID(1);
 		addPlayer(md51);
 
 		MD5Model* md52 = new MD5Model();
@@ -530,7 +535,7 @@ public:
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model2");
-		md52->setPlayerID(numPlayers());
+		md52->setPlayerID(2);
 		addPlayer(md52);
 
 		MD5Model* md53 = new MD5Model();
@@ -539,7 +544,7 @@ public:
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model3");
-		md53->setPlayerID(numPlayers());
+		md53->setPlayerID(3);
 		addPlayer(md53);
 
 
