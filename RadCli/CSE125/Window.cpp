@@ -191,8 +191,10 @@ void overheatBar(int fired, int hot, int style);
 
 UI_Panel* life_back;
 UI_Panel* life_front;
+UI_Panel* life_frame;
 UI_Panel* heat_back;
 UI_Panel* heat_front;
+UI_Panel* heat_frame;
 
 float x1_life = -2.0; //life
 float x2_life = 2.0;
