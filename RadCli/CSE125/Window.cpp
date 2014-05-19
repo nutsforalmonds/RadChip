@@ -349,16 +349,15 @@ void Window::idleCallback(void)
 			anim_time = 0;
 		}
 
-		//vector<mat4> Transforms;
-		//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
-		//GLSLProgram* sd = sdrCtl.getShader("basic_model");
-		//for (int i = 0; i < Transforms.size(); i++){
-		//	char Name[128];
-		//	memset(Name, 0, sizeof(Name));
-		//	SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
-		//	//sd->setUniform(Name, glm::transpose(Transforms[i]));
-		//	sd->setUniform(Name, Transforms[i]);
-		//}
+		m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		sd = sdrCtl.getShader("basic_model");
+		for (int i = 0; i < Transforms.size(); i++){
+			char Name[128];
+			memset(Name, 0, sizeof(Name));
+			SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+			//sd->setUniform(Name, glm::transpose(Transforms[i]));
+			sd->setUniform(Name, Transforms[i]);
+		}
 
 
 		simulateProjectile(delta);
@@ -463,7 +462,7 @@ void Window::displayCallback(void)
 		glViewport(0, 0, width, height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
 
-		//m_pMesh2->draw();
+		m_pMesh2->draw();
 
 		for (int i = 0; i < draw_list.size(); ++i)
 		{
@@ -1266,16 +1265,17 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
-	//m_pMesh2 = new Mesh();
-	//m_pMesh2->LoadMesh("Model/OctopusTower1_8_textures3.dae");
-	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
-	////m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
+	m_pMesh2 = new Mesh();
+	m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");
+	m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
+	m_pMesh2->setShadowTex(shadow_map_id);
+	m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 	//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0)));
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
-	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));*/
+	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2))); 
 	//m_pMesh2->setShadowTex(shadow_map_id);
 
 	///*md5 = new MD5Model();

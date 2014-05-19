@@ -509,12 +509,14 @@ uint Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 
 uint Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
+
 	assert(pNodeAnim->mNumScalingKeys > 0);
 
 	for (uint i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
 		if (AnimationTime < (float)pNodeAnim->mScalingKeys[i + 1].mTime) {
 			return i;
 		}
+		//std::cout << "i: " << i << " AnimationTime: " << AnimationTime << "mTime: " << (float)pNodeAnim->mScalingKeys[i + 1].mTime << std::endl;
 	}
 
 	assert(0);
@@ -576,6 +578,10 @@ void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const a
 	assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
 	float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
 	float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
+	//std::cout << "ScalingIndex: " << ScalingIndex << std::endl;
+	//std::cout << "AnimationTime: " << AnimationTime << std::endl;
+	//std::cout << "mTime: " << (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime << std::endl;
+	//std::cout <<"Factor: "<< Factor << std::endl;
 	assert(Factor >= 0.0f && Factor <= 1.0f);
 	const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
 	const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
@@ -639,6 +645,8 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const mat
 
 void Mesh::BoneTransform(float TimeInSeconds, vector<mat4>& Transforms)
 {
+	//std::cout <<"mDuration: " <<(float)m_pScene->mAnimations[0]->mDuration << std::endl;
+
 	//mat4 Identity;
 	//Identity.InitIdentity();
 	mat4 Identity = mat4(1.0);
