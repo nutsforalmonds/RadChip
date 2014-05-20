@@ -16,7 +16,6 @@ using namespace std;
 #define RESPAWN_COUNTER 100
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
-#define MAX_PLAYERS 4
 
 
 class Scene
@@ -246,10 +245,10 @@ public:
 				id = holder->getPlayerID();
 				//insert the player at position at playerID
 				//removes all players after playerID and appends them to the list.
-				for (int i = id; i < MAX_PLAYERS - 1; i++)
+				for (int i = id ; i < player.size() - 1; i++)
 				{
-					holder = player[i];
-					player.erase(player.begin() + i);
+					holder = player[id];
+					player.erase(player.begin() + id);
 					player.push_back(holder);
 				}
 
