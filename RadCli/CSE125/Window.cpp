@@ -186,36 +186,7 @@ void updateSound();
 
 int counter = 0;
 
-void healthBar(float damage);
-void overheatBar(int fired, int hot, int style);
-
-UI_Panel* life_back;
-UI_Panel* life_front;
-UI_Panel* life_frame;
-UI_Panel* heat_back;
-UI_Panel* heat_front;
-UI_Panel* heat_frame;
-
-float x1_life = -2.0; //life
-float x2_life = 2.0;
-float y1_life = -2.0;
-float y2_life = 2.0;
-
-float x1_heat = -2.0; // overheat bar
-float x2_heat = 2.0;
-float y1_heat = -2.0;
-float y2_heat = -2.0;
-
-int lock = 0;
-
-float less_life = 0;
-float overheat = 0;
-float shots = 0;
-float damage_taken = .1; //set to default 1/7 of the life bar
-float health_bar_size = x2_life - x1_life;
-float heat_bar_size = x2_heat - x1_heat;
-
-time_t over_de; //rate of decay of overheat bar
+UI * myUI;
 
 Texture * shadow;
 char buf[255];
@@ -517,23 +488,7 @@ void Window::displayCallback(void)
 
 		glDisable(GL_DEPTH_TEST);
 
-
-		//Status Bars
-		if (less_life)
-		{
-			healthBar(damage_taken);
-			less_life = 0;
-		}
-		
-		life_back->draw();
-		life_front->draw();
-		life_frame->draw();
-
-		overheatBar(shots, overheat, 2);
-		
-		heat_back->draw();
-		heat_front->draw();
-		heat_frame->draw();
+		myUI->draw();
 
 		//2D cube setColor() is changing the color of the text...
 		//Problem with the currently bound shader me thinks
@@ -927,8 +882,8 @@ void mouseFunc(int button, int state, int x, int y)
 					///scene->basicAttack(playerID);
 					
 					//UI testing purposes
-					less_life = 1;
-					shots = 1;
+					myUI->setLess_Life(1);
+					myUI->setShots(1);
 				}
 				else
 				{
@@ -1219,46 +1174,8 @@ void initialize(int argc, char *argv[])
 	cube0->setType("Cube");
 	cube0->setName("Test cube0");
 	player_list.push_back(cube0);*/
-	
-	//life bars
-	life_back = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-	life_back->setColor(vec3(1.0, 0.0, 0.0));
-	life_back->setShader(sdrCtl.getShader("basic_2D"));
-	//life_back->loadColorTex("img/UI_TEST.png", "PNG");
-	life_back->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
 
-	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-	life_front->setColor(vec3(0.0, 1.0, 0.0));
-	life_front->setShader(sdrCtl.getShader("basic_2D"));
-	//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-	life_front->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
-
-	life_frame = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-	life_frame->setColor(vec3(1.0, 0.0, 0.0));
-	life_frame->setShader(sdrCtl.getShader("basic_2D"));
-	life_frame->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
-	life_frame->setTex(true);
-	life_frame->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0, -1.0f)));
-
-	//overheat bars
-	heat_back = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
-	heat_back->setColor(vec3(1.0, 1.0, 1.0));
-	heat_back->setShader(sdrCtl.getShader("basic_2D"));
-	//heat_back->loadColorTex("img/UI_TEST.png", "PNG");
-	heat_back->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
-
-	heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
-	heat_front->setColor(vec3(0.0, 1.0, 0.0));
-	heat_front->setShader(sdrCtl.getShader("basic_2D"));
-	//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-	heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-
-	heat_frame = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
-	heat_frame->setColor(vec3(1.0, 1.0, 1.0));
-	heat_frame->setShader(sdrCtl.getShader("basic_2D"));
-	heat_frame->loadColorTex("img/UI_FRAME_VERT.png", "PNG");
-	heat_frame->setTex(true);
-	heat_frame->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
+	myUI = new UI();
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("grid_ground"));
@@ -1642,107 +1559,4 @@ void Window::removeDrawList(const std::string& name)
 	}
 }
 
-void healthBar(float damage)
-{
-	life_front->UI_Panel::~UI_Panel();
 
-	x2_life = x2_life - health_bar_size*damage;
-
-	if (x2_life <= x1_life)
-	{
-		x2_life = x1_life;
-	}
-
-	life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-	life_front->setColor(vec3(0.0, 1.0, 0.0));
-	life_front->setShader(sdrCtl.getShader("basic_2D"));
-	//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-	life_front->setModelM(glm::scale(vec3(0.1, 0.01, 1.0))*glm::translate(vec3(0.0f, 50.0f, -1.0f)));
-
-}
-
-void overheatBar(int fired, int hot, int style)
-{
-	//style will state what class character is meele or range 1 been meele, more cases can be added later
-	if (style == 1)
-	{
-		if (lock == 0)
-		{
-			heat_back->UI_Panel::~UI_Panel();
-			heat_front->UI_Panel::~UI_Panel();
-			lock = 1;
-		}
-	}
-
-	else
-	{
-		if (fired == 1 && hot == 0)
-		{
-			heat_front->UI_Panel::~UI_Panel();
-
-			y2_heat = y2_heat + ((heat_bar_size) / 7.0); //# of shots
-
-			if (y2_heat >= 2.0)
-			{
-				y2_heat = 2;
-				overheat = 1;
-			}
-
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
-			heat_front->setColor(vec3(0.0, 1.0, 0.0));
-			heat_front->setShader(sdrCtl.getShader("basic_2D"));
-			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-
-			over_de = clock();
-			shots = 0;
-		}
-
-
-		else if (fired == 0 && hot == 0)
-		{
-			heat_front->UI_Panel::~UI_Panel();
-
-			if (y2_heat > y1_heat && (clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
-			{
-				y2_heat = y2_heat - ((heat_bar_size) / 60.0);
-				over_de = clock();
-			}
-
-			if (y2_heat <= y1_heat)
-			{
-				y2_heat = y1_heat;
-			}
-
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
-			heat_front->setColor(vec3(0.0, 1.0, 0.0));
-			heat_front->setShader(sdrCtl.getShader("basic_2D"));
-			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-		}
-
-		else if (hot == 1)
-		{
-			heat_front->UI_Panel::~UI_Panel();
-
-			if ((clock() - over_de) / (float)CLOCKS_PER_SEC > 0.05)
-			{
-				y2_heat = y2_heat - ((heat_bar_size) / 60.0);
-				over_de = clock();
-			}
-
-			if (y2_heat < y1_heat)
-			{
-				y2_heat = y1_heat;
-				overheat = 0;
-			}
-
-			heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
-			heat_front->setColor(vec3(1.0, 0.0, 0.0));
-			heat_front->setShader(sdrCtl.getShader("basic_2D"));
-			//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-			heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
-
-		}
-	}
-}
