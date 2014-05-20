@@ -10,8 +10,6 @@ class Window	  // output window related routines
     static void idleCallback(void);
     static void reshapeCallback(int, int);
     static void displayCallback(void);
-	static void addDrawList(Object* obj);
-	static void removeDrawList(const std::string& input);
 };
 
 #endif

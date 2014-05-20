@@ -8,6 +8,7 @@ class Projectile : public Cube
 protected:
 	float startX;
 	float startY;
+	int distance;
 	std::vector<int> playersHit;
 	int playerID;
 
@@ -19,6 +20,8 @@ public:
 	float getStartY();
 	bool checkHit(int i);
 	void setHit(int i);
+	void setDistance(int i);
+	int getDistance();
 	void setPlayerID(int id){ playerID = id; }
 	int getPlayerID(){ return playerID; }
 };

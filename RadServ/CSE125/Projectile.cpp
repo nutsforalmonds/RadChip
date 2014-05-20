@@ -27,3 +27,13 @@ void Projectile::setHit(int i)
 {
 	playersHit[i] = 1;
 }
+
+int Projectile::getDistance()
+{
+	return distance;
+}
+
+void Projectile::setDistance(int i)
+{
+	distance = i;
+}
