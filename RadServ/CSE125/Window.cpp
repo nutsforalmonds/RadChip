@@ -288,7 +288,11 @@ int main(int argc, char *argv[])
 		QueryPerformanceCounter(&loop_end);
 		diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
 		if (diff < 15){
-			Sleep(15 - diff);
+			cout << diff << endl;
+			Sleep(15 - diff);			
+		}
+		else{
+			cout << diff << endl;
 		}
 	}
 	return 0;

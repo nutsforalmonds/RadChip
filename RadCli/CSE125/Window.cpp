@@ -210,6 +210,7 @@ tcp_client* cli;
 boost::array<mat4, 4> mats;
 
 bool running;
+double diff;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -279,7 +280,7 @@ void Window::idleCallback(void)
 	//print fps
 	static time_t timer = clock();
 	static time_t tick = clock();
-	float diff;
+	//float diff;
 	static float anim_time = 0;
 	vector<mat4> Transforms;
 	GLSLProgram* sd;
@@ -330,7 +331,7 @@ void Window::idleCallback(void)
 			sd->setUniform(Name, Transforms[i]);
 		}
 
-		simulateProjectile(delta);
+		//simulateProjectile(delta);
 
 		/*vector<mat4> playerMs = scene->getPlayerMats();
 		for (int i = 0; i < player_list.size(); i++){
@@ -511,7 +512,7 @@ void server_update(int value){
 	//double fjfj = (double)((double)(asdf.QuadPart - jkl.QuadPart) / (double)freq.QuadPart * 1000);
 	//jkl = asdf;
 	//cout << fjfj << endl;
-
+	diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	QueryPerformanceCounter(&loop_begin);
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
@@ -576,18 +577,26 @@ void server_update(int value){
 	player_list[2]->setModelM(mats[2]);
 	player_list[3]->setModelM(mats[3]);
 
-	despawnProjectile();
+	simulateProjectile(delta);
+
+	//despawnProjectile();
 	//Have to reset timer after
 	QueryPerformanceCounter(&loop_end);
-	int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
-	/*
+	//int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
+	diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
+	
+	
+	
 	if (diff > 15){
-		glutTimerFunc(0, server_update, 0);
-		//cout << "server_update() exceded 15ms mark"<< endl;
+		//glutTimerFunc(0, server_update, 0);
+		cout << "server_update() exceded 15ms mark"<< endl;
+		cout << diff << endl;
 	}
 	else{
-		glutTimerFunc(15-diff, server_update, 0);
-	} */
+		//glutTimerFunc(15-diff, server_update, 0);
+		Sleep(15 - diff);
+	} 
+	
 }
 
 void SelectFromMenu(int idCommand)
