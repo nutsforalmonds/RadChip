@@ -929,7 +929,7 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
-					projectileAttack(playerID, cam);
+					//projectileAttack(playerID, cam);
 					
 				}
 				else
