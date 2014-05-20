@@ -277,10 +277,6 @@ void simulateProjectile(float t)
 
 void Window::idleCallback(void)
 {
-	//print fps
-	static time_t timer = clock();
-	static time_t tick = clock();
-	//float diff;
 	static float anim_time = 0;
 	vector<mat4> Transforms;
 	GLSLProgram* sd;
@@ -291,26 +287,20 @@ void Window::idleCallback(void)
 		break;
 	case 1:
 
-		if (clock() - timer >= CLOCKS_PER_SEC){
-			//cout<<"FPS: "<<counter<<endl;
-			myFPS = counter;
-			sprintf_s(buf, "%s %d", "FPS ", myFPS);
-			timer = clock();
-			counter = 0;
-		}
-		counter++;
-
 		cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
 		if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
 			cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
 		}
 		cam->setPendingRot(0);
-
+		
+		/*
 		QueryPerformanceCounter(&current);
 		delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 		last = current;
-
 		anim_time += delta;
+		*/
+
+		anim_time += diff;
 		if (anim_time > 1 / 30.0){
 			//md5->Update(anim_time);
 			md50->Update(anim_time);
@@ -321,7 +311,8 @@ void Window::idleCallback(void)
 			anim_time = 0;
 		}
 
-		m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		m_pMesh2->BoneTransform(diff, Transforms);
 		sd = sdrCtl.getShader("basic_model");
 		for (int i = 0; i < Transforms.size(); i++){
 			char Name[128];
@@ -370,11 +361,8 @@ void Window::idleCallback(void)
 	}
 
 	updateShaders();
-
 	updateSound();
-
     displayCallback();  
-	//glutLeaveMainLoop();
 }
 void Window::reshapeCallback(int w, int h)
 {
@@ -398,6 +386,17 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	static time_t timer = clock();
+
+	if (clock() - timer >= CLOCKS_PER_SEC){
+		//cout<<"FPS: "<<counter<<endl;
+		myFPS = counter;
+		sprintf_s(buf, "%s %d", "FPS ", myFPS);
+		timer = clock();
+		counter = 0;
+	}
+	counter++;
+	
 	switch (myClientState->getState()){
 	case 0:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -489,15 +488,12 @@ void Window::displayCallback(void)
 
 		myUI->draw();
 
-		//2D cube setColor() is changing the color of the text...
-		//Problem with the currently bound shader me thinks
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
-
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
 
 		glEnable(GL_DEPTH_TEST);
 
-		glFlush();
+		//glFlush();
 
 		break;
 	default:
@@ -512,8 +508,12 @@ void server_update(int value){
 	//double fjfj = (double)((double)(asdf.QuadPart - jkl.QuadPart) / (double)freq.QuadPart * 1000);
 	//jkl = asdf;
 	//cout << fjfj << endl;
+
+	/*
 	diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	QueryPerformanceCounter(&loop_begin);
+	*/
+
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
@@ -566,7 +566,6 @@ void server_update(int value){
 		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
 	}
 
-
 	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
 	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
 	mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
@@ -577,26 +576,15 @@ void server_update(int value){
 	player_list[2]->setModelM(mats[2]);
 	player_list[3]->setModelM(mats[3]);
 
-	simulateProjectile(delta);
+	simulateProjectile(diff);
 
+	//Particles are instantly despawning
 	//despawnProjectile();
+
 	//Have to reset timer after
-	QueryPerformanceCounter(&loop_end);
+	//QueryPerformanceCounter(&loop_end);
 	//int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
-	diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
-	
-	
-	
-	if (diff > 15){
-		//glutTimerFunc(0, server_update, 0);
-		cout << "server_update() exceded 15ms mark"<< endl;
-		cout << diff << endl;
-	}
-	else{
-		//glutTimerFunc(15-diff, server_update, 0);
-		Sleep(15 - diff);
-	} 
-	
+	//diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
 }
 
 void SelectFromMenu(int idCommand)
@@ -708,14 +696,35 @@ int main(int argc, char *argv[])
 
   //glutMainLoop();
 
+  QueryPerformanceFrequency(&freq);
+  QueryPerformanceCounter(&last);
+
   running = true;
-  while (running){
+  do{
+
+	  QueryPerformanceCounter(&current);
+	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
+	  last = current;
+
 	  glutMainLoopEvent();
 	  //printf("LOOP!\n");
-	  Window::idleCallback();
-
 	  server_update(0);
-  }
+	  Window::idleCallback();
+	  
+	  QueryPerformanceCounter(&loop_end);
+	  diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
+
+	  if (diff > 15){
+		  //glutTimerFunc(0, server_update, 0);
+		  //cout << "server_update() exceded 15ms mark" << endl;
+		  //cout << diff << endl;
+	  }
+	  else{
+		  //glutTimerFunc(15-diff, server_update, 0);
+		  Sleep(15 - diff);
+	  }
+	  
+  } while (running);
 
   for (int i = 0; i < draw_list.size(); ++i)
   {
