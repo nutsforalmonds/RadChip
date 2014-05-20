@@ -167,7 +167,6 @@ int sprint_up = 10;
 
 //bool keyState[4];//up,down,left,right
 
-
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
 void trackballScale( int width, int height, int fromX, int fromY, int toX, int toY );
@@ -196,7 +195,6 @@ ClientState* myClientState;
 float awesome_time = 0.5;
 
 // Stuff Erik added
-
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
 int stateID = -1;
 int keyState = 0;
@@ -210,6 +208,8 @@ boost::asio::io_service io_service;
 tcp_client* cli;
 
 boost::array<mat4, 4> mats;
+
+bool running;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -249,7 +249,6 @@ void projectileAttack(int playerID, Camera * cam)
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }
-
 void despawnProjectile()
 {
 	for (int i = 0; i < projectile_list.size(); i++)
@@ -267,7 +266,6 @@ void despawnProjectile()
 		}
 	}
 }
-
 void simulateProjectile(float t)
 {
 	for (int i = 0; i < projectile_list.size(); i++){
@@ -332,7 +330,6 @@ void Window::idleCallback(void)
 			sd->setUniform(Name, Transforms[i]);
 		}
 
-
 		simulateProjectile(delta);
 
 		/*vector<mat4> playerMs = scene->getPlayerMats();
@@ -376,6 +373,7 @@ void Window::idleCallback(void)
 	updateSound();
 
     displayCallback();  
+	//glutLeaveMainLoop();
 }
 void Window::reshapeCallback(int w, int h)
 {
@@ -507,7 +505,6 @@ void Window::displayCallback(void)
 	glutSwapBuffers();
 }
 
-
 //LARGE_INTEGER asdf, jkl;
 void server_update(int value){
 	//QueryPerformanceCounter(&asdf);
@@ -625,7 +622,6 @@ void SelectFromMenu(int idCommand)
 	// Almost any menu selection requires a redraw
 	glutPostRedisplay();
 }
-
 int BuildPopupMenu(void)
 {
 	int menu;
@@ -644,6 +640,8 @@ int main(int argc, char *argv[])
   ConfigSettings::config->getValue("ScreenHeight", Window::height);
   
   glutInit(&argc, argv);      	      	      // initialize GLUT
+  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+  //glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);   // open an OpenGL context with double buffering, RGB colors, and depth buffering
   glutInitWindowSize(Window::width, Window::height);      // set initial window size
   glutCreateWindow("CSE 125 - Group 4 (RadioactiveChipmunks)");    	      // open window and set window title
@@ -698,7 +696,15 @@ int main(int argc, char *argv[])
 
   initialize(argc, argv);  
 
-  glutMainLoop();
+  //glutMainLoop();
+
+  running = true;
+  while (running){
+	  glutMainLoopEvent();
+	  //glutMainLoop();
+	  printf("LOOP!\n");
+	  Window::idleCallback();
+  }
 
   for (int i = 0; i < draw_list.size(); ++i)
   {
@@ -749,6 +755,7 @@ void keyboard(unsigned char key, int, int){
 			keyState = keyState | 1 << 3;
 		}
 		if (key == 27){
+			running = false;
 			exit(0);
 		}
 		if (key == ' '){
@@ -808,7 +815,6 @@ void keyboard(unsigned char key, int, int){
 		break;
 	}
 }
-
 void keyUp (unsigned char key, int x, int y) {  
 	
 	switch (myClientState->getState()){
