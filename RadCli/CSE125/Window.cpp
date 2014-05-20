@@ -701,8 +701,7 @@ int main(int argc, char *argv[])
   running = true;
   while (running){
 	  glutMainLoopEvent();
-	  //glutMainLoop();
-	  printf("LOOP!\n");
+	  //printf("LOOP!\n");
 	  Window::idleCallback();
   }
 
