@@ -16,6 +16,7 @@ using namespace std;
 #define RESPAWN_COUNTER 100
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
+#define MAX_PLAYERS 4
 
 
 class Scene
@@ -226,9 +227,11 @@ public:
 
 	void respawnPlayer()
 	{
+		Object * holder;
+		int id;
 		for (int i = 0; i < respawn.size(); i++)
 		{
-			Object * holder = respawn[i];
+			holder = respawn[i];
 			holder->setRespawn(holder->getRespawn() - 1);
 			cout << holder->getName() << " " << holder->getRespawn() << endl;
 			if (holder->getRespawn() < 1)
@@ -239,6 +242,17 @@ public:
 				player.push_back(holder);
 				holder->setHealth(7);
 				respawn.erase(respawn.begin() + i);
+
+				id = holder->getPlayerID();
+				//insert the player at position at playerID
+				//removes all players after playerID and appends them to the list.
+				for (int i = id; i < MAX_PLAYERS - 1; i++)
+				{
+					holder = player[i];
+					player.erase(player.begin() + i);
+					player.push_back(holder);
+				}
+
 				cout << "" << endl;
 			}
 		}
