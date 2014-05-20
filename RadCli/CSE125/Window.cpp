@@ -580,13 +580,14 @@ void server_update(int value){
 	//Have to reset timer after
 	QueryPerformanceCounter(&loop_end);
 	int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
+	/*
 	if (diff > 15){
 		glutTimerFunc(0, server_update, 0);
 		//cout << "server_update() exceded 15ms mark"<< endl;
 	}
 	else{
 		glutTimerFunc(15-diff, server_update, 0);
-	}
+	} */
 }
 
 void SelectFromMenu(int idCommand)
@@ -683,7 +684,7 @@ int main(int argc, char *argv[])
   glutPassiveMotionFunc(passiveMotionFunc);
 
   //Added for server debuging
-  glutTimerFunc(500, server_update, 0);
+  //glutTimerFunc(500, server_update, 0);
 
   glutKeyboardFunc(keyboard);
   glutKeyboardUpFunc(keyUp);
@@ -703,6 +704,8 @@ int main(int argc, char *argv[])
 	  glutMainLoopEvent();
 	  //printf("LOOP!\n");
 	  Window::idleCallback();
+
+	  server_update(0);
   }
 
   for (int i = 0; i < draw_list.size(); ++i)
