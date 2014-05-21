@@ -436,7 +436,7 @@ public:
 		selected_button->setShader(sdrCtl.getShader("basic_2D"));
 		selected_button->loadColorTex("img/team4", "PNG");
 		selected_button->setTex(true);
-		selected_button->setModelM(glm::scale(vec3(0.1, 0.05, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		selected_button->setModelM(glm::scale(vec3(0.1, 0.05, 1.0))*glm::translate(vec3(0.0f, highlightTrans, -1.0f)));
 
 	}
 	~MainMenu(){
@@ -465,16 +465,16 @@ public:
 	void checkHighlight(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((x > 0.42) && (x < 0.57)){
 
 			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((y > 0.35) && (y < 0.47)){
+				highlightTrans = 2.0;
 			}
 
 			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((y > 0.53) && (y < 0.64)){
+				highlightTrans = -2.0;
 			}
 		}
 	}
@@ -482,15 +482,15 @@ public:
 	void checkClick(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((x > 0.42) && (x < 0.57)){
 
 			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
+			if ((y > 0.35) && (y < 0.47)){
 
 			}
 
 			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
+			if ((y > 0.53) && (y < 0.64)){
 
 			}
 		}
@@ -504,6 +504,7 @@ private:
 	UI_Panel * exit_button;
 	UI_Panel * selected_button;
 
+	float highlightTrans = 0;
 
 };
 
@@ -560,7 +561,7 @@ public:
 
 private:
 
-
+	float highlightTrans = 0;
 
 };
 
@@ -616,5 +617,5 @@ public:
 	}
 
 private:
-
+	float highlightTrans = 0;
 };
