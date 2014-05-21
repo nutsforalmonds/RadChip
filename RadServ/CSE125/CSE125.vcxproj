@@ -135,7 +135,6 @@
     <ClCompile Include="ogldev_util.cpp" />
     <ClCompile Include="PlayerChar.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="random_texture.cpp" />
     <ClCompile Include="RangeWeapon.cpp" />
     <ClCompile Include="ShaderController.cpp" />
     <ClCompile Include="Texture.cpp" />

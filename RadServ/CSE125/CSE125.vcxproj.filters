@@ -34,9 +34,6 @@
     <ClCompile Include="Projectile.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="random_texture.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderController.cpp">
       <Filter>Source</Filter>
     </ClCompile>
