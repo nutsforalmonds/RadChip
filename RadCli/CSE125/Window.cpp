@@ -195,7 +195,6 @@ char buf[255];
 int myFPS = 0;
 
 ClientState* myClientState;
-float awesome_time = 0.5;
 
 // Stuff Erik added
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
@@ -486,24 +485,18 @@ void Window::displayCallback(void)
 		m_billboardList.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
 		m_billboardList2.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
 		m_billboardList3.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-		m_billboardList4.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-
-		awesome_time += 1.0;
-		if (awesome_time > 50.0){
-			awesome_time = 1.0;
-		}
 
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		particle->draw(Projection, View, awesome_time);
-		particle2->draw(Projection, View, awesome_time);
-		particle3->draw(Projection, View, awesome_time);
-		particle4->draw(Projection, View, awesome_time);
-		particle5->draw(Projection, View, awesome_time);
-		particle6->draw(Projection, View, awesome_time);
-		particle7->draw(Projection, View, awesome_time);
+		particle->draw(Projection, View);
+		particle2->draw(Projection, View);
+		particle3->draw(Projection, View);
+		particle4->draw(Projection, View);
+		particle5->draw(Projection, View);
+		particle6->draw(Projection, View);
+		particle7->draw(Projection, View);
 		glDisable(GL_BLEND);
 
 		glDisable(GL_DEPTH_TEST);
@@ -962,6 +955,16 @@ void mouseFunc(int button, int state, int x, int y)
 				myClientState->setState(1);
 				
 				if (!connected){
+					
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
+					
 					try
 					{
 						cli = new tcp_client(io_service, "localhost", "13");
@@ -1437,6 +1440,12 @@ void initialize(int argc, char *argv[])
 	particle->setColor(vec3(1.0, 0.0, 0.0));
 	particle->setShade(vec3(1.0, 0.0, 0.0));
 	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	
+	particle->setTime_Step(1.0);
+	particle->setTime_Max(150.0);
+	particle->setTime_Min(1.0);
+	particle->setTime(0.45);
+
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
 	particle2 = new ParticleSystem();
@@ -1447,6 +1456,12 @@ void initialize(int argc, char *argv[])
 	particle2->setColor(vec3(0.0, 1.0, 0.0));
 	particle2->setShade(vec3(0.0, 1.0, 0.0));
 	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle2->setTime_Step(0.5);
+	particle2->setTime_Max(15.0);
+	particle2->setTime_Min(1.5);
+	particle2->setTime(7.5);
+
 	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
 
 	particle3 = new ParticleSystem();
@@ -1457,6 +1472,9 @@ void initialize(int argc, char *argv[])
 	particle3->setColor(vec3(0.0, 0.0, 1.0));
 	particle3->setShade(vec3(0.0, 0.0, 1.0));
 	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle3->setTime(25.0);
+	
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
 	particle4 = new ParticleSystem();
@@ -1467,6 +1485,9 @@ void initialize(int argc, char *argv[])
 	particle4->setColor(vec3(1.0, 1.0, 1.0));
 	particle4->setShade(vec3(1.0, 1.0, 1.0));
 	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle4->setTime(35.0);
+
 	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	particle5 = new ParticleSystem();
@@ -1477,6 +1498,9 @@ void initialize(int argc, char *argv[])
 	particle5->setColor(vec3(1.0, 1.0, 0.0));
 	particle5->setShade(vec3(1.0, 1.0, 0.0));
 	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle5->setTime(45.0);
+
 	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
 
 	particle6 = new ParticleSystem();
@@ -1486,7 +1510,10 @@ void initialize(int argc, char *argv[])
 	particle6->setK(14.0f);
 	particle6->setColor(vec3(1.0, 0.0, 1.0));
 	particle6->setShade(vec3(1.0, 0.0, 1.0));
-	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG"); 
+
+	particle6->setTime(7.5);
+
 	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
 
 	particle7 = new ParticleSystem();
@@ -1499,21 +1526,10 @@ void initialize(int argc, char *argv[])
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
-
-
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
-
-	sprintf_s(buf, "%s", "Attempting to connect to server...");
+	//sprintf_s(buf, "%s", "Attempting to connect to server...");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 	glutSwapBuffers();
 
