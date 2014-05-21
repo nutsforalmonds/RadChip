@@ -431,20 +431,28 @@ public:
 		exit_button->setTex(true);
 		exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 
-		selected_button = new UI_Panel(-1, 1, -1, 1);
-		selected_button->setColor(vec3(1.0, 0.0, 0.0));
-		selected_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_button->loadColorTex("img/team4", "PNG");
-		selected_button->setTex(true);
-		selected_button->setModelM(glm::scale(vec3(0.1, 0.05, 1.0))*glm::translate(vec3(0.0f, highlightTrans, -1.0f)));
+		selected_start_button = new UI_Panel(-1, 1, -1, 1);
+		selected_start_button->setColor(vec3(1.0, 0.0, 0.0));
+		selected_start_button->setShader(sdrCtl.getShader("basic_2D"));
+		selected_start_button->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_start_button->setTex(true);
+		selected_start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
+
+		selected_end_button = new UI_Panel(-1, 1, -1, 1);
+		selected_end_button->setColor(vec3(1.0, 0.0, 0.0));
+		selected_end_button->setShader(sdrCtl.getShader("basic_2D"));
+		selected_end_button->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_end_button->setTex(true);
+		selected_end_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 
 	}
 	~MainMenu(){
-		menu->				~UI_Panel();
-		game_name->			~UI_Panel();
-		start_button->		~UI_Panel();
-		exit_button->		~UI_Panel();
-		selected_button->	~UI_Panel();
+		menu->					~UI_Panel();
+		game_name->				~UI_Panel();
+		start_button->			~UI_Panel();
+		exit_button->			~UI_Panel();
+		selected_start_button->	~UI_Panel();
+		selected_end_button->	~UI_Panel();
 	}
 
 	int draw(){
@@ -455,7 +463,14 @@ public:
 		game_name->draw();
 		start_button->draw();
 		exit_button->draw();
-		//selected_button->draw();
+		
+		if (drawStartHighlight){
+			selected_start_button->draw();
+		}
+
+		if (drawEndHighlight){
+			selected_end_button->draw();
+		}
 
 		glEnable(GL_DEPTH_TEST);
 
@@ -469,31 +484,47 @@ public:
 
 			//Spot for first button
 			if ((y > 0.35) && (y < 0.47)){
-				highlightTrans = 2.0;
+				drawStartHighlight = true;
+				drawEndHighlight = false;
+				cout << "Start Monica!" << endl;
 			}
 
 			//Spot for second button
-			if ((y > 0.53) && (y < 0.64)){
-				highlightTrans = -2.0;
+			else if ((y > 0.53) && (y < 0.64)){
+				drawEndHighlight = true;
+				drawStartHighlight = false;
+				cout << "End Monica!" << endl;
 			}
+			else{
+				drawStartHighlight = false;
+				drawEndHighlight = false;
+			}
+		}
+		else{
+			drawStartHighlight = false;
+			drawEndHighlight = false;
 		}
 	}
 
-	void checkClick(float x, float y){
+	int checkClick(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
 			//Spot for first button
 			if ((y > 0.35) && (y < 0.47)){
-
+				return 1;
 			}
 
 			//Spot for second button
-			if ((y > 0.53) && (y < 0.64)){
-
+			else if ((y > 0.53) && (y < 0.64)){
+				return 2;
 			}
+
+			return 0;
 		}
+
+		return 0;
 	}
 
 private:
@@ -502,10 +533,11 @@ private:
 	UI_Panel * game_name;
 	UI_Panel * start_button;
 	UI_Panel * exit_button;
-	UI_Panel * selected_button;
+	UI_Panel * selected_start_button;
+	UI_Panel * selected_end_button;
 
-	float highlightTrans = 0;
-
+	bool drawStartHighlight = false;
+	bool drawEndHighlight = false;
 };
 
 class GameMenu

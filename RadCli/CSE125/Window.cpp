@@ -291,7 +291,8 @@ void Window::idleCallback(void)
 	case 0:
 		break;
 	case 1:
-
+	case 2:
+	case 3:
 		cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
 		if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
 			cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
@@ -360,10 +361,14 @@ void Window::idleCallback(void)
 		}
 
 		View = cam->getViewM();
-		break;
-	case 2:
-		break;
-	case 3:
+
+		if (myClientState->getState() == 2){
+			myGameMenu->draw();
+		}
+		else if (myClientState->getState() == 3){
+			myDeathScreen->draw();
+		}
+
 		break;
 	default:
 		break;
@@ -411,12 +416,12 @@ void Window::displayCallback(void)
 	switch (myClientState->getState()){
 	case 0:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		/*
 		glDisable(GL_DEPTH_TEST);
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, m_Test2, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
-
+		*/
 		myMainMenu->draw();
-
 		break;
 	case 1:
 	case 2:
@@ -778,7 +783,7 @@ void keyboard(unsigned char key, int, int){
 		if (key == ' '){
 			if (space_up){
 				//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-				myClientState->setState(1);
+				//myClientState->setState(1);
 			}
 		}
 		break;
@@ -947,7 +952,14 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myMainMenu->checkClick(newX, newY);
+			int click = myMainMenu->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
+			else if (click == 2){
+				running = false;
+				exit(0);
+			}
 		}
 		break;
 	case 1:
