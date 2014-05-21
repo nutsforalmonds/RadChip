@@ -217,6 +217,8 @@ double diff;
 int test = 0;
 float test2 = 0;
 
+bool connected;
+
 void projectileAttack(int playerID, Camera * cam)
 {
 	mat4 test = cam->getCamM();
@@ -726,6 +728,7 @@ int main(int argc, char *argv[])
   QueryPerformanceCounter(&last);
 
   running = true;
+  connected = false;
   myClientState->setState(0);
   do{
 
@@ -735,7 +738,9 @@ int main(int argc, char *argv[])
 
 	  glutMainLoopEvent();
 	  //printf("LOOP!\n");
-	  server_update(0);
+	  if (connected){
+		  server_update(0);
+	  }
 	  Window::idleCallback();
 	  
 	  QueryPerformanceCounter(&loop_end);
@@ -955,6 +960,28 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
+
+				try
+				{
+					cli = new tcp_client(io_service, "localhost", "13");
+					io_service.run_one();
+					io_service.run_one();
+					playerID = cli->pID();
+					std::cout << "pid: " << playerID << std::endl;
+					//system("pause");
+				}
+				catch (std::exception& e)
+				{
+					sprintf_s(buf, "%s", "Error connecting to server!");
+					std::cerr << e.what() << std::endl;
+				}
+
+				cam = new Camera();
+				cam->attach(player_list[playerID]);
+				cam->postTrans(glm::translate(vec3(0, 1, 4)));
+
+				connected = true;
+
 			}
 			else if (click == 2){
 				running = false;
@@ -1482,38 +1509,6 @@ void initialize(int argc, char *argv[])
 	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 	glutSwapBuffers();
-
-	try
-	{
-		cli = new tcp_client(io_service, "localhost", "13");
-		io_service.run_one();
-		io_service.run_one();
-		playerID = cli->pID();
-		std::cout << "pid: " << playerID << std::endl;
-		//system("pause");
-	}
-	catch (std::exception& e)
-	{
-		sprintf_s(buf, "%s", "Error connecting to server!");
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
-
-		glutSwapBuffers();
-
-		std::cerr << e.what() << std::endl;
-	}
-
-	sprintf_s(buf, "%s", "Attempting to connect to server...done!");
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
-
-	glutSwapBuffers();
-
-	cam = new Camera();
-	cam->attach(player_list[playerID]);
-	cam->postTrans(glm::translate(vec3(0, 1, 4)));
 
 }
 
