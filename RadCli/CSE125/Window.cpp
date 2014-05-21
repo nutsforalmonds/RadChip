@@ -190,6 +190,12 @@ MainMenu * myMainMenu;
 GameMenu * myGameMenu;
 DeathScreen * myDeathScreen;
 
+UI_Panel * menu; 
+UI_Panel * game_name;
+UI_Panel * start_button;
+UI_Panel * exit_button;
+UI_Panel * selected_button;
+
 Texture * shadow;
 char buf[255];
 int myFPS = 0;
@@ -214,6 +220,8 @@ boost::array<mat4, 4> mats;
 
 bool running;
 double diff;
+int test = 0;
+float test2 = 0;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -415,6 +423,17 @@ void Window::displayCallback(void)
 
 		myMainMenu->draw();
 
+		glDisable(GL_BLEND);
+
+		glDisable(GL_DEPTH_TEST);
+		
+		menu->draw();
+		game_name->draw();
+		start_button->draw();
+		exit_button->draw();
+		//selected_button->draw();
+
+		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
 	case 2:
@@ -1500,6 +1519,41 @@ void initialize(int argc, char *argv[])
 	cam = new Camera();
 	cam->attach(player_list[playerID]);
 	cam->postTrans(glm::translate(vec3(0, 1, 4)));
+
+	menu = new UI_Panel(-1, 1, -1, 1);
+	menu->setColor(vec3(1.0, 0.0, 0.0));
+	menu->setShader(sdrCtl.getShader("basic_2D"));
+	menu->loadColorTex("img/back", "PNG");
+	menu->setTex(true);
+	menu->setModelM(glm::scale(vec3(0.90, 0.50, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
+	game_name = new UI_Panel(-1, 1, -1, 1);
+	game_name->setColor(vec3(1.0, 0.0, 0.0));
+	game_name->setShader(sdrCtl.getShader("basic_2D"));
+	game_name->loadColorTex("img/team4", "PNG");
+	game_name->setTex(true);
+	game_name->setModelM(glm::scale(vec3(0.5, 0.05, 1.0))*glm::translate(vec3(0.0f, 9.0, -1.0f)));
+
+	start_button = new UI_Panel(-1, 1, -1, 1);
+	start_button->setColor(vec3(1.0, 0.0, 0.0));
+	start_button->setShader(sdrCtl.getShader("basic_2D"));
+	start_button->loadColorTex("img/start", "PNG");
+	start_button->setTex(true);
+	start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
+
+	exit_button = new UI_Panel(-1, 1, -1, 1);
+	exit_button->setColor(vec3(1.0, 0.0, 0.0));
+	exit_button->setShader(sdrCtl.getShader("basic_2D"));
+	exit_button->loadColorTex("img/exit", "PNG");
+	exit_button->setTex(true);
+	exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
+
+	selected_button = new UI_Panel(-1, 1, -1, 1);
+	selected_button->setColor(vec3(1.0, 0.0, 0.0));
+	selected_button->setShader(sdrCtl.getShader("basic_2D"));
+	selected_button->loadColorTex("img/team4", "PNG");
+	selected_button->setTex(true);
+	selected_button->setModelM(glm::scale(vec3(0.1, 0.05, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
 }
 
