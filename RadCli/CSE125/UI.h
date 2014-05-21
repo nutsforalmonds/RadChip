@@ -549,28 +549,28 @@ public:
 		quit = new UI_Panel(-1, 1, -1, 1);
 		quit->setColor(vec3(1.0, 0.0, 0.0));
 		quit->setShader(sdrCtl.getShader("basic_2D"));
-		quit->loadColorTex("img/exit", "PNG");
+		quit->loadColorTex("img/quit_off.png", "PNG");
 		quit->setTex(true);
 		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
 
 		resume = new UI_Panel(-1, 1, -1, 1);
 		resume->setColor(vec3(1.0, 0.0, 0.0));
 		resume->setShader(sdrCtl.getShader("basic_2D"));
-		resume->loadColorTex("img/start", "PNG");
+		resume->loadColorTex("img/resume_off.png", "PNG");
 		resume->setTex(true);
 		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
 
 		selected_resume = new UI_Panel(-1, 1, -1, 1);
 		selected_resume->setColor(vec3(1.0, 0.0, 0.0));
 		selected_resume->setShader(sdrCtl.getShader("basic_2D"));
-		selected_resume->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_resume->loadColorTex("img/resume_on.png", "PNG");
 		selected_resume->setTex(true);
 		selected_resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
 
 		selected_quit = new UI_Panel(-1, 1, -1, 1);
 		selected_quit->setColor(vec3(1.0, 0.0, 0.0));
 		selected_quit->setShader(sdrCtl.getShader("basic_2D"));
-		selected_quit->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_quit->loadColorTex("img/quit_on.png", "PNG");
 		selected_quit->setTex(true);
 		selected_quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
 
@@ -578,7 +578,7 @@ public:
 		frame = new UI_Panel(-1, 1, -1, 1);
 		frame->setColor(vec3(1.0, 1.0, 1.0));
 		frame->setShader(sdrCtl.getShader("basic_2D"));
-		frame->loadColorTex("img/back", "PNG");
+		frame->loadColorTex("img/game_menu_back.png", "PNG");
 		frame->setTex(true);
 		frame->setModelM(glm::scale(vec3(0.5, 0.25, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
