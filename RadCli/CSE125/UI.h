@@ -486,14 +486,14 @@ public:
 			if ((y > 0.35) && (y < 0.47)){
 				drawStartHighlight = true;
 				drawEndHighlight = false;
-				cout << "Start Monica!" << endl;
+				//cout << "Start Monica!" << endl;
 			}
 
 			//Spot for second button
 			else if ((y > 0.53) && (y < 0.64)){
 				drawEndHighlight = true;
 				drawStartHighlight = false;
-				cout << "End Monica!" << endl;
+				//cout << "End Monica!" << endl;
 			}
 			else{
 				drawStartHighlight = false;
@@ -546,26 +546,34 @@ public:
 	GameMenu(){
 
 
-		resume = new UI_Panel(-1, 1, -1, 1);
-		resume->setColor(vec3(1.0, 0.0, 0.0));
-		resume->setShader(sdrCtl.getShader("basic_2D"));
-		resume->loadColorTex("img/exit", "PNG");
-		resume->setTex(true);
-		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
-
 		quit = new UI_Panel(-1, 1, -1, 1);
 		quit->setColor(vec3(1.0, 0.0, 0.0));
 		quit->setShader(sdrCtl.getShader("basic_2D"));
-		quit->loadColorTex("img/start", "PNG");
+		quit->loadColorTex("img/exit", "PNG");
 		quit->setTex(true);
-		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
 
-		selected = new UI_Panel(-1, 1, -1, 1);
-		selected->setColor(vec3(1.0, 0.0, 0.0));
-		selected->setShader(sdrCtl.getShader("basic_2D"));
-		selected->loadColorTex("img/start", "PNG");
-		selected->setTex(true);
-		selected->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		resume = new UI_Panel(-1, 1, -1, 1);
+		resume->setColor(vec3(1.0, 0.0, 0.0));
+		resume->setShader(sdrCtl.getShader("basic_2D"));
+		resume->loadColorTex("img/start", "PNG");
+		resume->setTex(true);
+		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+
+		selected_resume = new UI_Panel(-1, 1, -1, 1);
+		selected_resume->setColor(vec3(1.0, 0.0, 0.0));
+		selected_resume->setShader(sdrCtl.getShader("basic_2D"));
+		selected_resume->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_resume->setTex(true);
+		selected_resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+
+		selected_quit = new UI_Panel(-1, 1, -1, 1);
+		selected_quit->setColor(vec3(1.0, 0.0, 0.0));
+		selected_quit->setShader(sdrCtl.getShader("basic_2D"));
+		selected_quit->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_quit->setTex(true);
+		selected_quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
+
 
 		frame = new UI_Panel(-1, 1, -1, 1);
 		frame->setColor(vec3(1.0, 1.0, 1.0));
@@ -577,10 +585,11 @@ public:
 	}
 	~GameMenu(){
 
-		resume->   ~UI_Panel();
-		quit->     ~UI_Panel();
-		selected-> ~UI_Panel();
-		frame->    ~UI_Panel();
+		resume->			~UI_Panel();
+		quit->				~UI_Panel();
+		selected_resume->	~UI_Panel();
+		selected_quit->		~UI_Panel();
+		frame->				~UI_Panel();
 	}
 
 	int draw(){
@@ -589,8 +598,14 @@ public:
 		frame->draw();
 		resume->draw();
 		quit->draw();
-		selected->draw();
 
+		if (drawStartHighlight){
+			selected_resume->draw();
+		}
+
+		if (drawEndHighlight){
+			selected_quit->draw();
+		}
 
 		glEnable(GL_DEPTH_TEST);
 		return 0;
@@ -599,35 +614,51 @@ public:
 	void checkHighlight(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((y > 0.46) && (y < 0.53)){
 
 			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((x > 0.58) && (x < 0.73)){
+				drawStartHighlight = true;
+				drawEndHighlight = false;
+				//cout << "Start Monica!" << endl;
 			}
 
 			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
-
+			else if ((x > 0.26) && (x < 0.41)){
+				drawEndHighlight = true;
+				drawStartHighlight = false;
+				//cout << "End Monica!" << endl;
 			}
+			else{
+				drawStartHighlight = false;
+				drawEndHighlight = false;
+			}
+		}
+		else{
+			drawStartHighlight = false;
+			drawEndHighlight = false;
 		}
 	}
 
-	void checkClick(float x, float y){
+	int checkClick(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((y > 0.46) && (y < 0.53)){
 
 			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((x > 0.58) && (x < 0.73)){
+				return 1;
 			}
 
 			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
-
+			else if ((x > 0.26) && (x < 0.41)){
+				return 2;
 			}
+
+			return 0;
 		}
+
+		return 0;
 	}
 
 private:
@@ -636,9 +667,12 @@ private:
 
 	UI_Panel * resume;
 	UI_Panel * quit;
-	UI_Panel * selected;
+	UI_Panel * selected_resume;
+	UI_Panel * selected_quit;
 	UI_Panel * frame;
 
+	bool drawStartHighlight;
+	bool drawEndHighlight;
 };
 
 class DeathScreen

@@ -960,28 +960,29 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
+				
+				if (!connected){
+					try
+					{
+						cli = new tcp_client(io_service, "localhost", "13");
+						io_service.run_one();
+						io_service.run_one();
+						playerID = cli->pID();
+						std::cout << "pid: " << playerID << std::endl;
+						//system("pause");
+					}
+					catch (std::exception& e)
+					{
+						sprintf_s(buf, "%s", "Error connecting to server!");
+						std::cerr << e.what() << std::endl;
+					}
 
-				try
-				{
-					cli = new tcp_client(io_service, "localhost", "13");
-					io_service.run_one();
-					io_service.run_one();
-					playerID = cli->pID();
-					std::cout << "pid: " << playerID << std::endl;
-					//system("pause");
+					cam = new Camera();
+					cam->attach(player_list[playerID]);
+					cam->postTrans(glm::translate(vec3(0, 1, 4)));
+
+					connected = true;
 				}
-				catch (std::exception& e)
-				{
-					sprintf_s(buf, "%s", "Error connecting to server!");
-					std::cerr << e.what() << std::endl;
-				}
-
-				cam = new Camera();
-				cam->attach(player_list[playerID]);
-				cam->postTrans(glm::translate(vec3(0, 1, 4)));
-
-				connected = true;
-
 			}
 			else if (click == 2){
 				running = false;
@@ -1057,7 +1058,13 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myGameMenu->checkClick(newX, newY);
+			int click = myGameMenu->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
+			if (click == 2){
+				myClientState->setState(0);
+			}
 		}
 		break;
 	case 3:
