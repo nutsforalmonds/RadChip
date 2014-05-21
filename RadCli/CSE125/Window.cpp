@@ -186,6 +186,9 @@ void updateSound();
 int counter = 0;
 
 UI * myUI;
+MainMenu * myMainMenu;
+GameMenu * myGameMenu;
+DeathScreen * myDeathScreen;
 
 Texture * shadow;
 char buf[255];
@@ -356,6 +359,10 @@ void Window::idleCallback(void)
 
 		View = cam->getViewM();
 		break;
+	case 2:
+		break;
+	case 3:
+		break;
 	default:
 		break;
 	}
@@ -372,6 +379,8 @@ void Window::reshapeCallback(int w, int h)
 		height = h;
 		glViewport(0, 0, w, h);  // set new view port size
 	case 1:
+	case 2:
+	case 3:
 		width = w;
 		height = h;
 		glViewport(0, 0, w, h);  // set new view port size
@@ -403,9 +412,13 @@ void Window::displayCallback(void)
 		glDisable(GL_DEPTH_TEST);
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, m_Test2, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
+
+		myMainMenu->draw();
+
 		break;
 	case 1:
-		
+	case 2:
+	case 3:
 		///////  1st pass: render into depth map //////////
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, depth_fbo);
 		glViewport(0, 0, depth_texture_width, depth_texture_height);
@@ -494,7 +507,12 @@ void Window::displayCallback(void)
 		glEnable(GL_DEPTH_TEST);
 
 		//glFlush();
-
+		if (myClientState->getState() == 2){
+			myGameMenu->draw();
+		}
+		else if (myClientState->getState() == 3){
+			myDeathScreen->draw();
+		}
 		break;
 	default:
 		break;
@@ -687,7 +705,8 @@ int main(int argc, char *argv[])
   glutKeyboardUpFunc(keyUp);
   glutSpecialFunc(specialKeyboardFunc);
 
-  glutSetCursor(GLUT_CURSOR_NONE);
+  //glutSetCursor(GLUT_CURSOR_NONE);
+  glutSetCursor(GLUT_CURSOR_WAIT);
 
   BuildPopupMenu();
   glutAttachMenu(GLUT_MIDDLE_BUTTON);
@@ -700,6 +719,7 @@ int main(int argc, char *argv[])
   QueryPerformanceCounter(&last);
 
   running = true;
+  myClientState->setState(0);
   do{
 
 	  QueryPerformanceCounter(&current);
@@ -778,8 +798,9 @@ void keyboard(unsigned char key, int, int){
 			keyState = keyState | 1 << 5;
 		}
 		if (key == 27){
-			running = false;
-			exit(0);
+			//running = false;
+			//exit(0);
+			myClientState->setState(2);
 		}
 		if (key == ' '){
 			keyState = keyState | 1 << 4;
@@ -832,6 +853,20 @@ void keyboard(unsigned char key, int, int){
 		}
 		if (key == 't'){
 			SelectFromMenu(MENU_TEXTURING);
+		}
+		break;
+	case 2:
+		if (key == 27){
+			//running = false;
+			//exit(0);
+			myClientState->setState(1);
+		}
+		break;
+	case 3:
+		if (key == 27){
+			//running = false;
+			//exit(0);
+			myClientState->setState(1);
 		}
 		break;
 	default:
@@ -888,6 +923,10 @@ void keyUp (unsigned char key, int x, int y) {
 			}
 		}
 		break;
+	case 2:
+		break;
+	case 3:
+		break;
 	default:
 		break;
 	}
@@ -898,9 +937,16 @@ void mouseFunc(int button, int state, int x, int y)
 	oldY=y;
 	mouseDown = (state == GLUT_DOWN);
 	mouseButton = button;
-
+	float newX;
+	float newY;
 	switch (myClientState->getState()){
 	case 0:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			myMainMenu->checkClick(newX, newY);
+		}
 		break;
 	case 1:
 
@@ -965,6 +1011,22 @@ void mouseFunc(int button, int state, int x, int y)
 			}
 		}
 		break;
+	case 2:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			myGameMenu->checkClick(newX, newY);
+		}
+		break;
+	case 3:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			myDeathScreen->checkClick(newX, newY);
+		}
+		break;
 	default:
 		break;
 	}
@@ -973,8 +1035,9 @@ void motionFunc(int x, int y)
 {
 	switch (myClientState->getState()){
 	case 0:
-
 	case 1:
+	case 2:
+	case 3:
 		passiveMotionFunc(x, y);
 	default:
 		break;
@@ -989,8 +1052,14 @@ void passiveMotionFunc(int x, int y){
 	lastX = x;
 	lastY = y;
 
+	float newX;
+	float newY;
+
 	switch (myClientState->getState()){
 	case 0:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myMainMenu->checkHighlight(newX, newY);
 		break;
 	case 1:
 
@@ -1006,6 +1075,16 @@ void passiveMotionFunc(int x, int y){
 			lastY = Window::height / 2;
 			glutWarpPointer(Window::width / 2, Window::height / 2);
 		}
+		break;
+	case 2:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myGameMenu->checkHighlight(newX, newY);
+		break;
+	case 3:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myDeathScreen->checkHighlight(newX, newY);
 		break;
 	default:
 		break;
@@ -1208,6 +1287,9 @@ void initialize(int argc, char *argv[])
 	player_list.push_back(cube0);*/
 
 	myUI = new UI();
+	myMainMenu = new MainMenu();
+	myGameMenu = new GameMenu();
+	myDeathScreen = new DeathScreen();
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("grid_ground"));

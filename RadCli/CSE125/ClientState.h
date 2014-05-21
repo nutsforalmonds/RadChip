@@ -28,6 +28,22 @@ public:
 
 	void setState(int NewState){
 		State = NewState;
+		switch(State){
+			case 0:
+				glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+				break;
+			case 1:
+				glutSetCursor(GLUT_CURSOR_NONE);
+				break;
+			case 2:
+				glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+				break;
+			case 3:
+				glutSetCursor(GLUT_CURSOR_DESTROY);
+				break;
+			default:
+				break;
+		}
 	}
 	
 

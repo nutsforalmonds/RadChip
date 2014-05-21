@@ -220,7 +220,14 @@ public:
 		heat_frame->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
 		
 	}
-	~UI(){}
+	~UI(){
+		life_back->		~UI_Panel();
+		life_front->	~UI_Panel();
+		life_frame->	~UI_Panel();
+		heat_back->		~UI_Panel();
+		heat_front->	~UI_Panel();
+		heat_frame->	~UI_Panel();
+	}
 
 	int draw(){
 
@@ -388,5 +395,173 @@ private:
 	float heat_bar_size = x2_heat - x1_heat;
 
 	time_t over_de; //rate of decay of overheat bar
+
+};
+
+
+class MainMenu
+{
+public:
+	MainMenu(){
+
+
+	}
+	~MainMenu(){
+	
+	
+	}
+
+	int draw(){
+
+		return 0;
+	}
+
+	void checkHighlight(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+	void checkClick(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+private:
+
+};
+
+class GameMenu
+{
+public:
+	GameMenu(){
+
+
+	}
+	~GameMenu(){
+
+
+	}
+
+	int draw(){
+
+		return 0;
+	}
+
+	void checkHighlight(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+	void checkClick(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+private:
+
+
+
+};
+
+class DeathScreen
+{
+public:
+	DeathScreen(){
+
+
+	}
+	~DeathScreen(){
+
+
+	}
+
+	int draw(){
+
+		return 0;
+	}
+
+	void checkHighlight(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+	void checkClick(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.2) && (x < 0.8)){
+
+			//Spot for first button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+
+			//Spot for second button
+			if ((y > 0.2) && (y < 0.8)){
+
+			}
+		}
+	}
+
+private:
 
 };
