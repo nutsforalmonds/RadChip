@@ -15,7 +15,7 @@ uniform	sampler2D displacementTex;
                                                                                                 
 in vec3 WorldPos_ES_in[];                                                                       
 in vec2 TexCoord_ES_in[];                
-flat in vec3 CamPos_ES_in;                                                                                                                               
+flat in vec3 CamPos_ES_in[];                                                                                                                               
                                                                                                 
 out vec3 WorldPos_FS_in;                                                                        
 out vec2 TexCoord_FS_in;           
@@ -38,6 +38,7 @@ void main()
     // Interpolate the attributes of the output vertex using the barycentric coordinates        
     TexCoord_FS_in = interpolate2D(TexCoord_ES_in[0], TexCoord_ES_in[1], TexCoord_ES_in[2]);                                                
     WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]);    
+    CamPos_FS_in = CamPos_ES_in[0];
                                                                                                 
     // Displace the vertex along the normal                                                                  
     float disp = texture(displacementTex, TexCoord_FS_in.xy).x*dispHeight;              

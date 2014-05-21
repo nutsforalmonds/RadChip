@@ -10,7 +10,7 @@ in vec2 TexCoord_CS_in[];
 // attributes of the output CPs                                                                 
 out vec3 WorldPos_ES_in[];                                                                      
 out vec2 TexCoord_ES_in[];              
-flat out vec3 CamPos_ES_in;                                                                             
+flat out vec3 CamPos_ES_in[];                                                                             
 
                                                                                                 
 float GetTessLevel(float Distance0, float Distance1)                                            
@@ -35,7 +35,8 @@ void main()
 {                                                                                               
     // Set the control points of the output patch                                               
     TexCoord_ES_in[gl_InvocationID] = TexCoord_CS_in[gl_InvocationID];                                                   
-    WorldPos_ES_in[gl_InvocationID] = WorldPos_CS_in[gl_InvocationID];                          
+    WorldPos_ES_in[gl_InvocationID] = WorldPos_CS_in[gl_InvocationID];       
+    CamPos_ES_in[gl_InvocationID] = CamPos;                   
                                                                                                 
     // Calculate the distance from the camera to the three control points                       
     float EyeToVertexDistance0 = distance(CamPos, WorldPos_CS_in[0]);                     
