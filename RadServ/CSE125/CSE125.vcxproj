@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="billboard_list.h" />
+    <ClInclude Include="Boots.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConfigSettings.h" />
     <ClInclude Include="Cube.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="glutils.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Helpers.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="JSON_Parse.h" />
     <ClInclude Include="MD5Animation.h" />
     <ClInclude Include="MD5Model.h" />
@@ -101,8 +103,10 @@
     <ClInclude Include="Octree.h" />
     <ClInclude Include="ogldev_util.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="PlayerChar.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="random_texture.h" />
+    <ClInclude Include="RangeWeapon.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="ShaderController.h" />
@@ -113,24 +117,29 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureScreen.h" />
     <ClInclude Include="VAO.h" />
+    <ClInclude Include="Weapon.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="billboard_list.cpp" />
+    <ClCompile Include="Boots.cpp" />
     <ClCompile Include="ConfigSettings.cpp" />
     <ClCompile Include="glslprogram.cpp" />
     <ClCompile Include="glutils.cpp" />
     <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="MD5Animation.cpp" />
     <ClCompile Include="MD5Model.cpp" />
     <ClCompile Include="MD5ModelLoaderPCH.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ogldev_util.cpp" />
+    <ClCompile Include="PlayerChar.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="random_texture.cpp" />
+    <ClCompile Include="RangeWeapon.cpp" />
     <ClCompile Include="ShaderController.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

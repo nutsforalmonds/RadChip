@@ -4,6 +4,8 @@
 #include "Structures.h"
 #include <array>
 
+#define BASE_JUMPS 5
+
 class Object
 {
 public:
@@ -12,7 +14,11 @@ public:
 		modelM = mat4(1.0);
 		Rotation = mat4(1.0);
 		onGround = true;
-		health = 15;
+		health = 7;
+		numJumps = 5;
+		respawnCounter = 0;
+		kills = 0;
+		playerID = -1;
 	}
 	Object(string n, string t){
 		name = n;
@@ -20,7 +26,11 @@ public:
 		velocity = vec3(0.0);
 		modelM = mat4(1.0);
 		onGround = true;
-		health = 15;
+		health = 7;
+		numJumps = 5;
+		respawnCounter = 0;
+		kills = 0;
+		playerID = -1;
 	}
 	~Object(){}
 	virtual void draw(){/* This is a placeholder*/ }
@@ -70,11 +80,35 @@ public:
 	bool getTouchGround(){
 		return onGround;
 	}
+	void jump(int i){
+		velocity[1] += i;
+	}
 
 	void jump(){
-		if (onGround){
+		if (numJumps > 0)
+		{
 			velocity[1] += 5;
+			numJumps--;
 		}
+	}
+
+	int getNumJumps(){ return numJumps; }
+
+	int getTotalJumps(){
+		return BASE_JUMPS;
+	} //+ boots->getJumps(); } //
+
+	void incNumJumps()
+	{
+		numJumps++;
+	}
+
+
+	void resetVelocity()
+	{
+		velocity[0] = 0;
+		velocity[1] = 0;
+		velocity[2] = 0;
 	}
 
 	//set bounding box of the object
@@ -98,10 +132,23 @@ public:
 
 	int getHealth(){ return health; }
 
+	//int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
+
 	void setHealth(int i){ health--; }
+
+	int getRespawn() { return respawnCounter; }
+
+	void setRespawn(int i){ respawnCounter = i; }
+
+	int getKills(){ return kills; }
+
+	void setKills(int i){ kills += i; }
 
 	void setRotation(mat4 m){ Rotation = m; }
 	mat4 getRotation(){ return Rotation; }
+
+	int getPlayerID() { return playerID; }
+	void setPlayerID(int i) { playerID = i; }
 
 protected:
 	mat4 modelM;
@@ -117,4 +164,8 @@ protected:
 	float jumpVelocity;
 	bool onGround;
 	int health;
+	int numJumps;
+	int respawnCounter;
+	int kills;
+	int playerID;
 };

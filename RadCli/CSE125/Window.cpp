@@ -186,13 +186,15 @@ void updateSound();
 int counter = 0;
 
 UI * myUI;
+MainMenu * myMainMenu;
+GameMenu * myGameMenu;
+DeathScreen * myDeathScreen;
 
 Texture * shadow;
 char buf[255];
 int myFPS = 0;
 
 ClientState* myClientState;
-float awesome_time = 0.5;
 
 // Stuff Erik added
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
@@ -210,6 +212,11 @@ tcp_client* cli;
 boost::array<mat4, 4> mats;
 
 bool running;
+double diff;
+int test = 0;
+float test2 = 0;
+
+bool connected;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -229,7 +236,7 @@ void projectileAttack(int playerID, Camera * cam)
 	cubeT->setSpeed(5);
 	cubeT->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	cubeT->setModelM(player1*glm::translate(vec3(0, 0, -1)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 	cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	AABB hold = cubeT->getAABB();
 	cubeT->setStartX(hold.max[0]);
@@ -259,7 +266,7 @@ void despawnProjectile()
 		int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
 
 		//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
-		if (distance > 30)
+		if (distance >= (*projectile_list[i]).getDistance())
 		{
 			////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
 			projectile_list.erase(projectile_list.begin() + i);
@@ -276,10 +283,6 @@ void simulateProjectile(float t)
 
 void Window::idleCallback(void)
 {
-	//print fps
-	static time_t timer = clock();
-	static time_t tick = clock();
-	float diff;
 	static float anim_time = 0;
 	vector<mat4> Transforms;
 	GLSLProgram* sd;
@@ -289,27 +292,22 @@ void Window::idleCallback(void)
 	case 0:
 		break;
 	case 1:
-
-		if (clock() - timer >= CLOCKS_PER_SEC){
-			//cout<<"FPS: "<<counter<<endl;
-			myFPS = counter;
-			sprintf_s(buf, "%s %d", "FPS ", myFPS);
-			timer = clock();
-			counter = 0;
-		}
-		counter++;
-
+	case 2:
+	case 3:
 		cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
 		if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
 			cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
 		}
 		cam->setPendingRot(0);
-
+		
+		/*
 		QueryPerformanceCounter(&current);
 		delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 		last = current;
-
 		anim_time += delta;
+		*/
+
+		anim_time += diff;
 		if (anim_time > 1 / 30.0){
 			//md5->Update(anim_time);
 			md50->Update(anim_time);
@@ -320,7 +318,8 @@ void Window::idleCallback(void)
 			anim_time = 0;
 		}
 
-		m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
+		m_pMesh2->BoneTransform(diff, Transforms);
 		sd = sdrCtl.getShader("basic_model");
 		for (int i = 0; i < Transforms.size(); i++){
 			char Name[128];
@@ -330,7 +329,7 @@ void Window::idleCallback(void)
 			sd->setUniform(Name, Transforms[i]);
 		}
 
-		simulateProjectile(delta);
+		//simulateProjectile(delta);
 
 		/*vector<mat4> playerMs = scene->getPlayerMats();
 		for (int i = 0; i < player_list.size(); i++){
@@ -363,17 +362,22 @@ void Window::idleCallback(void)
 		}
 
 		View = cam->getViewM();
+
+		if (myClientState->getState() == 2){
+			myGameMenu->draw();
+		}
+		else if (myClientState->getState() == 3){
+			myDeathScreen->draw();
+		}
+
 		break;
 	default:
 		break;
 	}
 
 	updateShaders();
-
 	updateSound();
-
     displayCallback();  
-	//glutLeaveMainLoop();
 }
 void Window::reshapeCallback(int w, int h)
 {
@@ -383,6 +387,8 @@ void Window::reshapeCallback(int w, int h)
 		height = h;
 		glViewport(0, 0, w, h);  // set new view port size
 	case 1:
+	case 2:
+	case 3:
 		width = w;
 		height = h;
 		glViewport(0, 0, w, h);  // set new view port size
@@ -397,15 +403,30 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	static time_t timer = clock();
+
+	if (clock() - timer >= CLOCKS_PER_SEC){
+		//cout<<"FPS: "<<counter<<endl;
+		myFPS = counter;
+		sprintf_s(buf, "%s %d", "FPS ", myFPS);
+		timer = clock();
+		counter = 0;
+	}
+	counter++;
+	
 	switch (myClientState->getState()){
 	case 0:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		/*
 		glDisable(GL_DEPTH_TEST);
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, m_Test2, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
+		*/
+		myMainMenu->draw();
 		break;
 	case 1:
-		
+	case 2:
+	case 3:
 		///////  1st pass: render into depth map //////////
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, depth_fbo);
 		glViewport(0, 0, depth_texture_width, depth_texture_height);
@@ -464,40 +485,36 @@ void Window::displayCallback(void)
 		m_billboardList.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
 		m_billboardList2.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
 		m_billboardList3.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-		m_billboardList4.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-
-		awesome_time += 1.0;
-		if (awesome_time > 50.0){
-			awesome_time = 1.0;
-		}
 
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		particle->draw(Projection, View, awesome_time);
-		particle2->draw(Projection, View, awesome_time);
-		particle3->draw(Projection, View, awesome_time);
-		particle4->draw(Projection, View, awesome_time);
-		particle5->draw(Projection, View, awesome_time);
-		particle6->draw(Projection, View, awesome_time);
-		particle7->draw(Projection, View, awesome_time);
+		particle->draw(Projection, View);
+		particle2->draw(Projection, View);
+		particle3->draw(Projection, View);
+		particle4->draw(Projection, View);
+		particle5->draw(Projection, View);
+		particle6->draw(Projection, View);
+		particle7->draw(Projection, View);
 		glDisable(GL_BLEND);
 
 		glDisable(GL_DEPTH_TEST);
 
 		myUI->draw();
 
-		//2D cube setColor() is changing the color of the text...
-		//Problem with the currently bound shader me thinks
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
-
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
 
 		glEnable(GL_DEPTH_TEST);
 
-		glFlush();
-
+		//glFlush();
+		if (myClientState->getState() == 2){
+			myGameMenu->draw();
+		}
+		else if (myClientState->getState() == 3){
+			myDeathScreen->draw();
+		}
 		break;
 	default:
 		break;
@@ -512,7 +529,11 @@ void server_update(int value){
 	//jkl = asdf;
 	//cout << fjfj << endl;
 
+	/*
+	diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	QueryPerformanceCounter(&loop_begin);
+	*/
+
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
@@ -565,7 +586,6 @@ void server_update(int value){
 		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
 	}
 
-
 	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
 	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
 	mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
@@ -576,17 +596,15 @@ void server_update(int value){
 	player_list[2]->setModelM(mats[2]);
 	player_list[3]->setModelM(mats[3]);
 
-	despawnProjectile();
+	simulateProjectile(diff);
+
+	//Particles are instantly despawning
+	//despawnProjectile();
+
 	//Have to reset timer after
-	QueryPerformanceCounter(&loop_end);
-	int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
-	if (diff > 15){
-		glutTimerFunc(0, server_update, 0);
-		//cout << "server_update() exceded 15ms mark"<< endl;
-	}
-	else{
-		glutTimerFunc(15-diff, server_update, 0);
-	}
+	//QueryPerformanceCounter(&loop_end);
+	//int diff = (int)((double)(loop_end.QuadPart - loop_begin.QuadPart) / (double)freq.QuadPart *1000);
+	//diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
 }
 
 void SelectFromMenu(int idCommand)
@@ -683,13 +701,14 @@ int main(int argc, char *argv[])
   glutPassiveMotionFunc(passiveMotionFunc);
 
   //Added for server debuging
-  glutTimerFunc(500, server_update, 0);
+  //glutTimerFunc(500, server_update, 0);
 
   glutKeyboardFunc(keyboard);
   glutKeyboardUpFunc(keyUp);
   glutSpecialFunc(specialKeyboardFunc);
 
-  glutSetCursor(GLUT_CURSOR_NONE);
+  //glutSetCursor(GLUT_CURSOR_NONE);
+  glutSetCursor(GLUT_CURSOR_WAIT);
 
   BuildPopupMenu();
   glutAttachMenu(GLUT_MIDDLE_BUTTON);
@@ -698,13 +717,41 @@ int main(int argc, char *argv[])
 
   //glutMainLoop();
 
+  QueryPerformanceFrequency(&freq);
+  QueryPerformanceCounter(&last);
+
   running = true;
-  while (running){
+  connected = false;
+  myClientState->setState(0);
+  do{
+
+	  QueryPerformanceCounter(&current);
+	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
+	  last = current;
+
 	  glutMainLoopEvent();
-	  //glutMainLoop();
+
 	  //printf("LOOP!\n");
+	  if (connected){
+		  server_update(0);
+	  }
+
 	  Window::idleCallback();
-  }
+	  
+	  QueryPerformanceCounter(&loop_end);
+	  diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
+
+	  if (diff > 15){
+		  //glutTimerFunc(0, server_update, 0);
+		  //cout << "server_update() exceded 15ms mark" << endl;
+		  //cout << diff << endl;
+	  }
+	  else{
+		  //glutTimerFunc(15-diff, server_update, 0);
+		  Sleep(15 - diff);
+	  }
+	  
+  } while (running);
 
   for (int i = 0; i < draw_list.size(); ++i)
   {
@@ -736,7 +783,7 @@ void keyboard(unsigned char key, int, int){
 		if (key == ' '){
 			if (space_up){
 				//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
-				myClientState->setState(1);
+				//myClientState->setState(1);
 			}
 		}
 		break;
@@ -754,9 +801,13 @@ void keyboard(unsigned char key, int, int){
 		if (key == 's'){
 			keyState = keyState | 1 << 3;
 		}
+		if (key == 'W'){
+			keyState = keyState | 1 << 5;
+		}
 		if (key == 27){
-			running = false;
-			exit(0);
+			//running = false;
+			//exit(0);
+			myClientState->setState(2);
 		}
 		if (key == ' '){
 			keyState = keyState | 1 << 4;
@@ -811,6 +862,20 @@ void keyboard(unsigned char key, int, int){
 			SelectFromMenu(MENU_TEXTURING);
 		}
 		break;
+	case 2:
+		if (key == 27){
+			//running = false;
+			//exit(0);
+			myClientState->setState(1);
+		}
+		break;
+	case 3:
+		if (key == 27){
+			//running = false;
+			//exit(0);
+			myClientState->setState(1);
+		}
+		break;
 	default:
 		break;
 	}
@@ -848,6 +913,9 @@ void keyUp (unsigned char key, int x, int y) {
 		if (key == 's'){
 			keyState = keyState & ~(1 << 3);
 		}
+		if (key == 'W'){
+			keyState = keyState & ~(1 << 5);
+		}
 		if (key == ' '){
 			keyState = keyState & ~(1 << 4);
 			space_up = 1;
@@ -862,6 +930,10 @@ void keyUp (unsigned char key, int x, int y) {
 			}
 		}
 		break;
+	case 2:
+		break;
+	case 3:
+		break;
 	default:
 		break;
 	}
@@ -872,9 +944,56 @@ void mouseFunc(int button, int state, int x, int y)
 	oldY=y;
 	mouseDown = (state == GLUT_DOWN);
 	mouseButton = button;
-
+	float newX;
+	float newY;
 	switch (myClientState->getState()){
 	case 0:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			int click = myMainMenu->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+				
+				if (!connected){
+					
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
+					sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
+					
+					try
+					{
+						cli = new tcp_client(io_service, "localhost", "13");
+						io_service.run_one();
+						io_service.run_one();
+						playerID = cli->pID();
+						std::cout << "pid: " << playerID << std::endl;
+						//system("pause");
+					}
+					catch (std::exception& e)
+					{
+						sprintf_s(buf, "%s", "Error connecting to server!");
+						std::cerr << e.what() << std::endl;
+					}
+
+					cam = new Camera();
+					cam->attach(player_list[playerID]);
+					cam->postTrans(glm::translate(vec3(0, 1, 4)));
+
+					connected = true;
+				}
+			}
+			else if (click == 2){
+				running = false;
+				exit(0);
+			}
+		}
 		break;
 	case 1:
 
@@ -939,6 +1058,28 @@ void mouseFunc(int button, int state, int x, int y)
 			}
 		}
 		break;
+	case 2:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			int click = myGameMenu->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
+			if (click == 2){
+				myClientState->setState(0);
+			}
+		}
+		break;
+	case 3:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			myDeathScreen->checkClick(newX, newY);
+		}
+		break;
 	default:
 		break;
 	}
@@ -947,8 +1088,9 @@ void motionFunc(int x, int y)
 {
 	switch (myClientState->getState()){
 	case 0:
-
 	case 1:
+	case 2:
+	case 3:
 		passiveMotionFunc(x, y);
 	default:
 		break;
@@ -963,8 +1105,14 @@ void passiveMotionFunc(int x, int y){
 	lastX = x;
 	lastY = y;
 
+	float newX;
+	float newY;
+
 	switch (myClientState->getState()){
 	case 0:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myMainMenu->checkHighlight(newX, newY);
 		break;
 	case 1:
 
@@ -980,6 +1128,16 @@ void passiveMotionFunc(int x, int y){
 			lastY = Window::height / 2;
 			glutWarpPointer(Window::width / 2, Window::height / 2);
 		}
+		break;
+	case 2:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myGameMenu->checkHighlight(newX, newY);
+		break;
+	case 3:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		myDeathScreen->checkHighlight(newX, newY);
 		break;
 	default:
 		break;
@@ -1184,6 +1342,9 @@ void initialize(int argc, char *argv[])
 	player_list.push_back(cube0);*/
 
 	myUI = new UI();
+	myMainMenu = new MainMenu();
+	myGameMenu = new GameMenu();
+	myDeathScreen = new DeathScreen();
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("ground_tess"));
@@ -1283,6 +1444,12 @@ void initialize(int argc, char *argv[])
 	particle->setColor(vec3(1.0, 0.0, 0.0));
 	particle->setShade(vec3(1.0, 0.0, 0.0));
 	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	
+	particle->setTime_Step(1.0);
+	particle->setTime_Max(150.0);
+	particle->setTime_Min(1.0);
+	particle->setTime(0.45);
+
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
 	particle2 = new ParticleSystem();
@@ -1293,6 +1460,12 @@ void initialize(int argc, char *argv[])
 	particle2->setColor(vec3(0.0, 1.0, 0.0));
 	particle2->setShade(vec3(0.0, 1.0, 0.0));
 	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle2->setTime_Step(0.5);
+	particle2->setTime_Max(15.0);
+	particle2->setTime_Min(1.5);
+	particle2->setTime(7.5);
+
 	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
 
 	particle3 = new ParticleSystem();
@@ -1303,6 +1476,9 @@ void initialize(int argc, char *argv[])
 	particle3->setColor(vec3(0.0, 0.0, 1.0));
 	particle3->setShade(vec3(0.0, 0.0, 1.0));
 	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle3->setTime(25.0);
+	
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
 	particle4 = new ParticleSystem();
@@ -1313,6 +1489,9 @@ void initialize(int argc, char *argv[])
 	particle4->setColor(vec3(1.0, 1.0, 1.0));
 	particle4->setShade(vec3(1.0, 1.0, 1.0));
 	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle4->setTime(35.0);
+
 	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	particle5 = new ParticleSystem();
@@ -1323,6 +1502,9 @@ void initialize(int argc, char *argv[])
 	particle5->setColor(vec3(1.0, 1.0, 0.0));
 	particle5->setShade(vec3(1.0, 1.0, 0.0));
 	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+
+	particle5->setTime(45.0);
+
 	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
 
 	particle6 = new ParticleSystem();
@@ -1332,7 +1514,10 @@ void initialize(int argc, char *argv[])
 	particle6->setK(14.0f);
 	particle6->setColor(vec3(1.0, 0.0, 1.0));
 	particle6->setShade(vec3(1.0, 0.0, 1.0));
-	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG"); 
+
+	particle6->setTime(7.5);
+
 	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
 
 	particle7 = new ParticleSystem();
@@ -1345,55 +1530,12 @@ void initialize(int argc, char *argv[])
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
-
-
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
-
-	sprintf_s(buf, "%s", "Attempting to connect to server...");
+	//sprintf_s(buf, "%s", "Attempting to connect to server...");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 	glutSwapBuffers();
-
-	try
-	{
-		cli = new tcp_client(io_service, "localhost", "13");
-		io_service.run_one();
-		io_service.run_one();
-		playerID = cli->pID();
-		std::cout << "pid: " << playerID << std::endl;
-		//system("pause");
-	}
-	catch (std::exception& e)
-	{
-		sprintf_s(buf, "%s", "Error connecting to server!");
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
-
-		glutSwapBuffers();
-
-		std::cerr << e.what() << std::endl;
-	}
-
-	sprintf_s(buf, "%s", "Attempting to connect to server...done!");
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
-
-	glutSwapBuffers();
-
-	cam = new Camera();
-	cam->attach(player_list[playerID]);
-	cam->postTrans(glm::translate(vec3(0, 1, 4)));
 
 }
 

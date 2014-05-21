@@ -36,6 +36,11 @@ class ParticleSystem : public Object
 public:
 	ParticleSystem(void){
 
+		awesome_time = 1.5;
+		time_Max = 50.0;
+		time_Min = 1.5;
+		time_Step = 1.0;
+
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
 			// Assign each particle its theta value (in radians)
@@ -57,6 +62,8 @@ public:
 	~ParticleSystem(void){}
 
 	void draw(float time){
+
+		updateTime();
 
 		shader->setUniform(uniformLoc[0], View);
 		shader->setUniform(uniformLoc[1], Projection);
@@ -87,13 +94,15 @@ public:
 		vao.draw();
 		glUseProgram(0);
 	}
-	void draw(mat4& projection, mat4& view, float time){
+	void draw(mat4& projection, mat4& view){
+		
+		updateTime();
 		
 		shader->setUniform(uniformLoc[0], view);
 		shader->setUniform(uniformLoc[1], projection);
 		shader->setUniform(uniformLoc[2], getModelM());
 		shader->setUniform(uniformLoc[3], emitter.k);
-		shader->setUniform(uniformLoc[4], time/4);
+		shader->setUniform(uniformLoc[4], awesome_time/4);
 		shader->setUniform(uniformLoc[5], emitter.color);
 		shader->setUniform(uniformLoc[6], p_shade);
 		shader->setUniform(uniformLoc[7], 0);
@@ -128,6 +137,18 @@ public:
 	void setK(float input){ emitter.k = input; }
 	float getK(float input){ return emitter.k; }
 	
+	void setTime_Step(float s){ time_Step = s; }
+	float getTime_Step(){ return awesome_time; }
+
+	void setTime_Max(float ma){ time_Max = ma; }
+	float getTime_Max(){ return time_Max; }
+
+	void setTime_Min(float mi){ time_Min = mi; }
+	float getTime_Min(){ return time_Min; }
+	
+	void setTime(float t){ awesome_time = t; }
+	float getTime(){ return awesome_time; }
+
 private:
 	void generate(){
 	
@@ -138,6 +159,13 @@ private:
 		return (((float)(rand() % ((unsigned)RAND_MAX + 1)) / RAND_MAX) * range) + min;
 	}
 
+	void updateTime(){
+		awesome_time += time_Step;
+		if (awesome_time > time_Max){
+			awesome_time = time_Min;
+		}
+	}
+
 	VAO vao;
 	GLSLProgram * shader;
 	Emitter emitter;
@@ -146,4 +174,10 @@ private:
 	vector<int> uniformLoc;
 	std::vector<Texture*> m_Textures;
 	Texture* m_Texture;
+	float awesome_time;
+
+	float time_Max;
+	float time_Min;
+	float time_Step;
+
 };

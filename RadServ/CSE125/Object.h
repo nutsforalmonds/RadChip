@@ -1,8 +1,17 @@
 #pragma once
 #include "VAO.h"
 #include "glslprogram.h"
+#include "Item.h"
+#include "RangeWeapon.h"
+#include "Boots.h"
 #include "Structures.h"
 #include <array>
+#include <iostream>
+using namespace std;
+
+#define BASE_JUMPS 10
+
+static int iohjworihorhi = 0;
 
 class Object
 {
@@ -12,7 +21,13 @@ public:
 		modelM = mat4(1.0);
 		Rotation = mat4(1.0);
 		onGround = true;
-		health = 15;
+		health = 7;
+		numJumps = 5;
+		respawnCounter = 0;
+		kills = 0;
+		playerID = -1;
+		weapon = new RangeWeapon();
+		boots = new Boots(1, 10, 2);
 	}
 	Object(string n, string t){
 		name = n;
@@ -20,7 +35,13 @@ public:
 		velocity = vec3(0.0);
 		modelM = mat4(1.0);
 		onGround = true;
-		health = 15;
+		health = 7;
+		numJumps = 5;
+		respawnCounter = 0;
+		kills = 0;
+		playerID = -1;
+		weapon = new RangeWeapon();
+		boots = new Boots(1, 10, 2);
 	}
 	~Object(){}
 	virtual void draw(){/* This is a placeholder*/ }
@@ -70,10 +91,33 @@ public:
 		return onGround;
 	}
 
+	void jump(int i){
+		velocity[1] += i;
+	}
+
 	void jump(){
-		if (onGround){
-			velocity[1] = 10;
+		cout << numJumps << endl;
+		if (numJumps > 0)
+		{
+			velocity[1] += 1;
+			numJumps--;
 		}
+	}
+
+	int getNumJumps(){ return numJumps; }
+
+	int getTotalJumps(){ return BASE_JUMPS + boots->getJumps(); } //
+
+	void incNumJumps()
+	{
+		numJumps++;
+	}
+
+	void resetVelocity()
+	{
+		velocity[0] = 0;
+		velocity[1] = 0;
+		velocity[2] = 0;
 	}
 
 	//set bounding box of the object
@@ -97,10 +141,31 @@ public:
 
 	int getHealth(){ return health; }
 
+	int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
+
 	void setHealth(int i){ health--; }
+
+	int getRespawn() { return respawnCounter; }
+
+	void setRespawn(int i){ respawnCounter = i; }
+
+	int getKills(){ return kills; }
+
+	void setKills(int i){ kills += i; }
+
 
 	void setRotation(mat4 m){ Rotation = m; }
 	mat4 getRotation(){ return Rotation; }
+
+	RangeWeapon * getWeapon() { return weapon; }
+	void setWeapon(RangeWeapon * i) { weapon = i; }
+
+	Boots * getBoots() { return boots; }
+	void setBoots(Boots * b) { boots = b; }
+
+	int getPlayerID() { return playerID; }
+	void setPlayerID(int i) { playerID = i; }
+
 
 protected:
 	mat4 modelM;
@@ -116,4 +181,10 @@ protected:
 	float jumpVelocity;
 	bool onGround;
 	int health;
+	int numJumps;
+	int respawnCounter;
+	int kills;
+	int playerID;
+	RangeWeapon * weapon;
+	Boots * boots;
 };

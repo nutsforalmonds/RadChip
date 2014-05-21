@@ -90,10 +90,10 @@
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConfigSettings.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="gameState.h" />
     <ClInclude Include="glslprogram.h" />
     <ClInclude Include="glutils.h" />
     <ClInclude Include="Ground.h" />
-    <ClInclude Include="Header.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="JSON_Parse.h" />
     <ClInclude Include="MD5Animation.h" />
@@ -105,7 +105,6 @@
     <ClInclude Include="ogldev_util.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="random_texture.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderController.h" />
     <ClInclude Include="SkyBox.h" />
@@ -130,11 +129,42 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ogldev_util.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="random_texture.cpp" />
     <ClCompile Include="ShaderController.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Config.ini" />
+    <None Include="ConfigTemplate.ini" />
+    <None Include="Shaders\basic_edge_detection.frag" />
+    <None Include="Shaders\basic_edge_detection.vert" />
+    <None Include="Shaders\basic_flat.frag" />
+    <None Include="Shaders\basic_flat.vert" />
+    <None Include="Shaders\basic_lighted_texture.frag" />
+    <None Include="Shaders\basic_lighted_texture.vert" />
+    <None Include="Shaders\basic_model.frag" />
+    <None Include="Shaders\basic_model.vert" />
+    <None Include="Shaders\basic_phong_with_fog_potential.frag" />
+    <None Include="Shaders\basic_phong_with_fog_potential.vert" />
+    <None Include="Shaders\basic_projected_texture.frag" />
+    <None Include="Shaders\basic_projected_texture.vert" />
+    <None Include="Shaders\basic_reflect_refract.frag" />
+    <None Include="Shaders\basic_reflect_refract.vert" />
+    <None Include="Shaders\basic_skybox.frag" />
+    <None Include="Shaders\basic_skybox.vert" />
+    <None Include="Shaders\basic_texture_with_moss_potential.frag" />
+    <None Include="Shaders\basic_texture_with_moss_potential.vert" />
+    <None Include="Shaders\billboard.frag" />
+    <None Include="Shaders\billboard.geom" />
+    <None Include="Shaders\billboard.vert" />
+    <None Include="Shaders\emitter.frag" />
+    <None Include="Shaders\emitter.vert" />
+    <None Include="Shaders\grid_ground.frag" />
+    <None Include="Shaders\grid_ground.vert" />
+    <None Include="Shaders\ps_update.frag" />
+    <None Include="Shaders\ps_update.geom" />
+    <None Include="Shaders\ps_update.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

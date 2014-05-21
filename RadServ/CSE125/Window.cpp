@@ -72,40 +72,54 @@ void handle_mouse_state(int pid, int mouseState){
 	}
 }
 void handle_key_state(int pid, int keyState){
+	if (scene->getPlayerObj(pid) == NULL)
+		return;
 	if (keyState & 1){ //'a'
 		//cout << "move left" << endl;
-		scene->setHMove(pid, -1);
+		scene->setHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	else{
-		scene->cancelHMove(pid, -1);
+		scene->cancelHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	if (keyState & 1 << 1){ //'d'
 		//cout << "move right" << endl;
-		scene->setHMove(pid, 1);
+		scene->setHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	else{
-		scene->cancelHMove(pid, 1);
+		scene->cancelHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	if (keyState & 1 << 2){ //'w'
 		//cout << "move up" << endl;
-		scene->setVMove(pid, 1);
+		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	else{
-		scene->cancelVMove(pid, 1);
+		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	if (keyState & 1 << 3){ //'s'
 		//cout << "move down" << endl;
-		scene->setVMove(pid, -1);
+		scene->setVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	else{
-		scene->cancelVMove(pid, -1);
+		scene->cancelVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
 	}
 	if (keyState & 1 << 4){ //' '
 		//cout << "jump" << endl;
 		scene->jump(pid);
 	}
+	else
+	{
+
+	}
+	if (keyState & 1 << 5){ //'W' for sprint
+		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	}
+	else{
+		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	}
 }
 void handle_cam_rot(int pid, float cam_rot){
+	if (scene->getPlayerObj(pid) == NULL)
+		return;
 	scene->pushRot(pid, -cam_sp*cam_rot);
 	cam_rot = 0; // possibly a problem
 }
@@ -231,10 +245,10 @@ int main(int argc, char *argv[])
 
 		scene->simulate(diff, 1.0 / 100);
 		boost::array<mat4, 4> m;
-		m[0] = scene->getPlayerMats()[0];
-		m[1] = scene->getPlayerMats()[1];
-		m[2] = scene->getPlayerMats()[2];
-		m[3] = scene->getPlayerMats()[3];
+		for (int i = 0; i < scene->numPlayers(); i++)
+		{
+			m[i] = scene->getPlayerMats()[i];
+		}
 		// Print out matrix contents
 		/*
 		cout << (m[0])[0][0] << (m[0])[0][1] << (m[0])[0][2] << (m[0])[0][3] << endl;
@@ -274,7 +288,11 @@ int main(int argc, char *argv[])
 		QueryPerformanceCounter(&loop_end);
 		diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
 		if (diff < 15){
-			Sleep(15 - diff);
+			//cout << diff << endl;
+			Sleep(15 - diff);			
+		}
+		else{
+			//cout << diff << endl;
 		}
 	}
 	return 0;
