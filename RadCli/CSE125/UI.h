@@ -514,14 +514,53 @@ public:
 	GameMenu(){
 
 
+		resume = new UI_Panel(-1, 1, -1, 1);
+		resume->setColor(vec3(1.0, 0.0, 0.0));
+		resume->setShader(sdrCtl.getShader("basic_2D"));
+		resume->loadColorTex("img/exit", "PNG");
+		resume->setTex(true);
+		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
+
+		quit = new UI_Panel(-1, 1, -1, 1);
+		quit->setColor(vec3(1.0, 0.0, 0.0));
+		quit->setShader(sdrCtl.getShader("basic_2D"));
+		quit->loadColorTex("img/start", "PNG");
+		quit->setTex(true);
+		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+
+		selected = new UI_Panel(-1, 1, -1, 1);
+		selected->setColor(vec3(1.0, 0.0, 0.0));
+		selected->setShader(sdrCtl.getShader("basic_2D"));
+		selected->loadColorTex("img/start", "PNG");
+		selected->setTex(true);
+		selected->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
+		frame = new UI_Panel(-1, 1, -1, 1);
+		frame->setColor(vec3(1.0, 1.0, 1.0));
+		frame->setShader(sdrCtl.getShader("basic_2D"));
+		frame->loadColorTex("img/back", "PNG");
+		frame->setTex(true);
+		frame->setModelM(glm::scale(vec3(0.5, 0.25, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
 	}
 	~GameMenu(){
 
-
+		resume->   ~UI_Panel();
+		quit->     ~UI_Panel();
+		selected-> ~UI_Panel();
+		frame->    ~UI_Panel();
 	}
 
 	int draw(){
+		glDisable(GL_DEPTH_TEST);
 
+		frame->draw();
+		resume->draw();
+		quit->draw();
+		selected->draw();
+
+
+		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
 
@@ -563,6 +602,11 @@ private:
 
 	float highlightTrans = 0;
 
+	UI_Panel * resume;
+	UI_Panel * quit;
+	UI_Panel * selected;
+	UI_Panel * frame;
+
 };
 
 class DeathScreen
@@ -574,10 +618,12 @@ public:
 	}
 	~DeathScreen(){
 
+	
 
 	}
 
 	int draw(){
+
 
 		return 0;
 	}
