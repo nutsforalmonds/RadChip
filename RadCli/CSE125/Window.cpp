@@ -702,7 +702,7 @@ int main(int argc, char *argv[])
   while (running){
 	  glutMainLoopEvent();
 	  //glutMainLoop();
-	  printf("LOOP!\n");
+	  //printf("LOOP!\n");
 	  Window::idleCallback();
   }
 
@@ -1011,12 +1011,13 @@ void specialKeyboardFunc(int key, int x, int y){
 
 void updateShaders(){
 
-	GLSLProgram* p[4];
+	GLSLProgram* p[5];
 	p[0] = sdrCtl.getShader("basic_reflect_refract");
 	p[1] = sdrCtl.getShader("basic_texture");
 	p[2] = sdrCtl.getShader("grid_ground");
 	p[3] = sdrCtl.getShader("basic_model");
-	for (int i = 0; i < 4; i++){
+	p[4] = sdrCtl.getShader("ground_tess");
+	for (int i = 0; i < 5; i++){
 		p[i]->setUniform("light[0].type", light[0].type);
 		p[i]->setUniform("light[0].pos", light[0].pos);
 		p[i]->setUniform("light[0].specular", light[0].specular);
@@ -1056,6 +1057,7 @@ void setupShaders()
 	}
 
 	sdrCtl.createVGFShader("billboard", "Shaders/billboard.vert", "Shaders/billboard.geom", "Shaders/billboard.frag");
+	sdrCtl.createVCEFShader("ground_tess", "Shaders/ground_tess.vert", "Shaders/ground_tess.cntl", "Shaders/ground_tess.eval", "Shaders/ground_tess.frag");
 
 	updateShaders();
 }
@@ -1184,7 +1186,7 @@ void initialize(int argc, char *argv[])
 	myUI = new UI();
 
 	ground = new Ground();
-	ground->setShader(sdrCtl.getShader("grid_ground"));
+	ground->setShader(sdrCtl.getShader("ground_tess"));
 	ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
 	ground->loadDispTex("img/moon_tex/moon_DISP.png", "PNG");
 	ground->loadNormalTex("img/moon_tex/moon_NRM.png", "PNG");
@@ -1192,8 +1194,8 @@ void initialize(int argc, char *argv[])
 	ground->loadSpecTex("img/moon_tex/moon_SPEC.png", "PNG");
 	ground->setDimensionS(40);
 	ground->setDimensionT(40);
-	ground->setRow(501);
-	ground->setColumn(501);
+	ground->setRow(51);
+	ground->setColumn(51);
 	ground->setHeight(1 / 1.0);
 	ground->setShadowTex(shadow_map_id);
 	ground->generate();

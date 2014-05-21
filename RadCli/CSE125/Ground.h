@@ -58,6 +58,7 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("LightView"));
 		uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
 		uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+		uniformLoc.push_back(shader->getUniformLoc("CamPos"));
 	}
 	void draw(){
 		shader->setUniform(uniformLoc[0], View);
@@ -74,12 +75,14 @@ public:
 		shader->setUniform(uniformLoc[11], LightView);
 		shader->setUniform(uniformLoc[12], LightProjection);
 		shader->setUniform(uniformLoc[13], ScaleBias);
+		shader->setUniform(uniformLoc[14], vec3(glm::inverse(View)*vec4(0, 0, 0, 1)));
 		colorTex->Bind(GL_TEXTURE0);
 		normalTex->Bind(GL_TEXTURE1);
 		displacementTex->Bind(GL_TEXTURE2);
 		occlusionTex->Bind(GL_TEXTURE3);
 		specularTex->Bind(GL_TEXTURE4);
 		shader->use();
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
 		vao.draw();
 		glUseProgram(0);
 	}
@@ -104,6 +107,7 @@ public:
 		occlusionTex->Bind(GL_TEXTURE3);
 		specularTex->Bind(GL_TEXTURE4);
 		shader->use();
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
 		vao.draw();
 		glUseProgram(0);
 	}
@@ -188,7 +192,7 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, ground_positions.size()*sizeof(double), &ground_positions[0], GL_STATIC_DRAW, 0, 3, GL_DOUBLE, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.addAttrib(GL_ARRAY_BUFFER, ground_normals.size()*sizeof(double), &ground_normals[0], GL_STATIC_DRAW, 1, 3, GL_DOUBLE, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.addAttrib(GL_ARRAY_BUFFER, ground_texCoords.size()* sizeof(double), &ground_texCoords[0], GL_STATIC_DRAW, 2, 2, GL_DOUBLE, GL_FALSE, 0, (GLubyte*)NULL);
-		vao.setDrawMode(GL_TRIANGLES, ground_indices.size(), GL_UNSIGNED_INT, &ground_indices[0]);
+		vao.setDrawMode(GL_PATCHES, ground_indices.size(), GL_UNSIGNED_INT, &ground_indices[0]);
 	}
 
 	float getDispY(float x, float z){

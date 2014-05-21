@@ -60,7 +60,7 @@ public:
 		return m_NumBones;
 	}
 
-	void BoneTransform(float TimeInSeconds, vector<mat4>& Transforms);
+	void BoneTransform(double TimeInSeconds, vector<mat4>& Transforms);
 
 	void setShader(GLSLProgram* s);
 	void setAdjustM(mat4 m){ adjustM = m; }
@@ -131,14 +131,14 @@ private:
 		void AddBoneData(uint BoneID, float Weight);
 	};
 
-	void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-	void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-	void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-	uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-	uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
-	uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+	void CalcInterpolatedScaling(aiVector3D& Out, double AnimationTime, const aiNodeAnim* pNodeAnim);
+	void CalcInterpolatedRotation(aiQuaternion& Out, double AnimationTime, const aiNodeAnim* pNodeAnim);
+	void CalcInterpolatedPosition(aiVector3D& Out, double AnimationTime, const aiNodeAnim* pNodeAnim);
+	uint FindScaling(double AnimationTime, const aiNodeAnim* pNodeAnim);
+	uint FindRotation(double AnimationTime, const aiNodeAnim* pNodeAnim);
+	uint FindPosition(double AnimationTime, const aiNodeAnim* pNodeAnim);
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
-	void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const mat4& ParentTransform);
+	void ReadNodeHeirarchy(double AnimationTime, const aiNode* pNode, const mat4& ParentTransform);
 
 	bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 

@@ -29,6 +29,16 @@ void ShaderController::createVGFShader(const string& shader_name, const char * v
 	shaders[shader_name].link();
 }
 
+void ShaderController::createVCEFShader(const string& shader_name, const char * vert_file, const char* control_file, const char* eval_file, const char* frag_file)
+{
+	shaders[shader_name] = GLSLProgram();
+	shaders[shader_name].compileShaderFromFile(vert_file, GLSLShader::VERTEX);
+	shaders[shader_name].compileShaderFromFile(control_file, GLSLShader::TESS_CONTROL);
+	shaders[shader_name].compileShaderFromFile(eval_file, GLSLShader::TESS_EVALUATION);
+	shaders[shader_name].compileShaderFromFile(frag_file, GLSLShader::FRAGMENT);
+	shaders[shader_name].link();
+}
+
 GLSLProgram* ShaderController::getShader( const string& shader_name )
 {
 	return &shaders[shader_name];

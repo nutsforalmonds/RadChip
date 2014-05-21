@@ -22,6 +22,7 @@ public:
 	~ShaderController(void);
 	void createVFShader(const string& shader_name, const char * vert_file, const char* frag_file);
 	void createVGFShader(const string& shader_name, const char * vert_file, const char * geom_file, const char* frag_file);
+	void ShaderController::createVCEFShader(const string& shader_name, const char * vert_file, const char* control_file, const char* eval_file, const char* frag_file);
 	GLSLProgram* getShader(const string& shader_name);
 	void use(const string& shader_name);
 	void setUniform( const string& shader_name, const char *name, float x, float y, float z);
