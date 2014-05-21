@@ -99,7 +99,7 @@ public:
 		cout << numJumps << endl;
 		if (numJumps > 0)
 		{
-			velocity[1] += 1;
+			velocity[1] = 10;
 			numJumps--;
 		}
 	}

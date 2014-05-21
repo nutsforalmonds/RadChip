@@ -318,8 +318,10 @@ void Window::idleCallback(void)
 			anim_time = 0;
 		}
 
-		//m_pMesh2->BoneTransform((double)current.QuadPart / (double)freq.QuadPart, Transforms);
-		m_pMesh2->BoneTransform(diff, Transforms);
+		LARGE_INTEGER ct;
+		QueryPerformanceCounter(&ct);
+		m_pMesh2->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
+		//m_pMesh2->BoneTransform(diff, Transforms);
 		sd = sdrCtl.getShader("basic_model");
 		for (int i = 0; i < Transforms.size(); i++){
 			char Name[128];
@@ -660,7 +662,7 @@ int main(int argc, char *argv[])
   glutInit(&argc, argv);      	      	      // initialize GLUT
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
   //glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);   // open an OpenGL context with double buffering, RGB colors, and depth buffering
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);   // open an OpenGL context with double buffering, RGB colors, and depth buffering
   glutInitWindowSize(Window::width, Window::height);      // set initial window size
   glutCreateWindow("CSE 125 - Group 4 (RadioactiveChipmunks)");    	      // open window and set window title
   
