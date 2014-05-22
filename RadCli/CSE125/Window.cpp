@@ -562,6 +562,10 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
+		if (playerID == 1)
+		{
+			myUI->setShots(1);
+		}
 	}
 
 	//stateID = ((*recvVec)[1].first.c_str()[0]);
@@ -570,6 +574,10 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
+		if (playerID == 2)
+		{
+			myUI->setShots(1);
+		}
 	}
 
 //	stateID = ((*recvVec)[2].first.c_str()[0]);
@@ -578,6 +586,10 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
+		if (playerID == 3)
+		{
+			myUI->setShots(1);
+		}
 	}
 
 	//stateID = ((*recvVec)[3].first.c_str()[0]);
@@ -586,7 +598,12 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
+		if (playerID == 0)
+		{
+			myUI->setShots(1);
+		}
 	}
+
 
 	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
 	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
