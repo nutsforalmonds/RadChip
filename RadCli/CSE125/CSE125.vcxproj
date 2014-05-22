@@ -100,6 +100,7 @@
     <ClInclude Include="MD5Model.h" />
     <ClInclude Include="MD5ModelLoaderPCH.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Mesh_Static.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Octree.h" />
     <ClInclude Include="ogldev_util.h" />
@@ -127,6 +128,7 @@
     <ClCompile Include="MD5Model.cpp" />
     <ClCompile Include="MD5ModelLoaderPCH.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Mesh_Static.cpp" />
     <ClCompile Include="ogldev_util.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ShaderController.cpp" />
@@ -162,6 +164,10 @@
     <None Include="Shaders\emitter.vert" />
     <None Include="Shaders\grid_ground.frag" />
     <None Include="Shaders\grid_ground.vert" />
+    <None Include="Shaders\ground_tess.cntl" />
+    <None Include="Shaders\ground_tess.eval" />
+    <None Include="Shaders\ground_tess.frag" />
+    <None Include="Shaders\ground_tess.vert" />
     <None Include="Shaders\ps_update.frag" />
     <None Include="Shaders\ps_update.geom" />
     <None Include="Shaders\ps_update.vert" />

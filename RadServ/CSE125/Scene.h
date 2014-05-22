@@ -228,31 +228,35 @@ public:
 	{
 		Object * holder;
 		int id;
-		for (int i = 0; i < respawn.size(); i++)
+		for (int i = 0; i < player.size(); i++)
 		{
-			holder = respawn[i];
-			holder->setRespawn(holder->getRespawn() - 1);
-			cout << holder->getName() << " " << holder->getRespawn() << endl;
-			if (holder->getRespawn() < 1)
+			if (player[i]->getHealth() < 1)
 			{
-				//Window::addDrawList(holder);
-				//Window::addPlayerList(holder);
-				//Window::respawnPlayer(holder->getName());
-				player.push_back(holder);
-				holder->setHealth(7);
-				respawn.erase(respawn.begin() + i);
 
-				id = holder->getPlayerID();
-				//insert the player at position at playerID
-				//removes all players after playerID and appends them to the list.
-				for (int i = id ; i < player.size() - 1; i++)
+				holder = player[i];
+				holder->setRespawn(holder->getRespawn() - 1);
+				cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << endl;
+				if (holder->getRespawn() < 1)
 				{
-					holder = player[id];
-					player.erase(player.begin() + id);
-					player.push_back(holder);
-				}
+					//Window::addDrawList(holder);
+					//Window::addPlayerList(holder);
+					//Window::respawnPlayer(holder->getName());
+					holder->setHealth(-7);
+					holder->postTrans(glm::translate(vec3(5, 0.5, 7)));
 
-				cout << "" << endl;
+
+					//id = holder->getPlayerID();
+					////insert the player at position at playerID
+					////removes all players after playerID and appends them to the list.
+					//for (int i = id; i < player.size() - 1; i++)
+					//{
+					//	holder = player[id];
+					//	player.erase(player.begin() + id);
+					//	player.push_back(holder);
+					//}
+
+					cout << "" << endl;
+				}
 			}
 		}
 	}
@@ -324,11 +328,11 @@ public:
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
 			//Window::removePlayerList((*targetHolder).getName());
-			respawn.push_back(targetHolder);
+			//respawn.push_back(targetHolder);
 			for (int i = 0; i < player.size(); i++)
 			{
 				if (player[i]->getPlayerID() == targetId)
-					player.erase(player.begin() + i);
+					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
 			}
 			RangeWeapon * newItem = new RangeWeapon(dist,
 													spd,

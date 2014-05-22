@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Mesh.h"
+#include "Mesh_Static.h"
 #include "Texture.h"
 #include "ConfigSettings.h"
 #include "Sound.h"
@@ -86,6 +87,8 @@ Sound* testSound[6];
 
 Mesh* m_pMesh;
 Mesh* m_pMesh2;
+
+Mesh_Static* tryThis;
 
 MD5Model* md5;
 MD5Model* md50;
@@ -457,6 +460,7 @@ void Window::displayCallback(void)
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
 
 		m_pMesh2->draw();
+		//tryThis->draw();
 
 		for (int i = 0; i < draw_list.size(); ++i)
 		{
@@ -566,6 +570,7 @@ void server_update(int value){
 		{
 			myUI->setShots(1);
 		}
+		cout << "FIRE 0!" << endl;
 	}
 
 	//stateID = ((*recvVec)[1].first.c_str()[0]);
@@ -578,6 +583,7 @@ void server_update(int value){
 		{
 			myUI->setShots(1);
 		}
+		cout << "FIRE 1!" << endl;
 	}
 
 //	stateID = ((*recvVec)[2].first.c_str()[0]);
@@ -590,6 +596,7 @@ void server_update(int value){
 		{
 			myUI->setShots(1);
 		}
+		cout << "FIRE 2!" << endl;
 	}
 
 	//stateID = ((*recvVec)[3].first.c_str()[0]);
@@ -602,6 +609,7 @@ void server_update(int value){
 		{
 			myUI->setShots(1);
 		}
+		cout << "FIRE 3!" << endl;
 	}
 
 
@@ -1403,6 +1411,14 @@ void initialize(int argc, char *argv[])
 	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
 	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2))); 
 	//m_pMesh2->setShadowTex(shadow_map_id);
+
+	tryThis = new Mesh_Static();
+	tryThis->LoadMesh("Model/2Tower_6_bone.dae");
+	tryThis->setShader(sdrCtl.getShader("basic_model"));
+	tryThis->setShadowTex(shadow_map_id);
+	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
+
+
 
 	///*md5 = new MD5Model();
 	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");

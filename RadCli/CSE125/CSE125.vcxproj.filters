@@ -46,6 +46,9 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh_Static.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -142,6 +145,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="gameState.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh_Static.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -249,6 +255,18 @@
     </None>
     <None Include="ConfigTemplate.ini">
       <Filter>Config File</Filter>
+    </None>
+    <None Include="Shaders\ground_tess.cntl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ground_tess.eval">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ground_tess.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ground_tess.vert">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
