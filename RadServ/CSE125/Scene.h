@@ -17,6 +17,8 @@ using namespace std;
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
 
+#define MAX_DAMAGE -50
+
 
 class Scene
 {
@@ -235,15 +237,15 @@ public:
 
 				holder = player[i];
 				holder->setRespawn(holder->getRespawn() - 1);
-				cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << endl;
+				
 				if (holder->getRespawn() < 1)
 				{
 					//Window::addDrawList(holder);
 					//Window::addPlayerList(holder);
 					//Window::respawnPlayer(holder->getName());
-					holder->setHealth(-7);
-					holder->postTrans(glm::translate(vec3(5, 0.5, 7)));
-
+					holder->putHealth(7);
+					holder->setModelM(holder->getAliveModelM());
+					//cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << " " << player[i]->getHealth() << endl;
 
 					//id = holder->getPlayerID();
 					////insert the player at position at playerID
@@ -319,11 +321,14 @@ public:
 			int dist, spd, dmg;
 			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
 			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
+			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
 			//restricting speed and distance
 			if (dist > MAX_DISTANCE)
 				dist = MAX_DISTANCE;
 			if (spd > MAX_SPEED)
 				spd = MAX_SPEED;
+			if (dmg < MAX_DAMAGE)
+				dmg = MAX_DAMAGE;
 			 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
@@ -332,11 +337,15 @@ public:
 			for (int i = 0; i < player.size(); i++)
 			{
 				if (player[i]->getPlayerID() == targetId)
+				{
+					player[i]->setAliveModelM(player[i]->getModelM());
 					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+				}
 			}
+			cout << playerId << " " << dmg << endl;
 			RangeWeapon * newItem = new RangeWeapon(dist,
 													spd,
-													((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2);
+													dmg);
 			playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
@@ -414,6 +423,7 @@ public:
 		cubeT->setName("Test Cube" + std::to_string(projectile_counter));
 		projectile_counter++;
 		cubeT->setDistance(((RangeWeapon *)(playerHold)->getWeapon())->getDistance());
+		//cout << cubeT->getPlayerID() << " " << cubeT->getDistance() << " " << cubeT->getSpeed() << " " << ((RangeWeapon *)playerHold->getWeapon())->getDamage() << " " << endl;
 		//Add Cube to the draw list
 		////////////////////////////////////////////////////////Window::addDrawList(cubeT);
 		projectile.push_back(cubeT);

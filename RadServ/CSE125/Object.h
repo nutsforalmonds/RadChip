@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std;
 
-#define BASE_JUMPS 10
+#define BASE_JUMPS 20
 
 static int iohjworihorhi = 0;
 
@@ -58,6 +58,9 @@ public:
 	mat4 getModelM(){ return modelM; }
 	void setModelM(mat4 m){ modelM = m; }
 
+	mat4 getAliveModelM(){ return aliveModelM; }
+	void setAliveModelM(mat4 m){ aliveModelM = m; }
+
 	//set ad move in object space
 	void setHMove(int m){ hmove = m; velocity[0] = m*speed; }
 	int getHMove(){ return hmove; }
@@ -96,7 +99,7 @@ public:
 	}
 
 	void jump(){
-		cout << numJumps << endl;
+		//cout << numJumps << endl;
 		if (numJumps > 0)
 		{
 			velocity[1] = 10;
@@ -143,7 +146,9 @@ public:
 
 	int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
 
-	void setHealth(int i){ health--; }
+	void setHealth(int i){ health += i; }
+
+	void putHealth(int i){ health = i; }
 
 	int getRespawn() { return respawnCounter; }
 
@@ -187,4 +192,5 @@ protected:
 	int playerID;
 	RangeWeapon * weapon;
 	Boots * boots;
+	mat4 aliveModelM;
 };
