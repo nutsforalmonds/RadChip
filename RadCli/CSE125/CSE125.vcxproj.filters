@@ -150,6 +150,9 @@
     <ClInclude Include="Mesh_Static.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="AnimController.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

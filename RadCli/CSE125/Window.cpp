@@ -33,6 +33,7 @@
 #include "billboard_list.h"
 #include "UI.h"
 #include "ClientState.h"
+#include "AnimController.h"
 
 #include <assert.h>
 #include "ParticleSystem.h"
@@ -190,6 +191,8 @@ int myFPS = 0;
 
 ClientState* myClientState;
 
+AnimController monkeyAnimController;
+
 // Stuff Erik added
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
 int stateID = -1;
@@ -305,7 +308,8 @@ void Window::idleCallback(void)
 		QueryPerformanceCounter(&ct);
 		for (int i = 0; i < player_list.size(); i++){
 			//((Mesh*)player_list[i])->BoneTransform(fmod((double)ct.QuadPart / (double)freq.QuadPart, 16.0 / 24), Transforms);
-			((Mesh*)player_list[i])->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
+			//((Mesh*)player_list[i])->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
+			((Mesh*)player_list[i])->BoneTransform(monkeyAnimController.getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
 
 			sd = sdrCtl.getShader("basic_model");
 			for (int i = 0; i < Transforms.size(); i++){
@@ -729,8 +733,8 @@ int main(int argc, char *argv[])
   running = true;
   connected = false;
   myClientState->setState(0);
-  do{
 
+  do{
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	  last = current;
@@ -783,7 +787,10 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+LARGE_INTEGER time_track;
 void keyboard(unsigned char key, int, int){
+	QueryPerformanceCounter(&time_track);
+	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
 	switch (myClientState->getState()){
 	case 0:
 		if (key == ' '){
@@ -796,19 +803,34 @@ void keyboard(unsigned char key, int, int){
 	case 1:
 
 		if (key == 'a'){
-			keyState = keyState | 1;
+			if (!(keyState & 1)){
+				keyState = keyState | 1;
+				monkeyAnimController.setAnimLoop(0, time);
+			}
 		}
 		if (key == 'd'){
-			keyState = keyState | 1 << 1;
+			if (!(keyState & 1<<1)){
+				keyState = keyState | 1 << 1;
+				monkeyAnimController.setAnimLoop(0, time);
+			}
 		}
 		if (key == 'w'){
-			keyState = keyState | 1 << 2;
+			if (!(keyState & 1<<2)){
+				keyState = keyState | 1 << 2;
+				monkeyAnimController.setAnimLoop(0, time);
+			}
 		}
 		if (key == 's'){
-			keyState = keyState | 1 << 3;
+			if (!(keyState & 1<<3)){
+				keyState = keyState | 1 << 3;
+				monkeyAnimController.setAnimLoop(0, time);
+			}
 		}
 		if (key == 'W'){
-			keyState = keyState | 1 << 5;
+			if (!(keyState & 1<<5)){
+				keyState = keyState | 1 << 5;
+				monkeyAnimController.setAnimLoop(0, time);
+			}
 		}
 		if (key == 27){
 			//running = false;
@@ -817,6 +839,7 @@ void keyboard(unsigned char key, int, int){
 		}
 		if (key == ' '){
 			keyState = keyState | 1 << 4;
+			monkeyAnimController.setAnimOnce(3, time);
 
 			if (space_up){
 				space_up = 0;
@@ -887,7 +910,8 @@ void keyboard(unsigned char key, int, int){
 	}
 }
 void keyUp (unsigned char key, int x, int y) {  
-	
+	QueryPerformanceCounter(&time_track);
+	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
 	switch (myClientState->getState()){
 	case 0:
 		break;
@@ -895,9 +919,11 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 'a'){
 			keyState = keyState & ~1;
+			monkeyAnimController.unsetAnimLoop(0,time);
 		}
 		if (key == 'd'){
 			keyState = keyState & ~(1 << 1);
+			monkeyAnimController.unsetAnimLoop(0, time);
 		}
 		if (key == 'w'){
 			// These vars need to become arrays for each player
@@ -915,12 +941,15 @@ void keyUp (unsigned char key, int x, int y) {
 				}
 			}
 			keyState = keyState & ~(1 << 2);
+			monkeyAnimController.unsetAnimLoop(0, time);
 		}
 		if (key == 's'){
 			keyState = keyState & ~(1 << 3);
+			monkeyAnimController.unsetAnimLoop(0, time);
 		}
 		if (key == 'W'){
 			keyState = keyState & ~(1 << 5);
+			monkeyAnimController.unsetAnimLoop(0, time);
 		}
 		if (key == ' '){
 			keyState = keyState & ~(1 << 4);
@@ -946,6 +975,9 @@ void keyUp (unsigned char key, int x, int y) {
 }
 void mouseFunc(int button, int state, int x, int y)
 {
+	QueryPerformanceCounter(&time_track);
+	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+
 	oldX=x;
 	oldY=y;
 	mouseDown = (state == GLUT_DOWN);
@@ -1015,6 +1047,8 @@ void mouseFunc(int button, int state, int x, int y)
 					//UI testing purposes
 					myUI->setLess_Life(1);
 					myUI->setShots(1);
+
+					monkeyAnimController.setAnimOnce(5, time);
 				}
 				else
 				{
@@ -1029,7 +1063,7 @@ void mouseFunc(int button, int state, int x, int y)
 					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
 					//projectileAttack(playerID, cam);
-					
+					monkeyAnimController.setAnimOnce(5, time);
 				}
 				else
 				{
@@ -1347,6 +1381,15 @@ void initialize(int argc, char *argv[])
 		player_list.push_back(player0);
 	}
 
+	monkeyAnimController.add( 0 / 24.0, 16 / 24.0);//walk
+	monkeyAnimController.add(16 / 24.0, 4 / 24.0);//walk to stand
+	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
+	monkeyAnimController.add(25 / 24.0, 10 / 24.0);//jump
+	//monkeyAnimController.add(30 / 24.0, 5 / 24.0);//land
+	monkeyAnimController.add(35 / 24.0, 5 / 24.0);//stand to attack
+	monkeyAnimController.add(40 / 24.0, 20 / 24.0);//attack
+	//monkeyAnimController.add(55 / 24.0, 5 / 24.0);//attack to stand
+	monkeyAnimController.setDefault(2);//stand is the default animation
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");
