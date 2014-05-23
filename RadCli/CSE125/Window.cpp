@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Mesh.h"
+#include "Mesh_Static.h"
 #include "Texture.h"
 #include "ConfigSettings.h"
 #include "Sound.h"
@@ -83,6 +84,9 @@ std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 Sound* testSound[6];
+
+
+Mesh_Static* tryThis;
 
 BillboardList m_billboardList;
 BillboardList m_billboardList2;
@@ -541,6 +545,11 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
+		if (playerID == 1)
+		{
+			myUI->setShots(1);
+		}
+		cout << "FIRE 0!" << endl;
 	}
 
 	//stateID = ((*recvVec)[1].first.c_str()[0]);
@@ -549,6 +558,11 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
+		if (playerID == 2)
+		{
+			myUI->setShots(1);
+		}
+		cout << "FIRE 1!" << endl;
 	}
 
 //	stateID = ((*recvVec)[2].first.c_str()[0]);
@@ -557,6 +571,11 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
+		if (playerID == 3)
+		{
+			myUI->setShots(1);
+		}
+		cout << "FIRE 2!" << endl;
 	}
 
 	//stateID = ((*recvVec)[3].first.c_str()[0]);
@@ -565,7 +584,13 @@ void server_update(int value){
 	{
 		//std::cout << "Projectile fire" << std::endl;
 		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
+		if (playerID == 0)
+		{
+			myUI->setShots(1);
+		}
+		cout << "FIRE 3!" << endl;
 	}
+
 
 	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
 	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
@@ -1335,7 +1360,15 @@ void initialize(int argc, char *argv[])
 	//m_pMesh2->setAdjustM(glm::translate(vec3(10.0, 4.1, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2))); 
 	//m_pMesh2->setShadowTex(shadow_map_id);
 
-	///*md5 = new MD5Model();
+	tryThis = new Mesh_Static();
+	tryThis->LoadMesh("Model/2Tower_6_bone.dae");
+	tryThis->setShader(sdrCtl.getShader("basic_model"));
+	tryThis->setShadowTex(shadow_map_id);
+	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
+
+
+
+	////*md5 = new MD5Model();
 	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");
 	//md5->LoadAnim("Model/monky_MD5_try1.md5anim");
 	//md5->setShader(sdrCtl.getShader("basic_texture"));
