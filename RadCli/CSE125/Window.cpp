@@ -84,16 +84,6 @@ std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 Sound* testSound[6];
 
-Mesh* m_pMesh;
-Mesh* m_pMesh2;
-
-MD5Model* md5;
-MD5Model* md50;
-MD5Model* md51;
-MD5Model* md52;
-MD5Model* md53;
-MD5Model* md6;
-
 BillboardList m_billboardList;
 BillboardList m_billboardList2;
 BillboardList m_billboardList3;
@@ -307,28 +297,19 @@ void Window::idleCallback(void)
 		anim_time += delta;
 		*/
 
-		anim_time += diff;
-		if (anim_time > 1 / 30.0){
-			//md5->Update(anim_time);
-			md50->Update(anim_time);
-			md51->Update(anim_time);
-			md52->Update(anim_time);
-			md53->Update(anim_time);
-			//md6->Update(anim_time);
-			anim_time = 0;
-		}
-
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
-		m_pMesh2->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
-		//m_pMesh2->BoneTransform(diff, Transforms);
-		sd = sdrCtl.getShader("basic_model");
-		for (int i = 0; i < Transforms.size(); i++){
-			char Name[128];
-			memset(Name, 0, sizeof(Name));
-			SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
-			//sd->setUniform(Name, glm::transpose(Transforms[i]));
-			sd->setUniform(Name, Transforms[i]);
+		for (int i = 0; i < player_list.size(); i++){
+			//((Mesh*)player_list[i])->BoneTransform(fmod((double)ct.QuadPart / (double)freq.QuadPart, 16.0 / 24), Transforms);
+			((Mesh*)player_list[i])->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
+
+			sd = sdrCtl.getShader("basic_model");
+			for (int i = 0; i < Transforms.size(); i++){
+				char Name[128];
+				memset(Name, 0, sizeof(Name));
+				SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+				sd->setUniform(Name, Transforms[i]);
+			}
 		}
 
 		//simulateProjectile(delta);
@@ -455,8 +436,6 @@ void Window::displayCallback(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, width, height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
-
-		m_pMesh2->draw();
 
 		for (int i = 0; i < draw_list.size(); ++i)
 		{
@@ -1271,7 +1250,7 @@ void initialize(int argc, char *argv[])
 
 	light[0].type=1;
 	light[0].pos = vec4(0,40,0,1);
-	light[0].specular = vec3(0.2,0.2,0.2);
+	light[0].specular = vec3(0.1,0.1,0.1);
 	light[0].diffuse = vec3(0.9, 0.9, 0.9);
 	light[0].ambient = vec3(0.5, 0.5, 0.5);
 	light[0].dir = vec4(0,-1,0,1);
@@ -1284,47 +1263,6 @@ void initialize(int argc, char *argv[])
 	//fog.color = fogColor;
 
 	setupShaders();
-
-	md50 = new MD5Model();
-	md50->LoadModel("Model/monky_MD5_try1.md5mesh");
-	md50->LoadAnim("Model/monky_MD5_try1.md5anim");
-	md50->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
-	md50->setShininess(30);
-	md50->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	md50->setShadowTex(shadow_map_id);
-	player_list.push_back(md50);
-
-	md51 = new MD5Model();
-	md51->LoadModel("Model/monky_MD5_try1.md5mesh");
-	md51->LoadAnim("Model/monky_MD5_try1.md5anim");
-	md51->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
-	md51->setShininess(30);
-	md51->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	md51->setShadowTex(shadow_map_id);
-	player_list.push_back(md51);
-
-	md52 = new MD5Model();
-	md52->LoadModel("Model/monky_MD5_try1.md5mesh");
-	md52->LoadAnim("Model/monky_MD5_try1.md5anim");
-	md52->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
-	md52->setShininess(30);
-	md52->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	md52->setShadowTex(shadow_map_id);
-	player_list.push_back(md52);
-
-	md53 = new MD5Model();
-	md53->LoadModel("Model/monky_MD5_try1.md5mesh");
-	md53->LoadAnim("Model/monky_MD5_try1.md5anim");
-	md53->setShader(sdrCtl.getShader("basic_texture"));
-	md50->postTrans(glm::translate(vec3(20, 0.5, 7)));
-	md53->setShininess(30);
-	md53->setAdjustM(glm::translate(vec3(-0.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	md53->setShadowTex(shadow_map_id);
-	player_list.push_back(md53);
-
 
 	/*Cube* cube0 = new Cube();
 	cube0->setKd(vec3(0.8, 0.0, 0.0));
@@ -1374,12 +1312,22 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
-	m_pMesh2 = new Mesh();
-	m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");
-	m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
-	m_pMesh2->setShadowTex(shadow_map_id);
-	m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
-	//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 4.1, 0.0)));
+	for (int i = 0; i < 4; i++){
+		Mesh* player0 = new Mesh();
+		player0->LoadMesh("Model/monky2014_delete2.dae");
+		player0->setShader(sdrCtl.getShader("basic_model"));
+		player0->setShadowTex(shadow_map_id);
+		player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+		player0->setShininess(30);
+		player_list.push_back(player0);
+	}
+
+
+	//m_pMesh2 = new Mesh();
+	//m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");
+	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
+	//m_pMesh2->setShadowTex(shadow_map_id);
+	//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");

@@ -2,6 +2,7 @@
 #define	MESH_H
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <GL/glew.h>
 // assimp include files. These three are usually needed.
@@ -63,16 +64,17 @@ public:
 	void BoneTransform(double TimeInSeconds, vector<mat4>& Transforms);
 
 	void setShader(GLSLProgram* s);
+	void setShininess(int s){ shininess = s; }
 	void setAdjustM(mat4 m){ adjustM = m; }
 	void setShadowTex(int t){ shadowTex = t; }
 
 private:
 
-	void InitTranslationTransform(float x, float y, float z, glm::mat4 &to) {
+	void InitTranslationTransform(float& x, float& y, float& z, glm::mat4 &to) {
 		to = glm::translate(vec3(x, y, z));
 	}
 
-	void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ, glm::mat4 &to) {
+	void InitScaleTransform(float& ScaleX, float& ScaleY, float& ScaleZ, glm::mat4 &to) {
 		to = glm::scale(vec3(ScaleX, ScaleY, ScaleZ));
 	}
 
@@ -138,9 +140,12 @@ private:
 	uint FindRotation(double AnimationTime, const aiNodeAnim* pNodeAnim);
 	uint FindPosition(double AnimationTime, const aiNodeAnim* pNodeAnim);
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
-	void ReadNodeHeirarchy(double AnimationTime, const aiNode* pNode, const mat4& ParentTransform);
+	void ReadNodeHeirarchy(double AnimationTime, aiNode* pNode, const mat4& ParentTransform);
 
 	bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+	bool CreateAnimationMap(aiNode* pNode);
+	bool CreateNameMap(aiNode* pNode);
+	bool CreateNodeMap(aiNode* pNode);
 
 	//void InitMesh(unsigned int Index, const aiMesh* paiMesh);
 	void InitMesh(uint MeshIndex,
@@ -200,7 +205,7 @@ private:
 	std::vector<MeshEntry> m_Entries;
 	std::vector<Texture*> m_Textures;
 
-	map<string, uint> m_BoneMapping; // maps a bone name to its index
+	map<aiNode*, uint> m_BoneMapping; // maps a bone name to its index
 	uint m_NumBones;
 	vector<BoneInfo> m_BoneInfo;
 	mat4 m_GlobalInverseTransform;
@@ -210,9 +215,14 @@ private:
 
 	GLSLProgram* shader;
 	mat4 adjustM;
+	int shininess;
 
 	int shadowTex;
 	vector<int> uniformLoc;
+
+	map<aiNode*, const aiNodeAnim*> anim_map;
+	map<aiNode*, string> name_map;
+	map<string, aiNode*> node_map;
 };
 
 
