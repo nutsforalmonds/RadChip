@@ -1479,12 +1479,11 @@ void initialize(int argc, char *argv[])
 	particle->setColor(vec3(1.0, 0.0, 0.0));
 	particle->setShade(vec3(1.0, 0.0, 0.0));
 	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-	
 	particle->setTime_Step(1.0);
 	particle->setTime_Max(150.0);
 	particle->setTime_Min(1.0);
 	particle->setTime(0.45);
-
+	particle->setLoopInf(true);
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
 	particle2 = new ParticleSystem();
@@ -1495,12 +1494,11 @@ void initialize(int argc, char *argv[])
 	particle2->setColor(vec3(0.0, 1.0, 0.0));
 	particle2->setShade(vec3(0.0, 1.0, 0.0));
 	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
 	particle2->setTime_Step(0.5);
 	particle2->setTime_Max(15.0);
 	particle2->setTime_Min(1.5);
 	particle2->setTime(7.5);
-
+	particle2->setLoopInf(true);
 	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
 
 	particle3 = new ParticleSystem();
@@ -1511,9 +1509,8 @@ void initialize(int argc, char *argv[])
 	particle3->setColor(vec3(0.0, 0.0, 1.0));
 	particle3->setShade(vec3(0.0, 0.0, 1.0));
 	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
 	particle3->setTime(25.0);
-	
+	particle3->setLoopInf(true);
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
 	particle4 = new ParticleSystem();
@@ -1524,9 +1521,8 @@ void initialize(int argc, char *argv[])
 	particle4->setColor(vec3(1.0, 1.0, 1.0));
 	particle4->setShade(vec3(1.0, 1.0, 1.0));
 	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
 	particle4->setTime(35.0);
-
+	particle4->setLoopInf(true);
 	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	particle5 = new ParticleSystem();
@@ -1537,9 +1533,8 @@ void initialize(int argc, char *argv[])
 	particle5->setColor(vec3(1.0, 1.0, 0.0));
 	particle5->setShade(vec3(1.0, 1.0, 0.0));
 	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
 	particle5->setTime(45.0);
-
+	particle5->setLoopInf(true);
 	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
 
 	particle6 = new ParticleSystem();
@@ -1550,9 +1545,8 @@ void initialize(int argc, char *argv[])
 	particle6->setColor(vec3(1.0, 0.0, 1.0));
 	particle6->setShade(vec3(1.0, 0.0, 1.0));
 	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG"); 
-
 	particle6->setTime(7.5);
-
+	particle6->setLoopInf(true);
 	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
 
 	particle7 = new ParticleSystem();
@@ -1562,6 +1556,7 @@ void initialize(int argc, char *argv[])
 	particle7->setK(24.0f);
 	particle7->setColor(vec3(0.0, 1.0, 1.0));
 	particle7->setShade(vec3(0.0, 1.0, 1.0));
+	particle7->setLoopInf(true);
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
@@ -1573,10 +1568,11 @@ void initialize(int argc, char *argv[])
 	particle8->setColor(vec3(1.0, 0.0, 0.0));
 	particle8->setShade(vec3(0.0, 0.0, 1.0));
 	particle8->setLoopCount(1);
-	particle->setTime_Step(0.1);
-	particle->setTime_Max(150.0);
-	particle->setTime_Min(1.0);
-	particle->setTime(1.0);
+	particle8->setCurrentLoopCount(1);
+	particle8->setTime_Step(0.5);
+	particle8->setTime_Max(40.0);
+	particle8->setTime_Min(20.0);
+	particle8->setTime(20.0);
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	//particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
@@ -1692,6 +1688,8 @@ int loadAudio(){
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 		glutSwapBuffers();
+
+
 	}
 
 	return 0;

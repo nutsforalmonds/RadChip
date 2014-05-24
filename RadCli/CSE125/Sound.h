@@ -20,6 +20,7 @@ public:
 	Sound(FMOD_SYSTEM *mySystemSet, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound){		
 		mySystem = mySystemSet;
 		mySound = *sound;
+		volume = 50.0;
 		FMOD_System_CreateSound(mySystem, name_or_data, mode, exinfo, &mySound);
 		ERRCHECK(result);
 	}
@@ -29,6 +30,8 @@ public:
 	}
 
 	void Play(FMOD_CHANNELINDEX channelid, FMOD_BOOL paused, FMOD_CHANNEL **channel){
+		
+		FMOD_Channel_SetVolume(*channel, volume);
 		FMOD_System_PlaySound(mySystem, channelid, mySound, paused, channel);
 		ERRCHECK(result);
 	}
@@ -39,11 +42,18 @@ public:
 		ERRCHECK(result);
 	}
 
+	void setVolume(float v){
+		volume = v;
+		if (volume > 255){ volume = 255; }
+		if (volume < 0){ volume = 0; }
+	}
+
 private:
 	//used for err checking
 	FMOD_RESULT       result;
 	FMOD_SYSTEM      *mySystem;
 	FMOD_SOUND       *mySound;	
+	float volume;
 };
 
 #endif	/* SOUND_H */

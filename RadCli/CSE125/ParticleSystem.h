@@ -41,6 +41,7 @@ public:
 		time_Min = 1.5;
 		time_Step = 1.0;
 		current_loop = 0;
+		loopInf = false;
 
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
@@ -64,7 +65,7 @@ public:
 
 	void draw(){
 
-		if (current_loop < loop_count){
+		if (current_loop < loop_count || loopInf){
 
 			updateTime();
 
@@ -100,7 +101,7 @@ public:
 	}
 	void draw(mat4& projection, mat4& view){
 		
-		if (current_loop <= loop_count){
+		if (current_loop < loop_count || loopInf){
 
 			updateTime();
 
@@ -162,8 +163,12 @@ public:
 	void setCurrentLoopCount(int l){ current_loop = l; }
 	int getCurrentLoopCount(){ return current_loop; }
 
+	void setLoopInf(bool b){ loopInf = b; }
+	bool getLoopInf(){ return loopInf; }
+
 	void StartLoop(){
 		current_loop = 0;
+		awesome_time = time_Min;
 	}
 
 private:
@@ -179,8 +184,14 @@ private:
 	void updateTime(){
 		awesome_time += time_Step;
 		if (awesome_time > time_Max){
-			awesome_time = time_Min;
 			current_loop++;
+			if (current_loop < loop_count){
+				awesome_time = time_Min;
+			}
+			else if (loopInf){
+				current_loop = 0;
+				awesome_time = time_Min;
+			}
 		}
 	}
 
@@ -201,5 +212,6 @@ private:
 	bool start_loop;
 	int loop_count;
 	int current_loop;
+	bool loopInf;
 
 };
