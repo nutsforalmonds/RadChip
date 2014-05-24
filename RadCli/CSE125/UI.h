@@ -420,28 +420,28 @@ public:
 		start_button = new UI_Panel(-1, 1, -1, 1);
 		start_button->setColor(vec3(1.0, 0.0, 0.0));
 		start_button->setShader(sdrCtl.getShader("basic_2D"));
-		start_button->loadColorTex("img/start", "PNG");
+		start_button->loadColorTex("img/UI_elements/chipmunk_button_off.png", "PNG");
 		start_button->setTex(true);
 		start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
 
 		exit_button = new UI_Panel(-1, 1, -1, 1);
 		exit_button->setColor(vec3(1.0, 0.0, 0.0));
 		exit_button->setShader(sdrCtl.getShader("basic_2D"));
-		exit_button->loadColorTex("img/exit", "PNG");
+		exit_button->loadColorTex("img/UI_elements/chipmunk_button_exit_off.png", "PNG");
 		exit_button->setTex(true);
 		exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 
 		selected_start_button = new UI_Panel(-1, 1, -1, 1);
 		selected_start_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_start_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_start_button->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_start_button->loadColorTex("img/UI_elements/chipmunk_button_on.png", "PNG");
 		selected_start_button->setTex(true);
 		selected_start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
 
 		selected_end_button = new UI_Panel(-1, 1, -1, 1);
 		selected_end_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_end_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_end_button->loadColorTex("img/UI_FRAME_NEW.png", "PNG");
+		selected_end_button->loadColorTex("img/UI_elements/chipmunk_button_exit_on.png", "PNG");
 		selected_end_button->setTex(true);
 		selected_end_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 

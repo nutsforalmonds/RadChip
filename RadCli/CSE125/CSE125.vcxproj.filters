@@ -167,6 +167,9 @@
     <Filter Include="Config File">
       <UniqueIdentifier>{32aae289-32a4-418a-823c-95e0eb343de4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Maps">
+      <UniqueIdentifier>{97c126b0-16e8-42de-b546-88ee6867496e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\basic_edge_detection.frag">
@@ -270,6 +273,15 @@
     </None>
     <None Include="Shaders\ground_tess.vert">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ui_particle.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ui_particle.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Maps\Test1.json">
+      <Filter>Maps</Filter>
     </None>
   </ItemGroup>
 </Project>
