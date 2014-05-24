@@ -19,6 +19,24 @@ public:
 	AnimController(){}
 	AnimController(const AnimController& other){
 		segList = other.segList;
+		default_animation = other.default_animation;
+		currentLoop = other.currentLoop;
+		startTimeLoop = other.startTimeLoop;
+		loopCounter = other.loopCounter;
+		currentOnce = other.currentOnce;
+		startTimeOnce = other.startTimeOnce;
+		AnimOnceOn = other.AnimOnceOn;
+	}
+	AnimController& operator = (const AnimController& other){
+		segList = other.segList;
+		default_animation = other.default_animation;
+		currentLoop = other.currentLoop;
+		startTimeLoop = other.startTimeLoop;
+		loopCounter = other.loopCounter;
+		currentOnce = other.currentOnce;
+		startTimeOnce = other.startTimeOnce;
+		AnimOnceOn = other.AnimOnceOn;
+		return *this;
 	}
 	void add(double start, double duration){
 		segList.push_back(AnimSeg(start, duration));

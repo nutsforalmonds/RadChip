@@ -67,6 +67,7 @@ public:
 	void setShininess(int s){ shininess = s; }
 	void setAdjustM(mat4 m){ adjustM = m; }
 	void setShadowTex(int t){ shadowTex = t; }
+	void setTransforms(vector<mat4>& t){ transforms = t; }
 
 private:
 
@@ -100,7 +101,7 @@ private:
 
 
 
-#define NUM_BONES_PER_VEREX 4
+#define NUM_BONES_PER_VEREX 8
 
 	struct BoneInfo
 	{
@@ -118,6 +119,7 @@ private:
 	{
 		uint IDs[NUM_BONES_PER_VEREX];
 		float Weights[NUM_BONES_PER_VEREX];
+		int count = 0;
 
 		VertexBoneData()
 		{
@@ -128,9 +130,26 @@ private:
 		{
 			ZERO_MEM(IDs);
 			ZERO_MEM(Weights);
+			count = 0;
 		}
 
-		void AddBoneData(uint BoneID, float Weight);
+		void AddBoneData(float BoneID, float Weight)
+		{
+			for (uint i = 0; i < NUM_BONES_PER_VEREX; i++) {
+				if (Weights[i] == 0.0) {
+					IDs[i] = BoneID;
+					Weights[i] = Weight;
+					count++;
+					return;
+				}
+			}
+			// should never get here - more bones than we have space for
+			assert(0);
+		}
+
+		int getCount(){
+			return count;
+		}
 	};
 
 	void CalcInterpolatedScaling(aiVector3D& Out, double AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -223,6 +242,8 @@ private:
 	map<aiNode*, const aiNodeAnim*> anim_map;
 	map<aiNode*, string> name_map;
 	map<string, aiNode*> node_map;
+
+	vector<mat4> transforms;
 };
 
 

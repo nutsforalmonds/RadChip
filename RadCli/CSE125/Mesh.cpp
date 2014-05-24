@@ -7,31 +7,20 @@
 
 using namespace std;
 
-#define POSITION_LOCATION    0
-#define TEX_COORD_LOCATION   1
-#define NORMAL_LOCATION      2
-#define BONE_ID_LOCATION     3
-#define BONE_WEIGHT_LOCATION 4
+#define POSITION_LOCATION      0
+#define TEX_COORD_LOCATION     1
+#define NORMAL_LOCATION        2
+#define BONE_ID_1_LOCATION     3
+#define BONE_ID_2_LOCATION     4
+#define BONE_WEIGHT_1_LOCATION 5
+#define BONE_WEIGHT_2_LOCATION 6
+#define BONE_COUNT_LOCATION    7
 
 extern mat4 Projection;
 extern mat4 View;
 extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
-
-void Mesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
-{
-	for (uint i = 0; i < ARRAY_SIZE_IN_ELEMENTS(IDs); i++) {
-		if (Weights[i] == 0.0) {
-			IDs[i] = BoneID;
-			Weights[i] = Weight;
-			return;
-		}
-	}
-
-	// should never get here - more bones than we have space for
-	assert(0);
-}
 
 /*
 Mesh::MeshEntry::MeshEntry()
@@ -253,10 +242,16 @@ bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(BONE_ID_LOCATION);
-	glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
-	glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-	glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+	glEnableVertexAttribArray(BONE_ID_1_LOCATION);
+	glVertexAttribIPointer(BONE_ID_1_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+	glEnableVertexAttribArray(BONE_ID_2_LOCATION);
+	glVertexAttribIPointer(BONE_ID_2_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)16);
+	glEnableVertexAttribArray(BONE_WEIGHT_1_LOCATION);
+	glVertexAttribPointer(BONE_WEIGHT_1_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)32);
+	glEnableVertexAttribArray(BONE_WEIGHT_2_LOCATION);
+	glVertexAttribPointer(BONE_WEIGHT_2_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)48);
+	glEnableVertexAttribArray(BONE_COUNT_LOCATION);
+	glVertexAttribIPointer(BONE_COUNT_LOCATION, 1, GL_INT, sizeof(VertexBoneData), (const GLvoid*)64);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
@@ -460,6 +455,12 @@ void Mesh::draw()
 	shader->setUniform(uniformLoc[6], LightView);
 	shader->setUniform(uniformLoc[7], LightProjection);
 	shader->setUniform(uniformLoc[8], ScaleBias);
+	for (int i = 0; i < transforms.size(); i++){
+		char Name[128];
+		memset(Name, 0, sizeof(Name));
+		SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+		shader->setUniform(Name, transforms[i]);
+	}
 	shader->use();
 
 	glBindVertexArray(m_VAO);
@@ -502,6 +503,12 @@ void Mesh::draw(mat4& projection, mat4& view)
 	shader->setUniform(uniformLoc[6], LightView);
 	shader->setUniform(uniformLoc[7], LightProjection);
 	shader->setUniform(uniformLoc[8], ScaleBias);
+	for (int i = 0; i < transforms.size(); i++){
+		char Name[128];
+		memset(Name, 0, sizeof(Name));
+		SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+		shader->setUniform(Name, transforms[i]);
+	}
 	shader->use();
 
 	glBindVertexArray(m_VAO);

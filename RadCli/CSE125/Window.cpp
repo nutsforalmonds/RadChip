@@ -191,8 +191,6 @@ int myFPS = 0;
 
 ClientState* myClientState;
 
-AnimController monkeyAnimController;
-
 // Stuff Erik added
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
 int stateID = -1;
@@ -307,17 +305,8 @@ void Window::idleCallback(void)
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
 		for (int i = 0; i < player_list.size(); i++){
-			//((Mesh*)player_list[i])->BoneTransform(fmod((double)ct.QuadPart / (double)freq.QuadPart, 16.0 / 24), Transforms);
-			//((Mesh*)player_list[i])->BoneTransform((double)ct.QuadPart / (double)freq.QuadPart, Transforms);
-			((Mesh*)player_list[i])->BoneTransform(monkeyAnimController.getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
-
-			sd = sdrCtl.getShader("basic_model");
-			for (int i = 0; i < Transforms.size(); i++){
-				char Name[128];
-				memset(Name, 0, sizeof(Name));
-				SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
-				sd->setUniform(Name, Transforms[i]);
-			}
+			((Mesh*)player_list[i])->BoneTransform(player_list[i]->getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
+			((Mesh*)player_list[i])->setTransforms(Transforms);
 		}
 
 		//simulateProjectile(delta);
@@ -805,31 +794,31 @@ void keyboard(unsigned char key, int, int){
 		if (key == 'a'){
 			if (!(keyState & 1)){
 				keyState = keyState | 1;
-				monkeyAnimController.setAnimLoop(0, time);
+				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 'd'){
 			if (!(keyState & 1<<1)){
 				keyState = keyState | 1 << 1;
-				monkeyAnimController.setAnimLoop(0, time);
+				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 'w'){
 			if (!(keyState & 1<<2)){
 				keyState = keyState | 1 << 2;
-				monkeyAnimController.setAnimLoop(0, time);
+				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 's'){
 			if (!(keyState & 1<<3)){
 				keyState = keyState | 1 << 3;
-				monkeyAnimController.setAnimLoop(0, time);
+				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 'W'){
 			if (!(keyState & 1<<5)){
 				keyState = keyState | 1 << 5;
-				monkeyAnimController.setAnimLoop(0, time);
+				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 27){
@@ -839,7 +828,7 @@ void keyboard(unsigned char key, int, int){
 		}
 		if (key == ' '){
 			keyState = keyState | 1 << 4;
-			monkeyAnimController.setAnimOnce(3, time);
+			player_list[playerID]->setAnimOnce(2, time);
 
 			if (space_up){
 				space_up = 0;
@@ -919,11 +908,11 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 'a'){
 			keyState = keyState & ~1;
-			monkeyAnimController.unsetAnimLoop(0,time);
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'd'){
 			keyState = keyState & ~(1 << 1);
-			monkeyAnimController.unsetAnimLoop(0, time);
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'w'){
 			// These vars need to become arrays for each player
@@ -941,15 +930,15 @@ void keyUp (unsigned char key, int x, int y) {
 				}
 			}
 			keyState = keyState & ~(1 << 2);
-			monkeyAnimController.unsetAnimLoop(0, time);
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 's'){
 			keyState = keyState & ~(1 << 3);
-			monkeyAnimController.unsetAnimLoop(0, time);
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'W'){
 			keyState = keyState & ~(1 << 5);
-			monkeyAnimController.unsetAnimLoop(0, time);
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == ' '){
 			keyState = keyState & ~(1 << 4);
@@ -1048,7 +1037,7 @@ void mouseFunc(int button, int state, int x, int y)
 					myUI->setLess_Life(1);
 					myUI->setShots(1);
 
-					monkeyAnimController.setAnimOnce(5, time);
+					player_list[playerID]->setAnimOnce(3, time);
 				}
 				else
 				{
@@ -1063,7 +1052,7 @@ void mouseFunc(int button, int state, int x, int y)
 					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
 					//projectileAttack(playerID, cam);
-					monkeyAnimController.setAnimOnce(5, time);
+					player_list[playerID]->setAnimOnce(3, time);
 				}
 				else
 				{
@@ -1371,25 +1360,40 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
-	for (int i = 0; i < 4; i++){
-		Mesh* player0 = new Mesh();
-		player0->LoadMesh("Model/monky2014_delete2.dae");
-		player0->setShader(sdrCtl.getShader("basic_model"));
-		player0->setShadowTex(shadow_map_id);
-		player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-		player0->setShininess(30);
-		player_list.push_back(player0);
-	}
-
-	monkeyAnimController.add( 0 / 24.0, 16 / 24.0);//walk
-	monkeyAnimController.add(16 / 24.0, 4 / 24.0);//walk to stand
+	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
+	monkeyAnimController.add(0 / 24.0, 16 / 24.0);//walk
 	monkeyAnimController.add(25 / 24.0, 10 / 24.0);//jump
-	//monkeyAnimController.add(30 / 24.0, 5 / 24.0);//land
-	monkeyAnimController.add(35 / 24.0, 5 / 24.0);//stand to attack
 	monkeyAnimController.add(40 / 24.0, 20 / 24.0);//attack
-	//monkeyAnimController.add(55 / 24.0, 5 / 24.0);//attack to stand
-	monkeyAnimController.setDefault(2);//stand is the default animation
+	monkeyAnimController.setDefault(0);//stand is the default animation
+	AnimController chipmonkAnimController;
+	chipmonkAnimController.add(0 / 24.0, 5 / 24.0);//stand
+	chipmonkAnimController.add(10 / 24.0, 20 / 24.0);//walk
+	chipmonkAnimController.add(35 / 24.0, 10 / 24.0);//jump
+	chipmonkAnimController.add(50 / 24.0, 15 / 24.0);//attack
+	chipmonkAnimController.setDefault(0);//stand is the default animation
+	for (int i = 0; i < 4; i++){
+		if (i % 2){
+			Mesh* player0 = new Mesh();
+			player0->LoadMesh("Model/monky2014_delete2.dae");
+			player0->setAnimController(monkeyAnimController);
+			player0->setShader(sdrCtl.getShader("basic_model"));
+			player0->setShadowTex(shadow_map_id);
+			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+			player0->setShininess(30);
+			player_list.push_back(player0);
+		}
+		else{
+			Mesh* player0 = new Mesh();
+			player0->LoadMesh("Model/chipmunkOculus_animated_all3.dae");
+			player0->setAnimController(chipmonkAnimController);
+			player0->setShader(sdrCtl.getShader("basic_model"));
+			player0->setShadowTex(shadow_map_id);
+			player0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
+			player0->setShininess(30);
+			player_list.push_back(player0);
+		}
+	}
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");

@@ -3,6 +3,7 @@
 #include "glslprogram.h"
 #include "Structures.h"
 #include <array>
+#include "AnimController.h"
 
 #define BASE_JUMPS 5
 
@@ -126,29 +127,25 @@ public:
 	void addVelocity(vec3& v){ velocity += v; }
 	void clearYVelocity(){ velocity[1] = 0; }
 	float getYVelocity(){ return velocity[1]; }
-
 	//decide if the object is on ground
 	void touchGround(bool g){ onGround = g; }
-
 	int getHealth(){ return health; }
-
 	//int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
-
 	void setHealth(int i){ health--; }
-
 	int getRespawn() { return respawnCounter; }
-
 	void setRespawn(int i){ respawnCounter = i; }
-
 	int getKills(){ return kills; }
-
 	void setKills(int i){ kills += i; }
-
 	void setRotation(mat4 m){ Rotation = m; }
 	mat4 getRotation(){ return Rotation; }
-
 	int getPlayerID() { return playerID; }
 	void setPlayerID(int i) { playerID = i; }
+
+	void setAnimController(AnimController& ac){ this->ac = ac; }
+	void setAnimLoop(int index, double start_time){ ac.setAnimLoop(index, start_time); }
+	void unsetAnimLoop(int index, double end_time = 0.0){ ac.unsetAnimLoop(index, end_time); }
+	void setAnimOnce(int index, double start_time){ ac.setAnimOnce(index, start_time); }
+	double getAnimation(double time){ return ac.getAnimation(time); }
 
 protected:
 	mat4 modelM;
@@ -168,4 +165,5 @@ protected:
 	int respawnCounter;
 	int kills;
 	int playerID;
+	AnimController ac;
 };

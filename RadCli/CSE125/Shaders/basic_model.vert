@@ -5,8 +5,11 @@ const int MAX_BONES = 100;
 layout (location=0) in vec3 VertexPosition;
 layout (location=1) in vec2 VertexTexCoord;
 layout (location=2) in vec3 VertexNormal;
-layout (location = 3) in ivec4 BoneIDs;
-layout (location = 4) in vec4 Weights;
+layout (location=3) in ivec4 BoneIDs1;
+layout (location=4) in ivec4 BoneIDs2;
+layout (location=5) in vec4 Weights1;
+layout (location=6) in vec4 Weights2;
+layout (location=7) in int BoneCount;
 
 uniform	mat4 Model;
 uniform	mat4 View;
@@ -25,10 +28,16 @@ flat out vec3 cam;//camera in world
 
 void main()
 {
-	mat4 BoneTransform = gBones[BoneIDs[0]] * Weights[0];
-	BoneTransform     += gBones[BoneIDs[1]] * Weights[1];
-	BoneTransform     += gBones[BoneIDs[2]] * Weights[2];
-    BoneTransform     += gBones[BoneIDs[3]] * Weights[3];
+	mat4 BoneTransform = mat4(0.0);
+
+	for(int i=0; i<BoneCount; i++){
+		if(i<4){
+			BoneTransform += gBones[BoneIDs1[i]] * Weights1[i];
+		}else{
+			BoneTransform += gBones[BoneIDs2[i%4]] * Weights2[i%4];
+		}
+	}
+
     vec4 PosL    = BoneTransform * vec4(VertexPosition, 1.0);
 	vec4 NormalL = BoneTransform * vec4(VertexNormal, 0.0);
 
