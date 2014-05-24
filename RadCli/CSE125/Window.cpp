@@ -124,8 +124,7 @@ ShaderController sdrCtl;
 int oldX,oldY,mouseDown,mouseButton;
 
 Light light[1];
-Fog fog;
-vec3 fogColor = vec3(0.9,0.9,0.9);
+Fog fog(60, 10, 20, 0, 0.8f, vec3(1, 1, 1));
 
 //Scene* scene;
 
@@ -237,6 +236,7 @@ void projectileAttack(int playerID, Camera * cam)
 	cubeT->setStartX(hold.max[0]);
 	cubeT->setStartY(hold.max[2]);
 	cubeT->setShadowTex(shadow_map_id);
+	cubeT->setFog(fog);
 
 	//Name and type
 	cubeT->setType("Cube");
@@ -1347,6 +1347,7 @@ void initialize(int argc, char *argv[])
 	ground->setColumn(51);
 	ground->setHeight(1 / 1.0);
 	ground->setShadowTex(shadow_map_id);
+	ground->setFog(fog);
 	ground->generate();
 	ground->setType("Ground");
 	ground->setName("Ground");
@@ -1356,6 +1357,7 @@ void initialize(int argc, char *argv[])
 	skybox = new SkyBox(-50, 50, -50, 50, -50, 50);
 	skybox->setShader(sdrCtl.getShader("basic_skybox"));
 	skybox->setTexUnit(3);
+	skybox->setFog(fog);
 	skybox->setType("Skybox");
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
@@ -1376,11 +1378,13 @@ void initialize(int argc, char *argv[])
 		if (i % 2){
 			Mesh* player0 = new Mesh();
 			player0->LoadMesh("Model/monky2014_delete2.dae");
+			//player0->LoadMesh("Model/newWrench_animated.dae",false);
 			player0->setAnimController(monkeyAnimController);
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 			player0->setShininess(30);
+			player0->setFog(fog);
 			player_list.push_back(player0);
 		}
 		else{
@@ -1391,6 +1395,7 @@ void initialize(int argc, char *argv[])
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
 			player0->setShininess(30);
+			player0->setFog(fog);
 			player_list.push_back(player0);
 		}
 	}
@@ -1474,6 +1479,7 @@ void initialize(int argc, char *argv[])
 	particle->setColor(vec3(1.0, 0.0, 0.0));
 	particle->setShade(vec3(1.0, 0.0, 0.0));
 	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle->setFog(fog);
 	
 	particle->setTime_Step(1.0);
 	particle->setTime_Max(150.0);
@@ -1490,6 +1496,7 @@ void initialize(int argc, char *argv[])
 	particle2->setColor(vec3(0.0, 1.0, 0.0));
 	particle2->setShade(vec3(0.0, 1.0, 0.0));
 	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle2->setFog(fog);
 
 	particle2->setTime_Step(0.5);
 	particle2->setTime_Max(15.0);
@@ -1506,6 +1513,7 @@ void initialize(int argc, char *argv[])
 	particle3->setColor(vec3(0.0, 0.0, 1.0));
 	particle3->setShade(vec3(0.0, 0.0, 1.0));
 	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle3->setFog(fog);
 
 	particle3->setTime(25.0);
 	
@@ -1519,6 +1527,7 @@ void initialize(int argc, char *argv[])
 	particle4->setColor(vec3(1.0, 1.0, 1.0));
 	particle4->setShade(vec3(1.0, 1.0, 1.0));
 	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle4->setFog(fog);
 
 	particle4->setTime(35.0);
 
@@ -1532,6 +1541,7 @@ void initialize(int argc, char *argv[])
 	particle5->setColor(vec3(1.0, 1.0, 0.0));
 	particle5->setShade(vec3(1.0, 1.0, 0.0));
 	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle5->setFog(fog);
 
 	particle5->setTime(45.0);
 
@@ -1545,6 +1555,7 @@ void initialize(int argc, char *argv[])
 	particle6->setColor(vec3(1.0, 0.0, 1.0));
 	particle6->setShade(vec3(1.0, 0.0, 1.0));
 	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG"); 
+	particle6->setFog(fog);
 
 	particle6->setTime(7.5);
 
@@ -1558,6 +1569,7 @@ void initialize(int argc, char *argv[])
 	particle7->setColor(vec3(0.0, 1.0, 1.0));
 	particle7->setShade(vec3(0.0, 1.0, 1.0));
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle7->setFog(fog);
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
 	//sprintf_s(buf, "%s", "Attempting to connect to server...");

@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include <vector>
 #include <iostream>
+#include "Structures.h"
 using namespace std;
 
 extern mat4 Projection;
@@ -59,6 +60,13 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
 		uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
 		uniformLoc.push_back(shader->getUniformLoc("CamPos"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
+		//uniformLoc.push_back(shader->getUniformLoc(""));
 	}
 	void draw(){
 		shader->setUniform(uniformLoc[0], View);
@@ -76,6 +84,13 @@ public:
 		shader->setUniform(uniformLoc[12], LightProjection);
 		shader->setUniform(uniformLoc[13], ScaleBias);
 		shader->setUniform(uniformLoc[14], vec3(glm::inverse(View)*vec4(0, 0, 0, 1)));
+		shader->setUniform(uniformLoc[15], fog->maxDist);
+		shader->setUniform(uniformLoc[16], fog->minDist);
+		shader->setUniform(uniformLoc[17], fog->color);
+		shader->setUniform(uniformLoc[18], fog->visibility);
+		shader->setUniform(uniformLoc[19], fog->maxHeight);
+		shader->setUniform(uniformLoc[20], fog->minHeight);
+		//shader->setUniform(uniformLoc[], );
 		colorTex->Bind(GL_TEXTURE0);
 		normalTex->Bind(GL_TEXTURE1);
 		displacementTex->Bind(GL_TEXTURE2);
@@ -101,6 +116,12 @@ public:
 		shader->setUniform(uniformLoc[11], LightView);
 		shader->setUniform(uniformLoc[12], LightProjection);
 		shader->setUniform(uniformLoc[13], ScaleBias);
+		shader->setUniform(uniformLoc[15], fog->maxDist);
+		shader->setUniform(uniformLoc[16], fog->minDist);
+		shader->setUniform(uniformLoc[17], fog->color);
+		shader->setUniform(uniformLoc[19], fog->maxHeight);
+		shader->setUniform(uniformLoc[20], fog->minHeight);
+		//shader->setUniform(uniformLoc[], );
 		colorTex->Bind(GL_TEXTURE0);
 		normalTex->Bind(GL_TEXTURE1);
 		displacementTex->Bind(GL_TEXTURE2);
@@ -206,6 +227,7 @@ public:
 	}
 	void setHeight(float f){ dispHeight = f; }
 	void setShadowTex(int t){ shadowTex = t; }
+	void setFog(Fog& f){ fog = &f; }
 
 private:
 	VAO vao;
@@ -230,5 +252,6 @@ private:
 	float dispHeight;
 	int shadowTex;
 	vector<int> uniformLoc;
+	Fog* fog;
 };
 

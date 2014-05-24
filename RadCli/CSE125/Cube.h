@@ -52,6 +52,12 @@ public:
 		shader->setUniform(uniformLoc[13], LightView);
 		shader->setUniform(uniformLoc[14], LightProjection);
 		shader->setUniform(uniformLoc[15], ScaleBias);
+		shader->setUniform(uniformLoc[16], fog->maxDist);
+		shader->setUniform(uniformLoc[17], fog->minDist);
+		shader->setUniform(uniformLoc[18], fog->color);
+		shader->setUniform(uniformLoc[19], fog->visibility);
+		shader->setUniform(uniformLoc[20], fog->maxHeight);
+		shader->setUniform(uniformLoc[21], fog->minHeight);
 		shader->use();
 		vao.draw();
 		glUseProgram(0);
@@ -73,6 +79,12 @@ public:
 		shader->setUniform(uniformLoc[13], LightView);
 		shader->setUniform(uniformLoc[14], LightProjection);
 		shader->setUniform(uniformLoc[15], ScaleBias);
+		shader->setUniform(uniformLoc[16], fog->maxDist);
+		shader->setUniform(uniformLoc[17], fog->minDist);
+		shader->setUniform(uniformLoc[18], fog->color);
+		shader->setUniform(uniformLoc[19], fog->visibility);
+		shader->setUniform(uniformLoc[20], fog->maxHeight);
+		shader->setUniform(uniformLoc[21], fog->minHeight);
 		shader->use();
 		vao.draw();
 		glUseProgram(0);
@@ -95,6 +107,12 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("LightView"));
 		uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
 		uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
 	}
 	void setKd(vec3 v){ material.Kd = v; }
 	vec3 getKd(){ return material.Kd; }
@@ -137,6 +155,7 @@ public:
 		}
 	}
 	void setShadowTex(int t){ shadowTex = t; }
+	void setFog(Fog& f){ fog = &f; }
 private:
 	void generate(float negx,float posx,float negy,float posy,float negz,float posz){
 		std::array<float,72> positions = {
@@ -180,5 +199,6 @@ private:
 	vec3 color;
 	int shadowTex;
 	vector<int> uniformLoc;
+	Fog* fog;
 };
 

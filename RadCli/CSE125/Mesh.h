@@ -25,6 +25,7 @@ using glm::mat3;
 #include "Structures.h"
 #include <array>
 #include "Object.h"
+#include "Structures.h"
 
 struct Vertex
 {
@@ -67,6 +68,7 @@ public:
 	void setShadowTex(int t){ shadowTex = t; }
 	void setTransforms(vector<mat4>& t){ transforms = t; }
 	void setParticleSystem(ParticleSystem* p){ pSystem = p; }
+	void setFog(Fog& f){ fog = &f; }
 
 private:
 
@@ -244,6 +246,8 @@ private:
 
 	vector<mat4> transforms;
 	ParticleSystem* pSystem;
+	
+	Fog* fog;
 };
 
 
