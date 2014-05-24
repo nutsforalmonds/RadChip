@@ -64,11 +64,13 @@ public:
 
 	void setShader(GLSLProgram* s);
 	void setShininess(int s){ shininess = s; }
-	void setAdjustM(mat4 m){ adjustM = m; }
+	void setAdjustM(mat4& m){ adjustM = m; }
 	void setShadowTex(int t){ shadowTex = t; }
 	void setTransforms(vector<mat4>& t){ transforms = t; }
 	void setParticleSystem(ParticleSystem* p){ pSystem = p; }
 	void setFog(Fog& f){ fog = &f; }
+
+	mat4& getAdjustM(){ return adjustM; }
 
 private:
 

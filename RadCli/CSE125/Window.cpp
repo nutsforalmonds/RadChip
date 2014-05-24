@@ -221,35 +221,33 @@ void projectileAttack(int playerID, Camera * cam)
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
 
-	Projectile* cubeT = new Projectile(player_list.size());
-	cubeT->setKd(vec3(0.8, 0.0, 0.0));
-	cubeT->setKa(vec3(0.3, 0.0, 0.0));
-	cubeT->setKs(vec3(0.4, 0.0, 0.0));
-	cubeT->setShininess(100);
-	cubeT->setReflectFactor(vec2(0.2, 0.5));
-	cubeT->setEta(0.5);
-	cubeT->setCubeMapUnit(3);
-	cubeT->setSpeed(5);
-	cubeT->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	Projectile* wrenchT = new Projectile(player_list.size());
+	wrenchT->LoadMesh("Model/newWrench_animated.dae",false);
+	wrenchT->setShader(sdrCtl.getShader("basic_model"));
+	wrenchT->setShadowTex(shadow_map_id);
+	wrenchT->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	wrenchT->setShininess(30);
+	wrenchT->setFog(fog);
+
+	wrenchT->setSpeed(5);
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-	cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	AABB hold = cubeT->getAABB();
-	cubeT->setStartX(hold.max[0]);
-	cubeT->setStartY(hold.max[2]);
-	cubeT->setShadowTex(shadow_map_id);
-	cubeT->setFog(fog);
+	wrenchT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	wrenchT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+	AABB hold = wrenchT->getAABB();
+	wrenchT->setStartX(hold.max[0]);
+	wrenchT->setStartY(hold.max[2]);
+	wrenchT->setShadowTex(shadow_map_id);
 
 	//Name and type
-	cubeT->setType("Cube");
-	cubeT->setName("Test Cube" + std::to_string(projectile_counter));
+	wrenchT->setType("Cube");
+	wrenchT->setName("Test Cube" + std::to_string(projectile_counter));
 	projectile_counter++;
 	//Add Cube to the draw list
 	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
-	projectile_list.push_back(cubeT);
-	cubeT->setSpeed(50);
+	projectile_list.push_back(wrenchT);
+	wrenchT->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	cubeT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	wrenchT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }
@@ -275,6 +273,7 @@ void simulateProjectile(float t)
 	for (int i = 0; i < projectile_list.size(); i++){
 		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
 		projectile_list[i]->postTrans(glm::translate(projectile_list[i]->getVelocity()*t));
+		projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*projectile_list[i]->getAdjustM());
 	}
 }
 
@@ -1389,6 +1388,7 @@ void initialize(int argc, char *argv[])
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+			//player0->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 			player0->setShininess(30);
 			player0->setFog(fog);
 			player_list.push_back(player0);

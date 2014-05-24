@@ -2,8 +2,9 @@
 #define _PROJECTILE_H_
 #include "Cube.h"
 #include <vector>
+#include "Mesh.h"
 
-class Projectile : public Cube
+class Projectile : public Mesh
 {
 protected:
 	float startX;
