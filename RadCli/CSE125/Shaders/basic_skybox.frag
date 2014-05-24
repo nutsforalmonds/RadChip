@@ -1,12 +1,15 @@
 #version 400
 
 /* UNCOMMENT FOR FOG (1/2)*/
-/*struct FogInfo{
+struct FogInfo{
 	float maxDist;
 	float minDist;
 	vec3 color;
+	float visibility;
+	float maxHeight;
+	float minHeight;
 };
-uniform FogInfo fog;*/
+uniform FogInfo fog;
 
 uniform samplerCube CubeMapTex;//sky box texture unit
 
@@ -26,11 +29,13 @@ void main()
 	ads += cubeMapColor;
 
 	/* UNCOMMENT FOR FOG (2/2)*/
-	/*//apply fog
-	float dist = distance(position,cam);
-	float fog_factor = (fog.maxDist-dist)/(fog.maxDist-fog.minDist);
-	fog_factor = clamp(fog_factor,0.0,1.0);
-	ads = mix(vec4(fog.color,1.0),ads,fog_factor);*/
+	//apply fog
+	//ads = mix(ads,vec4(fog.color,1.0),fog.visibility); 
+
+	float height = abs(position.y);
+	float height_factor = (fog.maxHeight-height)/(fog.maxHeight-fog.minHeight);
+	height_factor = pow(clamp(height_factor,0.0,1.0),2.0)*fog.visibility;
+	ads = mix(ads,vec4(fog.color,1.0),height_factor);
 
 	FragColor = ads;
 }

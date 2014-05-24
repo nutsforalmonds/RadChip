@@ -2,6 +2,7 @@
 #include "VAO.h"
 #include "glslprogram.h"
 #include <array>
+#include "Structures.h"
 
 extern mat4 Projection;
 extern mat4 View;
@@ -21,6 +22,13 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("ViewMatrix"));
 		uniformLoc.push_back(shader->getUniformLoc("ProjectionMatrix"));
 		uniformLoc.push_back(shader->getUniformLoc("CubeMapTex"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
+		//uniformLoc.push_back(shader->getUniformLoc(""));
 	}
 	void setTexUnit(int u){ texUnit = u; }
 	int getTexUnit(){ return texUnit; }
@@ -28,10 +36,18 @@ public:
 		shader->setUniform(uniformLoc[0], View);
 		shader->setUniform(uniformLoc[1], Projection);
 		shader->setUniform(uniformLoc[2], texUnit);
+		shader->setUniform(uniformLoc[3], fog->maxDist);
+		shader->setUniform(uniformLoc[4], fog->minDist);
+		shader->setUniform(uniformLoc[5], fog->color);
+		shader->setUniform(uniformLoc[6], fog->visibility);
+		shader->setUniform(uniformLoc[7], fog->maxHeight);
+		shader->setUniform(uniformLoc[8], fog->minHeight);
+		//shader->setUniform(uniformLoc[], );
 		shader->use();
 		vao.draw();
 		glUseProgram(0);
 	}
+	void setFog(Fog& f){ this->fog = &f; }
 
 private:
 	void generate(float negx, float posx, float negy, float posy, float negz, float posz){
@@ -67,5 +83,6 @@ private:
 	std::array<int, 36> skybox_indices;
 	int texUnit;
 	vector<int> uniformLoc;
+	Fog* fog;
 };
 

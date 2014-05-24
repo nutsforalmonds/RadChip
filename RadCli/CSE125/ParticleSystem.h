@@ -62,7 +62,6 @@ public:
 	}
 	
 	~ParticleSystem(void){}
-
 	void draw(){
 
 		if (current_loop < loop_count || loopInf){
@@ -77,6 +76,12 @@ public:
 			shader->setUniform(uniformLoc[5], emitter.color);
 			shader->setUniform(uniformLoc[6], p_shade);
 			shader->setUniform(uniformLoc[7], 0);
+			shader->setUniform(uniformLoc[8], fog->maxDist);
+			shader->setUniform(uniformLoc[9], fog->minDist);
+			shader->setUniform(uniformLoc[10], fog->color);
+			shader->setUniform(uniformLoc[11], fog->visibility);
+			shader->setUniform(uniformLoc[12], fog->maxHeight);
+			shader->setUniform(uniformLoc[13], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			/*
@@ -113,6 +118,12 @@ public:
 			shader->setUniform(uniformLoc[5], emitter.color);
 			shader->setUniform(uniformLoc[6], p_shade);
 			shader->setUniform(uniformLoc[7], 0);
+			shader->setUniform(uniformLoc[8], fog->maxDist);
+			shader->setUniform(uniformLoc[9], fog->minDist);
+			shader->setUniform(uniformLoc[10], fog->color);
+			shader->setUniform(uniformLoc[11], fog->visibility);
+			shader->setUniform(uniformLoc[12], fog->maxHeight);
+			shader->setUniform(uniformLoc[13], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -131,6 +142,12 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("uColor"));
 		uniformLoc.push_back(shader->getUniformLoc("aShade"));
 		uniformLoc.push_back(shader->getUniformLoc("uTexture"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
 		
 	}
 	
@@ -156,6 +173,8 @@ public:
 	
 	void setTime(float t){ awesome_time = t; }
 	float getTime(){ return awesome_time; }
+	
+	void setFog(Fog& f){ fog = &f; }
 
 	void setLoopCount(int l){ loop_count = l; }
 	int getLoopCount(){ return loop_count; }
@@ -208,6 +227,9 @@ private:
 	float time_Max;
 	float time_Min;
 	float time_Step;
+
+
+	Fog* fog;
 
 	bool start_loop;
 	int loop_count;

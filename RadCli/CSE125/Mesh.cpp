@@ -448,6 +448,13 @@ void Mesh::setShader(GLSLProgram* s)
 	uniformLoc.push_back(shader->getUniformLoc("LightView"));
 	uniformLoc.push_back(shader->getUniformLoc("LightProjection"));
 	uniformLoc.push_back(shader->getUniformLoc("ScaleBias"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+	uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
+	//uniformLoc.push_back(shader->getUniformLoc(""));
 }
 
 void Mesh::draw()
@@ -461,6 +468,13 @@ void Mesh::draw()
 	shader->setUniform(uniformLoc[6], LightView);
 	shader->setUniform(uniformLoc[7], LightProjection);
 	shader->setUniform(uniformLoc[8], ScaleBias);
+	shader->setUniform(uniformLoc[9], fog->maxDist);
+	shader->setUniform(uniformLoc[10], fog->minDist);
+	shader->setUniform(uniformLoc[11], fog->color);
+	shader->setUniform(uniformLoc[12], fog->visibility);
+	shader->setUniform(uniformLoc[13], fog->maxHeight);
+	shader->setUniform(uniformLoc[14], fog->minHeight);
+	//shader->setUniform(uniformLoc[], );
 	for (int i = 0; i < transforms.size(); i++){
 		char Name[128];
 		memset(Name, 0, sizeof(Name));
@@ -509,6 +523,13 @@ void Mesh::draw(mat4& projection, mat4& view)
 	shader->setUniform(uniformLoc[6], LightView);
 	shader->setUniform(uniformLoc[7], LightProjection);
 	shader->setUniform(uniformLoc[8], ScaleBias);
+	shader->setUniform(uniformLoc[9], fog->maxDist);
+	shader->setUniform(uniformLoc[10], fog->minDist);
+	shader->setUniform(uniformLoc[11], fog->color);
+	shader->setUniform(uniformLoc[12], fog->visibility);
+	shader->setUniform(uniformLoc[13], fog->maxHeight);
+	shader->setUniform(uniformLoc[14], fog->minHeight);
+	//shader->setUniform(uniformLoc[], );
 	for (int i = 0; i < transforms.size(); i++){
 		char Name[128];
 		memset(Name, 0, sizeof(Name));

@@ -1,12 +1,15 @@
 #version 400
 
 /* UNCOMMENT FOR FOG EFFECT (1/2)*/
-/*struct FogInfo{
+struct FogInfo{
 	float maxDist;
 	float minDist;
 	vec3 color;
+	float visibility;
+	float maxHeight;
+	float minHeight;
 };
-uniform FogInfo fog;*/
+uniform FogInfo fog;
 
 struct Light{
 	int type;//0:directional  1:point  2:spot
@@ -148,8 +151,6 @@ void main()
 			// lit = hor[1] + (midh-shadow_coord[0])/(0.5/1024)*(hor[0]/2.0 - hor[1]/2.0); 
 	  // 	}
 
-	FragColor = myads(); 
-
 	/* UNCOMMENT FOR SKYBOX REFLECTION (2/2) */
 	/* //apply skybox reflection
 	vec3 reflectDir = reflect(WorldPos_FS_in-CamPos_FS_in,normalize(norm));
@@ -157,10 +158,14 @@ void main()
 	ads = mix(ads,cubeMapColor,material.ReflectFactor);
 	//ads = mix(ads,cubeMapColor,1-(1-material.ReflectFactor)*dot(normalize(reflectDir),normalize(norm))); for more complex reflect */
 
+	vec4 ads = myads();
+
 	/* UNCOMMENT FOR FOG EFFECT (2/2)*/
-	/* //apply fog
+	//apply fog
 	float dist = distance(WorldPos_FS_in,CamPos_FS_in);
-	float fog_factor = (fog.maxDist-dist)/(fog.maxDist-fog.minDist);
-	fog_factor = clamp(fog_factor,0.0,1.0);
-	ads = mix(vec4(fog.color,1.0),ads,fog_factor); */
+	float fog_factor = (dist-fog.minDist)/(fog.maxDist-fog.minDist);
+	fog_factor = pow(clamp(fog_factor,0.0,1.0),2.0)*fog.visibility;
+	ads = mix(ads,vec4(fog.color,1.0),fog_factor); 
+
+	FragColor = ads; 
 }
