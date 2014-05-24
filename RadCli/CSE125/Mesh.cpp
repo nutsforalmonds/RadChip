@@ -89,7 +89,7 @@ void Mesh::Clear()
 }
 
 
-bool Mesh::LoadMesh(const std::string& Filename)
+bool Mesh::LoadMesh(const std::string& Filename, bool anim)
 {
 	// Release the previously loaded mesh (if it exists)
 	Clear();
@@ -130,6 +130,12 @@ bool Mesh::LoadMesh(const std::string& Filename)
 
 	CreateAnimationMap(m_pScene->mRootNode);
 	CreateNameMap(m_pScene->mRootNode);
+
+	if (!anim){
+		vector<mat4> Transformations;
+		BoneTransform(0, Transformations);
+		setTransforms(Transformations);
+	}
 
 	return Ret;
 }

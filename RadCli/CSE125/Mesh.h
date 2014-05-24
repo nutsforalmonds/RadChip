@@ -9,13 +9,11 @@
 #include "assimp/Importer.hpp"	//OO version Header!
 #include "assimp/PostProcess.h"
 #include "assimp/Scene.h"
-
 #include "ogldev_util.h"
 #include "Texture.h"
-
 #include "VAO.h"
-
 #include <glm/glm.hpp>
+#include "ParticleSystem.h"
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
@@ -51,7 +49,7 @@ public:
 
 	~Mesh();
 
-	bool LoadMesh(const std::string& Filename);
+	bool LoadMesh(const std::string& Filename, bool anim=true);
 
 	void draw();
 	void draw(mat4& projection, mat4& view);
@@ -68,6 +66,7 @@ public:
 	void setAdjustM(mat4 m){ adjustM = m; }
 	void setShadowTex(int t){ shadowTex = t; }
 	void setTransforms(vector<mat4>& t){ transforms = t; }
+	void setParticleSystem(ParticleSystem* p){ pSystem = p; }
 
 private:
 
@@ -244,6 +243,7 @@ private:
 	map<string, aiNode*> node_map;
 
 	vector<mat4> transforms;
+	ParticleSystem* pSystem;
 };
 
 
