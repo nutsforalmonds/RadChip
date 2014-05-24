@@ -44,6 +44,7 @@ ParticleSystem* particle4;
 ParticleSystem* particle5;
 ParticleSystem* particle6;
 ParticleSystem* particle7;
+ParticleSystem* particle8;
 long long m_currentTimeMillis;
 
 
@@ -125,6 +126,7 @@ int oldX,oldY,mouseDown,mouseButton;
 
 Light light[1];
 Fog fog(60, 10, 20, 0, 0.8f, vec3(1, 1, 1));
+Fog emptyFog(1,0,1,0,0.0f,vec3(0,0,0));
 
 //Scene* scene;
 
@@ -475,6 +477,7 @@ void Window::displayCallback(void)
 		particle5->draw(Projection, View);
 		particle6->draw(Projection, View);
 		particle7->draw(Projection, View);
+		particle8->draw();
 		glDisable(GL_BLEND);
 
 		glDisable(GL_DEPTH_TEST);
@@ -820,6 +823,9 @@ void keyboard(unsigned char key, int, int){
 				keyState = keyState | 1 << 5;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
+		}
+		if (key == 'm'){
+			particle8->StartLoop();
 		}
 		if (key == 27){
 			//running = false;
@@ -1571,6 +1577,22 @@ void initialize(int argc, char *argv[])
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
 	particle7->setFog(fog);
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
+
+	particle8 = new ParticleSystem();
+	particle8->setShader(sdrCtl.getShader("ui_particle"));
+	particle8->setType("Particle_System");
+	particle8->setName("Particle_Test");
+	particle8->setK(24.0f);
+	particle8->setColor(vec3(1.0, 0.0, 0.0));
+	particle8->setShade(vec3(0.0, 0.0, 1.0));
+	particle8->setLoopCount(1);
+	particle->setTime_Step(0.1);
+	particle->setTime_Max(150.0);
+	particle->setTime_Min(1.0);
+	particle->setTime(1.0);
+	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
+	particle8->setFog(emptyFog);
+	//particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
 	//sprintf_s(buf, "%s", "Attempting to connect to server...");
 

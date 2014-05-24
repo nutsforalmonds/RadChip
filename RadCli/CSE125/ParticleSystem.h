@@ -40,6 +40,7 @@ public:
 		time_Max = 50.0;
 		time_Min = 1.5;
 		time_Step = 1.0;
+		current_loop = 0;
 
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
@@ -60,70 +61,75 @@ public:
 	}
 	
 	~ParticleSystem(void){}
+	void draw(){
 
-	void draw(float time){
+		if (current_loop < loop_count){
 
-		updateTime();
+			updateTime();
 
-		shader->setUniform(uniformLoc[0], View);
-		shader->setUniform(uniformLoc[1], Projection);
-		shader->setUniform(uniformLoc[2], getModelM());
-		shader->setUniform(uniformLoc[3], emitter.k);
-		shader->setUniform(uniformLoc[4], time / 4);
-		shader->setUniform(uniformLoc[5], emitter.color);
-		shader->setUniform(uniformLoc[6], p_shade);
-		shader->setUniform(uniformLoc[7], 0);
-		shader->setUniform(uniformLoc[8], fog->maxDist);
-		shader->setUniform(uniformLoc[9], fog->minDist);
-		shader->setUniform(uniformLoc[10], fog->color);
-		shader->setUniform(uniformLoc[11], fog->visibility);
-		shader->setUniform(uniformLoc[12], fog->maxHeight);
-		shader->setUniform(uniformLoc[13], fog->minHeight);
-		m_Texture->Bind(GL_TEXTURE0);
-		
-		/*
-		shader->setUniform(uniformLoc[4], Projection*View*getModelM());
-		shader->setUniform(uniformLoc[5], material.Kd);
-		shader->setUniform(uniformLoc[6], material.Ka);
-		shader->setUniform(uniformLoc[7], material.Ks);
-		shader->setUniform(uniformLoc[8], material.Shininess);
-		shader->setUniform(uniformLoc[9], material.ReflectFactor);
-		shader->setUniform(uniformLoc[10], material.Eta);
-		shader->setUniform(uniformLoc[11], CubeMapUnit);
-		shader->setUniform(uniformLoc[12], color);
-		shader->setUniform(uniformLoc[13], shadowTex);
-		shader->setUniform(uniformLoc[14], LightView);
-		shader->setUniform(uniformLoc[15], LightProjection);
-		shader->setUniform(uniformLoc[16], ScaleBias);
-		*/
-		shader->use();
-		vao.draw();
-		glUseProgram(0);
+			shader->setUniform(uniformLoc[0], View);
+			shader->setUniform(uniformLoc[1], Projection);
+			shader->setUniform(uniformLoc[2], getModelM());
+			shader->setUniform(uniformLoc[3], emitter.k);
+			shader->setUniform(uniformLoc[4], awesome_time / 4);
+			shader->setUniform(uniformLoc[5], emitter.color);
+			shader->setUniform(uniformLoc[6], p_shade);
+			shader->setUniform(uniformLoc[7], 0);
+			shader->setUniform(uniformLoc[8], fog->maxDist);
+			shader->setUniform(uniformLoc[9], fog->minDist);
+			shader->setUniform(uniformLoc[10], fog->color);
+			shader->setUniform(uniformLoc[11], fog->visibility);
+			shader->setUniform(uniformLoc[12], fog->maxHeight);
+			shader->setUniform(uniformLoc[13], fog->minHeight);
+			m_Texture->Bind(GL_TEXTURE0);
+
+			/*
+			shader->setUniform(uniformLoc[4], Projection*View*getModelM());
+			shader->setUniform(uniformLoc[5], material.Kd);
+			shader->setUniform(uniformLoc[6], material.Ka);
+			shader->setUniform(uniformLoc[7], material.Ks);
+			shader->setUniform(uniformLoc[8], material.Shininess);
+			shader->setUniform(uniformLoc[9], material.ReflectFactor);
+			shader->setUniform(uniformLoc[10], material.Eta);
+			shader->setUniform(uniformLoc[11], CubeMapUnit);
+			shader->setUniform(uniformLoc[12], color);
+			shader->setUniform(uniformLoc[13], shadowTex);
+			shader->setUniform(uniformLoc[14], LightView);
+			shader->setUniform(uniformLoc[15], LightProjection);
+			shader->setUniform(uniformLoc[16], ScaleBias);
+			*/
+			shader->use();
+			vao.draw();
+			glUseProgram(0);
+		}
 	}
 	void draw(mat4& projection, mat4& view){
 		
-		updateTime();
-		
-		shader->setUniform(uniformLoc[0], view);
-		shader->setUniform(uniformLoc[1], projection);
-		shader->setUniform(uniformLoc[2], getModelM());
-		shader->setUniform(uniformLoc[3], emitter.k);
-		shader->setUniform(uniformLoc[4], awesome_time/4);
-		shader->setUniform(uniformLoc[5], emitter.color);
-		shader->setUniform(uniformLoc[6], p_shade);
-		shader->setUniform(uniformLoc[7], 0);
-		shader->setUniform(uniformLoc[8], fog->maxDist);
-		shader->setUniform(uniformLoc[9], fog->minDist);
-		shader->setUniform(uniformLoc[10], fog->color);
-		shader->setUniform(uniformLoc[11], fog->visibility);
-		shader->setUniform(uniformLoc[12], fog->maxHeight);
-		shader->setUniform(uniformLoc[13], fog->minHeight);
-		m_Texture->Bind(GL_TEXTURE0);
-		
-		shader->use();
-		//glLineWidth(time);
-		vao.draw();
-		glUseProgram(0);
+		if (current_loop <= loop_count){
+
+			updateTime();
+
+			shader->setUniform(uniformLoc[0], view);
+			shader->setUniform(uniformLoc[1], projection);
+			shader->setUniform(uniformLoc[2], getModelM());
+			shader->setUniform(uniformLoc[3], emitter.k);
+			shader->setUniform(uniformLoc[4], awesome_time / 4);
+			shader->setUniform(uniformLoc[5], emitter.color);
+			shader->setUniform(uniformLoc[6], p_shade);
+			shader->setUniform(uniformLoc[7], 0);
+			shader->setUniform(uniformLoc[8], fog->maxDist);
+			shader->setUniform(uniformLoc[9], fog->minDist);
+			shader->setUniform(uniformLoc[10], fog->color);
+			shader->setUniform(uniformLoc[11], fog->visibility);
+			shader->setUniform(uniformLoc[12], fog->maxHeight);
+			shader->setUniform(uniformLoc[13], fog->minHeight);
+			m_Texture->Bind(GL_TEXTURE0);
+
+			shader->use();
+			//glLineWidth(time);
+			vao.draw();
+			glUseProgram(0);
+		}
 	}
 	void setShader(GLSLProgram* shader){
 		this->shader = shader;
@@ -169,6 +175,16 @@ public:
 	
 	void setFog(Fog& f){ fog = &f; }
 
+	void setLoopCount(int l){ loop_count = l; }
+	int getLoopCount(){ return loop_count; }
+
+	void setCurrentLoopCount(int l){ current_loop = l; }
+	int getCurrentLoopCount(){ return current_loop; }
+
+	void StartLoop(){
+		current_loop = 0;
+	}
+
 private:
 	void generate(){
 	
@@ -183,6 +199,7 @@ private:
 		awesome_time += time_Step;
 		if (awesome_time > time_Max){
 			awesome_time = time_Min;
+			current_loop++;
 		}
 	}
 
@@ -200,6 +217,11 @@ private:
 	float time_Min;
 	float time_Step;
 
+
 	Fog* fog;
+
+	bool start_loop;
+	int loop_count;
+	int current_loop;
 
 };
