@@ -19,6 +19,16 @@ struct Light{
 	vec3 ambient;
 };
 
+struct FogInfo{
+	float maxDist;
+	float minDist;
+	vec3 color;
+	float visibility;
+	float maxHeight;
+	float minHeight;
+};
+uniform FogInfo fog;
+
 uniform samplerCube CubeMapTex;//sky box texture // for reflection 
 uniform Material material;
 uniform Light light[1];//one light for basic shader. To add light, increment light array size, then update ads()
@@ -90,6 +100,12 @@ void main()
 	//vec4 reColor = mix(refractColor, reflectColor, material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
 	ads += mix(myads(),reflectColor,material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
 	//ads += mix(ads(),reColor,material.ReflectFactor[1]-(material.ReflectFactor[1]-material.ReflectFactor[0])*dot(normalize(reflectDir),normalize(norm)));
+
+	//apply fog
+	float dist = distance(position,cam);
+	float fog_factor = (dist-fog.minDist)/(fog.maxDist-fog.minDist);
+	fog_factor = pow(clamp(fog_factor,0.0,1.0),2.0)*fog.visibility;
+	ads = mix(ads,vec4(fog.color,1.0),fog_factor); 
 
 	FragColor = ads;
 }

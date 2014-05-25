@@ -9,9 +9,10 @@ uniform mat4 ViewMatrix;
 uniform mat4 ModelMatrix; 
 uniform float uK;
 uniform float uTime;
- 
-//out vec3 position;//position in world
+
 out vec3 vShade;
+out vec3 position;//position in world
+flat out vec3 cam;//camera in world
 
 void main(void)
 {
@@ -20,10 +21,13 @@ void main(void)
 	
 	//float x = cos(aTheta);
     //float y = sin(aTheta);
-	
-	vec4 position = vec4(x, y, 0.0, 1.0);
 
-    gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*position;
+	vec4 pos = vec4(x, y, 0.0, 1.0);
+
+	position = vec3(ModelMatrix*pos);
+	cam = vec3(inverse(ViewMatrix)*vec4(0,0,0,1));
+
+    gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*pos;
 	//gl_Position = position;
     gl_PointSize = 25.0 / uTime;
 	

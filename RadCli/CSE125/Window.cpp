@@ -72,20 +72,15 @@ using glm::quat;
 using namespace rapidjson;
 using namespace std;
 
-FMOD_SYSTEM      *fmodSystem;
-FMOD_SOUND       *sound;
-FMOD_CHANNEL     *channel = 0;
-FMOD_RESULT       result;
-int               key;
-unsigned int      version;
+SoundSystem *mySoundSystem;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
-std::vector<Sound*> sound_list;
-Sound* testSound[6];
+//std::vector<Sound*> sound_list;
+//Sound* testSound[6];
 
 
 Mesh_Static* tryThis;
@@ -125,8 +120,8 @@ ShaderController sdrCtl;
 int oldX,oldY,mouseDown,mouseButton;
 
 Light light[1];
-Fog fog;
-vec3 fogColor = vec3(0.9,0.9,0.9);
+Fog fog(60, 10, 20, 0, 0.8f, vec3(1, 1, 1));
+Fog emptyFog(1,0,1,0,0.0f,vec3(0,0,0));
 
 //Scene* scene;
 
@@ -135,6 +130,7 @@ Ground* ground;
 SkyBox* skybox;
 Sphere* sphere;
 TextureScreen* texScreen;
+Mesh* mother_of_wrench;
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
@@ -177,7 +173,7 @@ void setupShaders();
 void initialize(int argc, char *argv[]);
 void loadTextures();
 int loadAudio();
-void updateSound();
+//void updateSound();
 
 int counter = 0;
 
@@ -221,34 +217,36 @@ void projectileAttack(int playerID, Camera * cam)
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
 
-	Projectile* cubeT = new Projectile(player_list.size());
-	cubeT->setKd(vec3(0.8, 0.0, 0.0));
-	cubeT->setKa(vec3(0.3, 0.0, 0.0));
-	cubeT->setKs(vec3(0.4, 0.0, 0.0));
-	cubeT->setShininess(100);
-	cubeT->setReflectFactor(vec2(0.2, 0.5));
-	cubeT->setEta(0.5);
-	cubeT->setCubeMapUnit(3);
-	cubeT->setSpeed(5);
-	cubeT->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	Projectile* wrenchT = new Projectile(player_list.size());
+	//wrenchT->LoadMesh("Model/newWrench_animated.dae",false);
+	wrenchT->setVAO(mother_of_wrench->getVAO());
+	wrenchT->setEntries(mother_of_wrench->getEntries());
+	wrenchT->setTextures(mother_of_wrench->getTextures());
+	wrenchT->setShader(sdrCtl.getShader("basic_model"));
+	wrenchT->setShadowTex(shadow_map_id);
+	wrenchT->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	wrenchT->setShininess(30);
+	wrenchT->setFog(fog);
+
+	wrenchT->setSpeed(5);
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-	cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	AABB hold = cubeT->getAABB();
-	cubeT->setStartX(hold.max[0]);
-	cubeT->setStartY(hold.max[2]);
-	cubeT->setShadowTex(shadow_map_id);
+	wrenchT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	wrenchT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+	AABB hold = wrenchT->getAABB();
+	wrenchT->setStartX(hold.max[0]);
+	wrenchT->setStartY(hold.max[2]);
+	wrenchT->setShadowTex(shadow_map_id);
 
 	//Name and type
-	cubeT->setType("Cube");
-	cubeT->setName("Test Cube" + std::to_string(projectile_counter));
+	wrenchT->setType("Cube");
+	wrenchT->setName("Test Cube" + std::to_string(projectile_counter));
 	projectile_counter++;
 	//Add Cube to the draw list
 	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
-	projectile_list.push_back(cubeT);
-	cubeT->setSpeed(50);
+	projectile_list.push_back(wrenchT);
+	wrenchT->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	cubeT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	wrenchT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }
@@ -274,6 +272,7 @@ void simulateProjectile(float t)
 	for (int i = 0; i < projectile_list.size(); i++){
 		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
 		projectile_list[i]->postTrans(glm::translate(projectile_list[i]->getVelocity()*t));
+		projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*projectile_list[i]->getAdjustM());
 	}
 }
 
@@ -357,7 +356,7 @@ void Window::idleCallback(void)
 	}
 
 	updateShaders();
-	updateSound();
+	//updateSound();
     displayCallback();  
 }
 void Window::reshapeCallback(int w, int h)
@@ -725,6 +724,9 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
+  mySoundSystem = new SoundSystem();
+  mySoundSystem->createMusic();
+
   do{
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
@@ -770,10 +772,10 @@ int main(int argc, char *argv[])
   {
 	  delete texture_list[i];
   }
-  for (int i = 0; i < sound_list.size(); ++i)
-  {
-	  delete sound_list[i];
-  }
+  //for (int i = 0; i < sound_list.size(); ++i)
+  //{
+	//  delete sound_list[i];
+//  }
 
   return 0;
 }
@@ -838,13 +840,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 		}
 		if (key == 13)
 		{
@@ -924,7 +926,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-					testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -1035,7 +1037,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					///scene->basicAttack(playerID);
 					
 					//UI testing purposes
@@ -1054,7 +1056,7 @@ void mouseFunc(int button, int state, int x, int y)
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
 
-					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
@@ -1069,7 +1071,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-					testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				}
 				else
 				{
@@ -1185,7 +1187,7 @@ void specialKeyboardFunc(int key, int x, int y){
 	case 1:
 		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 			if (sprint_up >= 10){
-				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				//scene->jump(playerID);
 			}
 			if (sprint_up > 0){
@@ -1352,6 +1354,7 @@ void initialize(int argc, char *argv[])
 	ground->setColumn(51);
 	ground->setHeight(1 / 1.0);
 	ground->setShadowTex(shadow_map_id);
+	ground->setFog(fog);
 	ground->generate();
 	ground->setType("Ground");
 	ground->setName("Ground");
@@ -1361,9 +1364,19 @@ void initialize(int argc, char *argv[])
 	skybox = new SkyBox(-50, 50, -50, 50, -50, 50);
 	skybox->setShader(sdrCtl.getShader("basic_skybox"));
 	skybox->setTexUnit(3);
+	skybox->setFog(fog);
 	skybox->setType("Skybox");
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
+
+	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
+	mother_of_wrench = new Mesh();
+	mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
+	mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
+	mother_of_wrench->setShadowTex(shadow_map_id);
+	mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	mother_of_wrench->setShininess(30);
+	mother_of_wrench->setFog(fog);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
@@ -1381,11 +1394,14 @@ void initialize(int argc, char *argv[])
 		if (i % 2){
 			Mesh* player0 = new Mesh();
 			player0->LoadMesh("Model/monky2014_delete2.dae");
+			//player0->LoadMesh("Model/newWrench_animated.dae",false);
 			player0->setAnimController(monkeyAnimController);
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+			//player0->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 			player0->setShininess(30);
+			player0->setFog(fog);
 			player_list.push_back(player0);
 		}
 		else{
@@ -1396,6 +1412,7 @@ void initialize(int argc, char *argv[])
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
 			player0->setShininess(30);
+			player0->setFog(fog);
 			player_list.push_back(player0);
 		}
 	}
@@ -1441,12 +1458,12 @@ void initialize(int argc, char *argv[])
 	//md6->setName("Player Model");
 
 	//AUDIO START!
-	if (loadAudio()){
-		printf("Error with FMOD Init!\n");
-	}
-	else{
-		printf("FMOD Init successful!\n");
-	}
+	//if (loadAudio()){
+	//	printf("Error with FMOD Init!\n");
+	//}
+	//else{
+	//	printf("FMOD Init successful!\n");
+	//}
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
@@ -1479,12 +1496,12 @@ void initialize(int argc, char *argv[])
 	particle->setColor(vec3(1.0, 0.0, 0.0));
 	particle->setShade(vec3(1.0, 0.0, 0.0));
 	particle->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-	
+	particle->setFog(fog);
 	particle->setTime_Step(1.0);
 	particle->setTime_Max(150.0);
 	particle->setTime_Min(1.0);
 	particle->setTime(0.45);
-
+	particle->setLoopInf(true);
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
 	particle2 = new ParticleSystem();
@@ -1495,12 +1512,12 @@ void initialize(int argc, char *argv[])
 	particle2->setColor(vec3(0.0, 1.0, 0.0));
 	particle2->setShade(vec3(0.0, 1.0, 0.0));
 	particle2->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
+	particle2->setFog(fog);
 	particle2->setTime_Step(0.5);
 	particle2->setTime_Max(15.0);
 	particle2->setTime_Min(1.5);
 	particle2->setTime(7.5);
-
+	particle2->setLoopInf(true);
 	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
 
 	particle3 = new ParticleSystem();
@@ -1511,9 +1528,9 @@ void initialize(int argc, char *argv[])
 	particle3->setColor(vec3(0.0, 0.0, 1.0));
 	particle3->setShade(vec3(0.0, 0.0, 1.0));
 	particle3->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
+	particle3->setFog(fog);
 	particle3->setTime(25.0);
-	
+	particle3->setLoopInf(true);
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
 	particle4 = new ParticleSystem();
@@ -1524,9 +1541,9 @@ void initialize(int argc, char *argv[])
 	particle4->setColor(vec3(1.0, 1.0, 1.0));
 	particle4->setShade(vec3(1.0, 1.0, 1.0));
 	particle4->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
+	particle4->setFog(fog);
 	particle4->setTime(35.0);
-
+	particle4->setLoopInf(true);
 	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	particle5 = new ParticleSystem();
@@ -1537,9 +1554,9 @@ void initialize(int argc, char *argv[])
 	particle5->setColor(vec3(1.0, 1.0, 0.0));
 	particle5->setShade(vec3(1.0, 1.0, 0.0));
 	particle5->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
-
+	particle5->setFog(fog);
 	particle5->setTime(45.0);
-
+	particle5->setLoopInf(true);
 	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
 
 	particle6 = new ParticleSystem();
@@ -1550,9 +1567,9 @@ void initialize(int argc, char *argv[])
 	particle6->setColor(vec3(1.0, 0.0, 1.0));
 	particle6->setShade(vec3(1.0, 0.0, 1.0));
 	particle6->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG"); 
-
+	particle6->setFog(fog);
 	particle6->setTime(7.5);
-
+	particle6->setLoopInf(true);
 	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
 
 	particle7 = new ParticleSystem();
@@ -1562,7 +1579,9 @@ void initialize(int argc, char *argv[])
 	particle7->setK(24.0f);
 	particle7->setColor(vec3(0.0, 1.0, 1.0));
 	particle7->setShade(vec3(0.0, 1.0, 1.0));
+	particle7->setLoopInf(true);
 	particle7->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	particle7->setFog(fog);
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
 	particle8 = new ParticleSystem();
@@ -1573,14 +1592,13 @@ void initialize(int argc, char *argv[])
 	particle8->setColor(vec3(1.0, 0.0, 0.0));
 	particle8->setShade(vec3(0.0, 0.0, 1.0));
 	particle8->setLoopCount(1);
-	particle->setTime_Step(0.1);
-	particle->setTime_Max(150.0);
-	particle->setTime_Min(1.0);
-	particle->setTime(1.0);
+	particle8->setCurrentLoopCount(1);
+	particle8->setTime_Step(0.5);
+	particle8->setTime_Max(40.0);
+	particle8->setTime_Min(20.0);
+	particle8->setTime(20.0);
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
-	//particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
-
-	//sprintf_s(buf, "%s", "Attempting to connect to server...");
+	particle8->setFog(emptyFog);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
@@ -1589,6 +1607,7 @@ void initialize(int argc, char *argv[])
 
 }
 
+/*
 void updateSound(){
 	FMOD_System_Update(fmodSystem);
 
@@ -1638,6 +1657,7 @@ void updateSound(){
 			ERRCHECK(result);
 		}
 		*/
+		/*
 		FMOD_System_GetChannelsPlaying(fmodSystem, &channelsplaying);
 
 
@@ -1646,12 +1666,14 @@ void updateSound(){
 		//printf("\n");
 	}
 }
-
+*/
+/*
 int loadAudio(){
 
 	/*
 	Create a System object and initialize.
 	*/
+	/*
 	result = FMOD_System_Create(&fmodSystem);
 	ERRCHECK(result);
 
@@ -1681,8 +1703,8 @@ int loadAudio(){
 
 		glutSwapBuffers();
 
-		testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
-		sound_list.push_back(testSound[0]);
+		//testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
+		//sound_list.push_back(testSound[0]);
 		printf("done!\n");
 
 		//Print to game window
@@ -1692,12 +1714,14 @@ int loadAudio(){
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 		glutSwapBuffers();
+
+
 	}
 
 	return 0;
 
 }
-
+*/
 void loadTextures(){
 
 	int NumberOfTextures = map_info->GetTextureCount();

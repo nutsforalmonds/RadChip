@@ -1,7 +1,7 @@
 #include "Projectile.h"
 
 Projectile::Projectile(int numPlayers)
-: Cube()
+: Mesh()
 {
 	for (int i = 0; i < numPlayers; i++)
 	{

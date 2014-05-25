@@ -795,4 +795,8 @@ std::string gameState::intToString(int i){
 }
 std::string gameState::boolToString(bool b){
 	return std::to_string(b);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6b3b118a0ba31401f4c165f7a5954ccdc33834f9

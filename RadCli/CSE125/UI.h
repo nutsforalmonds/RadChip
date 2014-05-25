@@ -420,39 +420,55 @@ public:
 		start_button = new UI_Panel(-1, 1, -1, 1);
 		start_button->setColor(vec3(1.0, 0.0, 0.0));
 		start_button->setShader(sdrCtl.getShader("basic_2D"));
-		start_button->loadColorTex("img/UI_elements/chipmunk_button_off.png", "PNG");
+		start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartOFF_1.png", "PNG");
 		start_button->setTex(true);
 		start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
 
 		exit_button = new UI_Panel(-1, 1, -1, 1);
 		exit_button->setColor(vec3(1.0, 0.0, 0.0));
 		exit_button->setShader(sdrCtl.getShader("basic_2D"));
-		exit_button->loadColorTex("img/UI_elements/chipmunk_button_exit_off.png", "PNG");
+		exit_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitOFF_1.png", "PNG");
 		exit_button->setTex(true);
-		exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
+		exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -6.0, -1.0f)));
+
+		setting_button = new UI_Panel(-1, 1, -1, 1);
+		setting_button->setColor(vec3(1.0, 0.0, 0.0));
+		setting_button->setShader(sdrCtl.getShader("basic_2D"));
+		setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsOFF.png", "PNG");
+		setting_button->setTex(true);
+		setting_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 
 		selected_start_button = new UI_Panel(-1, 1, -1, 1);
 		selected_start_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_start_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_start_button->loadColorTex("img/UI_elements/chipmunk_button_on.png", "PNG");
+		selected_start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartON_1.png", "PNG");
 		selected_start_button->setTex(true);
 		selected_start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
 
 		selected_end_button = new UI_Panel(-1, 1, -1, 1);
 		selected_end_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_end_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_end_button->loadColorTex("img/UI_elements/chipmunk_button_exit_on.png", "PNG");
+		selected_end_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON.png", "PNG");
 		selected_end_button->setTex(true);
-		selected_end_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
+		selected_end_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -6.0, -1.0f)));
 
+		selected_setting_button = new UI_Panel(-1, 1, -1, 1);
+		selected_setting_button->setColor(vec3(1.0, 0.0, 0.0));
+		selected_setting_button->setShader(sdrCtl.getShader("basic_2D"));
+		selected_setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON.png", "PNG");
+		selected_setting_button->setTex(true);
+		selected_setting_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
 	}
 	~MainMenu(){
-		menu->					~UI_Panel();
-		game_name->				~UI_Panel();
-		start_button->			~UI_Panel();
-		exit_button->			~UI_Panel();
-		selected_start_button->	~UI_Panel();
-		selected_end_button->	~UI_Panel();
+		menu->					  ~UI_Panel();
+		game_name->				  ~UI_Panel();
+		start_button->			  ~UI_Panel();
+		exit_button->			  ~UI_Panel();
+		setting_button->          ~UI_Panel();
+		selected_start_button->	  ~UI_Panel();
+		selected_end_button->	  ~UI_Panel();
+		selected_setting_button-> ~UI_Panel();
+
 	}
 
 	int draw(){
@@ -463,6 +479,7 @@ public:
 		game_name->draw();
 		start_button->draw();
 		exit_button->draw();
+		setting_button->draw();
 		
 		if (drawStartHighlight){
 			selected_start_button->draw();
@@ -470,6 +487,10 @@ public:
 
 		if (drawEndHighlight){
 			selected_end_button->draw();
+		}
+
+		if (drawSettingHighlight){
+			selected_setting_button->draw();
 		}
 
 		glEnable(GL_DEPTH_TEST);
@@ -486,23 +507,36 @@ public:
 			if ((y > 0.35) && (y < 0.47)){
 				drawStartHighlight = true;
 				drawEndHighlight = false;
+				drawSettingHighlight = false;
+				
 				//cout << "Start Monica!" << endl;
 			}
 
 			//Spot for second button
 			else if ((y > 0.53) && (y < 0.64)){
-				drawEndHighlight = true;
+				drawSettingHighlight = true;
+				drawEndHighlight = false;
 				drawStartHighlight = false;
 				//cout << "End Monica!" << endl;
+			}
+			
+			//Spot for third button
+			else if ((y > 0.71) && (y < 0.81))
+			{
+				drawEndHighlight = true;
+				drawStartHighlight = false;
+				drawSettingHighlight = false;
 			}
 			else{
 				drawStartHighlight = false;
 				drawEndHighlight = false;
+				drawSettingHighlight = false;
 			}
 		}
 		else{
 			drawStartHighlight = false;
 			drawEndHighlight = false;
+			drawSettingHighlight = false;
 		}
 	}
 
@@ -518,6 +552,11 @@ public:
 
 			//Spot for second button
 			else if ((y > 0.53) && (y < 0.64)){
+				return 0;
+			}
+
+			else if ((y > 0.71) && (y < 0.81))
+			{
 				return 2;
 			}
 
@@ -533,11 +572,14 @@ private:
 	UI_Panel * game_name;
 	UI_Panel * start_button;
 	UI_Panel * exit_button;
+	UI_Panel * setting_button;
 	UI_Panel * selected_start_button;
 	UI_Panel * selected_end_button;
+	UI_Panel * selected_setting_button;
 
 	bool drawStartHighlight = false;
 	bool drawEndHighlight = false;
+	bool drawSettingHighlight = false;
 };
 
 class GameMenu
@@ -549,28 +591,28 @@ public:
 		quit = new UI_Panel(-1, 1, -1, 1);
 		quit->setColor(vec3(1.0, 0.0, 0.0));
 		quit->setShader(sdrCtl.getShader("basic_2D"));
-		quit->loadColorTex("img/quit_off.png", "PNG");
+		quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitOFF.png", "PNG");
 		quit->setTex(true);
 		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
 
 		resume = new UI_Panel(-1, 1, -1, 1);
 		resume->setColor(vec3(1.0, 0.0, 0.0));
 		resume->setShader(sdrCtl.getShader("basic_2D"));
-		resume->loadColorTex("img/resume_off.png", "PNG");
+		resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
 		resume->setTex(true);
 		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
 
 		selected_resume = new UI_Panel(-1, 1, -1, 1);
 		selected_resume->setColor(vec3(1.0, 0.0, 0.0));
 		selected_resume->setShader(sdrCtl.getShader("basic_2D"));
-		selected_resume->loadColorTex("img/resume_on.png", "PNG");
+		selected_resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
 		selected_resume->setTex(true);
 		selected_resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
 
 		selected_quit = new UI_Panel(-1, 1, -1, 1);
 		selected_quit->setColor(vec3(1.0, 0.0, 0.0));
 		selected_quit->setShader(sdrCtl.getShader("basic_2D"));
-		selected_quit->loadColorTex("img/quit_on.png", "PNG");
+		selected_quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitON.png", "PNG");
 		selected_quit->setTex(true);
 		selected_quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
 

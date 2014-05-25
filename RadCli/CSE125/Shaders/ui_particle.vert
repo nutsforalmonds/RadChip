@@ -15,15 +15,13 @@ out vec3 vShade;
 
 void main(void)
 {
-    //float x = uTime * cos(uK*aTheta)*sin(aTheta);
-    //float y = uTime * cos(uK*aTheta)*cos(aTheta);
+    float x = uTime * cos(uK*aTheta)*sin(aTheta);
+    float y = uTime * cos(uK*aTheta)*cos(aTheta);
 	
 	//float x = uTime * cos(aTheta);
     //float y = uTime * sin(aTheta);
-
-	vec2 v = vec2(aTheta,uTime);
 	
-	vec4 position = vec4(nx, ny, 0.0, 1.0);
+	vec4 position = vec4(x, y, 0.0, 1.0);
 
     //gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*position;
 	gl_Position = position;

@@ -305,13 +305,9 @@ public:
 
 		Projectile* cube6 = new Projectile(player.size());
 		cube6->setShader(sdrCtl.getShader("basic_reflect_refract"));
-		cube6->setKd(vec3(0.8, 0.0, 0.0));
-		cube6->setKa(vec3(0.3, 0.0, 0.0));
-		cube6->setKs(vec3(0.4, 0.0, 0.0));
+
 		cube6->setShininess(100);
-		cube6->setReflectFactor(vec2(0.2, 0.5));
-		cube6->setEta(0.5);
-		cube6->setCubeMapUnit(3);
+
 		cube6->setSpeed(5);
 		//cube6->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
 		cube6->setModelM(player1*glm::translate(vec3(0, 0, -1)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 

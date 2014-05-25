@@ -36,7 +36,26 @@ struct Material{
 struct Fog{
 	float maxDist;
 	float minDist;
+	float maxHeight;
+	float minHeight;
+	float visibility;
 	vec3 color;
+	Fog(){
+		maxDist = 0;
+		minDist = 0;
+		maxHeight = 0;
+		minHeight = 0;
+		visibility = 1;
+		color = vec3(0, 0, 0);
+	}
+	Fog(float maxD, float minD, float maxH, float minH, float v, vec3 c ){
+		maxDist = maxD;
+		minDist = minD;
+		maxHeight = maxH;
+		minHeight = minH;
+		visibility = v;
+		color = c;
+	}
 };
 
 class AABB{
