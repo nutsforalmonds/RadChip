@@ -498,7 +498,7 @@ public:
 		return 0;
 	}
 
-	void checkHighlight(float x, float y){
+	int checkHighlight(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
@@ -509,6 +509,7 @@ public:
 				drawEndHighlight = false;
 				drawSettingHighlight = false;
 				
+				return 1;
 				//cout << "Start Monica!" << endl;
 			}
 
@@ -517,6 +518,8 @@ public:
 				drawSettingHighlight = true;
 				drawEndHighlight = false;
 				drawStartHighlight = false;
+
+				return 1;
 				//cout << "End Monica!" << endl;
 			}
 			
@@ -526,17 +529,24 @@ public:
 				drawEndHighlight = true;
 				drawStartHighlight = false;
 				drawSettingHighlight = false;
+
+				return 1;
 			}
+
 			else{
 				drawStartHighlight = false;
 				drawEndHighlight = false;
 				drawSettingHighlight = false;
+
+				return 0;
 			}
 		}
 		else{
 			drawStartHighlight = false;
 			drawEndHighlight = false;
 			drawSettingHighlight = false;
+
+			return 0;
 		}
 	}
 
@@ -653,7 +663,7 @@ public:
 		return 0;
 	}
 
-	void checkHighlight(float x, float y){
+	int checkHighlight(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
 		if ((y > 0.46) && (y < 0.53)){
@@ -662,6 +672,8 @@ public:
 			if ((x > 0.58) && (x < 0.73)){
 				drawStartHighlight = true;
 				drawEndHighlight = false;
+
+				return 1;
 				//cout << "Start Monica!" << endl;
 			}
 
@@ -669,16 +681,22 @@ public:
 			else if ((x > 0.26) && (x < 0.41)){
 				drawEndHighlight = true;
 				drawStartHighlight = false;
+
+				return 1;
 				//cout << "End Monica!" << endl;
 			}
 			else{
 				drawStartHighlight = false;
 				drawEndHighlight = false;
+
+				return 0;
 			}
 		}
 		else{
 			drawStartHighlight = false;
 			drawEndHighlight = false;
+
+			return 0;
 		}
 	}
 

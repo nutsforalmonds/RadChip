@@ -223,6 +223,8 @@ std::string out;
 gameState gs;
 int i = 0;
 
+int inMenuBox = false;
+
 void projectileAttack(int playerID, Camera * cam)
 {
 	mat4 test = cam->getCamM();
@@ -1054,7 +1056,7 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
-				
+				testSound[7]->Play();
 				if (!connected){
 					
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
@@ -1090,6 +1092,8 @@ void mouseFunc(int button, int state, int x, int y)
 				menuMusic->Stop();
 			}
 			else if (click == 2){
+				testSound[7]->Play();
+				Sleep(1250);
 				running = false;
 				exit(0);
 			}
@@ -1167,9 +1171,11 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = myGameMenu->checkClick(newX, newY);
 			if (click == 1){
+				testSound[7]->Play();
 				myClientState->setState(1);
 			}
 			if (click == 2){
+				testSound[7]->Play();
 				myClientState->setState(0);
 				menuMusic->setFade(0.05, 0.001);
 				menuMusic->Play();
@@ -1216,7 +1222,17 @@ void passiveMotionFunc(int x, int y){
 	case 0:
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
-		myMainMenu->checkHighlight(newX, newY);
+		int sound;
+		sound = myMainMenu->checkHighlight(newX, newY);
+		if (sound){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	case 1:
 
@@ -1236,7 +1252,18 @@ void passiveMotionFunc(int x, int y){
 	case 2:
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
-		myGameMenu->checkHighlight(newX, newY);
+		int sound2;
+		sound2 = myGameMenu->checkHighlight(newX, newY);
+		if (sound2){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
+		break;
 		break;
 	case 3:
 		newX = (float)x / Window::width;
