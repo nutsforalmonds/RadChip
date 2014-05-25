@@ -135,6 +135,7 @@ Ground* ground;
 SkyBox* skybox;
 Sphere* sphere;
 TextureScreen* texScreen;
+Mesh* mother_of_wrench;
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
@@ -222,7 +223,10 @@ void projectileAttack(int playerID, Camera * cam)
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
 
 	Projectile* wrenchT = new Projectile(player_list.size());
-	wrenchT->LoadMesh("Model/newWrench_animated.dae",false);
+	//wrenchT->LoadMesh("Model/newWrench_animated.dae",false);
+	wrenchT->setVAO(mother_of_wrench->getVAO());
+	wrenchT->setEntries(mother_of_wrench->getEntries());
+	wrenchT->setTextures(mother_of_wrench->getTextures());
 	wrenchT->setShader(sdrCtl.getShader("basic_model"));
 	wrenchT->setShadowTex(shadow_map_id);
 	wrenchT->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
@@ -1366,6 +1370,15 @@ void initialize(int argc, char *argv[])
 	skybox->setType("Skybox");
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
+
+	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
+	mother_of_wrench = new Mesh();
+	mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
+	mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
+	mother_of_wrench->setShadowTex(shadow_map_id);
+	mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	mother_of_wrench->setShininess(30);
+	mother_of_wrench->setFog(fog);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand

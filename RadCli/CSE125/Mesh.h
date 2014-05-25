@@ -70,7 +70,41 @@ public:
 	void setParticleSystem(ParticleSystem* p){ pSystem = p; }
 	void setFog(Fog& f){ fog = &f; }
 
+#define INVALID_MATERIAL 0xFFFFFFFF
+	struct MeshEntry {
+		MeshEntry()
+		{
+			NumIndices = 0;
+			BaseVertex = 0;
+			BaseIndex = 0;
+			MaterialIndex = INVALID_MATERIAL;
+		}
+
+		~MeshEntry();
+
+		void Init(const std::vector<float>& pos, const std::vector<float>& tex, const std::vector<float>& norm, std::vector<unsigned int>& ind);
+		void draw(){ vao.draw(); }
+
+		GLuint VB;
+		GLuint IB;
+		unsigned int NumIndices;
+		unsigned int MaterialIndex;
+		unsigned int NumVertices;
+		VAO vao;
+		vector<unsigned int> inds;
+
+		unsigned int BaseVertex;
+		unsigned int BaseIndex;
+
+	};
+
 	mat4& getAdjustM(){ return adjustM; }
+	GLuint& getVAO(){ return m_VAO; }
+	void setVAO(GLuint& vao){ m_VAO = vao; }
+	std::vector<MeshEntry>& getEntries(){ return m_Entries; }
+	void setEntries(std::vector<MeshEntry>& en){ m_Entries = en; }
+	std::vector<Texture*>& getTextures(){ return m_Textures; }
+	void setTextures(std::vector<Texture*>& tx){ m_Textures = tx; }
 
 private:
 
@@ -183,8 +217,6 @@ private:
 	bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 	void Clear();
 
-#define INVALID_MATERIAL 0xFFFFFFFF
-
 	enum VB_TYPES {
 		INDEX_BUFFER,
 		POS_VB,
@@ -196,33 +228,6 @@ private:
 
 	GLuint m_VAO;
 	GLuint m_Buffers[NUM_VBs];
-
-	struct MeshEntry {
-		MeshEntry()
-		{
-			NumIndices = 0;
-			BaseVertex = 0;
-			BaseIndex = 0;
-			MaterialIndex = INVALID_MATERIAL;
-		}
-
-		~MeshEntry();
-
-		void Init(const std::vector<float>& pos, const std::vector<float>& tex, const std::vector<float>& norm, std::vector<unsigned int>& ind);
-		void draw(){ vao.draw(); }
-
-		GLuint VB;
-		GLuint IB;
-		unsigned int NumIndices;
-		unsigned int MaterialIndex;
-		unsigned int NumVertices;
-		VAO vao;
-		vector<unsigned int> inds;
-
-		unsigned int BaseVertex;
-		unsigned int BaseIndex;
-
-	};
 
 	std::vector<MeshEntry> m_Entries;
 	std::vector<Texture*> m_Textures;
