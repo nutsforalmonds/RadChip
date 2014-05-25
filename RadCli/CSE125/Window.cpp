@@ -76,14 +76,15 @@ using namespace rapidjson;
 using namespace std;
 
 SoundSystem *mySoundSystem;
+Music *menuMusic;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
-//std::vector<Sound*> sound_list;
-//Sound* testSound[6];
+std::vector<Sound*> sound_list;
+Sound* testSound[10];
 
 
 Mesh_Static* tryThis;
@@ -176,7 +177,6 @@ void setupShaders();
 void initialize(int argc, char *argv[]);
 void loadTextures();
 int loadAudio();
-//void updateSound();
 
 int counter = 0;
 
@@ -363,7 +363,7 @@ void Window::idleCallback(void)
 	}
 
 	updateShaders();
-	//updateSound();
+	mySoundSystem->update();
     displayCallback();  
 }
 void Window::reshapeCallback(int w, int h)
@@ -752,9 +752,6 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
-  mySoundSystem = new SoundSystem();
-  mySoundSystem->createMusic();
-
   do{
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
@@ -800,10 +797,10 @@ int main(int argc, char *argv[])
   {
 	  delete texture_list[i];
   }
-  //for (int i = 0; i < sound_list.size(); ++i)
-  //{
-	//  delete sound_list[i];
-//  }
+  for (int i = 0; i < sound_list.size(); ++i)
+  {
+	  delete sound_list[i];
+  }
 
   return 0;
 }
@@ -816,7 +813,7 @@ void keyboard(unsigned char key, int, int){
 	case 0:
 		if (key == ' '){
 			if (space_up){
-				//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				testSound[2]->Play();
 				//myClientState->setState(1);
 			}
 		}
@@ -868,13 +865,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				//testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				testSound[1]->Play();
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			testSound[2]->Play();
 		}
 		if (key == 13)
 		{
@@ -1049,6 +1046,7 @@ void mouseFunc(int button, int state, int x, int y)
 					cam->postTrans(glm::translate(vec3(0, 1, 4)));
 
 					connected = true;
+					menuMusic->Stop();
 				}
 			}
 			else if (click == 2){
@@ -1065,7 +1063,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					//testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					testSound[4]->Play();
 					///scene->basicAttack(playerID);
 					
 					//UI testing purposes
@@ -1084,7 +1082,7 @@ void mouseFunc(int button, int state, int x, int y)
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
 
-					//testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					testSound[3]->Play();
 
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
@@ -1099,7 +1097,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-					//testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					testSound[5]->Play();
 				}
 				else
 				{
@@ -1292,6 +1290,11 @@ void initialize(int argc, char *argv[])
 
 	draw_list.clear();
 
+	//Init the JSON parser for the map
+	map_info = new JSON_Parser("Maps/Test1.json");
+	printf("Loading Map: %s\n", map_info->GetMapName().c_str());
+	sprintf_s(buf, "%s %s", "Loading Map:", map_info->GetMapName().c_str());
+
 	GLenum err = glewInit();
 	if( GLEW_OK != err )
 	{
@@ -1303,10 +1306,13 @@ void initialize(int argc, char *argv[])
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glutSwapBuffers();
 
-	//Init the JSON parser for the map
-	map_info = new JSON_Parser("Maps/Test1.json");
-	printf("Loading Map: %s\n", map_info->GetMapName().c_str());
-	sprintf_s(buf, "%s %s", "Loading Map:", map_info->GetMapName().c_str());
+	//AUDIO START!
+	if (loadAudio()){
+		printf("Error with FMOD Init!\n");
+	}
+	else{
+		printf("FMOD Init successful!\n");
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
@@ -1315,7 +1321,6 @@ void initialize(int argc, char *argv[])
 
 	loadTextures();
 
-	
 	//depth buffer initialization
 	glGenFramebuffers(1, &depth_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
@@ -1330,7 +1335,6 @@ void initialize(int argc, char *argv[])
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
-
 	light[0].type=1;
 	light[0].pos = vec4(0,40,0,1);
 	light[0].specular = vec3(0.1,0.1,0.1);
@@ -1387,7 +1391,6 @@ void initialize(int argc, char *argv[])
 	ground->setType("Ground");
 	ground->setName("Ground");
 	stationary_list.push_back(ground);
-
 
 	skybox = new SkyBox(-50, 50, -50, 50, -50, 50);
 	skybox->setShader(sdrCtl.getShader("basic_skybox"));
@@ -1463,8 +1466,6 @@ void initialize(int argc, char *argv[])
 	tryThis->setShadowTex(shadow_map_id);
 	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 
-
-
 	////*md5 = new MD5Model();
 	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");
 	//md5->LoadAnim("Model/monky_MD5_try1.md5anim");
@@ -1484,14 +1485,6 @@ void initialize(int argc, char *argv[])
 	//md6->setShadowTex(shadow_map_id);
 	//md6->setType("Model");
 	//md6->setName("Player Model");
-
-	//AUDIO START!
-	//if (loadAudio()){
-	//	printf("Error with FMOD Init!\n");
-	//}
-	//else{
-	//	printf("FMOD Init successful!\n");
-	//}
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
@@ -1635,87 +1628,20 @@ void initialize(int argc, char *argv[])
 
 }
 
-/*
-void updateSound(){
-	FMOD_System_Update(fmodSystem);
-
-	{
-		unsigned int ms = 0;
-		unsigned int lenms = 0;
-		int          playing = 0;
-		int          paused = 0;
-		int          channelsplaying = 0;
-
-		if (channel)
-		{
-			FMOD_SOUND *currentsound = 0;
-
-			result = FMOD_Channel_IsPlaying(channel, &playing);
-			if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
-			{
-				ERRCHECK(result);
-			}
-
-			result = FMOD_Channel_GetPaused(channel, &paused);
-			if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
-			{
-				ERRCHECK(result);
-			}
-
-			result = FMOD_Channel_GetPosition(channel, &ms, FMOD_TIMEUNIT_MS);
-			if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
-			{
-				ERRCHECK(result);
-			}
-
-			FMOD_Channel_GetCurrentSound(channel, &currentsound);
-			if (currentsound)
-			{
-				result = FMOD_Sound_GetLength(currentsound, &lenms, FMOD_TIMEUNIT_MS);
-				if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
-				{
-					ERRCHECK(result);
-				}
-			}
-		}
-		/*
-		result = FMOD_Sound_GetLength(sound, &lenms, FMOD_TIMEUNIT_MS);
-		if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
-		{
-			ERRCHECK(result);
-		}
-		*/
-		/*
-		FMOD_System_GetChannelsPlaying(fmodSystem, &channelsplaying);
 
 
-		//printf("Time %02d:%02d:%02d/%02d:%02d:%02d : %s : Channels Playing %2d\r", ms / 1000 / 60, ms / 1000 % 60, ms / 10 % 100, lenms / 1000 / 60, lenms / 1000 % 60, lenms / 10 % 100, paused ? "Paused " : playing ? "Playing" : "Stopped", channelsplaying);
-
-		//printf("\n");
-	}
-}
-*/
-/*
 int loadAudio(){
 
 	/*
 	Create a System object and initialize.
 	*/
-	/*
-	result = FMOD_System_Create(&fmodSystem);
-	ERRCHECK(result);
 
-	result = FMOD_System_GetVersion(fmodSystem, &version);
-	ERRCHECK(result);
-
-	if (version < FMOD_VERSION)
-	{
-		printf("Error!  You are using an old version of FMOD %08x.  This program requires %08x\n", version, FMOD_VERSION);
-		return 1;
-	}
-
-	result = FMOD_System_Init(fmodSystem, 32, FMOD_INIT_NORMAL, NULL);
-	ERRCHECK(result);
+	mySoundSystem = new SoundSystem();
+	//mySoundSystem->createMusic();
+	menuMusic = new Music(mySoundSystem, "Music/backgroundMenu.wav");
+	menuMusic->setLoopCount(-1);
+	menuMusic->setVolume(0.05);
+	menuMusic->Play();
 
 	int NumberOfAudio = map_info->GetAudioCount();
 	for (int i = 0; i < NumberOfAudio; i++){
@@ -1731,8 +1657,9 @@ int loadAudio(){
 
 		glutSwapBuffers();
 
-		//testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
-		//sound_list.push_back(testSound[0]);
+		testSound[i] = new Sound(mySoundSystem, path.c_str());
+		testSound[i]->setVolume(0.05);
+		sound_list.push_back(testSound[0]);
 		printf("done!\n");
 
 		//Print to game window
@@ -1742,14 +1669,11 @@ int loadAudio(){
 		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
 		glutSwapBuffers();
-
-
 	}
 
 	return 0;
-
 }
-*/
+
 void loadTextures(){
 
 	int NumberOfTextures = map_info->GetTextureCount();

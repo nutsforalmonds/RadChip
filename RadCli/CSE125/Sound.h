@@ -93,38 +93,56 @@ public:
 	}
 
 
-	FMOD::Sound createSound(){
+	FMOD::Sound* createSound(string path){
 		FMOD::Sound *sound;
 
 		// Load sound effects into memory (not streaming)
-		result = system->createSound("Effect.mp3", FMOD_DEFAULT, 0, &sound);
+		result = system->createSound(path.c_str(), FMOD_DEFAULT, 0, &sound);
 		FMODErrorCheck(result);
 
-		system->playSound(FMOD_CHANNEL_FREE, sound, false, 0);
+		return sound;
 	}
 
-	FMOD::Sound createMusic(){
+	void playSound(FMOD::Sound *s, float v){
+		FMOD::Channel *temp;
+		system->playSound(FMOD_CHANNEL_FREE, s, false, &temp);
+		temp->setVolume(v);
+	}
+
+	FMOD::Sound* createMusic(string path){
 		FMOD::Sound *song;
 		
 		// Open music as a stream
-		result = system->createStream("Music/backgroundMenu.wav", FMOD_DEFAULT, 0, &song);
+		result = system->createStream(path.c_str(), FMOD_DEFAULT, 0, &song);
 		FMODErrorCheck(result);
 
 		// Assign each song to a channel and start them paused
-		result = system->playSound(FMOD_CHANNEL_FREE, song, true, &channel1);
+		result = system->playSound(FMOD_CHANNEL_FREE, song, true, &music);
 		FMODErrorCheck(result);
-
-		// Songs should repeat forever
-		channel1->setLoopCount(-1);
-
-		channel1->setVolume(0.05);
-
-		channel1->setPaused(false);
-		return *song;
+		
+		return song;
 	}
 
-	void playMusic(){
+	FMOD::Channel* getLastMusicChan(){ return music; }
 
+	void playMusic(FMOD::Channel *chan){
+		chan->setPaused(false);
+	}
+
+	void stopMusic(FMOD::Channel *chan){
+		chan->setPaused(true);
+	}
+
+	void setLoopCount(FMOD::Channel *chan, int loop){
+		chan->setLoopCount(loop);
+	}
+
+	void setVolume(FMOD::Channel *chan, float v){
+		chan->setVolume(v);
+	}
+
+	void update(){
+		FMODErrorCheck(system->update());
 	}
 
 private:
@@ -138,6 +156,7 @@ private:
 		}
 	}
 	
+	//System Stuff
 	char name[256];
 	FMOD::System *system;
 	FMOD_RESULT result;
@@ -146,53 +165,91 @@ private:
 	FMOD_SPEAKERMODE speakerMode;
 	FMOD_CAPS caps;
 
-	FMOD::Channel *channel1, *channel2;
+	//Testing code
+	FMOD::Channel *music; 
+	FMOD::Channel *sound;
 
 };
 
-/*
-class Sound
+class Music
 {
 public:
-	Sound(FMOD_SYSTEM *mySystemSet, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound){		
-		mySystem = mySystemSet;
-		mySound = *sound;
-		volume = 0.5;
-		FMOD_System_CreateSound(mySystem, name_or_data, mode, exinfo, &mySound);
-		ERRCHECK(result);
+	Music(SoundSystem *s, string path){
+		system = s;
+		me = system->createMusic(path);
+		myChan = s->getLastMusicChan();
 	}
-	~Sound(void){
-		result = FMOD_Sound_Release(mySound);
-		ERRCHECK(result);
+	~Music(){
+
 	}
 
-	void Play(FMOD_CHANNELINDEX channelid, FMOD_BOOL paused, FMOD_CHANNEL **channel){
-		
-		FMOD_System_PlaySound(mySystem, channelid, mySound, paused, channel);
-		ERRCHECK(result);
+	void Play(){
+		system->playMusic(myChan);
 	}
 
-	/* If the file has embedded loop points which automatically makes looping turn happen, turn off like this. */
-/*
-void Mode(FMOD_MODE mode){
-		result = FMOD_Sound_SetMode(mySound, mode);
-		ERRCHECK(result);
+	void Stop(){
+		system->stopMusic(myChan);
+	}
+
+	void setLoopCount(int loop){
+		loopCount = loop;
+		system->setLoopCount(myChan, loopCount);
 	}
 
 	void setVolume(float v){
 		volume = v;
-		if (volume > 255){ volume = 255; }
-		if (volume < 0){ volume = 0; }
+		if (volume > 1.0){
+			volume = 1.0;
+		}
+		else if (volume < 0.0){
+			volume = 0.0;
+		}
+		system->setVolume(myChan, volume);
 	}
 
 private:
-	//used for err checking
-	FMOD_RESULT       result;
-	FMOD_SYSTEM      *mySystem;
-	FMOD_SOUND       *mySound;	
+	FMOD::Sound *me;
+	FMOD::Channel *myChan;
+	SoundSystem *system;
 	float volume;
+	int loopCount;
 };
 
-*/
+class Sound
+{
+public:
+	Sound(SoundSystem *s, string path){
+		system = s;
+		me = system->createSound(path);
+	}
+	~Sound(){
+
+	}
+
+	void Play(){
+		system->playSound(me, volume);
+	}
+
+	
+	void setVolume(float v){
+		volume = v;
+		if (volume > 1.0){
+			volume = 1.0;
+		}
+		else if (volume < 0.0){
+			volume = 0.0;
+		}
+	}
+
+	float getVolume(){ return volume; }
+	
+
+private:
+	FMOD::Sound *me;
+	FMOD::Channel *myChan;
+	SoundSystem *system;
+	float volume;
+	int loopCount;
+};
 
 #endif	/* SOUND_H */
