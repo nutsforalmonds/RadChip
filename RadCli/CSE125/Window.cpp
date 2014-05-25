@@ -243,6 +243,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = wrenchT->getAABB();
 	wrenchT->setStartX(hold.max[0]);
 	wrenchT->setStartY(hold.max[2]);
+	wrenchT->setDistance(50);
 	wrenchT->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -271,6 +272,7 @@ void despawnProjectile()
 		if (distance >= (*projectile_list[i]).getDistance())
 		{
 			////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+			delete projectile_list[i];
 			projectile_list.erase(projectile_list.begin() + i);
 		}
 	}
@@ -360,6 +362,8 @@ void Window::idleCallback(void)
 		else if (myClientState->getState() == 3){
 			myDeathScreen->draw();
 		}
+
+		despawnProjectile();
 
 		break;
 	default:

@@ -68,7 +68,7 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-	Clear();
+	//Clear();
 }
 
 
