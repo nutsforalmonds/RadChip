@@ -15,7 +15,7 @@ MD5Model::MD5Model()
 
 MD5Model::~MD5Model()
 {
-	for (int i = 0; i < m_Meshes.size(); i++){
+	for (uint i = 0; i < m_Meshes.size(); i++){
 		delete m_Meshes[i];
 	}
 }

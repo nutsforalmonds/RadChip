@@ -41,7 +41,7 @@ using glm::mat3;
 using glm::quat;
 using namespace std;
 Ground* ground;
-float cam_sp = 0.1;
+float cam_sp = (float)0.1;
 string configBuf;
 int counter = 0;
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 			}
 		}*/
 
-		scene->simulate(diff, 1.0 / 100);
+		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> m;
 		for (int i = 0; i < scene->numPlayers(); i++)
 		{

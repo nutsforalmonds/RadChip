@@ -18,7 +18,7 @@ public:
 	void setStartY(float y);
 	float getStartX();
 	float getStartY();
-	bool checkHit(int i);
+	int checkHit(int i);
 	void setHit(int i);
 	void setDistance(int i);
 	int getDistance();

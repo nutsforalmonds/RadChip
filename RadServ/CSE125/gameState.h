@@ -1,10 +1,10 @@
 #include "rapidjson\document.h"
 #include "rapidjson\stringbuffer.h"
-#include "rapidjson\filestream.h";
-#include "rapidjson\prettywriter.h";
-#include "rapidjson\rapidjson.h";
-#include "rapidjson\reader.h";
-#include "rapidjson\writer.h";
+#include "rapidjson\filestream.h"
+#include "rapidjson\prettywriter.h"
+#include "rapidjson\rapidjson.h"
+#include "rapidjson\reader.h"
+#include "rapidjson\writer.h"
 #include "Object.h"
 #include <vector>
 #include <glm/gtc/type_ptr.hpp>
@@ -125,7 +125,7 @@ mat4 gameState::getCam(int i){
 void gameState::setHealth(int in, int j){
 	objects->at(in)->setHealth(j);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -150,7 +150,7 @@ void gameState::setName(int i, std::string s){
 void gameState::postTrans(int in, mat4 m){
 	objects->at(in)->postTrans(m);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -167,7 +167,7 @@ void gameState::postTrans(int in, mat4 m){
 void gameState::postRotate(int in, mat4 m){
 	objects->at(in)->postRotate(m);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -184,7 +184,7 @@ void gameState::postRotate(int in, mat4 m){
 void gameState::preTrans(int in, mat4 m){
 	objects->at(in)->preTrans(m);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -201,7 +201,7 @@ void gameState::preTrans(int in, mat4 m){
 void gameState::preRotate(int in, mat4 m){
 	objects->at(in)->preRotate(m);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -218,7 +218,7 @@ void gameState::preRotate(int in, mat4 m){
 void gameState::setModelM(int in, mat4 m){
 	objects->at(in)->setModelM(m);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -235,7 +235,7 @@ void gameState::setModelM(int in, mat4 m){
 void gameState::setHMove(int in, int x){
 	objects->at(in)->setHMove(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -254,7 +254,7 @@ void gameState::setHMove(int in, int x){
 void gameState::cancelHMove(int in, int x){
 	objects->at(in)->cancelHMove(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -273,7 +273,7 @@ void gameState::cancelHMove(int in, int x){
 void gameState::setVMove(int in, int x){
 	objects->at(in)->setVMove(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -292,7 +292,7 @@ void gameState::setVMove(int in, int x){
 void gameState::cancelVMove(int in, int x){
 	objects->at(in)->cancelVMove(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -311,7 +311,7 @@ void gameState::cancelVMove(int in, int x){
 void gameState::setSpeed(int in, float x){
 	objects->at(in)->setSpeed(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -329,7 +329,7 @@ void gameState::setSpeed(int in, float x){
 void gameState::setPendingRot(int in, float x){
 	objects->at(in)->setPendingRot(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -346,7 +346,7 @@ void gameState::setPendingRot(int in, float x){
 void gameState::pushRot(int in, float x){
 	objects->at(in)->pushRot(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -363,7 +363,7 @@ void gameState::pushRot(int in, float x){
 void gameState::jump(int in){
 	objects->at(in)->jump();
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -380,7 +380,7 @@ void gameState::jump(int in){
 void gameState::setAABB(int in, AABB x){
 	objects->at(in)->setAABB(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -397,7 +397,7 @@ void gameState::setAABB(int in, AABB x){
 void gameState::setVelocity(int in, vec3 x){
 	objects->at(in)->setVelocity(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -414,7 +414,7 @@ void gameState::setVelocity(int in, vec3 x){
 void gameState::addVelocity(int in, vec3 x){
 	objects->at(in)->addVelocity(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -431,7 +431,7 @@ void gameState::addVelocity(int in, vec3 x){
 void gameState::clearYVelocity(int in){
 	objects->at(in)->clearYVelocity();
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -448,7 +448,7 @@ void gameState::clearYVelocity(int in){
 void gameState::touchGround(int in, bool x){
 	objects->at(in)->touchGround(x);
 	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
+	for (uint i = 0; i < commands->size(); ++i){
 		if (commands->at(i).first == in){
 			exists = i;
 			break;
@@ -641,7 +641,7 @@ std::string gameState::getPosString(std::vector<std::pair<string, mat4>>* v){
 	rapidjson::Document::AllocatorType& allocator = fromScratch.GetAllocator();
 	rapidjson::Value array(rapidjson::kArrayType);
 	std::string temp;
-	for (int h = 0; h < v->size(); ++h){
+	for (uint h = 0; h < v->size(); ++h){
 		rapidjson::Value array(rapidjson::kArrayType);
 		for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j){
@@ -749,7 +749,7 @@ void gameState::removeObject(int i){
 
 std::vector<Object*> gameState::getObjectByType(string type){
 	std::vector<Object*> res;
-	for (int i = 0; i < objects->size(); ++i)
+	for (uint i = 0; i < objects->size(); ++i)
 	if (objects->at(i)->getType() == type)
 		res.push_back(objects->at(i));
 

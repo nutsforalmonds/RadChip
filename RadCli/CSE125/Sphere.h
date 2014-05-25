@@ -57,7 +57,7 @@ private:
 	{
 		float const R = 1./(float)(rings-1);
 		float const S = 1./(float)(sectors-1);
-		int r, s;
+		uint r, s;
 
 		vertex_positions.resize(rings * sectors * 3);
 		vertex_normals.resize(rings * sectors * 3);

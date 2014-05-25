@@ -475,7 +475,7 @@ void Mesh::draw()
 	shader->setUniform(uniformLoc[13], fog->maxHeight);
 	shader->setUniform(uniformLoc[14], fog->minHeight);
 	//shader->setUniform(uniformLoc[], );
-	for (int i = 0; i < transforms.size(); i++){
+	for (uint i = 0; i < transforms.size(); i++){
 		char Name[128];
 		memset(Name, 0, sizeof(Name));
 		SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
@@ -530,7 +530,7 @@ void Mesh::draw(mat4& projection, mat4& view)
 	shader->setUniform(uniformLoc[13], fog->maxHeight);
 	shader->setUniform(uniformLoc[14], fog->minHeight);
 	//shader->setUniform(uniformLoc[], );
-	for (int i = 0; i < transforms.size(); i++){
+	for (uint i = 0; i < transforms.size(); i++){
 		char Name[128];
 		memset(Name, 0, sizeof(Name));
 		SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);

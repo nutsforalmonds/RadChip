@@ -253,7 +253,7 @@ public:
 		}
 	}
 
-	bool isRipe(int cliID){
+	bool isRipe(uint cliID){
 		if (cliID < clients_.size())
 			return clients_[cliID]->isRipe();
 		else

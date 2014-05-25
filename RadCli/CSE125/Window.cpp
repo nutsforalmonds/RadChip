@@ -50,6 +50,8 @@ ParticleSystem* particle7;
 ParticleSystem* particle8;
 long long m_currentTimeMillis;
 
+#include "ParticleSystem2.h"
+
 
 enum {
 	MENU_LIGHTING = 1,
@@ -98,7 +100,7 @@ JSON_Parser *map_info;
 
 int Window::width = 1280;   // set window width in pixels here
 int Window::height = 720;   // set window height in pixels here
-float nearClip = 0.1;
+float nearClip = (float)0.1;
 float farClip = 1000.0;
 float fov = 55.0;
 
@@ -139,7 +141,7 @@ int texScreenWidth = 512;
 int texScreenHeight = 512;
 
 Camera* cam;
-float cam_sp = 0.1;
+float cam_sp = (float)0.1;
 float cam_dx = 0;
 
 GLuint fboHandle;
@@ -268,7 +270,7 @@ void projectileAttack(int playerID, Camera * cam)
 }
 void despawnProjectile()
 {
-	for (int i = 0; i < projectile_list.size(); i++)
+	for (uint i = 0; i < projectile_list.size(); i++)
 	{
 		float startX = projectile_list[i]->getStartX();
 		float startY = projectile_list[i]->getStartY();
@@ -286,7 +288,7 @@ void despawnProjectile()
 }
 void simulateProjectile(float t)
 {
-	for (int i = 0; i < projectile_list.size(); i++){
+	for (uint i = 0; i < projectile_list.size(); i++){
 		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
 		projectile_list[i]->postTrans(glm::translate(projectile_list[i]->getVelocity()*t));
 		projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*projectile_list[i]->getAdjustM());
@@ -297,7 +299,7 @@ void Window::idleCallback(void)
 {
 	static float anim_time = 0;
 	vector<mat4> Transforms;
-	GLSLProgram* sd;
+	//GLSLProgram* sd;
 	vector<mat4> playerMs;
 
 	switch (myClientState->getState()){
@@ -324,7 +326,7 @@ void Window::idleCallback(void)
 
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
-		for (int i = 0; i < player_list.size(); i++){
+		for (uint i = 0; i < player_list.size(); i++){
 			((Mesh*)player_list[i])->BoneTransform(player_list[i]->getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
 			((Mesh*)player_list[i])->setTransforms(Transforms);
 		}
@@ -441,15 +443,15 @@ void Window::displayCallback(void)
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		//m_pMesh2->draw(LightProjection, LightView);
-		for (int i = 0; i < player_list.size(); ++i)
+		for (uint i = 0; i < player_list.size(); ++i)
 		{
 			player_list[i]->draw(LightProjection, LightView);
 		}
-		for (int i = 0; i < stationary_list.size(); ++i)
+		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw(LightProjection, LightView);
 		}
-		for (int i = 0; i < projectile_list.size(); ++i)
+		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw(LightProjection, LightView);
 		}
@@ -461,19 +463,19 @@ void Window::displayCallback(void)
 		glViewport(0, 0, width, height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
 
-		for (int i = 0; i < draw_list.size(); ++i)
+		for (uint i = 0; i < draw_list.size(); ++i)
 		{
 			draw_list[i]->draw();
 		}
-		for (int i = 0; i < player_list.size(); ++i)
+		for (uint i = 0; i < player_list.size(); ++i)
 		{
 			player_list[i]->draw();
 		}
-		for (int i = 0; i < stationary_list.size(); ++i)
+		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw();
 		}
-		for (int i = 0; i < projectile_list.size(); ++i)
+		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw();
 		}
@@ -495,6 +497,7 @@ void Window::displayCallback(void)
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthMask(GL_FALSE);
 		particle->draw(Projection, View);
 		particle2->draw(Projection, View);
 		particle3->draw(Projection, View);
@@ -504,7 +507,7 @@ void Window::displayCallback(void)
 		particle7->draw(Projection, View);
 		particle8->draw();
 		glDisable(GL_BLEND);
-
+		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
 
 		myUI->draw();
@@ -801,23 +804,23 @@ int main(int argc, char *argv[])
 	  
   } while (running);
 
-  for (int i = 0; i < draw_list.size(); ++i)
+  for (uint i = 0; i < draw_list.size(); ++i)
   {
 	  delete draw_list[i];
   }
-  for (int i = 0; i < player_list.size(); ++i)
+  for (uint i = 0; i < player_list.size(); ++i)
   {
 	  delete player_list[i];
   }
-  for (int i = 0; i < stationary_list.size(); ++i)
+  for (uint i = 0; i < stationary_list.size(); ++i)
   {
 	  delete stationary_list[i];
   }
-  for (int i = 0; i < texture_list.size(); ++i)
+  for (uint i = 0; i < texture_list.size(); ++i)
   {
 	  delete texture_list[i];
   }
-  for (int i = 0; i < sound_list.size(); ++i)
+  for (uint i = 0; i < sound_list.size(); ++i)
   {
 	  delete sound_list[i];
   }
@@ -1591,7 +1594,7 @@ void initialize(int argc, char *argv[])
 	particle->setTime_Step(1.0);
 	particle->setTime_Max(150.0);
 	particle->setTime_Min(1.0);
-	particle->setTime(0.45);
+	particle->setTime((float)0.45);
 	particle->setLoopInf(true);
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
@@ -1798,7 +1801,7 @@ void Window::addDrawList(Object* obj)
 
 void Window::removeDrawList(const std::string& name)
 {
-	for (int j = 0; j< draw_list.size(); j++)
+	for (uint j = 0; j< draw_list.size(); j++)
 	{
 		if ((*draw_list[j]).getName() == name)
 			draw_list.erase(draw_list.begin() + j);

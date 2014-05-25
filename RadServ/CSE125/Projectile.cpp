@@ -18,7 +18,7 @@ float Projectile::getStartY(){
 	return startY;
 }
 
-bool Projectile::checkHit(int i)
+int Projectile::checkHit(int i)
 {
 	return playersHit[i];
 }

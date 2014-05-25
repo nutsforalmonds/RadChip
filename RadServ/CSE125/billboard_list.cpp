@@ -78,7 +78,7 @@ void BillboardList::BindBoards()
 {
 	vec3 Temp[10];
 
-	for (unsigned int i = 0; i < num_of_boards; i++) {
+	for (int i = 0; i < num_of_boards; i++) {
 		Temp[i] = mBoardList[i];
 	}
 	glGenVertexArrays(1, &m_vao);

@@ -137,7 +137,7 @@ public:
 		{
 			time -= substep;
 			float dy = jumpVelocity*substep;
-			jumpVelocity -= 9.8*substep;
+			jumpVelocity -= (float)9.8*substep;
 			preTrans(glm::translate(vec3(0, dy, 0)));
 			if ((modelM*vec4(0, -0.5, 0, 1))[1] < 0.0){
 				preTrans(glm::translate(vec3(0, -(modelM*vec4(0, -0.5, 0, 1))[1], 0)));
@@ -146,7 +146,7 @@ public:
 			}
 		}
 		float dy = jumpVelocity*time;
-		jumpVelocity -= 9.8*time;
+		jumpVelocity -= (float)9.8*time;
 		preTrans(glm::translate(vec3(0, dy, 0)));
 		if ((modelM*vec4(0, -0.5, 0, 1))[1] < 0.0){
 			preTrans(glm::translate(vec3(0, -(modelM*vec4(0, -0.5, 0, 1))[1], 0)));

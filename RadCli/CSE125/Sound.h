@@ -103,7 +103,7 @@ public:
 		return sound;
 	}
 
-	void playSound(FMOD::Sound *s, float v){
+	void playSound(FMOD::Sound *s, double v){
 		FMOD::Channel *temp;
 		system->playSound(FMOD_CHANNEL_FREE, s, false, &temp);
 		temp->setVolume(v);
@@ -137,7 +137,7 @@ public:
 		chan->setLoopCount(loop);
 	}
 
-	void setVolume(FMOD::Channel *chan, float v){
+	void setVolume(FMOD::Channel *chan, double v){
 		chan->setVolume(v);
 	}
 
@@ -201,7 +201,7 @@ public:
 		system->setLoopCount(myChan, loopCount);
 	}
 
-	void setVolume(float v){
+	void setVolume(double v){
 		volume = v;
 		if (volume > 1.0){
 			volume = 1.0;
@@ -212,7 +212,7 @@ public:
 		system->setVolume(myChan, volume);
 	}
 
-	void setFade(float v, float s){
+	void setFade(double v, double s){
 		fade = v;
 		fadeStep = s;
 		fadeDone = false;
@@ -221,7 +221,7 @@ public:
 
 	void fadeUpdate(){
 		if ((!fadeDone) || volume < fade){
-			float temp = volume + fadeStep;
+			double temp = volume + fadeStep;
 			if (volume > fade){
 				temp = fade;
 			}
@@ -238,9 +238,9 @@ private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
 	SoundSystem *system;
-	float volume;
+	double volume;
 	int loopCount;
-	float fade, fadeStep;
+	double fade, fadeStep;
 	bool fadeDone;
 };
 
@@ -260,7 +260,7 @@ public:
 	}
 
 	
-	void setVolume(float v){
+	void setVolume(double v){
 		volume = v;
 		if (volume > 1.0){
 			volume = 1.0;
@@ -276,7 +276,7 @@ private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
 	SoundSystem *system;
-	float volume;
+	double volume;
 	int loopCount;
 };
 

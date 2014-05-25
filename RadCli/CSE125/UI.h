@@ -64,7 +64,7 @@ void glWindowPos2fMESAemulate(GLfloat x, GLfloat y)
 // (0,0) is the bottom left of the window regardless of size
 void RenderString(float x, float y, void *font, const unsigned char* string, vec3 const& rgb)
 {
-	char *c;
+	//char *c;
 
 	glColor3f(rgb.r, rgb.g, rgb.b);
 	//glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
@@ -390,7 +390,7 @@ private:
 	float less_life = 0;
 	float overheat = 0;
 	float shots = 0;
-	float damage_taken = .1; //set to default 1/7 of the life bar
+	float damage_taken = (float)0.1; //set to default 1/7 of the life bar
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = x2_heat - x1_heat;
 

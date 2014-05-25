@@ -106,6 +106,7 @@
     <ClInclude Include="Octree.h" />
     <ClInclude Include="ogldev_util.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="ParticleSystem2.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderController.h" />

@@ -19,11 +19,11 @@ public:
 		initialize();
 	}
 	~Scene(){
-		for (int i = 0; i<stationary.size(); i++){
+		for (uint i = 0; i<stationary.size(); i++){
 			delete stationary[i];
 		}
 		stationary.clear();
-		for (int i = 0; i<player.size(); i++){
+		for (uint i = 0; i<player.size(); i++){
 			delete player[i];
 		}
 		player.clear();
@@ -49,10 +49,10 @@ public:
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
 		//player-stationary detection
-		for (int i = 0; i < player.size(); i++){
+		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = false;
 			bool touchGround2 = false;
-			for (int j = 0; j < stationary.size(); j++){
+			for (uint j = 0; j < stationary.size(); j++){
 				if (strcmp(stationary[j]->getType().c_str(), "Ground") == 0){
 					AABB pBox = player[i]->getAABB();
 					vec3 mid = (pBox.max + pBox.min) / 2.0f;
@@ -90,9 +90,9 @@ public:
 
 	void collisionDetectionPlayer(){
 		//player-stationary detection
-		for (int i = 0; i < player.size(); i++){
+		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = player[i]->getTouchGround();
-			for (int j = i + 1; j < player.size(); j++){
+			for (uint j = i + 1; j < player.size(); j++){
 				bool touchGround2 = player[j]->getTouchGround();
 				AABB pBox = player[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
@@ -114,9 +114,9 @@ public:
 
 	void collisionDetectionProjectile(){
 		//player-stationary detection
-		for (int i = 0; i < projectile.size(); i++){
+		for (uint i = 0; i < projectile.size(); i++){
 			bool touchGround1 = projectile[i]->getTouchGround();
-			for (int j = 1; j < player.size(); j++){
+			for (uint j = 1; j < player.size(); j++){
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
 				bool touchGround2 = player[j]->getTouchGround();
@@ -223,17 +223,17 @@ public:
 	void addProjectile(Projectile* p){ projectile.push_back(p); }
 	void setGravity(vec3& g){ gravity = g; }
 	void resolvePlayerRotation(){
-		for (int i = 0; i < player.size(); i++){
+		for (uint i = 0; i < player.size(); i++){
 			player[i]->postRotate(glm::rotate(mat4(1.0), player[i]->getPendingRote(), vec3(0, 1, 0)));
 			player[i]->setPendingRot(0);
 		}
 	}
 	void resolvePlayerTransition(float t){
-		for (int i = 0; i < player.size(); i++){
+		for (uint i = 0; i < player.size(); i++){
 			player[i]->addVelocity(gravity*t);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
-		for (int i = 0; i < projectile.size(); i++){
+		for (uint i = 0; i < projectile.size(); i++){
 			projectile[i]->addVelocity(gravity*t);
 			projectile[i]->postTrans(glm::translate(projectile[i]->getVelocity()*t));
 		}
@@ -249,7 +249,7 @@ public:
 
 	void basicAttack(int playerID)
 	{
-		for (int j = 1; j < player.size(); j++){
+		for (uint j = 1; j < player.size(); j++){
 			AABB pBox = player[playerID]->getAABB();
 			AABB sBox = player[j]->getAABB();
 			vector<int> holder;
@@ -332,7 +332,7 @@ public:
 
 	void despawnProjectile()
 	{
-		for (int i = 0; i < projectile.size(); i++)
+		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();
 			float startY = projectile[i]->getStartY();
@@ -350,7 +350,7 @@ public:
 
 	vector<mat4> getPlayerMats(){
 		vector<mat4> m;
-		for (int i = 0; i < player.size(); i++){
+		for (uint i = 0; i < player.size(); i++){
 			m.push_back(player[i]->getModelM());
 		}
 		return m;
