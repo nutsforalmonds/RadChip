@@ -72,20 +72,15 @@ using glm::quat;
 using namespace rapidjson;
 using namespace std;
 
-FMOD_SYSTEM      *fmodSystem;
-FMOD_SOUND       *sound;
-FMOD_CHANNEL     *channel = 0;
-FMOD_RESULT       result;
-int               key;
-unsigned int      version;
+SoundSystem *mySoundSystem;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
-std::vector<Sound*> sound_list;
-Sound* testSound[6];
+//std::vector<Sound*> sound_list;
+//Sound* testSound[6];
 
 
 Mesh_Static* tryThis;
@@ -178,7 +173,7 @@ void setupShaders();
 void initialize(int argc, char *argv[]);
 void loadTextures();
 int loadAudio();
-void updateSound();
+//void updateSound();
 
 int counter = 0;
 
@@ -361,7 +356,7 @@ void Window::idleCallback(void)
 	}
 
 	updateShaders();
-	updateSound();
+	//updateSound();
     displayCallback();  
 }
 void Window::reshapeCallback(int w, int h)
@@ -729,6 +724,9 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
+  mySoundSystem = new SoundSystem();
+  mySoundSystem->createMusic();
+
   do{
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
@@ -774,10 +772,10 @@ int main(int argc, char *argv[])
   {
 	  delete texture_list[i];
   }
-  for (int i = 0; i < sound_list.size(); ++i)
-  {
-	  delete sound_list[i];
-  }
+  //for (int i = 0; i < sound_list.size(); ++i)
+  //{
+	//  delete sound_list[i];
+//  }
 
   return 0;
 }
@@ -842,13 +840,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//testSound[2]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 		}
 		if (key == 13)
 		{
@@ -928,7 +926,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-					testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -1039,7 +1037,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[4]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					///scene->basicAttack(playerID);
 					
 					//UI testing purposes
@@ -1058,7 +1056,7 @@ void mouseFunc(int button, int state, int x, int y)
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
 
-					testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[3]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
@@ -1073,7 +1071,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-					testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//testSound[5]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				}
 				else
 				{
@@ -1189,7 +1187,7 @@ void specialKeyboardFunc(int key, int x, int y){
 	case 1:
 		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 			if (sprint_up >= 10){
-				testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				//scene->jump(playerID);
 			}
 			if (sprint_up > 0){
@@ -1460,12 +1458,12 @@ void initialize(int argc, char *argv[])
 	//md6->setName("Player Model");
 
 	//AUDIO START!
-	if (loadAudio()){
-		printf("Error with FMOD Init!\n");
-	}
-	else{
-		printf("FMOD Init successful!\n");
-	}
+	//if (loadAudio()){
+	//	printf("Error with FMOD Init!\n");
+	//}
+	//else{
+	//	printf("FMOD Init successful!\n");
+	//}
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
@@ -1609,6 +1607,7 @@ void initialize(int argc, char *argv[])
 
 }
 
+/*
 void updateSound(){
 	FMOD_System_Update(fmodSystem);
 
@@ -1658,6 +1657,7 @@ void updateSound(){
 			ERRCHECK(result);
 		}
 		*/
+		/*
 		FMOD_System_GetChannelsPlaying(fmodSystem, &channelsplaying);
 
 
@@ -1666,12 +1666,14 @@ void updateSound(){
 		//printf("\n");
 	}
 }
-
+*/
+/*
 int loadAudio(){
 
 	/*
 	Create a System object and initialize.
 	*/
+	/*
 	result = FMOD_System_Create(&fmodSystem);
 	ERRCHECK(result);
 
@@ -1701,8 +1703,8 @@ int loadAudio(){
 
 		glutSwapBuffers();
 
-		testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
-		sound_list.push_back(testSound[0]);
+		//testSound[i] = new Sound(fmodSystem, path.c_str(), FMOD_HARDWARE, 0, &sound);
+		//sound_list.push_back(testSound[0]);
 		printf("done!\n");
 
 		//Print to game window
@@ -1719,7 +1721,7 @@ int loadAudio(){
 	return 0;
 
 }
-
+*/
 void loadTextures(){
 
 	int NumberOfTextures = map_info->GetTextureCount();
