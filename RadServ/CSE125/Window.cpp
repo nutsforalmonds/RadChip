@@ -3,6 +3,7 @@
 #include <iostream>
 #include <time.h>
 #include <boost/asio.hpp>
+#include <boost/make_shared.hpp>
 #include "Server.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +33,7 @@
 #include <AL/alc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "gameState.h"
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
@@ -52,6 +54,9 @@ int playerID = -1;
 int numOfVecs = 4;
 int keyState = 0;
 bool player1shoot, player2shoot, player3shoot, player4shoot;
+
+std::string str;
+gameState gs;
 
 void handle_mouse_state(int pid, int mouseState){
 	if (mouseState & 1){
@@ -168,6 +173,8 @@ int main(int argc, char *argv[])
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	srand(time(NULL));
+
 	try
 	{
 		tcp::resolver resolver(io_service);
@@ -232,7 +239,7 @@ int main(int argc, char *argv[])
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 			}
 		}
-		if (strcmp((*recvVec)[numOfVecs * 3].first.c_str(), ""))
+		/*if (strcmp((*recvVec)[numOfVecs * 3].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 3].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
@@ -241,7 +248,7 @@ int main(int argc, char *argv[])
 				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 			}
-		}
+		}*/
 
 		scene->simulate(diff, 1.0 / 100);
 		boost::array<mat4, 4> m;
@@ -273,16 +280,40 @@ int main(int argc, char *argv[])
 		else
 			p3 = "3S";
 
-		(*sendVec)[0] = std::make_pair(p0.c_str(), m[0]);
-		(*sendVec)[1] = std::make_pair(p1.c_str(), m[1]);
-		(*sendVec)[2] = std::make_pair(p2.c_str(), m[2]);
-		(*sendVec)[3] = std::make_pair(p3.c_str(), m[3]);
+		(*sendVec)[0] = std::make_pair("0", m[0]);
+		(*sendVec)[1] = std::make_pair("1", m[1]);
+		(*sendVec)[2] = std::make_pair("2", m[2]);
+		(*sendVec)[3] = std::make_pair("3", m[3]);
+
+		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
 		//std::cout << "pair 2: " << ((*sendVec)[2].first.c_str()) << std::endl;
 		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
-		server->send(*sendVec);
+		//server->send(*sendVec);
+
+		/*int num = rand() % 1000 + 1;
+
+		for (int i = 0; i < num; i++)
+		{
+			str = str + "a";
+		}
+
+		num = rand() % 1000 + 1;
+
+		for (int i = 0; i < num; i++)
+		{
+			str = str + "b";
+		}
+
+		str = "{" + str + "}";*/
+
+		str = gs.getPosString(sendVec);
+
+		server->send(str + '`');
 		io_service.poll();
+
+		//str = "";
 
 		//limit the speed of server
 		QueryPerformanceCounter(&loop_end);

@@ -4,6 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
+#include <iterator>
 #include "object.h"
 #include "glslprogram.h" //Mat4 data type
 
@@ -22,10 +23,6 @@ public:
 		endpoint_ = *itr;
 		std::cout << "Address: " << endpoint_.address() << std::endl;
 
-		ret_.push_back(std::make_pair("initRet_c", mat4(0.0f)));
-		ret_.push_back(std::make_pair("initRet_c", mat4(0.0f)));
-		ret_.push_back(std::make_pair("initRet_c", mat4(0.0f)));
-		ret_.push_back(std::make_pair("initRet_c", mat4(0.0f)));
 		pIDVec_.push_back(std::make_pair("initPID_c", mat4(0.0f)));
 
 		socket_.async_connect(endpoint_,
@@ -43,23 +40,26 @@ public:
 		//std::cout << "write called" << std::endl;
 		//std::cout << "sendVec string:" << in.front().first << std::endl;
 		/*std::cout << "sendVec dat:" << in.front().second[0][0] <<
-			in.front().second[0][1] <<
-			in.front().second[0][2] <<
-			in.front().second[0][3] <<
-			in.front().second[1][0] <<
-			in.front().second[1][1] <<
-			in.front().second[1][2] <<
-			in.front().second[1][3] << std::endl;*/
+		in.front().second[0][1] <<
+		in.front().second[0][2] <<
+		in.front().second[0][3] <<
+		in.front().second[1][0] <<
+		in.front().second[1][1] <<
+		in.front().second[1][2] <<
+		in.front().second[1][3] << std::endl;*/
 		boost::asio::async_write(socket_,
-			boost::asio::buffer(in, 2048),
+			boost::asio::buffer(in, 2048*2),
 			boost::bind(&tcp_client::handle_write, this,
 			boost::asio::placeholders::error));
 	}
 
-
-	std::vector <std::pair<string, mat4>>* read()
+	std::string read()
 	{
-		return &ret_;
+		//if (last_str.compare(ret_str) != 0)
+		//{
+			return ret_str;
+		//}
+		//else return "";
 	}
 
 	int pID()
@@ -75,9 +75,12 @@ private:
 	boost::asio::io_service& io_service_;
 	tcp::socket socket_;
 	tcp::endpoint endpoint_;
-	std::vector <std::pair<string, mat4>> ret_; // possible concurrence problems
+	char ret_ [2048*2]; // possible concurrence problems
 	std::vector <std::pair<string, mat4>> pIDVec_;
 	bool pID_ready = 0;
+	boost::asio::streambuf b;
+	std::string ret_str;
+	std::string last_str;
 
 	void handle_connect(const boost::system::error_code& error)
 	{
@@ -85,9 +88,10 @@ private:
 		{
 			std::cout << "Client connected to server" << std::endl;
 			boost::asio::async_read(socket_,
-				boost::asio::buffer(pIDVec_, 2048),
+				boost::asio::buffer(pIDVec_, 2048*2),
 				boost::bind(&tcp_client::handle_PID, this,
 				boost::asio::placeholders::error));
+			std::cout << "client connect done\n";
 		}
 		else
 		{
@@ -102,10 +106,11 @@ private:
 		{
 			pID_ready = 1;
 			//std::cout << "Reading" << std::endl;
-			boost::asio::async_read(socket_,
-				boost::asio::buffer(ret_, 2048),
+			boost::asio::async_read_until(socket_,
+				b, "`",
 				boost::bind(&tcp_client::handle_read, this,
-				boost::asio::placeholders::error));//
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
 		}
 		else
 		{
@@ -114,33 +119,42 @@ private:
 		}
 	}
 
-	void handle_read(const boost::system::error_code& error)
+	void handle_read(const boost::system::error_code& error,
+					 size_t bytes)
 	{
 		if (!error)
 		{
 			/*std::cout << "read called" << std::endl;
 			std::cout << "recvVec string:" << ret_.front().first << std::endl;
 			std::cout << "recvVec dat:" << ret_.front().second[0][0] <<
-				ret_.front().second[0][1] <<
-				ret_.front().second[0][2] <<
-				ret_.front().second[0][3] <<
-				ret_.front().second[1][0] <<
-				ret_.front().second[1][1] <<
-				ret_.front().second[1][2] <<
-				ret_.front().second[1][3] <<
-				ret_.front().second[2][0] <<
-				ret_.front().second[2][1] <<
-				ret_.front().second[2][2] <<
-				ret_.front().second[2][3] <<
-				ret_.front().second[3][0] <<
-				ret_.front().second[3][1] <<
-				ret_.front().second[3][2] <<
-				ret_.front().second[3][3] << std::endl;
+			ret_.front().second[0][1] <<
+			ret_.front().second[0][2] <<
+			ret_.front().second[0][3] <<
+			ret_.front().second[1][0] <<
+			ret_.front().second[1][1] <<
+			ret_.front().second[1][2] <<
+			ret_.front().second[1][3] <<
+			ret_.front().second[2][0] <<
+			ret_.front().second[2][1] <<
+			ret_.front().second[2][2] <<
+			ret_.front().second[2][3] <<
+			ret_.front().second[3][0] <<
+			ret_.front().second[3][1] <<
+			ret_.front().second[3][2] <<
+			ret_.front().second[3][3] << std::endl;
 			std::cout << "Reading" << std::endl;*/
-			boost::asio::async_read(socket_,
-				boost::asio::buffer(ret_, 2048),
+
+			std::string str((std::istreambuf_iterator<char>(&b)),
+				std::istreambuf_iterator<char>());
+			last_str = ret_str;
+			ret_str = str;
+			//std::cout << ret_str << std::endl;
+			b.consume(bytes);
+			boost::asio::async_read_until(socket_,
+				b, "`",
 				boost::bind(&tcp_client::handle_read, this,
-				boost::asio::placeholders::error));
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
 		}
 		else
 		{
@@ -151,10 +165,10 @@ private:
 
 	/*void write(std::vector <pair<string, mat4>>& in)
 	{
-		boost::asio::async_write(socket_,
-			boost::asio::buffer(in, 2048),
-			boost::bind(&tcp_client::handle_write, this,
-			boost::asio::placeholders::error));
+	boost::asio::async_write(socket_,
+	boost::asio::buffer(in, 2048),
+	boost::bind(&tcp_client::handle_write, this,
+	boost::asio::placeholders::error));
 	}*/
 
 	void handle_write(const boost::system::error_code& error)

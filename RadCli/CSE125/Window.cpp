@@ -1,3 +1,4 @@
+#pragma once
 #define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,8 @@
 #include "UI.h"
 #include "ClientState.h"
 #include "AnimController.h"
+
+#include "gameState.h"
 
 #include <assert.h>
 #include "ParticleSystem.h"
@@ -197,6 +200,7 @@ int projectile_counter = 0;
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
+bool recvValid = false;
 
 boost::asio::io_service io_service;
 tcp_client* cli;
@@ -209,6 +213,9 @@ int test = 0;
 float test2 = 0;
 
 bool connected;
+std::string out;
+gameState gs;
+int i = 0;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -525,8 +532,19 @@ void server_update(int value){
 	cam_dx = 0;
 
 	// RECEIVE STUFF
-	recvVec = cli->read();
+	//recvVec = cli->read();
+	out = cli->read();
 	io_service.poll();
+
+	//std::cout << out << std::endl;
+
+	if (out[0] == '{')
+	{
+		unsigned pos = out.find("`");
+		out = out.substr(0, pos);
+		recvVec = gs.parsePosString(out);
+		recvValid = true;
+	}
 	
 	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
@@ -534,69 +552,79 @@ void server_update(int value){
 	//std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
 
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
-
-	if ( (*recvVec)[0].first.c_str()[1] == 's' )
+	if (recvValid)
 	{
-		//std::cout << "Projectile fire" << std::endl;
-		projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
-		if (playerID == 1)
+		std::cout << out << '\n' << std::endl;
+		if ((*recvVec)[0].first.c_str()[1] == 's')
 		{
-			myUI->setShots(1);
+			//std::cout << "Projectile fire" << std::endl;
+			projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
+			if (playerID == 1)
+			{
+				myUI->setShots(1);
+			}
+			cout << "FIRE 0!" << endl;
 		}
-		cout << "FIRE 0!" << endl;
-	}
 
-	//stateID = ((*recvVec)[1].first.c_str()[0]);
+		//stateID = ((*recvVec)[1].first.c_str()[0]);
 
-	if ((*recvVec)[1].first.c_str()[1] == 's')
-	{
-		//std::cout << "Projectile fire" << std::endl;
-		projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
-		if (playerID == 2)
+		if ((*recvVec)[1].first.c_str()[1] == 's')
 		{
-			myUI->setShots(1);
+			//std::cout << "Projectile fire" << std::endl;
+			projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
+			if (playerID == 2)
+			{
+				myUI->setShots(1);
+			}
+			cout << "FIRE 1!" << endl;
 		}
-		cout << "FIRE 1!" << endl;
-	}
 
-//	stateID = ((*recvVec)[2].first.c_str()[0]);
+		//	stateID = ((*recvVec)[2].first.c_str()[0]);
 
-	if ((*recvVec)[2].first.c_str()[1] == 's')
-	{
-		//std::cout << "Projectile fire" << std::endl;
-		projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
-		if (playerID == 3)
+		if ((*recvVec)[2].first.c_str()[1] == 's')
 		{
-			myUI->setShots(1);
+			//std::cout << "Projectile fire" << std::endl;
+			projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
+			if (playerID == 3)
+			{
+				myUI->setShots(1);
+			}
+			cout << "FIRE 2!" << endl;
 		}
-		cout << "FIRE 2!" << endl;
-	}
 
-	//stateID = ((*recvVec)[3].first.c_str()[0]);
+		//stateID = ((*recvVec)[3].first.c_str()[0]);
 
-	if ((*recvVec)[3].first.c_str()[1] == 's')
-	{
-		//std::cout << "Projectile fire" << std::endl;
-		projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
-		if (playerID == 0)
+		if ((*recvVec)[3].first.c_str()[1] == 's')
 		{
-			myUI->setShots(1);
+			//std::cout << "Projectile fire" << std::endl;
+			projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
+			if (playerID == 0)
+			{
+				myUI->setShots(1);
+			}
+			cout << "FIRE 3!" << endl;
 		}
-		cout << "FIRE 3!" << endl;
+		if (i == 800)
+		{
+			int zero = atoi(&((*recvVec)[0].first.c_str())[0]);
+			int one = atoi(&((*recvVec)[1].first.c_str())[0]);
+			mat4 mzero = (*recvVec)[0].second;
+			mat4 mone = (*recvVec)[1].second;
+		}
+
+		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
+		mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
+		mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
+		mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
+
+		player_list[0]->setModelM(mats[0]);
+		player_list[1]->setModelM(mats[1]);
+		player_list[2]->setModelM(mats[2]);
+		player_list[3]->setModelM(mats[3]);
+		i++;
+
+		simulateProjectile(diff);
 	}
-
-
-	mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
-	mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
-	mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
-	mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
-
-	player_list[0]->setModelM(mats[0]);
-	player_list[1]->setModelM(mats[1]);
-	player_list[2]->setModelM(mats[2]);
-	player_list[3]->setModelM(mats[3]);
-
-	simulateProjectile(diff);
 
 	//Particles are instantly despawning
 	//despawnProjectile();

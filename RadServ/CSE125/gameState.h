@@ -78,7 +78,7 @@ gameState::~gameState()
 {
 }
 
-void gameState::setShoot(int in, bool b){
+/*void gameState::setShoot(int in, bool b){
 	objects->at(in)->setShoot(b);
 	int exists = -1;
 	for (int i = 0; i < commands->size(); ++i){
@@ -120,7 +120,7 @@ void gameState::setCam(int in, mat4 m){
 
 mat4 gameState::getCam(int i){
 	return objects->at(i)->getCam();
-}
+}*/
 
 void gameState::setHealth(int in, int j){
 	objects->at(in)->setHealth(j);
@@ -462,178 +462,178 @@ void gameState::touchGround(int in, bool x){
 	}
 }
 
-void gameState::setJumpVelocity(int in, float x){
-	objects->at(in)->setJumpVelocity(x);
-	int exists = -1;
-	for (int i = 0; i < commands->size(); ++i){
-		if (commands->at(i).first == in){
-			exists = i;
-			break;
-		}
-	}
-	if (exists == -1)
-		commands->push_back(std::make_pair(in, "j"));
-	else {
-		if (commands->at(exists).second.find("j") == std::string::npos)
-			commands->at(exists).second.append("j");
-	}
-}
+//void gameState::setJumpVelocity(int in, float x){
+//	objects->at(in)->setJumpVelocity(x);
+//	int exists = -1;
+//	for (int i = 0; i < commands->size(); ++i){
+//		if (commands->at(i).first == in){
+//			exists = i;
+//			break;
+//		}
+//	}
+//	if (exists == -1)
+//		commands->push_back(std::make_pair(in, "j"));
+//	else {
+//		if (commands->at(exists).second.find("j") == std::string::npos)
+//			commands->at(exists).second.append("j");
+//	}
+//}
 
-std::string gameState::getJSONStringFull(){
-	rapidjson::Document fromScratch;
-	fromScratch.SetObject();
-	rapidjson::Document::AllocatorType& allocator = fromScratch.GetAllocator();
-	std::string temp, temp2, temp3, temp4, temp5, temp6;
-	for (int i = 0; i < commands->size(); ++i){
-		rapidjson::Value object(rapidjson::kObjectType);
-		std::string mod = commands->at(i).second;
-		for (int j = 0; j < mod.size(); ++j){
-			rapidjson::Value array(rapidjson::kArrayType);
-			switch (mod[j]){
-			case 'p':
-				//std::cout << "p";
-				for (int k = 0; k < 4; ++k)
-				for (int l = 0; l < 4; ++l)
-					array.PushBack(objects->at(commands->at(i).first)->getModelM()[k][l], allocator);
-				object.AddMember("p", array, allocator);
-				break;
-			case 'v':
-				//	std::cout << "v";
-				array.PushBack(objects->at(commands->at(i).first)->getVelocity()[0], allocator).PushBack(objects->at(commands->at(i).first)->getVelocity()[1], allocator).PushBack(objects->at(commands->at(i).first)->getVelocity()[2], allocator);
-				object.AddMember("v", array, allocator);
-				break;
-			case 'b':
-				//std::cout << "b";
-				for (int k = 0; k < 3; ++k)
-					array.PushBack(objects->at(commands->at(i).first)->getAABB().min[k], allocator);
-				for (int k = 0; k < 3; ++k)
-					array.PushBack(objects->at(commands->at(i).first)->getAABB().max[k], allocator);
-				object.AddMember("b", array, allocator);
-				break;
-			case 's':
-				object.AddMember("s", objects->at(commands->at(i).first)->getSpeed(), allocator);
-				break;
-			case 'r':
-				//std::cout << "putting in for r : " << objects->at(commands->at(i).first)->getPendingRote() << std::endl;
-				object.AddMember("r", objects->at(commands->at(i).first)->getPendingRot(), allocator);
-				break;
-			case 'j':
-				object.AddMember("j", objects->at(commands->at(i).first)->getJumpVelocity(), allocator);
-				break;
-			case 'g':
-				object.AddMember("g", objects->at(commands->at(i).first)->getTouchGround(), allocator);
-				break;
-			case 'h':
-				object.AddMember("h", objects->at(commands->at(i).first)->getHMove(), allocator);
-				break;
-			case 'm':
-				object.AddMember("m", objects->at(commands->at(i).first)->getVMove(), allocator);
-				break;
-			case 'e':
-				object.AddMember("e", objects->at(commands->at(i).first)->getHealth(), allocator);
-				break;
-			case 't':
-				object.AddMember("t", objects->at(commands->at(i).first)->getShoot(), allocator);
-			case 'c':
-				for (int k = 0; k < 4; ++k)
-				for (int l = 0; l < 4; ++l)
-					array.PushBack(objects->at(commands->at(i).first)->getCam()[k][l], allocator);
-				object.AddMember("c", array, allocator);
-				break;
-			}
-		}
-		temp2 = "";
-		temp2 += std::to_string(commands->at(i).first);
-		fromScratch.AddMember(temp2.c_str(), object, allocator);
-	}
-	rapidjson::StringBuffer strbuf;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
-	fromScratch.Accept(writer);
-	return strbuf.GetString();
-}
-void gameState::parseJSONString(std::string str){
-	rapidjson::Document parsedFromString;
-	parsedFromString.SetObject();
-	parsedFromString.Parse<0>(str.c_str());
-
-	for (rapidjson::Value::ConstMemberIterator it = parsedFromString.MemberBegin(); it != parsedFromString.MemberEnd(); it++)
-	for (rapidjson::Value::ConstMemberIterator it2 = it->value.MemberBegin(); it2 != it->value.MemberEnd(); it2++){
-		if (it2->name.GetString() == "p"){
-			mat4 m;
-			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
-			for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j){
-				m[i][j] = (float)it3->value.GetDouble();
-				it3++;
-			}
-			objects->at(std::atoi(it->name.GetString()))->setModelM(m);
-		}
-		else if (it2->name.GetString() == "v"){
-			vec3 v;
-			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
-			for (int i = 0; i < 3; ++i){
-				v[i] = (float)it3->value.GetDouble();
-				it3++;
-			}
-			objects->at(std::atoi(it->name.GetString()))->setVelocity(v);
-		}
-		else if (it2->name.GetString() == "b"){
-			AABB box;
-			vec3 v1, v2;
-			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();){
-				for (int i = 0; i < 3; ++i){
-					v1[i] = (float)it3->value.GetDouble();
-					it3++;
-				}
-				for (int i = 0; i < 3; ++i){
-					v2[i] = (float)it3->value.GetDouble();
-					it3++;
-				}
-			}
-			box.min = v1;
-			box.max = v2;
-			objects->at(std::atoi(it->name.GetString()))->setAABB(box);
-		}
-		else if (it2->name.GetString() == "s"){
-			objects->at(std::atoi(it->name.GetString()))->setSpeed((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "r"){
-			objects->at(std::atoi(it->name.GetString()))->setPendingRot((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "j"){
-			objects->at(std::atoi(it->name.GetString()))->setJumpVelocity((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "g"){
-			objects->at(std::atoi(it->name.GetString()))->setJumpVelocity((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "h"){
-			objects->at(std::atoi(it->name.GetString()))->setHMove((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "m"){
-			objects->at(std::atoi(it->name.GetString()))->setVMove((float)it2->value.GetDouble());
-		}
-		else if (it2->name.GetString() == "e"){
-			objects->at(std::atoi(it->name.GetString()))->setHealth((float)it2->value.GetInt());
-		}
-		else if (it2->name.GetString() == "t"){
-			objects->at(std::atoi(it->name.GetString()))->setShoot((it2->value.GetBool()));
-		}
-		else if (it2->name.GetString() == "c"){
-			mat4 m;
-			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
-			for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j){
-				m[i][j] = (float)it3->value.GetDouble();
-				it3++;
-			}
-			objects->at(std::atoi(it->name.GetString()))->setCam(m);
-		}
-	}
-
-
-	std::vector<Object* > poop;
-
-}
+//std::string gameState::getJSONStringFull(){
+//	rapidjson::Document fromScratch;
+//	fromScratch.SetObject();
+//	rapidjson::Document::AllocatorType& allocator = fromScratch.GetAllocator();
+//	std::string temp, temp2, temp3, temp4, temp5, temp6;
+//	for (int i = 0; i < commands->size(); ++i){
+//		rapidjson::Value object(rapidjson::kObjectType);
+//		std::string mod = commands->at(i).second;
+//		for (int j = 0; j < mod.size(); ++j){
+//			rapidjson::Value array(rapidjson::kArrayType);
+//			switch (mod[j]){
+//			case 'p':
+//				//std::cout << "p";
+//				for (int k = 0; k < 4; ++k)
+//				for (int l = 0; l < 4; ++l)
+//					array.PushBack(objects->at(commands->at(i).first)->getModelM()[k][l], allocator);
+//				object.AddMember("p", array, allocator);
+//				break;
+//			case 'v':
+//				//	std::cout << "v";
+//				array.PushBack(objects->at(commands->at(i).first)->getVelocity()[0], allocator).PushBack(objects->at(commands->at(i).first)->getVelocity()[1], allocator).PushBack(objects->at(commands->at(i).first)->getVelocity()[2], allocator);
+//				object.AddMember("v", array, allocator);
+//				break;
+//			case 'b':
+//				//std::cout << "b";
+//				for (int k = 0; k < 3; ++k)
+//					array.PushBack(objects->at(commands->at(i).first)->getAABB().min[k], allocator);
+//				for (int k = 0; k < 3; ++k)
+//					array.PushBack(objects->at(commands->at(i).first)->getAABB().max[k], allocator);
+//				object.AddMember("b", array, allocator);
+//				break;
+//			case 's':
+//				object.AddMember("s", objects->at(commands->at(i).first)->getSpeed(), allocator);
+//				break;
+//			case 'r':
+//				//std::cout << "putting in for r : " << objects->at(commands->at(i).first)->getPendingRote() << std::endl;
+//				object.AddMember("r", objects->at(commands->at(i).first)->getPendingRot(), allocator);
+//				break;
+//			case 'j':
+//				object.AddMember("j", objects->at(commands->at(i).first)->getJumpVelocity(), allocator);
+//				break;
+//			case 'g':
+//				object.AddMember("g", objects->at(commands->at(i).first)->getTouchGround(), allocator);
+//				break;
+//			case 'h':
+//				object.AddMember("h", objects->at(commands->at(i).first)->getHMove(), allocator);
+//				break;
+//			case 'm':
+//				object.AddMember("m", objects->at(commands->at(i).first)->getVMove(), allocator);
+//				break;
+//			case 'e':
+//				object.AddMember("e", objects->at(commands->at(i).first)->getHealth(), allocator);
+//				break;
+//			case 't':
+//				object.AddMember("t", objects->at(commands->at(i).first)->getShoot(), allocator);
+//			case 'c':
+//				for (int k = 0; k < 4; ++k)
+//				for (int l = 0; l < 4; ++l)
+//					array.PushBack(objects->at(commands->at(i).first)->getCam()[k][l], allocator);
+//				object.AddMember("c", array, allocator);
+//				break;
+//			}
+//		}
+//		temp2 = "";
+//		temp2 += std::to_string(commands->at(i).first);
+//		fromScratch.AddMember(temp2.c_str(), object, allocator);
+//	}
+//	rapidjson::StringBuffer strbuf;
+//	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+//	fromScratch.Accept(writer);
+//	return strbuf.GetString();
+//}
+//void gameState::parseJSONString(std::string str){
+//	rapidjson::Document parsedFromString;
+//	parsedFromString.SetObject();
+//	parsedFromString.Parse<0>(str.c_str());
+//
+//	for (rapidjson::Value::ConstMemberIterator it = parsedFromString.MemberBegin(); it != parsedFromString.MemberEnd(); it++)
+//	for (rapidjson::Value::ConstMemberIterator it2 = it->value.MemberBegin(); it2 != it->value.MemberEnd(); it2++){
+//		if (it2->name.GetString() == "p"){
+//			mat4 m;
+//			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
+//			for (int i = 0; i < 4; ++i)
+//			for (int j = 0; j < 4; ++j){
+//				m[i][j] = (float)it3->value.GetDouble();
+//				it3++;
+//			}
+//			objects->at(std::atoi(it->name.GetString()))->setModelM(m);
+//		}
+//		else if (it2->name.GetString() == "v"){
+//			vec3 v;
+//			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
+//			for (int i = 0; i < 3; ++i){
+//				v[i] = (float)it3->value.GetDouble();
+//				it3++;
+//			}
+//			objects->at(std::atoi(it->name.GetString()))->setVelocity(v);
+//		}
+//		else if (it2->name.GetString() == "b"){
+//			AABB box;
+//			vec3 v1, v2;
+//			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();){
+//				for (int i = 0; i < 3; ++i){
+//					v1[i] = (float)it3->value.GetDouble();
+//					it3++;
+//				}
+//				for (int i = 0; i < 3; ++i){
+//					v2[i] = (float)it3->value.GetDouble();
+//					it3++;
+//				}
+//			}
+//			box.min = v1;
+//			box.max = v2;
+//			objects->at(std::atoi(it->name.GetString()))->setAABB(box);
+//		}
+//		else if (it2->name.GetString() == "s"){
+//			objects->at(std::atoi(it->name.GetString()))->setSpeed((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "r"){
+//			objects->at(std::atoi(it->name.GetString()))->setPendingRot((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "j"){
+//			objects->at(std::atoi(it->name.GetString()))->setJumpVelocity((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "g"){
+//			objects->at(std::atoi(it->name.GetString()))->setJumpVelocity((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "h"){
+//			objects->at(std::atoi(it->name.GetString()))->setHMove((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "m"){
+//			objects->at(std::atoi(it->name.GetString()))->setVMove((float)it2->value.GetDouble());
+//		}
+//		else if (it2->name.GetString() == "e"){
+//			objects->at(std::atoi(it->name.GetString()))->setHealth((float)it2->value.GetInt());
+//		}
+//		else if (it2->name.GetString() == "t"){
+//			objects->at(std::atoi(it->name.GetString()))->setShoot((it2->value.GetBool()));
+//		}
+//		else if (it2->name.GetString() == "c"){
+//			mat4 m;
+//			for (rapidjson::Value::ConstMemberIterator it3 = it2->value.MemberBegin(); it3 != it2->value.MemberEnd();)
+//			for (int i = 0; i < 4; ++i)
+//			for (int j = 0; j < 4; ++j){
+//				m[i][j] = (float)it3->value.GetDouble();
+//				it3++;
+//			}
+//			objects->at(std::atoi(it->name.GetString()))->setCam(m);
+//		}
+//	}
+//
+//
+//	std::vector<Object* > poop;
+//
+//}
 
 std::string gameState::getPosString(std::vector<std::pair<string, mat4>>* v){
 	rapidjson::Document fromScratch;
@@ -723,22 +723,22 @@ std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str
 
 
 
-void gameState::addObject(Object* obj){
-
-	if (openIndices.size() == 0){
-		objects->push_back(obj);
-		obj->setGameStateIndex(objects->size() - 1);
-
-		commands->push_back(std::make_pair(objects->size() - 1, "pvbsrjghme"));
-	}
-	else {
-		objects->at(openIndices.back()) = obj;
-		obj->setGameStateIndex(openIndices.back());
-		openIndices.pop_back();
-		commands->push_back(std::make_pair(openIndices.back(), "pvbsrjghme"));
-	}
-
-}
+//void gameState::addObject(Object* obj){
+//
+//	if (openIndices.size() == 0){
+//		objects->push_back(obj);
+//		obj->setGameStateIndex(objects->size() - 1);
+//
+//		commands->push_back(std::make_pair(objects->size() - 1, "pvbsrjghme"));
+//	}
+//	else {
+//		objects->at(openIndices.back()) = obj;
+//		obj->setGameStateIndex(openIndices.back());
+//		openIndices.pop_back();
+//		commands->push_back(std::make_pair(openIndices.back(), "pvbsrjghme"));
+//	}
+//
+//}
 
 void gameState::removeObject(int i){
 	//cout << "remove object\n";
@@ -795,8 +795,4 @@ std::string gameState::intToString(int i){
 }
 std::string gameState::boolToString(bool b){
 	return std::to_string(b);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 6b3b118a0ba31401f4c165f7a5954ccdc33834f9

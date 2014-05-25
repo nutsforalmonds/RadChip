@@ -78,7 +78,7 @@ gameState::~gameState()
 {
 }
 
-void gameState::setShoot(int in, bool b){
+/*void gameState::setShoot(int in, bool b){
 	objects->at(in)->setShoot(b);
 	int exists = -1;
 	for (int i = 0; i < commands->size(); ++i){
@@ -120,7 +120,7 @@ void gameState::setCam(int in, mat4 m){
 
 mat4 gameState::getCam(int i){
 	return objects->at(i)->getCam();
-}
+}*/
 
 void gameState::setHealth(int in, int j){
 	objects->at(in)->setHealth(j);
@@ -462,7 +462,7 @@ void gameState::touchGround(int in, bool x){
 	}
 }
 
-void gameState::setJumpVelocity(int in, float x){
+/*void gameState::setJumpVelocity(int in, float x){
 	objects->at(in)->setJumpVelocity(x);
 	int exists = -1;
 	for (int i = 0; i < commands->size(); ++i){
@@ -477,9 +477,9 @@ void gameState::setJumpVelocity(int in, float x){
 		if (commands->at(exists).second.find("j") == std::string::npos)
 			commands->at(exists).second.append("j");
 	}
-}
+}*/
 
-std::string gameState::getJSONStringFull(){
+/*std::string gameState::getJSONStringFull(){
 	rapidjson::Document fromScratch;
 	fromScratch.SetObject();
 	rapidjson::Document::AllocatorType& allocator = fromScratch.GetAllocator();
@@ -658,63 +658,63 @@ std::string gameState::getPosString(std::vector<std::pair<string, mat4>>* v){
 	return strbuf.GetString();
 
 }
-
+*/
 std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str){
 	rapidjson::Document parsedFromString;
 	parsedFromString.SetObject();
 	parsedFromString.Parse<0>(str.c_str());
 	std::vector<std::pair<string, mat4> >* pos = new std::vector<std::pair<string, mat4> >;
-	if (!parsedFromString["player1"].IsNull()){
+	if (!parsedFromString["0"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["player1"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["0"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("player1", bbb));
+		pos->push_back(std::make_pair("0", bbb));
 	}
-	if (!parsedFromString["player2"].IsNull()){
+	if (!parsedFromString["1"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["player2"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["1"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("player2", bbb));
+		pos->push_back(std::make_pair("1", bbb));
 	}
-	if (!parsedFromString["player3"].IsNull()){
+	if (!parsedFromString["2"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["player3"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["2"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("player3", bbb));
+		pos->push_back(std::make_pair("2", bbb));
 	}
-	if (!parsedFromString["player4"].IsNull()){
+	if (!parsedFromString["3"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["player4"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["3"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("player4", bbb));
+		pos->push_back(std::make_pair("3", bbb));
 	}
 
 
@@ -723,7 +723,7 @@ std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str
 
 
 
-void gameState::addObject(Object* obj){
+/*void gameState::addObject(Object* obj){
 
 	if (openIndices.size() == 0){
 		objects->push_back(obj);
@@ -738,7 +738,7 @@ void gameState::addObject(Object* obj){
 		commands->push_back(std::make_pair(openIndices.back(), "pvbsrjghme"));
 	}
 
-}
+}*/
 
 void gameState::removeObject(int i){
 	//cout << "remove object\n";
@@ -795,8 +795,4 @@ std::string gameState::intToString(int i){
 }
 std::string gameState::boolToString(bool b){
 	return std::to_string(b);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 6b3b118a0ba31401f4c165f7a5954ccdc33834f9

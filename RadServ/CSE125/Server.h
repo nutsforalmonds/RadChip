@@ -22,7 +22,7 @@ public:
 
 	/*static pointer create(boost::asio::io_service& io_service)
 	{
-		return pointer(new tcp_connection(io_service));
+	return pointer(new tcp_connection(io_service));
 	}*/
 
 	tcp_connection(boost::asio::io_service& io_service,
@@ -49,18 +49,27 @@ public:
 	{
 		ret_.front() = std::make_pair(std::to_string(pID), mat4(0.0f));
 		boost::asio::async_write(socket_,
-			boost::asio::buffer(ret_, 2048),
+			boost::asio::buffer(ret_, 2048*2),
 			boost::bind(&tcp_connection::handle_read, this,
 			boost::asio::placeholders::error));
 	}
 
-	void deliver(std::vector <pair<string, mat4>>& obj)
+	void deliver(boost::shared_ptr<string> obj)
 	{
 		//std::cout << "Server send data to connection" << std::endl;
+		//char carray[2048 * 2] = "";
+		//for (int i = 0; i < obj.size(); ++i)
+		//	carray[i] = obj[i];
+		//carray[obj.size()] = '\0';
+		
+		std::ostream stream(&outStrm);
+		stream << obj;
+		
 		boost::asio::async_write(socket_,
-			boost::asio::buffer(obj, 2048),
+			boost::asio::buffer(*obj, 2048),
 			boost::bind(&tcp_connection::handle_write, this,
-			boost::asio::placeholders::error));
+			boost::asio::placeholders::error,
+			obj));
 	}
 
 	void handle_read(const boost::system::error_code& error)
@@ -69,9 +78,9 @@ public:
 		{
 			ripe = true;
 			boost::asio::async_read(socket_,
-				boost::asio::buffer(ret_, 2048),
+				boost::asio::buffer(ret_, 2048*2),
 				boost::bind(&tcp_connection::handle_read, shared_from_this(),
-					boost::asio::placeholders::error));
+				boost::asio::placeholders::error));
 		}
 		// Else remove player from server
 		else
@@ -80,7 +89,7 @@ public:
 		}
 	}
 
-	void handle_write(const boost::system::error_code& error)
+	void handle_write(const boost::system::error_code& error, boost::shared_ptr<std::string> s)
 	{
 		if (!error)
 		{
@@ -114,6 +123,7 @@ private:
 	tcp::socket socket_;
 	std::vector <pair<string, mat4>> ret_;
 	bool ripe;//determines if the received message is read or not
+	boost::asio::streambuf outStrm;
 
 };
 
@@ -130,10 +140,6 @@ public:
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
@@ -203,8 +209,10 @@ public:
 		//clients_.erase(player);
 	}
 
-	void send(std::vector <pair<string, mat4>>& obj)
+	void send(std::string const& obj)
 	{
+		boost::shared_ptr<std::string> strP = boost::make_shared<std::string>(obj);
+
 		if (clients_.empty())
 		{
 			//std::cout << "no clients to send to" << std::endl;
@@ -213,7 +221,8 @@ public:
 		{
 			for each(tcp_connection_ptr client in clients_)
 			{
-				client->deliver(obj);
+				std::cout << *strP << endl << endl;
+				client->deliver(strP);
 			}
 		}
 	}
