@@ -137,6 +137,8 @@ SkyBox* skybox;
 Sphere* sphere;
 TextureScreen* texScreen;
 Mesh* mother_of_wrench;
+Mesh* mother_of_banana;
+Mesh* mother_of_nut;
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
@@ -234,37 +236,42 @@ void projectileAttack(int playerID, Camera * cam)
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
 
-	Projectile* wrenchT = new Projectile(player_list.size());
-	//wrenchT->LoadMesh("Model/newWrench_animated.dae",false);
-	wrenchT->setVAO(mother_of_wrench->getVAO());
-	wrenchT->setEntries(mother_of_wrench->getEntries());
-	wrenchT->setTextures(mother_of_wrench->getTextures());
-	wrenchT->setShader(sdrCtl.getShader("basic_model"));
-	wrenchT->setShadowTex(shadow_map_id);
-	wrenchT->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-	wrenchT->setShininess(30);
-	wrenchT->setFog(fog);
+	Projectile* pjt = new Projectile(player_list.size());
+	if (playerID % 2){//monkey throws
+		pjt->setVAO(mother_of_banana->getVAO());
+		pjt->setEntries(mother_of_banana->getEntries());
+		pjt->setTextures(mother_of_banana->getTextures());
+		pjt->setAdjustM(mother_of_banana->getAdjustM());
+	}
+	else{//chipmonk throws
+		pjt->setVAO(mother_of_nut->getVAO());
+		pjt->setEntries(mother_of_nut->getEntries());
+		pjt->setTextures(mother_of_nut->getTextures());
+		pjt->setAdjustM(mother_of_nut->getAdjustM());
+	}
+	pjt->setShader(sdrCtl.getShader("basic_model"));
+	pjt->setShininess(30);
+	pjt->setFog(fog);
 
-	wrenchT->setSpeed(5);
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	wrenchT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-	wrenchT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-	AABB hold = wrenchT->getAABB();
-	wrenchT->setStartX(hold.max[0]);
-	wrenchT->setStartY(hold.max[2]);
-	wrenchT->setDistance(50);
-	wrenchT->setShadowTex(shadow_map_id);
+	pjt->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	pjt->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+	AABB hold = pjt->getAABB();
+	pjt->setStartX(hold.max[0]);
+	pjt->setStartY(hold.max[2]);
+	pjt->setDistance(50);
+	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
-	wrenchT->setType("Cube");
-	wrenchT->setName("Test Cube" + std::to_string(projectile_counter));
+	pjt->setType("Cube");
+	pjt->setName("Test Cube" + std::to_string(projectile_counter));
 	projectile_counter++;
 	//Add Cube to the draw list
 	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
-	projectile_list.push_back(wrenchT);
-	wrenchT->setSpeed(50);
+	projectile_list.push_back(pjt);
+	pjt->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	wrenchT->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }
@@ -1482,6 +1489,22 @@ void initialize(int argc, char *argv[])
 	mother_of_wrench->setShininess(30);
 	mother_of_wrench->setFog(fog);
 
+	mother_of_banana = new Mesh();
+	mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
+	mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
+	mother_of_banana->setShadowTex(shadow_map_id);
+	mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+	mother_of_banana->setShininess(30);
+	mother_of_banana->setFog(fog);
+
+	mother_of_nut = new Mesh();
+	mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
+	mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
+	mother_of_nut->setShadowTex(shadow_map_id);
+	mother_of_nut->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
+	mother_of_nut->setShininess(30);
+	mother_of_nut->setFog(fog);
+
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
 	monkeyAnimController.add(0 / 24.0, 16 / 24.0);//walk
@@ -1498,12 +1521,12 @@ void initialize(int argc, char *argv[])
 		if (i % 2){
 			Mesh* player0 = new Mesh();
 			player0->LoadMesh("Model/monky2014_delete2.dae");
-			//player0->LoadMesh("Model/newWrench_animated.dae",false);
+			//player0->LoadMesh("Model/banana_animated.dae",false);
 			player0->setAnimController(monkeyAnimController);
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-			//player0->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+			//player0->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
 			player0->setShininess(30);
 			player0->setFog(fog);
 			player_list.push_back(player0);
