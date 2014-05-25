@@ -184,6 +184,7 @@ UI * myUI;
 MainMenu * myMainMenu;
 GameMenu * myGameMenu;
 DeathScreen * myDeathScreen;
+Logo * logo;
 
 Texture * shadow;
 char buf[255];
@@ -410,6 +411,7 @@ void Window::displayCallback(void)
 		glEnable(GL_DEPTH_TEST);
 		*/
 		myMainMenu->draw();
+		logo->draw();
 		break;
 	case 1:
 	case 2:
@@ -1372,6 +1374,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
+	logo = new Logo();
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("ground_tess"));

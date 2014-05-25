@@ -773,3 +773,33 @@ public:
 private:
 	float highlightTrans = 0;
 };
+
+class Logo
+{
+public:
+	Logo()
+	{
+		logo = new UI_Panel(-1, 1, -1, 1);
+		logo->setColor(vec3(1.0, 0.0, 0.0));
+		logo->setShader(sdrCtl.getShader("basic_2D"));
+		logo->loadColorTex("img/UI_elements/logoB", "PNG");
+		logo->setTex(true);
+		logo->setModelM(glm::scale(vec3(0.1, 0.1, 1.0))*glm::translate(vec3(0.0f, -4.5, -1.0f)));
+	}
+	~Logo()
+	{
+		logo-> ~UI_Panel();
+	}
+	int draw()
+	{
+		glDisable(GL_DEPTH_TEST);
+
+		logo->draw();
+
+		glEnable(GL_DEPTH_TEST);
+
+		return 0;
+	}
+private:
+	UI_Panel * logo;
+};
