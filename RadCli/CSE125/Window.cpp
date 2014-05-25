@@ -213,6 +213,11 @@ double diff;
 int test = 0;
 float test2 = 0;
 
+const int m_lenght = 10;
+unsigned char s_test[m_lenght];
+int but_up = 1;
+int m_pos = 0;
+
 bool connected;
 std::string out;
 gameState gs;
@@ -419,6 +424,10 @@ void Window::displayCallback(void)
 		*/
 		myMainMenu->draw();
 		logo->draw();
+
+		glDisable(GL_DEPTH_TEST);
+		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, s_test, vec3(1.0f, 1.0f, 1.0f));
+		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
 	case 2:
@@ -826,6 +835,22 @@ void keyboard(unsigned char key, int, int){
 				//myClientState->setState(1);
 			}
 		}
+
+		if ((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46){
+			if (but_up && m_pos < m_lenght){
+				but_up = 0;
+				s_test[m_pos] = key;
+				m_pos++;
+			}
+		}
+
+		if (key == 8){
+			if (but_up && m_pos >= 1){
+				but_up = 0;
+				m_pos--;
+				s_test[m_pos] = 0;
+			}
+		}
 		break;
 	case 1:
 
@@ -944,6 +969,12 @@ void keyUp (unsigned char key, int x, int y) {
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
 	switch (myClientState->getState()){
 	case 0:
+		if ((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46){
+			but_up = 1;
+		}
+		if (key == 8){
+			but_up = 1;
+		}
 		break;
 	case 1:
 
