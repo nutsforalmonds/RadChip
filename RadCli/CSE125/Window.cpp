@@ -293,6 +293,9 @@ void Window::idleCallback(void)
 
 	switch (myClientState->getState()){
 	case 0:
+		if (!menuMusic->getFadeDone()){
+			menuMusic->fadeUpdate();
+		}
 		break;
 	case 1:
 	case 2:
@@ -1048,8 +1051,8 @@ void mouseFunc(int button, int state, int x, int y)
 					cam->postTrans(glm::translate(vec3(0, 1, 4)));
 
 					connected = true;
-					menuMusic->Stop();
 				}
+				menuMusic->Stop();
 			}
 			else if (click == 2){
 				running = false;
@@ -1133,6 +1136,8 @@ void mouseFunc(int button, int state, int x, int y)
 			}
 			if (click == 2){
 				myClientState->setState(0);
+				menuMusic->setFade(0.05, 0.001);
+				menuMusic->Play();
 			}
 		}
 		break;

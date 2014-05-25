@@ -145,6 +145,10 @@ public:
 		FMODErrorCheck(system->update());
 	}
 
+	void free(FMOD::Sound *t){
+		FMODErrorCheck(t->release());
+	}
+
 private:
 	
 	void FMODErrorCheck(FMOD_RESULT result)
@@ -178,9 +182,10 @@ public:
 		system = s;
 		me = system->createMusic(path);
 		myChan = s->getLastMusicChan();
+		fadeDone = true;
 	}
 	~Music(){
-
+		system->free(me);
 	}
 
 	void Play(){
@@ -207,12 +212,36 @@ public:
 		system->setVolume(myChan, volume);
 	}
 
+	void setFade(float v, float s){
+		fade = v;
+		fadeStep = s;
+		fadeDone = false;
+		setVolume(0);
+	}
+
+	void fadeUpdate(){
+		if ((!fadeDone) || volume < fade){
+			float temp = volume + fadeStep;
+			if (volume > fade){
+				temp = fade;
+			}
+			setVolume(temp);
+		}
+		else{
+			fadeDone = true;
+		}
+	}
+
+	bool getFadeDone(){ return fadeDone; }
+
 private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
 	SoundSystem *system;
 	float volume;
 	int loopCount;
+	float fade, fadeStep;
+	bool fadeDone;
 };
 
 class Sound
@@ -223,7 +252,7 @@ public:
 		me = system->createSound(path);
 	}
 	~Sound(){
-
+		system->free(me);
 	}
 
 	void Play(){
@@ -242,7 +271,6 @@ public:
 	}
 
 	float getVolume(){ return volume; }
-	
 
 private:
 	FMOD::Sound *me;
