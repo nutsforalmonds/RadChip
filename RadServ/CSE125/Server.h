@@ -221,7 +221,7 @@ public:
 		{
 			for each(tcp_connection_ptr client in clients_)
 			{
-				std::cout << *strP << endl << endl;
+				//std::cout << *strP << endl << endl;
 				client->deliver(strP);
 			}
 		}

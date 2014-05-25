@@ -577,7 +577,7 @@ void server_update(int value){
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
 	if (recvValid)
 	{
-		std::cout << out << '\n' << std::endl;
+		//std::cout << out << '\n' << std::endl;
 		if ((*recvVec)[0].first.c_str()[1] == 's')
 		{
 			//std::cout << "Projectile fire" << std::endl;
