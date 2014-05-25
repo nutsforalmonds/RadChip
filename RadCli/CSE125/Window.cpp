@@ -37,6 +37,7 @@
 #include "AnimController.h"
 
 #include "gameState.h"
+#include "CXBOXController.h"
 
 #include <assert.h>
 #include "ParticleSystem.h"
@@ -79,6 +80,8 @@ using namespace std;
 
 SoundSystem *mySoundSystem;
 Music *menuMusic;
+Music *gameMusic;
+Sound* testSound[10];
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
@@ -86,8 +89,6 @@ std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
-Sound* testSound[10];
-
 
 Mesh_Static* tryThis;
 
@@ -226,6 +227,21 @@ gameState gs;
 int i = 0;
 
 int inMenuBox = false;
+
+CXBOXController* Player1;
+bool LL = false;
+bool LR = false;
+bool LU = false;
+bool LD = false;
+
+bool RL = false;
+bool RR = false;
+bool RU = false;
+bool RD = false;
+
+bool JMP = false;
+bool ATT1 = false;
+bool ATT2 = false;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -377,6 +393,150 @@ void Window::idleCallback(void)
 		break;
 	default:
 		break;
+	}
+
+
+	//Gamepad Input Handeling
+	if (myClientState->getState() == 1){
+		short LX = Player1->GetState().Gamepad.sThumbLX;
+		short LY = Player1->GetState().Gamepad.sThumbLY;
+		short RX = Player1->GetState().Gamepad.sThumbRX;
+		short RY = Player1->GetState().Gamepad.sThumbRY;
+
+		if (LX > 15000){
+			//cout << "Left Stick X: RIGHT!" << endl;
+			if (!LR){
+				LR = true;
+				keyboard('d', 0, 0);
+			}
+		}
+		else if (LX < -15000){
+			//cout << "Left Stick X: LEFT!" << endl;
+			if (!LL){
+				LL = true;
+				keyboard('a', 0, 0);
+			}
+		}
+		else{
+			//cout << "Left Stick X: CENTER!" << endl;
+			if (LR){
+				LR = false;
+				keyUp('d', 0, 0);
+			}
+			if (LL){
+				LL = false;
+				keyUp('a', 0, 0);
+			}
+		}
+
+		if (LY > 15000){
+			//cout << "Left Stick Y: UP!" << endl;
+			if (!LU){
+				LU = true;
+				keyboard('w', 0, 0);
+			}
+		}
+		else if (LY < -15000){
+			//cout << "Left Stick Y: DOWN!" << endl;
+			if (!LD){
+				LD = true;
+				keyboard('s', 0, 0);
+			}
+		}
+		else{
+			//cout << "Left Stick Y: CENTER!" << endl;
+			if (LU){
+				LU = false;
+				keyUp('w', 0, 0);
+			}
+			if (LD){
+				LD = false;
+				keyUp('s', 0, 0);
+			}
+		}
+
+		int x = 0.5 * Window::width;
+		int y = 0.5 * Window::height;
+
+		if (RX > 15000){
+			//cout << "Right Stick X: RIGHT!" << endl;
+			x = 0.54 * Window::width;
+			//motionFunc(x, y);
+		}
+		else if (RX < -15000){
+			//cout << "Right Stick X: LEFT!" << endl;
+			x = 0.46 * Window::width;
+			//motionFunc(x, y);
+		}
+		else{
+			//cout << "Right Stick X: CENTER!" << endl;
+			x = 0.5 * Window::width;
+			//motionFunc(x, y);
+		}
+
+		if (RY > 15000){
+		//	cout << "Right Stick Y: UP!" << endl;
+			y = 0.46 * Window::height;
+			//motionFunc(x, y);
+		}
+		else if (RY < -15000){
+			//cout << "Right Stick Y: DOWN!" << endl;
+			y = 0.54 * Window::height;
+			//motionFunc(x, y);
+		}
+		else{
+			//cout << "Right Stick Y: CENTER!" << endl;
+			y = 0.5 * Window::height;
+			//motionFunc(x, y);
+		}
+		//Pass the sudo mouse cords to the mouse update function
+		motionFunc(x, y);
+
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A)
+		{
+			//Player1->Vibrate(65535, 0);
+			if (!JMP){
+				JMP = true;
+				keyboard(' ', 0, 0);
+			}
+		}
+		else{
+			if (JMP){
+				JMP = false;
+				keyUp(' ', 0, 0);
+			}
+		}
+
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_X)
+		{
+			//Player1->Vibrate(65535, 0);
+			if (!ATT1){
+				ATT1 = true;
+				//keyboard(' ', 0, 0);
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, x, y);
+			}
+		}
+		else{
+			if (ATT1){
+				ATT1 = false;
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
+			}
+		}
+
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B)
+		{
+			//Player1->Vibrate(65535, 0);
+			if (!ATT2){
+				ATT2 = true;
+				mouseFunc(GLUT_RIGHT_BUTTON, GLUT_DOWN, x, y);
+			}
+		}
+		else{
+			if (ATT2){
+				ATT2 = false;
+				mouseFunc(GLUT_RIGHT_BUTTON, GLUT_UP, x, y);
+			}
+		}
 	}
 
 	updateShaders();
@@ -889,8 +1049,11 @@ void keyboard(unsigned char key, int, int){
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
+
+		//This calls the player damaged effects
 		if (key == 'm'){
 			particle8->StartLoop();
+			Player1->Vibrate(65535, 65535);
 		}
 		if (key == 27){
 			//running = false;
@@ -1093,6 +1256,8 @@ void mouseFunc(int button, int state, int x, int y)
 					connected = true;
 				}
 				menuMusic->Stop();
+			//	gameMusic->setFade(0.75, 0.005);
+				gameMusic->Play();
 			}
 			else if (click == 2){
 				testSound[7]->Play();
@@ -1180,7 +1345,8 @@ void mouseFunc(int button, int state, int x, int y)
 			if (click == 2){
 				testSound[7]->Play();
 				myClientState->setState(0);
-				menuMusic->setFade(0.05, 0.001);
+				gameMusic->Stop();
+				menuMusic->setFade(0.75, 0.005);
 				menuMusic->Play();
 			}
 		}
@@ -1361,6 +1527,8 @@ void initialize(int argc, char *argv[])
 	QueryPerformanceCounter(&last);
 
 	draw_list.clear();
+
+	Player1 = new CXBOXController(1);
 
 	//Init the JSON parser for the map
 	map_info = new JSON_Parser("Maps/Test1.json");
@@ -1713,8 +1881,13 @@ int loadAudio(){
 	//mySoundSystem->createMusic();
 	menuMusic = new Music(mySoundSystem, "Music/backgroundMenu.wav");
 	menuMusic->setLoopCount(-1);
-	menuMusic->setVolume(0.05);
+	menuMusic->setVolume(0.75);
 	menuMusic->Play();
+
+	gameMusic = new Music(mySoundSystem, "Music/background_music.mp3");
+	gameMusic->setLoopCount(-1);
+	gameMusic->setVolume(0.75);
+	//gameMusic->Play();
 
 	int NumberOfAudio = map_info->GetAudioCount();
 	for (int i = 0; i < NumberOfAudio; i++){
@@ -1731,7 +1904,7 @@ int loadAudio(){
 		glutSwapBuffers();
 
 		testSound[i] = new Sound(mySoundSystem, path.c_str());
-		testSound[i]->setVolume(0.05);
+		testSound[i]->setVolume(0.5);
 		sound_list.push_back(testSound[0]);
 		printf("done!\n");
 

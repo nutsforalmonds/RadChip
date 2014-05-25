@@ -49,6 +49,9 @@
     <ClCompile Include="Mesh_Static.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="CXBOXController.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -154,6 +157,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem2.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CXBOXController.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

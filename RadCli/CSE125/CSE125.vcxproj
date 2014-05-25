@@ -91,6 +91,7 @@
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConfigSettings.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="CXBOXController.h" />
     <ClInclude Include="gameState.h" />
     <ClInclude Include="glslprogram.h" />
     <ClInclude Include="glutils.h" />
@@ -123,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="billboard_list.cpp" />
     <ClCompile Include="ConfigSettings.cpp" />
+    <ClCompile Include="CXBOXController.cpp" />
     <ClCompile Include="glslprogram.cpp" />
     <ClCompile Include="glutils.cpp" />
     <ClCompile Include="Helpers.cpp" />
