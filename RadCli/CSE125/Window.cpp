@@ -244,6 +244,11 @@ bool RD = false;
 bool JMP = false;
 bool ATT1 = false;
 bool ATT2 = false;
+bool ESC = false;
+bool SPT = false;
+
+bool STR = false;
+bool FLS = false;
 
 void projectileAttack(int playerID, Camera * cam)
 {
@@ -401,14 +406,56 @@ void Window::idleCallback(void)
 	default:
 		break;
 	}
+	//Gamepad Input Handeling Main Menu
+	if (myClientState->getState() == 0){
+		short LX = Player1->GetState().Gamepad.sThumbLX;
+		short LY = Player1->GetState().Gamepad.sThumbLY;
 
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+		{
+			if (!STR){
+				STR = true;
+				int fakeX = 0.5 * Window::width;
+				int fakeY = 0.4 * Window::height;
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+			}
+		}
+		else{
+			if (STR){
+				STR = false;
+			}
+		}
 
-	//Gamepad Input Handeling
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+		{
+			if (!FLS){
+				FLS = true;
+				int fakeX = 0.5 * Window::width;
+				int fakeY = 0.75 * Window::height;
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+			}
+		}
+		else{
+			if (FLS){
+				FLS = false;
+			}
+		}
+
+	}
+
+	//Gamepad Input Handeling Game
 	if (myClientState->getState() == 1){
 		short LX = Player1->GetState().Gamepad.sThumbLX;
 		short LY = Player1->GetState().Gamepad.sThumbLY;
 		short RX = Player1->GetState().Gamepad.sThumbRX;
 		short RY = Player1->GetState().Gamepad.sThumbRY;
+
+		float leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger / 255;
+		float rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger / 255;
+		bool LT = false;
+		bool RT = false;
+		if (leftTrigger > 0.2){ LT = true; }
+		if (rightTrigger > 0.2){ RT = true; }
 
 		if (LX > 15000){
 			//cout << "Left Stick X: RIGHT!" << endl;
@@ -499,7 +546,38 @@ void Window::idleCallback(void)
 		//Pass the sudo mouse cords to the mouse update function
 		motionFunc(x, y);
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A)
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+		{
+			//Player1->Vibrate(65535, 0);
+			if (!ESC){
+				ESC = true;
+				keyboard(27, 0, 0);
+			}
+		}
+		else{
+			if (ESC){
+				ESC = false;
+				keyUp(27, 0, 0);
+			}
+		}
+
+		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER))
+		{
+			//Player1->Vibrate(65535, 0);
+			if (!SPT){
+				SPT = true;
+				//keyboard(' ', 0, 0);
+				//SPRINT STUFF HERE PLZ
+			}
+		}
+		else{
+			if (SPT){
+				SPT = false;
+				//keyUp(' ', 0, 0);
+			}
+		}
+
+		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A) || (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
 			//Player1->Vibrate(65535, 0);
 			if (!JMP){
@@ -514,7 +592,7 @@ void Window::idleCallback(void)
 			}
 		}
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_X)
+		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_X) || LT)
 		{
 			//Player1->Vibrate(65535, 0);
 			if (!ATT1){
@@ -530,7 +608,7 @@ void Window::idleCallback(void)
 			}
 		}
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B)
+		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B) || RT)
 		{
 			//Player1->Vibrate(65535, 0);
 			if (!ATT2){
@@ -544,6 +622,48 @@ void Window::idleCallback(void)
 				mouseFunc(GLUT_RIGHT_BUTTON, GLUT_UP, x, y);
 			}
 		}
+	}
+
+	//Gamepad Input Handeling Game Menu
+	if (myClientState->getState() == 2){
+		short LX = Player1->GetState().Gamepad.sThumbLX;
+		short LY = Player1->GetState().Gamepad.sThumbLY;
+
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+		{
+			if (!STR){
+				STR = true;
+				int fakeX = 0.6 * Window::width;
+				int fakeY = 0.5 * Window::height;
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+			}
+		}
+		else{
+			if (STR){
+				STR = false;
+			}
+		}
+
+		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+		{
+			if (!FLS){
+				FLS = true;
+				int fakeX = 0.3 * Window::width;
+				int fakeY = 0.5 * Window::height;
+				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+			}
+		}
+		else{
+			if (FLS){
+				FLS = false;
+			}
+		}
+	}
+
+	//Gamepad Input Handeling Death Screen
+	if (myClientState->getState() == 3){
+		short LX = Player1->GetState().Gamepad.sThumbLX;
+		short LY = Player1->GetState().Gamepad.sThumbLY;
 	}
 
 	updateShaders();
