@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 			}
 		}
-		/*if (strcmp((*recvVec)[numOfVecs * 3].first.c_str(), ""))
+		if (strcmp((*recvVec)[numOfVecs * 3].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 3].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
 			}
-		}*/
+		}
 
 		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> m;
@@ -280,10 +280,10 @@ int main(int argc, char *argv[])
 		else
 			p3 = "3S";
 
-		(*sendVec)[0] = std::make_pair("0", m[0]);
-		(*sendVec)[1] = std::make_pair("1", m[1]);
-		(*sendVec)[2] = std::make_pair("2", m[2]);
-		(*sendVec)[3] = std::make_pair("3", m[3]);
+		(*sendVec)[0] = std::make_pair(p0.c_str(), m[0]);
+		(*sendVec)[1] = std::make_pair(p1.c_str(), m[1]);
+		(*sendVec)[2] = std::make_pair(p2.c_str(), m[2]);
+		(*sendVec)[3] = std::make_pair(p3.c_str(), m[3]);
 
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;

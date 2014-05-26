@@ -252,7 +252,7 @@ bool FLS = false;
 
 void projectileAttack(int playerID, Camera * cam)
 {
-	mat4 test = cam->getCamM();
+	mat4 test = cam->getCamToWorldM();
 	vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
@@ -318,7 +318,7 @@ void simulateProjectile(float t)
 {
 	for (uint i = 0; i < projectile_list.size(); i++){
 		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
-		projectile_list[i]->postTrans(glm::translate(projectile_list[i]->getVelocity()*t));
+		projectile_list[i]->preTrans(glm::translate(projectile_list[i]->getVelocity()*t));
 		projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*projectile_list[i]->getAdjustM());
 	}
 }
@@ -1781,7 +1781,7 @@ void initialize(int argc, char *argv[])
 	mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
 	mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
 	mother_of_banana->setShadowTex(shadow_map_id);
-	mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+	mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
 	mother_of_banana->setShininess(30);
 	mother_of_banana->setFog(fog);
 
@@ -1789,7 +1789,7 @@ void initialize(int argc, char *argv[])
 	mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
 	mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
 	mother_of_nut->setShadowTex(shadow_map_id);
-	mother_of_nut->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
+	mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
 	mother_of_nut->setShininess(30);
 	mother_of_nut->setFog(fog);
 
@@ -1809,12 +1809,12 @@ void initialize(int argc, char *argv[])
 		if (i % 2){
 			Mesh* player0 = new Mesh();
 			player0->LoadMesh("Model/monky2014_delete2.dae");
-			//player0->LoadMesh("Model/banana_animated.dae",false);
+			//player0->LoadMesh("Model/nut_animated.dae",false);
 			player0->setAnimController(monkeyAnimController);
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
 			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-			//player0->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+			//player0->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
 			player0->setShininess(30);
 			player0->setFog(fog);
 			player_list.push_back(player0);
@@ -1825,7 +1825,7 @@ void initialize(int argc, char *argv[])
 			player0->setAnimController(chipmonkAnimController);
 			player0->setShader(sdrCtl.getShader("basic_model"));
 			player0->setShadowTex(shadow_map_id);
-			player0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
+			player0->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
 			player0->setShininess(30);
 			player0->setFog(fog);
 			player_list.push_back(player0);

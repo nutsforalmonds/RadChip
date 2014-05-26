@@ -664,57 +664,109 @@ std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str
 	parsedFromString.SetObject();
 	parsedFromString.Parse<0>(str.c_str());
 	std::vector<std::pair<string, mat4> >* pos = new std::vector<std::pair<string, mat4> >;
-	if (!parsedFromString["0"].IsNull()){
+	if (!parsedFromString["0s"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["0"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["0s"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("0", bbb));
+		pos->push_back(std::make_pair("0s", bbb));
 	}
-	if (!parsedFromString["1"].IsNull()){
+	if (!parsedFromString["0S"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["1"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["0S"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("1", bbb));
+		pos->push_back(std::make_pair("0S", bbb));
 	}
-	if (!parsedFromString["2"].IsNull()){
+	if (!parsedFromString["1s"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["2"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["1s"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("2", bbb));
+		pos->push_back(std::make_pair("1s", bbb));
 	}
-	if (!parsedFromString["3"].IsNull()){
+	if (!parsedFromString["1S"].IsNull()){
 		float nums[16] = { 0.0 };
 		int k = 0;
 		for (int i = 0; i < 4; ++i){
 			for (int j = 0; j < 4; ++j){
-				nums[i * 4 + j] = (float)parsedFromString["3"][k].GetDouble();
+				nums[i * 4 + j] = (float)parsedFromString["1S"][k].GetDouble();
 				k++;
 			}
 		}
 
 		glm::mat4 bbb = (glm::make_mat4(nums));
-		pos->push_back(std::make_pair("3", bbb));
+		pos->push_back(std::make_pair("1S", bbb));
+	}
+	if (!parsedFromString["2s"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["2s"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("2s", bbb));
+	}
+	if (!parsedFromString["2S"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["2S"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("2S", bbb));
+	}
+	if (!parsedFromString["3s"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["3s"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("3s", bbb));
+	}
+	if (!parsedFromString["3S"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["3S"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("3S", bbb));
 	}
 
 
