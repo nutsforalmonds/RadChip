@@ -250,6 +250,13 @@ bool SPT = false;
 bool STR = false;
 bool FLS = false;
 
+bool USE_JOYSTICK = false;
+int Vibrate_Frame_Num = 0;
+
+void stopVibrate(int i){
+	Player1->Vibrate(0, 0);
+}
+
 void projectileAttack(int playerID, Camera * cam)
 {
 	mat4 test = cam->getCamToWorldM();
@@ -406,264 +413,268 @@ void Window::idleCallback(void)
 	default:
 		break;
 	}
-	//Gamepad Input Handeling Main Menu
-	if (myClientState->getState() == 0){
-		short LX = Player1->GetState().Gamepad.sThumbLX;
-		short LY = Player1->GetState().Gamepad.sThumbLY;
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
-		{
-			if (!STR){
-				STR = true;
-				int fakeX = 0.5 * Window::width;
-				int fakeY = 0.4 * Window::height;
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
-			}
-		}
-		else{
-			if (STR){
-				STR = false;
-			}
-		}
+	if (USE_JOYSTICK){
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-		{
-			if (!FLS){
-				FLS = true;
-				int fakeX = 0.5 * Window::width;
-				int fakeY = 0.75 * Window::height;
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
-			}
-		}
-		else{
-			if (FLS){
-				FLS = false;
-			}
-		}
+		//Gamepad Input Handeling Main Menu
+		if (myClientState->getState() == 0){
+			short LX = Player1->GetState().Gamepad.sThumbLX;
+			short LY = Player1->GetState().Gamepad.sThumbLY;
 
-	}
+			if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+			{
+				if (!STR){
+					STR = true;
+					int fakeX = 0.5 * Window::width;
+					int fakeY = 0.4 * Window::height;
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+				}
+			}
+			else{
+				if (STR){
+					STR = false;
+				}
+			}
 
-	//Gamepad Input Handeling Game
-	if (myClientState->getState() == 1){
-		short LX = Player1->GetState().Gamepad.sThumbLX;
-		short LY = Player1->GetState().Gamepad.sThumbLY;
-		short RX = Player1->GetState().Gamepad.sThumbRX;
-		short RY = Player1->GetState().Gamepad.sThumbRY;
+			if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+			{
+				if (!FLS){
+					FLS = true;
+					int fakeX = 0.5 * Window::width;
+					int fakeY = 0.75 * Window::height;
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+				}
+			}
+			else{
+				if (FLS){
+					FLS = false;
+				}
+			}
 
-		float leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger / 255;
-		float rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger / 255;
-		bool LT = false;
-		bool RT = false;
-		if (leftTrigger > 0.2){ LT = true; }
-		if (rightTrigger > 0.2){ RT = true; }
+		}
+		
+		//Gamepad Input Handeling Game
+		if (myClientState->getState() == 1){
+			short LX = Player1->GetState().Gamepad.sThumbLX;
+			short LY = Player1->GetState().Gamepad.sThumbLY;
+			short RX = Player1->GetState().Gamepad.sThumbRX;
+			short RY = Player1->GetState().Gamepad.sThumbRY;
 
-		if (LX > 15000){
-			//cout << "Left Stick X: RIGHT!" << endl;
-			if (!LR){
-				LR = true;
-				keyboard('d', 0, 0);
-			}
-		}
-		else if (LX < -15000){
-			//cout << "Left Stick X: LEFT!" << endl;
-			if (!LL){
-				LL = true;
-				keyboard('a', 0, 0);
-			}
-		}
-		else{
-			//cout << "Left Stick X: CENTER!" << endl;
-			if (LR){
-				LR = false;
-				keyUp('d', 0, 0);
-			}
-			if (LL){
-				LL = false;
-				keyUp('a', 0, 0);
-			}
-		}
+			float leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger / 255;
+			float rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger / 255;
+			bool LT = false;
+			bool RT = false;
+			if (leftTrigger > 0.2){ LT = true; }
+			if (rightTrigger > 0.2){ RT = true; }
 
-		if (LY > 15000){
-			//cout << "Left Stick Y: UP!" << endl;
-			if (!LU){
-				LU = true;
-				keyboard('w', 0, 0);
+			if (LX > 15000){
+				//cout << "Left Stick X: RIGHT!" << endl;
+				if (!LR){
+					LR = true;
+					keyboard('d', 0, 0);
+				}
 			}
-		}
-		else if (LY < -15000){
-			//cout << "Left Stick Y: DOWN!" << endl;
-			if (!LD){
-				LD = true;
-				keyboard('s', 0, 0);
+			else if (LX < -15000){
+				//cout << "Left Stick X: LEFT!" << endl;
+				if (!LL){
+					LL = true;
+					keyboard('a', 0, 0);
+				}
 			}
-		}
-		else{
-			//cout << "Left Stick Y: CENTER!" << endl;
-			if (LU){
-				LU = false;
-				keyUp('w', 0, 0);
+			else{
+				//cout << "Left Stick X: CENTER!" << endl;
+				if (LR){
+					LR = false;
+					keyUp('d', 0, 0);
+				}
+				if (LL){
+					LL = false;
+					keyUp('a', 0, 0);
+				}
 			}
-			if (LD){
-				LD = false;
-				keyUp('s', 0, 0);
-			}
-		}
 
-		int x = 0.5 * Window::width;
-		int y = 0.5 * Window::height;
+			if (LY > 15000){
+				//cout << "Left Stick Y: UP!" << endl;
+				if (!LU){
+					LU = true;
+					keyboard('w', 0, 0);
+				}
+			}
+			else if (LY < -15000){
+				//cout << "Left Stick Y: DOWN!" << endl;
+				if (!LD){
+					LD = true;
+					keyboard('s', 0, 0);
+				}
+			}
+			else{
+				//cout << "Left Stick Y: CENTER!" << endl;
+				if (LU){
+					LU = false;
+					keyUp('w', 0, 0);
+				}
+				if (LD){
+					LD = false;
+					keyUp('s', 0, 0);
+				}
+			}
 
-		if (RX > 15000){
-			//cout << "Right Stick X: RIGHT!" << endl;
-			x = 0.54 * Window::width;
-			//motionFunc(x, y);
-		}
-		else if (RX < -15000){
-			//cout << "Right Stick X: LEFT!" << endl;
-			x = 0.46 * Window::width;
-			//motionFunc(x, y);
-		}
-		else{
-			//cout << "Right Stick X: CENTER!" << endl;
-			x = 0.5 * Window::width;
-			//motionFunc(x, y);
-		}
+			int x = 0.5 * Window::width;
+			int y = 0.5 * Window::height;
 
-		if (RY > 15000){
-		//	cout << "Right Stick Y: UP!" << endl;
-			y = 0.46 * Window::height;
-			//motionFunc(x, y);
-		}
-		else if (RY < -15000){
-			//cout << "Right Stick Y: DOWN!" << endl;
-			y = 0.54 * Window::height;
-			//motionFunc(x, y);
-		}
-		else{
-			//cout << "Right Stick Y: CENTER!" << endl;
-			y = 0.5 * Window::height;
-			//motionFunc(x, y);
-		}
-		//Pass the sudo mouse cords to the mouse update function
-		motionFunc(x, y);
+			if (RX > 15000){
+				//cout << "Right Stick X: RIGHT!" << endl;
+				x = 0.54 * Window::width;
+				//motionFunc(x, y);
+			}
+			else if (RX < -15000){
+				//cout << "Right Stick X: LEFT!" << endl;
+				x = 0.46 * Window::width;
+				//motionFunc(x, y);
+			}
+			else{
+				//cout << "Right Stick X: CENTER!" << endl;
+				x = 0.5 * Window::width;
+				//motionFunc(x, y);
+			}
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
-		{
-			//Player1->Vibrate(65535, 0);
-			if (!ESC){
-				ESC = true;
-				keyboard(27, 0, 0);
+			if (RY > 15000){
+				//	cout << "Right Stick Y: UP!" << endl;
+				y = 0.46 * Window::height;
+				//motionFunc(x, y);
 			}
-		}
-		else{
-			if (ESC){
-				ESC = false;
-				keyUp(27, 0, 0);
+			else if (RY < -15000){
+				//cout << "Right Stick Y: DOWN!" << endl;
+				y = 0.54 * Window::height;
+				//motionFunc(x, y);
 			}
-		}
+			else{
+				//cout << "Right Stick Y: CENTER!" << endl;
+				y = 0.5 * Window::height;
+				//motionFunc(x, y);
+			}
+			//Pass the sudo mouse cords to the mouse update function
+			motionFunc(x, y);
 
-		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER))
-		{
-			//Player1->Vibrate(65535, 0);
-			if (!SPT){
-				SPT = true;
-				//keyboard(' ', 0, 0);
-				//SPRINT STUFF HERE PLZ
+			if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+			{
+				//Player1->Vibrate(65535, 0);
+				if (!ESC){
+					ESC = true;
+					keyboard(27, 0, 0);
+				}
 			}
-		}
-		else{
-			if (SPT){
-				SPT = false;
-				//keyUp(' ', 0, 0);
+			else{
+				if (ESC){
+					ESC = false;
+					keyUp(27, 0, 0);
+				}
 			}
-		}
 
-		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A) || (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
-		{
-			//Player1->Vibrate(65535, 0);
-			if (!JMP){
-				JMP = true;
-				keyboard(' ', 0, 0);
+			if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER))
+			{
+				//Player1->Vibrate(65535, 0);
+				if (!SPT){
+					SPT = true;
+					//keyboard(' ', 0, 0);
+					//SPRINT STUFF HERE PLZ
+				}
 			}
-		}
-		else{
-			if (JMP){
-				JMP = false;
-				keyUp(' ', 0, 0);
+			else{
+				if (SPT){
+					SPT = false;
+					//keyUp(' ', 0, 0);
+				}
 			}
-		}
 
-		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_X) || LT)
-		{
-			//Player1->Vibrate(65535, 0);
-			if (!ATT1){
-				ATT1 = true;
-				//keyboard(' ', 0, 0);
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, x, y);
+			if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A) || (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
+			{
+				//Player1->Vibrate(65535, 0);
+				if (!JMP){
+					JMP = true;
+					keyboard(' ', 0, 0);
+				}
 			}
-		}
-		else{
-			if (ATT1){
-				ATT1 = false;
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
+			else{
+				if (JMP){
+					JMP = false;
+					keyUp(' ', 0, 0);
+				}
 			}
-		}
 
-		if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B) || RT)
-		{
-			//Player1->Vibrate(65535, 0);
-			if (!ATT2){
-				ATT2 = true;
-				mouseFunc(GLUT_RIGHT_BUTTON, GLUT_DOWN, x, y);
+			if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_X) || LT)
+			{
+				//Player1->Vibrate(65535, 0);
+				if (!ATT1){
+					ATT1 = true;
+					//keyboard(' ', 0, 0);
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, x, y);
+				}
 			}
-		}
-		else{
-			if (ATT2){
-				ATT2 = false;
-				mouseFunc(GLUT_RIGHT_BUTTON, GLUT_UP, x, y);
+			else{
+				if (ATT1){
+					ATT1 = false;
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
+				}
 			}
-		}
-	}
 
-	//Gamepad Input Handeling Game Menu
-	if (myClientState->getState() == 2){
-		short LX = Player1->GetState().Gamepad.sThumbLX;
-		short LY = Player1->GetState().Gamepad.sThumbLY;
-
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
-		{
-			if (!STR){
-				STR = true;
-				int fakeX = 0.6 * Window::width;
-				int fakeY = 0.5 * Window::height;
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+			if ((Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B) || RT)
+			{
+				//Player1->Vibrate(65535, 0);
+				if (!ATT2){
+					ATT2 = true;
+					mouseFunc(GLUT_RIGHT_BUTTON, GLUT_DOWN, x, y);
+				}
 			}
-		}
-		else{
-			if (STR){
-				STR = false;
+			else{
+				if (ATT2){
+					ATT2 = false;
+					mouseFunc(GLUT_RIGHT_BUTTON, GLUT_UP, x, y);
+				}
 			}
 		}
 
-		if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-		{
-			if (!FLS){
-				FLS = true;
-				int fakeX = 0.3 * Window::width;
-				int fakeY = 0.5 * Window::height;
-				mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
-			}
-		}
-		else{
-			if (FLS){
-				FLS = false;
-			}
-		}
-	}
+		//Gamepad Input Handeling Game Menu
+		if (myClientState->getState() == 2){
+			short LX = Player1->GetState().Gamepad.sThumbLX;
+			short LY = Player1->GetState().Gamepad.sThumbLY;
 
-	//Gamepad Input Handeling Death Screen
-	if (myClientState->getState() == 3){
-		short LX = Player1->GetState().Gamepad.sThumbLX;
-		short LY = Player1->GetState().Gamepad.sThumbLY;
+			if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_START)
+			{
+				if (!STR){
+					STR = true;
+					int fakeX = 0.6 * Window::width;
+					int fakeY = 0.5 * Window::height;
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+				}
+			}
+			else{
+				if (STR){
+					STR = false;
+				}
+			}
+
+			if (Player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+			{
+				if (!FLS){
+					FLS = true;
+					int fakeX = 0.3 * Window::width;
+					int fakeY = 0.5 * Window::height;
+					mouseFunc(GLUT_LEFT_BUTTON, GLUT_DOWN, fakeX, fakeY);
+				}
+			}
+			else{
+				if (FLS){
+					FLS = false;
+				}
+			}
+		}
+
+		//Gamepad Input Handeling Death Screen
+		if (myClientState->getState() == 3){
+			short LX = Player1->GetState().Gamepad.sThumbLX;
+			short LY = Player1->GetState().Gamepad.sThumbLY;
+		}
 	}
 
 	updateShaders();
@@ -994,6 +1005,7 @@ int main(int argc, char *argv[])
   ConfigSettings::config->copyMissingSettings();
   ConfigSettings::config->getValue("ScreenWidth", Window::width);
   ConfigSettings::config->getValue("ScreenHeight", Window::height);
+  ConfigSettings::config->getValue("Gamepad", USE_JOYSTICK);
   
   glutInit(&argc, argv);      	      	      // initialize GLUT
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
@@ -1180,7 +1192,10 @@ void keyboard(unsigned char key, int, int){
 		//This calls the player damaged effects
 		if (key == 'm'){
 			particle8->StartLoop();
-			Player1->Vibrate(65535, 65535);
+			if (USE_JOYSTICK){
+				Player1->Vibrate(65535, 65535);
+				glutTimerFunc(500, stopVibrate, 0);
+			}
 		}
 		if (key == 27){
 			//running = false;
