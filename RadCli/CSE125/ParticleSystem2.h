@@ -32,8 +32,10 @@ typedef struct Emitter2
 	float       eRadius;
 	float       eVelocity;
 	float       eDecay;
-	float       eSize;
-	vec3		eColor;
+	float       eSizeStart;
+	float       eSizeEnd;
+	vec3		eColorStart;
+	vec3		eColorEnd;
 }
 Emitter2;
 
@@ -55,7 +57,7 @@ public:
 		float oColor = 0.25f;       // 0.5 = 50% shade offset
 
 		awesome_time = 0.0;
-		time_Max = 30.0;
+		time_Max = 40.0;
 		time_Min = 0.0;
 		time_Step = 0.5;
 		current_loop = 0;
@@ -79,17 +81,19 @@ public:
 		}
 
 		// Load Properties
-		myEmitter.eRadius = 4.75f;							// Blast radius
+		myEmitter.eRadius = 3.75f;							// Blast radius
 		myEmitter.eVelocity = 3.00f;                        // Explosion velocity
-		myEmitter.eDecay = 2.00f;                           // Explosion decay
-		myEmitter.eSize = 16.00f;                           // Fragment size
-		myEmitter.eColor = vec3(1.00f, 0.50f, 0.00f);		// Fragment color
+		myEmitter.eDecay = 4.00f;                           // Explosion decay
+		myEmitter.eSizeStart = 32.00f;                      // Fragment start size
+		myEmitter.eSizeEnd = 8.00f;                         // Fragment end size
+		myEmitter.eColorStart = vec3(1.00f, 0.50f, 0.00f);  // Fragment start color
+		myEmitter.eColorEnd = vec3(0.25f, 0.00f, 0.00f);    // Fragment end color
 
 		// Set global factors
 		float growth = myEmitter.eRadius / myEmitter.eVelocity;       // Growth time
 		life = growth + myEmitter.eDecay + oDecay;                    // Simulation lifetime
 	
-		float drag = 20.00f;                                   // Drag (air resistance)
+		float drag = 10.00f;                                   // Drag (air resistance)
 		gravity = vec2(0.00f, -9.81f*(1.0f / drag));           // World gravity
 
 		vao.generate();
@@ -123,15 +127,17 @@ public:
 			shader->setUniform(uniformLoc[5], myEmitter.eRadius);
 			shader->setUniform(uniformLoc[6], myEmitter.eVelocity);
 			shader->setUniform(uniformLoc[7], myEmitter.eDecay);
-			shader->setUniform(uniformLoc[8], myEmitter.eSize);
-			shader->setUniform(uniformLoc[9], myEmitter.eColor);
+			shader->setUniform(uniformLoc[8], myEmitter.eSizeStart);
+			shader->setUniform(uniformLoc[9], myEmitter.eSizeEnd);
+			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
+			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
 
-			shader->setUniform(uniformLoc[10], fog->maxDist);
-			shader->setUniform(uniformLoc[11], fog->minDist);
-			shader->setUniform(uniformLoc[12], fog->color);
-			shader->setUniform(uniformLoc[13], fog->visibility);
-			shader->setUniform(uniformLoc[14], fog->maxHeight);
-			shader->setUniform(uniformLoc[15], fog->minHeight);
+			shader->setUniform(uniformLoc[12], fog->maxDist);
+			shader->setUniform(uniformLoc[13], fog->minDist);
+			shader->setUniform(uniformLoc[14], fog->color);
+			shader->setUniform(uniformLoc[15], fog->visibility);
+			shader->setUniform(uniformLoc[16], fog->maxHeight);
+			shader->setUniform(uniformLoc[17], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			/*
@@ -168,15 +174,17 @@ public:
 			shader->setUniform(uniformLoc[5], myEmitter.eRadius);
 			shader->setUniform(uniformLoc[6], myEmitter.eVelocity);
 			shader->setUniform(uniformLoc[7], myEmitter.eDecay);
-			shader->setUniform(uniformLoc[8], myEmitter.eSize);
-			shader->setUniform(uniformLoc[9], myEmitter.eColor);
+			shader->setUniform(uniformLoc[8], myEmitter.eSizeStart);
+			shader->setUniform(uniformLoc[9], myEmitter.eSizeEnd);
+			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
+			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
 
-			shader->setUniform(uniformLoc[10], fog->maxDist);
-			shader->setUniform(uniformLoc[11], fog->minDist);
-			shader->setUniform(uniformLoc[12], fog->color);
-			shader->setUniform(uniformLoc[13], fog->visibility);
-			shader->setUniform(uniformLoc[14], fog->maxHeight);
-			shader->setUniform(uniformLoc[15], fog->minHeight);
+			shader->setUniform(uniformLoc[12], fog->maxDist);
+			shader->setUniform(uniformLoc[13], fog->minDist);
+			shader->setUniform(uniformLoc[14], fog->color);
+			shader->setUniform(uniformLoc[15], fog->visibility);
+			shader->setUniform(uniformLoc[16], fog->maxHeight);
+			shader->setUniform(uniformLoc[17], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -195,8 +203,10 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("u_eRadius"));
 		uniformLoc.push_back(shader->getUniformLoc("u_eVelocity"));
 		uniformLoc.push_back(shader->getUniformLoc("u_eDecay"));
-		uniformLoc.push_back(shader->getUniformLoc("u_eSize"));
-		uniformLoc.push_back(shader->getUniformLoc("u_eColor"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eSizeStart"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eSizeEnd"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eColorStart"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eColorEnd"));
 
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
