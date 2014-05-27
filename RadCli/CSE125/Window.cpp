@@ -355,12 +355,9 @@ void Window::idleCallback(void)
 	case 1:
 	case 2:
 	case 3:
-		cam->preRotate(glm::rotate(mat4(1.0), cam->getPendingRote(), vec3(1, 0, 0)));
-		if ((cam->getCamM()*vec4(0, 1, 0, 0))[1] < 0){
-			cam->setPreRot(glm::rotate(mat4(1.0), -90.0f, vec3(1, 0, 0)));
-		}
-		cam->setPendingRot(0);
 		
+		cam->update();
+
 		/*
 		QueryPerformanceCounter(&current);
 		delta = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
@@ -1389,7 +1386,8 @@ void mouseFunc(int button, int state, int x, int y)
 
 					cam = new Camera();
 					cam->attach(player_list[playerID]);
-					cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
+					//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
+					cam->init(2.5, 6, 1.5);
 
 					connected = true;
 				}
