@@ -292,5 +292,11 @@
     <None Include="Maps\Test1.json">
       <Filter>Maps</Filter>
     </None>
+    <None Include="Shaders\pe_system.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\pe_system.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

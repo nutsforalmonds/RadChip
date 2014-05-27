@@ -1,6 +1,6 @@
 {
     "map_name": "Test 1",
-    "num_shaders": 8,
+    "num_shaders": 9,
     "shaders": [
         {
             "name": "basic_skybox",
@@ -41,6 +41,11 @@
             "name": "ui_particle",
             "vert": "Shaders/ui_particle.vert",
             "frag": "Shaders/ui_particle.frag"
+        },
+		{
+            "name": "pe_system",
+            "vert": "Shaders/pe_system.vert",
+            "frag": "Shaders/pe_system.frag"
         }
     ],
     "num_audio": 8,

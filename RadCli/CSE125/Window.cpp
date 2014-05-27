@@ -53,7 +53,7 @@ ParticleSystem* particle8;
 long long m_currentTimeMillis;
 
 #include "ParticleSystem2.h"
-
+ParticleSystem2* testSystem;
 
 enum {
 	MENU_LIGHTING = 1,
@@ -257,6 +257,13 @@ int Vibrate_Frame_Num = 0;
 
 void stopVibrate(int i){
 	Player1->Vibrate(0, 0);
+}
+
+void Vibrate(int L, int R, int time){
+	if (USE_JOYSTICK){
+		Player1->Vibrate(65535, 65535);
+		glutTimerFunc(500, stopVibrate, 0);
+	}
 }
 
 void projectileAttack(int playerID, Camera * cam)
@@ -806,6 +813,7 @@ void Window::displayCallback(void)
 		particle6->draw(Projection, View);
 		particle7->draw(Projection, View);
 		particle8->draw();
+		testSystem->draw(Projection, View);
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
@@ -1181,10 +1189,7 @@ void keyboard(unsigned char key, int, int){
 		//This calls the player damaged effects
 		if (key == 'm'){
 			particle8->StartLoop();
-			if (USE_JOYSTICK){
-				Player1->Vibrate(65535, 65535);
-				glutTimerFunc(500, stopVibrate, 0);
-			}
+			Vibrate(65535, 65535, 500);
 		}
 		if (key == 27){
 			//running = false;
@@ -2011,6 +2016,16 @@ void initialize(int argc, char *argv[])
 	particle8->setTime(20.0);
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	particle8->setFog(emptyFog);
+
+
+	testSystem = new ParticleSystem2();
+	testSystem->setShader(sdrCtl.getShader("pe_system"));
+	testSystem->setType("Particle_System");
+	testSystem->setName("Particle_Test");
+	testSystem->setLoopInf(true);
+	testSystem->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	testSystem->setFog(fog);
+	testSystem->setModelM(glm::translate(vec3(-30.0f, 5.0f, 0.0f)));
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));

@@ -13,20 +13,27 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 360
+#define NUM_PARTICLES 180
 
 typedef struct Particle2
 {
-	float theta;
-	vec3 shade;
+	float       pID;
+	float       pRadiusOffset;
+	float       pVelocityOffset;
+	float       pDecayOffset;
+	float       pSizeOffset;
+	vec3		pColorOffset;
 }
 Particle2;
 
 typedef struct Emitter2
 {
-	Particle2 particles[NUM_PARTICLES];
-	float k;
-	vec3 color;
+	Particle2    eParticles[NUM_PARTICLES];
+	float       eRadius;
+	float       eVelocity;
+	float       eDecay;
+	float       eSize;
+	vec3		eColor;
 }
 Emitter2;
 
@@ -36,29 +43,69 @@ class ParticleSystem2 : public Object
 public:
 	ParticleSystem2(void){
 
-		awesome_time = 1.5;
-		time_Max = 50.0;
-		time_Min = 1.5;
-		time_Step = 1.0;
+		gravity = vec2(0.0f, 0.0f);
+		life = 0.0f;
+		//time = 0.0f;
+
+		// Offset bounds
+		float oRadius = 0.25f;      // 0.0 = circle; 1.0 = ring
+		float oVelocity = 0.50f;    // Speed
+		float oDecay = 0.25f;       // Time
+		float oSize = 8.00f;        // Pixels
+		float oColor = 0.25f;       // 0.5 = 50% shade offset
+
+		awesome_time = 0.0;
+		time_Max = 30.0;
+		time_Min = 0.0;
+		time_Step = 0.5;
 		current_loop = 0;
 		loopInf = false;
 
+		// Load Particles
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
-			// Assign each particle its theta value (in radians)
-			//p_theta[i] = i*(3.14159265359 / 180);
-			emitter.particles[i].theta = i*(3.14159265359 / 180);
-			emitter.particles[i].shade.x = randomFloatBetween(-0.5f, 0.5f);
-			emitter.particles[i].shade.y = randomFloatBetween(-0.5f, 0.5f);
-			emitter.particles[i].shade.z = randomFloatBetween(-0.5f, 0.5f);
+			// Assign a unique ID to each particle, between 0 and 360 (in radians)
+			myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			
+			// Assign random offsets within bounds
+			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
+			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
+			myEmitter.eParticles[i].pDecayOffset = (-oDecay) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oDecay) - (-oDecay))));
+			myEmitter.eParticles[i].pSizeOffset = (-oSize) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oSize) - (-oSize))));
+			float r = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			float g = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			float b = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			myEmitter.eParticles[i].pColorOffset = vec3(r, g, b);
 		}
 
+		// Load Properties
+		myEmitter.eRadius = 4.75f;							// Blast radius
+		myEmitter.eVelocity = 3.00f;                        // Explosion velocity
+		myEmitter.eDecay = 2.00f;                           // Explosion decay
+		myEmitter.eSize = 16.00f;                           // Fragment size
+		myEmitter.eColor = vec3(1.00f, 0.50f, 0.00f);		// Fragment color
+
+		// Set global factors
+		float growth = myEmitter.eRadius / myEmitter.eVelocity;       // Growth time
+		life = growth + myEmitter.eDecay + oDecay;                    // Simulation lifetime
+	
+		float drag = 20.00f;                                   // Drag (air resistance)
+		gravity = vec2(0.00f, -9.81f*(1.0f / drag));           // World gravity
+
 		vao.generate();
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(emitter.particles), &emitter.particles, GL_STATIC_DRAW, 0, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, theta)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(emitter.particles), &emitter.particles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, shade)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 0, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pID)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pRadiusOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pVelocityOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pDecayOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
 
 		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
 		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+	}
+
+	void updateLifeCycle(float timeElapsed){
+
 	}
 
 	~ParticleSystem2(void){}
@@ -71,17 +118,20 @@ public:
 			shader->setUniform(uniformLoc[0], View);
 			shader->setUniform(uniformLoc[1], Projection);
 			shader->setUniform(uniformLoc[2], getModelM());
-			shader->setUniform(uniformLoc[3], emitter.k);
-			shader->setUniform(uniformLoc[4], awesome_time / 4);
-			shader->setUniform(uniformLoc[5], emitter.color);
-			shader->setUniform(uniformLoc[6], p_shade);
-			shader->setUniform(uniformLoc[7], 0);
-			shader->setUniform(uniformLoc[8], fog->maxDist);
-			shader->setUniform(uniformLoc[9], fog->minDist);
-			shader->setUniform(uniformLoc[10], fog->color);
-			shader->setUniform(uniformLoc[11], fog->visibility);
-			shader->setUniform(uniformLoc[12], fog->maxHeight);
-			shader->setUniform(uniformLoc[13], fog->minHeight);
+			shader->setUniform(uniformLoc[3], gravity);
+			shader->setUniform(uniformLoc[4], awesome_time/4);
+			shader->setUniform(uniformLoc[5], myEmitter.eRadius);
+			shader->setUniform(uniformLoc[6], myEmitter.eVelocity);
+			shader->setUniform(uniformLoc[7], myEmitter.eDecay);
+			shader->setUniform(uniformLoc[8], myEmitter.eSize);
+			shader->setUniform(uniformLoc[9], myEmitter.eColor);
+
+			shader->setUniform(uniformLoc[10], fog->maxDist);
+			shader->setUniform(uniformLoc[11], fog->minDist);
+			shader->setUniform(uniformLoc[12], fog->color);
+			shader->setUniform(uniformLoc[13], fog->visibility);
+			shader->setUniform(uniformLoc[14], fog->maxHeight);
+			shader->setUniform(uniformLoc[15], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			/*
@@ -113,17 +163,20 @@ public:
 			shader->setUniform(uniformLoc[0], view);
 			shader->setUniform(uniformLoc[1], projection);
 			shader->setUniform(uniformLoc[2], getModelM());
-			shader->setUniform(uniformLoc[3], emitter.k);
-			shader->setUniform(uniformLoc[4], awesome_time / 4);
-			shader->setUniform(uniformLoc[5], emitter.color);
-			shader->setUniform(uniformLoc[6], p_shade);
-			shader->setUniform(uniformLoc[7], 0);
-			shader->setUniform(uniformLoc[8], fog->maxDist);
-			shader->setUniform(uniformLoc[9], fog->minDist);
-			shader->setUniform(uniformLoc[10], fog->color);
-			shader->setUniform(uniformLoc[11], fog->visibility);
-			shader->setUniform(uniformLoc[12], fog->maxHeight);
-			shader->setUniform(uniformLoc[13], fog->minHeight);
+			shader->setUniform(uniformLoc[3], gravity);
+			shader->setUniform(uniformLoc[4], awesome_time/4);
+			shader->setUniform(uniformLoc[5], myEmitter.eRadius);
+			shader->setUniform(uniformLoc[6], myEmitter.eVelocity);
+			shader->setUniform(uniformLoc[7], myEmitter.eDecay);
+			shader->setUniform(uniformLoc[8], myEmitter.eSize);
+			shader->setUniform(uniformLoc[9], myEmitter.eColor);
+
+			shader->setUniform(uniformLoc[10], fog->maxDist);
+			shader->setUniform(uniformLoc[11], fog->minDist);
+			shader->setUniform(uniformLoc[12], fog->color);
+			shader->setUniform(uniformLoc[13], fog->visibility);
+			shader->setUniform(uniformLoc[14], fog->maxHeight);
+			shader->setUniform(uniformLoc[15], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -134,14 +187,17 @@ public:
 	}
 	void setShader(GLSLProgram* shader){
 		this->shader = shader;
-		uniformLoc.push_back(shader->getUniformLoc("ViewMatrix"));
-		uniformLoc.push_back(shader->getUniformLoc("ProjectionMatrix"));
-		uniformLoc.push_back(shader->getUniformLoc("ModelMatrix"));
-		uniformLoc.push_back(shader->getUniformLoc("uK"));
-		uniformLoc.push_back(shader->getUniformLoc("uTime"));
-		uniformLoc.push_back(shader->getUniformLoc("uColor"));
-		uniformLoc.push_back(shader->getUniformLoc("aShade"));
-		uniformLoc.push_back(shader->getUniformLoc("uTexture"));
+		uniformLoc.push_back(shader->getUniformLoc("u_ViewMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("u_ProjectionMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("u_ModelMatrix"));
+		uniformLoc.push_back(shader->getUniformLoc("u_Gravity"));
+		uniformLoc.push_back(shader->getUniformLoc("u_Time"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eRadius"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eVelocity"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eDecay"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eSize"));
+		uniformLoc.push_back(shader->getUniformLoc("u_eColor"));
+
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
@@ -151,16 +207,10 @@ public:
 
 	}
 
-	void setColor(vec3 c){ emitter.color = c; }
-	void setShade(vec3 s){ p_shade = s; }
-
 	void setTexture(GLenum TextureTarget, const char* FileName, const char* FileType){
 		m_Texture = new Texture(TextureTarget, FileName, FileType);
 		m_Texture->Load();
 	}
-
-	void setK(float input){ emitter.k = input; }
-	float getK(float input){ return emitter.k; }
 
 	void setTime_Step(float s){ time_Step = s; }
 	float getTime_Step(){ return awesome_time; }
@@ -216,7 +266,7 @@ private:
 
 	VAO vao;
 	GLSLProgram * shader;
-	Emitter2 emitter;
+	Emitter2 myEmitter;
 	//vec3 e_color;
 	vec3 p_shade;
 	vector<int> uniformLoc;
@@ -236,4 +286,8 @@ private:
 	int current_loop;
 	bool loopInf;
 
+
+	vec2 gravity;
+	float life;
+	//float time;
 };

@@ -280,6 +280,8 @@ int main(int argc, char *argv[])
 		else
 			p3 = "3S";
 
+		//SEND SHIT HERE by adding to the p0-p3 strings//
+
 		(*sendVec)[0] = std::make_pair(p0.c_str(), m[0]);
 		(*sendVec)[1] = std::make_pair(p1.c_str(), m[1]);
 		(*sendVec)[2] = std::make_pair(p2.c_str(), m[2]);
