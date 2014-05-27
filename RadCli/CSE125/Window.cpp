@@ -38,6 +38,7 @@
 
 #include "gameState.h"
 #include "CXBOXController.h"
+#include "ParseOpts.h"
 
 #include <assert.h>
 #include "ParticleSystem.h"
@@ -206,6 +207,7 @@ int projectile_counter = 0;
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
+ParseOpts* parseOpts;
 bool recvValid = false;
 
 boost::asio::io_service io_service;
@@ -875,62 +877,49 @@ void server_update(int value){
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
 	if (recvValid)
 	{
-		//std::cout << out << '\n' << std::endl;
-		if ((*recvVec)[0].first.c_str()[1] == 's')
+		// get shoot bit from recvVec for player 0
+		if (parseOpts->getShoot(recvVec, 0))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(atoi(&((*recvVec)[0].first.c_str())[0]), cam);
-			if (playerID == 1)
+			projectileAttack(0, cam);
+			if (playerID == 0)
 			{
 				myUI->setShots(1);
 			}
 			cout << "FIRE 0!" << endl;
 		}
 
-		//stateID = ((*recvVec)[1].first.c_str()[0]);
-
-		if ((*recvVec)[1].first.c_str()[1] == 's')
+		if (parseOpts->getShoot(recvVec, 1))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(atoi(&((*recvVec)[1].first.c_str())[0]), cam);
-			if (playerID == 2)
+			projectileAttack(1, cam);
+			if (playerID == 1)
 			{
 				myUI->setShots(1);
 			}
 			cout << "FIRE 1!" << endl;
 		}
 
-		//	stateID = ((*recvVec)[2].first.c_str()[0]);
-
-		if ((*recvVec)[2].first.c_str()[1] == 's')
+		if (parseOpts->getShoot(recvVec, 2))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(atoi(&((*recvVec)[2].first.c_str())[0]), cam);
-			if (playerID == 3)
+			projectileAttack(2, cam);
+			if (playerID == 2)
 			{
 				myUI->setShots(1);
 			}
 			cout << "FIRE 2!" << endl;
 		}
 
-		//stateID = ((*recvVec)[3].first.c_str()[0]);
-
-		if ((*recvVec)[3].first.c_str()[1] == 's')
+		if (parseOpts->getShoot(recvVec, 3))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(atoi(&((*recvVec)[3].first.c_str())[0]), cam);
-			if (playerID == 0)
+			projectileAttack(3, cam);
+			if (playerID == 3)
 			{
 				myUI->setShots(1);
 			}
 			cout << "FIRE 3!" << endl;
-		}
-		if (i == 800)
-		{
-			int zero = atoi(&((*recvVec)[0].first.c_str())[0]);
-			int one = atoi(&((*recvVec)[1].first.c_str())[0]);
-			mat4 mzero = (*recvVec)[0].second;
-			mat4 mone = (*recvVec)[1].second;
 		}
 
 		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
@@ -1375,6 +1364,8 @@ void mouseFunc(int button, int state, int x, int y)
 					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
+
+					parseOpts = new ParseOpts();
 					
 					try
 					{
@@ -1663,6 +1654,7 @@ void setupShaders()
 }
 void initialize(int argc, char *argv[])
 {
+
 	myClientState = new ClientState();
 
 	QueryPerformanceFrequency(&freq);

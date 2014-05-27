@@ -134,6 +134,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mesh_Static.cpp" />
     <ClCompile Include="ogldev_util.cpp" />
+    <ClCompile Include="ParseOpts.h" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ShaderController.cpp" />
     <ClCompile Include="Texture.cpp" />
