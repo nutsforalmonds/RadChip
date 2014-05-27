@@ -1006,7 +1006,7 @@ int main(int argc, char *argv[])
   bool buf;
   ConfigSettings::config->getValue("FullScreen", buf);
   if (buf){
-	glutFullScreen();
+	  glutFullScreen();
   }
   
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -1384,7 +1384,7 @@ void mouseFunc(int button, int state, int x, int y)
 
 					cam = new Camera();
 					cam->attach(player_list[playerID]);
-					cam->postTrans(glm::translate(vec3(0, 1, 4)));
+					cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
 
 					connected = true;
 				}
