@@ -52,6 +52,9 @@
     <ClCompile Include="CXBOXController.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="ParseOpts.h">
+      <Filter>Header</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">

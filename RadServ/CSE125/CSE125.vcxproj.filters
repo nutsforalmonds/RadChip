@@ -168,6 +168,9 @@
     <ClInclude Include="PlayerChar.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="gameState.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
