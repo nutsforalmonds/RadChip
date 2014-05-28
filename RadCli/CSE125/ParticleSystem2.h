@@ -18,6 +18,7 @@ extern mat4 ScaleBias;
 typedef struct Particle2
 {
 	float       pID;
+	float       pID2;
 	float       pRadiusOffset;
 	float       pVelocityOffset;
 	float       pDecayOffset;
@@ -36,6 +37,7 @@ typedef struct Emitter2
 	float       eSizeEnd;
 	vec3		eColorStart;
 	vec3		eColorEnd;
+	vec3		ePosition;
 }
 Emitter2;
 
@@ -68,7 +70,7 @@ public:
 		{
 			// Assign a unique ID to each particle, between 0 and 360 (in radians)
 			myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
-			
+			myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
 			// Assign random offsets within bounds
 			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
 			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
@@ -88,6 +90,7 @@ public:
 		myEmitter.eSizeEnd = 8.00f;                         // Fragment end size
 		myEmitter.eColorStart = vec3(1.00f, 0.50f, 0.00f);  // Fragment start color
 		myEmitter.eColorEnd = vec3(0.25f, 0.00f, 0.00f);    // Fragment end color
+		myEmitter.ePosition = vec3(0.00f, 0.00f, 0.00f);    // Emitter position
 
 		// Set global factors
 		float growth = myEmitter.eRadius / myEmitter.eVelocity;       // Growth time
@@ -98,11 +101,12 @@ public:
 
 		vao.generate();
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 0, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pID)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pRadiusOffset)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pVelocityOffset)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pDecayOffset)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
-		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pID2)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pRadiusOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pVelocityOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pDecayOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 6, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
 
 		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
 		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
@@ -132,13 +136,14 @@ public:
 			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
 			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
 			shader->setUniform(uniformLoc[12], 0);
+			shader->setUniform(uniformLoc[13], myEmitter.ePosition);
 
-			shader->setUniform(uniformLoc[13], fog->maxDist);
-			shader->setUniform(uniformLoc[14], fog->minDist);
-			shader->setUniform(uniformLoc[15], fog->color);
-			shader->setUniform(uniformLoc[16], fog->visibility);
-			shader->setUniform(uniformLoc[17], fog->maxHeight);
-			shader->setUniform(uniformLoc[18], fog->minHeight);
+			shader->setUniform(uniformLoc[14], fog->maxDist);
+			shader->setUniform(uniformLoc[15], fog->minDist);
+			shader->setUniform(uniformLoc[16], fog->color);
+			shader->setUniform(uniformLoc[17], fog->visibility);
+			shader->setUniform(uniformLoc[18], fog->maxHeight);
+			shader->setUniform(uniformLoc[19], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			/*
@@ -180,13 +185,14 @@ public:
 			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
 			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
 			shader->setUniform(uniformLoc[12], 0);
+			shader->setUniform(uniformLoc[13], myEmitter.ePosition);
 
-			shader->setUniform(uniformLoc[13], fog->maxDist);
-			shader->setUniform(uniformLoc[14], fog->minDist);
-			shader->setUniform(uniformLoc[15], fog->color);
-			shader->setUniform(uniformLoc[16], fog->visibility);
-			shader->setUniform(uniformLoc[17], fog->maxHeight);
-			shader->setUniform(uniformLoc[18], fog->minHeight);
+			shader->setUniform(uniformLoc[14], fog->maxDist);
+			shader->setUniform(uniformLoc[15], fog->minDist);
+			shader->setUniform(uniformLoc[16], fog->color);
+			shader->setUniform(uniformLoc[17], fog->visibility);
+			shader->setUniform(uniformLoc[18], fog->maxHeight);
+			shader->setUniform(uniformLoc[19], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -210,6 +216,7 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("u_eColorStart"));
 		uniformLoc.push_back(shader->getUniformLoc("u_eColorEnd"));
 		uniformLoc.push_back(shader->getUniformLoc("u_Texture"));
+		uniformLoc.push_back(shader->getUniformLoc("u_ePosition"));
 
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
