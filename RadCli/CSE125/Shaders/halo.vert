@@ -16,14 +16,14 @@ flat out vec3 cam;//camera in world
 
 void main(void)
 {
-    float x = uTime * cos(uK*aTheta)*sin(aTheta);
-    float y = uTime * cos(uK*aTheta)*cos(aTheta);
-	float z = 0.0;
+    //float x = uTime * cos(uK*aTheta)*sin(uK*aTheta);
+    //float y = uTime * cos(uK*aTheta)*cos(uK*aTheta);
+	//float z = 0.0;
 
 	//Convert Spherical angles to cartesian coordinates and calculate radius
-	//float x = uTime * cos(uK*aTheta)*sin(aTheta);
-	//float y = uTime * cos(uK*aTheta)*cos(aTheta);
-	//float z = uTime;
+	float x = uTime * cos(aTheta);
+	float y = uTime * sin(aTheta);
+	float z = uTime;
 
 	
 	//float x = cos(aTheta);

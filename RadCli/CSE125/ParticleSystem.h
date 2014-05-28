@@ -13,7 +13,7 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 360
+#define NUM_PARTICLES 36000
 
 typedef struct Particle
 {
@@ -47,7 +47,8 @@ public:
 		{
 			// Assign each particle its theta value (in radians)
 			//p_theta[i] = i*(3.14159265359 / 180);
-			emitter.particles[i].theta = i*(3.14159265359 / 180);
+			//emitter.particles[i].theta = i*(3.14159265359 / 180);
+			emitter.particles[i].theta = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
 			emitter.particles[i].shade.x = randomFloatBetween(-0.5f, 0.5f);
 			emitter.particles[i].shade.y = randomFloatBetween(-0.5f, 0.5f);
 			emitter.particles[i].shade.z = randomFloatBetween(-0.5f, 0.5f);

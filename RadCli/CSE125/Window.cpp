@@ -255,6 +255,49 @@ bool FLS = false;
 bool USE_JOYSTICK = false;
 int Vibrate_Frame_Num = 0;
 
+const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
+struct timezone2
+{
+	__int32  tz_minuteswest; /* minutes W of Greenwich */
+	bool  tz_dsttime;     /* type of dst correction */
+};
+
+struct timeval2 {
+	__int32    tv_sec;         /* seconds */
+	__int32    tv_usec;        /* microseconds */
+};
+
+int gettimeofday(struct timeval2 *tv/*in*/, struct timezone2 *tz/*in*/)
+{
+	FILETIME ft;
+	__int64 tmpres = 0;
+	TIME_ZONE_INFORMATION tz_winapi;
+	int rez = 0;
+
+	ZeroMemory(&ft, sizeof(ft));
+	ZeroMemory(&tz_winapi, sizeof(tz_winapi));
+
+	GetSystemTimeAsFileTime(&ft);
+
+	tmpres = ft.dwHighDateTime;
+	tmpres <<= 32;
+	tmpres |= ft.dwLowDateTime;
+
+	/*converting file time to unix epoch*/
+	tmpres /= 10;  /*convert into microseconds*/
+	tmpres -= DELTA_EPOCH_IN_MICROSECS;
+	tv->tv_sec = (__int32)(tmpres*0.000001);
+	tv->tv_usec = (tmpres % 1000000);
+
+
+	//_tzset(),don't work properly, so we use GetTimeZoneInformation
+	rez = GetTimeZoneInformation(&tz_winapi);
+	tz->tz_dsttime = (rez == 2) ? true : false;
+	tz->tz_minuteswest = tz_winapi.Bias + ((rez == 2) ? tz_winapi.DaylightBias : 0);
+
+	return 0;
+}
+
 void stopVibrate(int i){
 	Player1->Vibrate(0, 0);
 }
@@ -1000,7 +1043,16 @@ int main(int argc, char *argv[])
   ConfigSettings::config->getValue("ScreenWidth", Window::width);
   ConfigSettings::config->getValue("ScreenHeight", Window::height);
   ConfigSettings::config->getValue("Gamepad", USE_JOYSTICK);
-  
+
+  struct timeval2 tv;
+  struct timezone2 tz;
+  struct tm *tm1;
+  time_t time1;
+  ZeroMemory(&tv, sizeof(tv));
+  ZeroMemory(&tz, sizeof(tz));
+  gettimeofday(&tv, &tz); // call gettimeofday()
+  srand(tv.tv_usec * tv.tv_sec);
+
   glutInit(&argc, argv);      	      	      // initialize GLUT
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
   //glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
@@ -1949,7 +2001,7 @@ void initialize(int argc, char *argv[])
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
 	particle4 = new ParticleSystem();
-	particle4->setShader(sdrCtl.getShader("emitter"));
+	particle4->setShader(sdrCtl.getShader("halo"));
 	particle4->setType("Particle_System");
 	particle4->setName("Particle_Test");
 	particle4->setK(1.0f);

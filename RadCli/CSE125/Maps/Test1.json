@@ -1,6 +1,6 @@
 {
     "map_name": "Test 1",
-    "num_shaders": 9,
+    "num_shaders": 10,
     "shaders": [
         {
             "name": "basic_skybox",
@@ -46,6 +46,11 @@
             "name": "pe_system",
             "vert": "Shaders/pe_system.vert",
             "frag": "Shaders/pe_system.frag"
+        },
+		{
+            "name": "halo",
+            "vert": "Shaders/halo.vert",
+            "frag": "Shaders/halo.frag"
         }
     ],
     "num_audio": 8,

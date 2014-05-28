@@ -13,7 +13,7 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 180
+#define NUM_PARTICLES 1000
 
 typedef struct Particle2
 {
@@ -64,13 +64,18 @@ public:
 		time_Step = 0.5;
 		current_loop = 0;
 		loopInf = false;
+		float myTheta, myPhi;
 
 		// Load Particles
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
+			myTheta = randomFloatBetween(0.0, 360.00);
+			myPhi = randomFloatBetween(0.0, 360.00);
+			myEmitter.eParticles[i].pID = (myTheta*(3.14159265359 / 180));
+			myEmitter.eParticles[i].pID2 = (myPhi*(3.14159265359 / 180));
 			// Assign a unique ID to each particle, between 0 and 360 (in radians)
-			myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
-			myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
 			// Assign random offsets within bounds
 			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
 			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
@@ -266,8 +271,8 @@ private:
 	}
 	float randomFloatBetween(float min, float max)
 	{
-		float range = max - min;
-		return (((float)(rand() % ((unsigned)RAND_MAX + 1)) / RAND_MAX) * range) + min;
+		float myRand = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+		return myRand;
 	}
 
 	void updateTime(){

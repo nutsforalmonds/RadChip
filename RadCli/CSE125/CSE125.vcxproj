@@ -142,6 +142,8 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.frag" />
+    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.vert" />
     <None Include="Config.ini" />
     <None Include="ConfigTemplate.ini" />
     <None Include="Maps\Test1.json" />
