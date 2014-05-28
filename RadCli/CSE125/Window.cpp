@@ -1439,7 +1439,7 @@ void mouseFunc(int button, int state, int x, int y)
 					cam = new Camera();
 					cam->attach(player_list[playerID]);
 					//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
-					cam->init(2.5, 6, 1.5);
+					cam->init(1.0,1.5, 6, 1.0);
 
 					connected = true;
 				}

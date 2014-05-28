@@ -31,7 +31,8 @@ public:
 	}
 	float getPendingRote(){ return pendingRot; }
 
-	void init(float up, float back, float bottom){
+	void init(float right, float up, float back, float bottom){
+		this->right = right;
 		this->up = up;
 		this->back = back;
 		this->bottom = bottom;
@@ -43,11 +44,11 @@ public:
 
 		if (pendingRot > angle_limit){
 			setPostTrans(glm::translate(vec3(0,0,bottom/sin(pendingRot/180.0*M_PI))));
-			setPreTrans(glm::translate(vec3(0, up, 0)));
+			setPreTrans(glm::translate(vec3(right, up, 0)));
 		}
 		else{
 			setPostTrans(glm::translate(vec3(0,0,back)));
-			setPreTrans(glm::translate(vec3(0, up, 0)));
+			setPreTrans(glm::translate(vec3(right, up, 0)));
 		}
 	}
 
@@ -67,5 +68,6 @@ private:
 	float back;
 	float bottom;
 	float angle_limit;
+	float right;
 };
 
