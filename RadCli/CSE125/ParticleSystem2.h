@@ -131,13 +131,14 @@ public:
 			shader->setUniform(uniformLoc[9], myEmitter.eSizeEnd);
 			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
 			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
+			shader->setUniform(uniformLoc[12], 0);
 
-			shader->setUniform(uniformLoc[12], fog->maxDist);
-			shader->setUniform(uniformLoc[13], fog->minDist);
-			shader->setUniform(uniformLoc[14], fog->color);
-			shader->setUniform(uniformLoc[15], fog->visibility);
-			shader->setUniform(uniformLoc[16], fog->maxHeight);
-			shader->setUniform(uniformLoc[17], fog->minHeight);
+			shader->setUniform(uniformLoc[13], fog->maxDist);
+			shader->setUniform(uniformLoc[14], fog->minDist);
+			shader->setUniform(uniformLoc[15], fog->color);
+			shader->setUniform(uniformLoc[16], fog->visibility);
+			shader->setUniform(uniformLoc[17], fog->maxHeight);
+			shader->setUniform(uniformLoc[18], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			/*
@@ -178,13 +179,14 @@ public:
 			shader->setUniform(uniformLoc[9], myEmitter.eSizeEnd);
 			shader->setUniform(uniformLoc[10], myEmitter.eColorStart);
 			shader->setUniform(uniformLoc[11], myEmitter.eColorEnd);
+			shader->setUniform(uniformLoc[12], 0);
 
-			shader->setUniform(uniformLoc[12], fog->maxDist);
-			shader->setUniform(uniformLoc[13], fog->minDist);
-			shader->setUniform(uniformLoc[14], fog->color);
-			shader->setUniform(uniformLoc[15], fog->visibility);
-			shader->setUniform(uniformLoc[16], fog->maxHeight);
-			shader->setUniform(uniformLoc[17], fog->minHeight);
+			shader->setUniform(uniformLoc[13], fog->maxDist);
+			shader->setUniform(uniformLoc[14], fog->minDist);
+			shader->setUniform(uniformLoc[15], fog->color);
+			shader->setUniform(uniformLoc[16], fog->visibility);
+			shader->setUniform(uniformLoc[17], fog->maxHeight);
+			shader->setUniform(uniformLoc[18], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -207,6 +209,7 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("u_eSizeEnd"));
 		uniformLoc.push_back(shader->getUniformLoc("u_eColorStart"));
 		uniformLoc.push_back(shader->getUniformLoc("u_eColorEnd"));
+		uniformLoc.push_back(shader->getUniformLoc("u_Texture"));
 
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
