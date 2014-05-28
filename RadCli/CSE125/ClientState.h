@@ -41,6 +41,9 @@ public:
 			case 3:
 				glutSetCursor(GLUT_CURSOR_DESTROY);
 				break;
+			case 4:
+				glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+				break;
 			default:
 				break;
 		}

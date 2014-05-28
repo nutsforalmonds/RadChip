@@ -190,6 +190,7 @@ UI * myUI;
 MainMenu * myMainMenu;
 GameMenu * myGameMenu;
 DeathScreen * myDeathScreen;
+Settings * settings;
 Logo * logo;
 
 Texture * shadow;
@@ -220,10 +221,11 @@ double diff;
 int test = 0;
 float test2 = 0;
 
-const int m_lenght = 10;
+const int m_lenght = 25;
 unsigned char s_test[m_lenght];
 int but_up = 1;
 int m_pos = 0;
+int text_flag = 0;
 
 bool connected;
 std::string out;
@@ -777,7 +779,7 @@ void Window::displayCallback(void)
 		logo->draw();
 
 		glDisable(GL_DEPTH_TEST);
-		RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, s_test, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, s_test, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
@@ -872,6 +874,9 @@ void Window::displayCallback(void)
 		else if (myClientState->getState() == 3){
 			myDeathScreen->draw();
 		}
+		break;
+	case 4:
+		settings->draw();
 		break;
 	default:
 		break;
@@ -1186,19 +1191,37 @@ void keyboard(unsigned char key, int, int){
 			}
 		}
 
-		if ((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46){
+		if (((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46) && text_flag){
 			if (but_up && m_pos < m_lenght){
 				but_up = 0;
 				s_test[m_pos] = key;
 				m_pos++;
+
+				if (m_pos < m_lenght)
+				{
+					s_test[m_pos] = '|';
+				}
 			}
 		}
 
-		if (key == 8){
+		if (key == 8 && text_flag){
 			if (but_up && m_pos >= 1){
+				
 				but_up = 0;
+
+				if (m_pos < m_lenght)
+				{
+					s_test[m_pos] = 0;
+				}
+
 				m_pos--;
-				s_test[m_pos] = 0;
+				s_test[m_pos] = '|';
+			}
+		}
+
+		if (key == 13 && text_flag){
+			if (but_up){
+				text_flag = 0;
 			}
 		}
 		break;
@@ -1313,6 +1336,11 @@ void keyboard(unsigned char key, int, int){
 			myClientState->setState(1);
 		}
 		break;
+	case 4:
+		if (key == 27){
+			myClientState->setState(0);
+		}
+		break;
 	default:
 		break;
 	}
@@ -1382,6 +1410,8 @@ void keyUp (unsigned char key, int x, int y) {
 	case 2:
 		break;
 	case 3:
+		break;
+	case 4:
 		break;
 	default:
 		break;
@@ -1453,7 +1483,15 @@ void mouseFunc(int button, int state, int x, int y)
 				running = false;
 				exit(0);
 			}
+
+			else if (click == 3){
+				myClientState->setState(4);
+			}
+			else if (click == 4){
+				text_flag = 1;
+			}
 		}
+
 		break;
 	case 1:
 
@@ -1547,6 +1585,8 @@ void mouseFunc(int button, int state, int x, int y)
 			myDeathScreen->checkClick(newX, newY);
 		}
 		break;
+	case 4:
+		break;
 	default:
 		break;
 	}
@@ -1626,6 +1666,8 @@ void passiveMotionFunc(int x, int y){
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
 		myDeathScreen->checkHighlight(newX, newY);
+		break;
+	case 4:
 		break;
 	default:
 		break;
@@ -1801,6 +1843,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
+	settings = new Settings();
 	logo = new Logo();
 
 	ground = new Ground();
