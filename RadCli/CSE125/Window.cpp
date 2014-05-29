@@ -35,6 +35,7 @@
 #include "UI.h"
 #include "ClientState.h"
 #include "AnimController.h"
+#include "ParticleAnimated.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -1997,6 +1998,15 @@ void initialize(int argc, char *argv[])
 	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList4.AddBoard(vec3(1.0f, 1.0f, -6.0f));
 	m_billboardList4.BindBoards();
+
+	ParticleAnimated* p_anim = new ParticleAnimated();
+	p_anim->Init("img/monster_hellknight.png", "PNG");
+	p_anim->setShader(sdrCtl.getShader("billboard"));
+	p_anim->AddBoard(vec3(0.0f, 2.0f, 0.0f));
+	p_anim->setWidth(1.0f);
+	p_anim->setHeight(1.0f);
+	p_anim->BindBoards();
+	draw_list.push_back(p_anim);
 
 	particle = new ParticleSystem();
 	particle->setShader(sdrCtl.getShader("emitter"));

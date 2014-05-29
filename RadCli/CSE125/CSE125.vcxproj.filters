@@ -165,6 +165,9 @@
     <ClInclude Include="CXBOXController.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleAnimated.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
