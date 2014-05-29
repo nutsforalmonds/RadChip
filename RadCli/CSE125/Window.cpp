@@ -87,6 +87,7 @@ Sound* testSound[10];
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
+std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
@@ -802,6 +803,10 @@ void Window::displayCallback(void)
 		{
 			player_list[i]->draw(LightProjection, LightView);
 		}
+		for (uint i = 0; i < tower_list.size(); ++i)
+		{
+			tower_list[i]->draw(LightProjection, LightView);
+		}
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw(LightProjection, LightView);
@@ -825,6 +830,10 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < player_list.size(); ++i)
 		{
 			player_list[i]->draw();
+		}
+		for (uint i = 0; i < tower_list.size(); ++i)
+		{
+			tower_list[i]->draw();
 		}
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
@@ -924,6 +933,7 @@ void server_update(int value){
 	{
 		unsigned pos = out.find("`");
 		out = out.substr(0, pos);
+		delete recvVec;
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
 	}
@@ -932,6 +942,11 @@ void server_update(int value){
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 2: " << atoi(&((*recvVec)[2].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
+
+	//cout << "size: " << recvVec->size() << endl;
+	//for (int i = 0; i < 6; i++){
+	//	cout <<i<<" : "<< (*recvVec)[i].first.c_str()<<endl;
+	//}
 
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
 	if (recvValid)
@@ -990,6 +1005,10 @@ void server_update(int value){
 		player_list[1]->setModelM(mats[1]);
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
+
+		tower_list[0]->setModelM((*recvVec)[4].second);
+		tower_list[1]->setModelM((*recvVec)[5].second);
+
 		i++;
 
 		simulateProjectile(diff);
@@ -1446,6 +1465,8 @@ void mouseFunc(int button, int state, int x, int y)
 				testSound[7]->Play();
 				if (!connected){
 					
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
@@ -1951,7 +1972,7 @@ void initialize(int argc, char *argv[])
 	tower0->setModelM(glm::translate(vec3(0,0,-5)));
 	tower0->setShininess(30);
 	tower0->setFog(fog);
-	stationary_list.push_back(tower0);
+	tower_list.push_back(tower0);
 
 	Mesh* tower1 = new Mesh();
 	tower1->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
@@ -1961,7 +1982,7 @@ void initialize(int argc, char *argv[])
 	tower1->setModelM(glm::translate(vec3(0,0,5)));
 	tower1->setShininess(30);
 	tower1->setFog(fog);
-	stationary_list.push_back(tower1);
+	tower_list.push_back(tower1);
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");

@@ -51,7 +51,6 @@ public:
 		return NULL;
 	}
 
-
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -60,6 +59,7 @@ public:
 		//	//octree here
 			collisionDetection();
 			collisionDetectionPlayer();
+			collisionDetectionTower();
 			collisionDetectionProjectile();
 			despawnProjectile();
 			rechargeJump();
@@ -69,6 +69,7 @@ public:
 		////octree here
 		collisionDetection();
 		collisionDetectionPlayer();
+		collisionDetectionTower();
 		collisionDetectionProjectile();
 		despawnProjectile();
 		rechargeJump();
@@ -76,10 +77,10 @@ public:
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
-		//player-stationary detection
 		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = false;
 			bool touchGround2 = false;
+			//player-stationary detection
 			for (uint j = 0; j < stationary.size(); j++){
 				if (strcmp(stationary[j]->getType().c_str(), "Ground") == 0){
 					AABB pBox = player[i]->getAABB();
@@ -111,13 +112,69 @@ public:
 					stationary[j]->touchGround(touchGround2);
 				}
 			}
+			//player-tower detection
+			for (uint j = 0; j < tower.size(); j++){
+				AABB pBox = player[i]->getAABB();
+				AABB sBox = tower[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					fixCollision(player[i], tower[j], pBox, sBox, touchGround1, touchGround2);
+				}
+				tower[j]->touchGround(touchGround2);
+			}
 
 			player[i]->touchGround(touchGround1);
 		}
 	}
 
+	void collisionDetectionTower(){
+		//tower-stationary detection
+		for (uint i = 0; i < tower.size(); i++){
+			bool touchGround1 = false;
+			bool touchGround2 = false;
+			for (uint j = 0; j < stationary.size(); j++){
+				if (strcmp(stationary[j]->getType().c_str(), "Ground") == 0){
+					AABB pBox = tower[i]->getAABB();
+					vec3 mid = (pBox.max + pBox.min) / 2.0f;
+					float disp = ((Ground*)stationary[j])->getDispY(mid[0], mid[2]);
+					if (disp != -1){
+						if (pBox.min[1] < disp){
+							touchGround1 = true;
+							tower[i]->postTrans(glm::translate(vec3(0.0f, disp - pBox.min[1], 0.0f)));
+							tower[i]->clearYVelocity();
+						}
+						if (pBox.min[1] - disp < 0.1)
+							touchGround1 = true;
+					}
+				}
+				else{
+					AABB pBox = tower[i]->getAABB();
+					AABB sBox = stationary[j]->getAABB();
+					bool collide = true;
+					for (int v = 0; v < 3; v++){
+						if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+							collide = false;
+							break;
+						}
+					}
+					if (collide){
+						fixCollision(tower[i], stationary[j], pBox, sBox, touchGround1, touchGround2);
+					}
+					stationary[j]->touchGround(touchGround2);
+				}
+			}
+
+			tower[i]->touchGround(touchGround1);
+		}
+	}
 	void collisionDetectionPlayer(){
-		//player-stationary detection
+		//player-player detection
 		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = player[i]->getTouchGround();
 			for (uint j = i + 1; j < player.size(); j++){
@@ -139,7 +196,6 @@ public:
 			player[i]->touchGround(touchGround1);
 		}
 	}
-
 
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
 		float Rewind[3];
@@ -185,6 +241,7 @@ public:
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
+	void addTower(Object* t){ tower.push_back(t); }
 	void addStationary(Object* s){ stationary.push_back(s); }
 	void addProjectile(Projectile* p){ projectile.push_back(p); }
 	void setGravity(vec3& g){ gravity = g; }
@@ -216,7 +273,6 @@ public:
 	void cancelHMove(int playerID, int m){ getPlayerObj(playerID)->cancelHMove(m); }
 	void setVMove(int playerID, int m){ getPlayerObj(playerID)->setVMove(m); }
 	void cancelVMove(int playerID, int m){ getPlayerObj(playerID)->cancelVMove(m); }
-
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
@@ -262,8 +318,6 @@ public:
 			}
 		}
 	}
-
-
 	void collisionDetectionProjectile(){
 		//player-stationary detection
 		for (uint i = 0; i < projectile.size(); i++)
@@ -310,7 +364,6 @@ public:
 			}
 		}
 	}
-
 	void damagePlayer(int targetId, int playerId)
 	{
 		Object * playerHolder = getPlayerObj(playerId);
@@ -352,7 +405,6 @@ public:
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
 		}
 	}
-
 	void basicAttack(int playerID)
 	{
 	  for (uint j = 0; j < player.size(); j++)
@@ -391,7 +443,6 @@ public:
 	    }
 	  
 	}
-
 	void projectileAttack(int playerID, mat4 * cam)
 	{
 		mat4 test = *cam; //cam->getCamM();
@@ -433,7 +484,6 @@ public:
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
-
 	void despawnProjectile()
 	{
 		for (uint i = 0; i < projectile.size(); i++)
@@ -451,12 +501,10 @@ public:
 			}
 		}
 	}
-
 	void recover(int playerId)
 	{
 		getPlayerObj(playerId)->jump(20);
 	}
-
 	void rechargeJump()
 	{
 		for (uint i = 0; i < player.size(); i++)
@@ -465,43 +513,44 @@ public:
 				player[i]->incNumJumps();
 		}
 	}
-
 	void takeItem()
 	{
 
 	}
-
 	void resetVelocity(int playerId)
 	{
 		player[playerId]->resetVelocity();
 	}
-
 	int numPlayers()
 	{
 		return player.size();
 	}
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// END OF PLAYER ACTIONS ///////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	vector<mat4> getPlayerMats(){
-		vector<mat4> m;
-		for (uint i = 0; i < player.size(); i++){
-			m.push_back(player[i]->getModelM());
+	boost::array<mat4, 4> getPlayerMats(){
+		boost::array<mat4, 4> m;
+		assert(player.size() == 4);
+		for (uint i = 0; i < 4; i++){
+			m[i] = player[i]->getModelM();
 		}
 		return m;
 	}
-
 	Object * getPlayerElement(int i)
 	{
 		return player[i];
 	}
-
 	Object * getPlayer(int i)
 	{
 		return getPlayerObj(i);
+	}
+	boost::array<mat4, 2> getTowerMats(){
+		boost::array<mat4, 2> m;
+		assert(tower.size() == 2);
+		for (uint i = 0; i < 2; i++){
+			m[i] = tower[i]->getModelM();
+		}
+		return m;
 	}
 	void initialize(){
 
@@ -574,6 +623,23 @@ public:
 		md53->setPlayerID(3);
 		addPlayer(md53);
 
+		//triplet tower
+		MD5Model* tw0 = new MD5Model();
+		tw0->postTrans(glm::translate(vec3(0, 0, -5)));
+		tw0->setAABB(AABB(vec3(-0.7, 0.55, -0.7), vec3(0.7, 3.77, 0.7)));
+		tw0->setType("Model");
+		tw0->setName("Tower Model0");
+		tw0->setPlayerID(0);
+		addTower(tw0);
+
+		//pctopus tower
+		MD5Model* tw1 = new MD5Model();
+		tw1->postTrans(glm::translate(vec3(0, 0, 5)));
+		tw1->setAABB(AABB(vec3(-0.7, 0.55, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw1->setType("Model");
+		tw1->setName("Tower Model1");
+		tw1->setPlayerID(1);
+		addTower(tw1);
 
 		Ground* ground = new Ground();
 		ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
