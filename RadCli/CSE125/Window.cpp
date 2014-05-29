@@ -1943,11 +1943,15 @@ void initialize(int argc, char *argv[])
 		}
 	}
 
-	//m_pMesh2 = new Mesh();
-	//m_pMesh2->LoadMesh("Model/2Tower_6_bone.dae");
-	//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
-	//m_pMesh2->setShadowTex(shadow_map_id);
-	//m_pMesh2->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
+	Mesh* tower0 = new Mesh();
+	tower0->LoadMesh("Model/2Tower_6_bone.dae",false);
+	tower0->setShader(sdrCtl.getShader("basic_model"));
+	tower0->setShadowTex(shadow_map_id);
+	tower0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));//glm::translate(vec3(0.0, 1.0, 0.0))*
+	tower0->setModelM(mat4(1.0));
+	tower0->setShininess(30);
+	tower0->setFog(fog);
+	stationary_list.push_back(tower0);
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
