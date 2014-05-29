@@ -31,14 +31,30 @@ public:
 	ParticleAnimated(){
 		m_pTexture = NULL;
 		m_VB = INVALID_OGL_VALUE;
+		setModelM(mat4(1.0));
 	}
-	~ParticleAnimated(){
-		SAFE_DELETE(m_pTexture);
+	~ParticleAnimated(){//commented out because only mother of animated particles needs to be deleted
+		//SAFE_DELETE(m_pTexture);
 
-		if (m_VB != INVALID_OGL_VALUE)
-		{
-			glDeleteBuffers(1, &m_VB);
-		}
+		//if (m_VB != INVALID_OGL_VALUE)
+		//{
+		//	glDeleteBuffers(1, &m_VB);
+		//}
+	}
+	ParticleAnimated(const ParticleAnimated& other){
+		*this = other;
+	}
+
+	ParticleAnimated& operator = (const ParticleAnimated& other){
+		m_VB = other.m_VB;
+		m_pTexture = other.m_pTexture;
+		m_vao = other.m_vao;
+		shader = other.shader;
+		uniformLoc = other.uniformLoc;
+		width = other.width;
+		height = other.height;
+		Position = other.Position;
+		return *this;
 	}
 
 	bool Init(const std::string& TexFilename, const char* FileType){
@@ -77,54 +93,18 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("texUnit"));
 	}
 
-	void CreatePositionBuffer(){
-		vec3 Positions[NUM_ROWS * NUM_COLUMNS];
-
-		for (unsigned int j = 0; j < NUM_ROWS; j++) {
-			for (unsigned int i = 0; i < NUM_COLUMNS; i++) {
-				vec3 Pos((float)i, 1.0f, (float)j);
-				Positions[j * NUM_COLUMNS + i] = Pos;
-			}
-		}
+	void Bind(){
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 		glEnableVertexAttribArray(0);
 
 		glGenBuffers(1, &m_VB);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VB);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Positions), &Positions[0], GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		num_of_boards = NUM_ROWS * NUM_COLUMNS;
-	}
-	void CreateSinglePositionBuffer(vec3 pos){
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
-		glEnableVertexAttribArray(0);
-
-		glGenBuffers(1, &m_VB);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VB);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(pos), &pos, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		num_of_boards = 1;
-	}
-	void BindBoards(){
-		vec3 Temp[10];
-
-		for (int i = 0; i < num_of_boards; i++) {
-			Temp[i] = mBoardList[i];
-		}
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
-		glEnableVertexAttribArray(0);
-
-		glGenBuffers(1, &m_VB);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VB);
-		glBufferData(GL_ARRAY_BUFFER, 12 * num_of_boards, &Temp[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), &Position, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
-	void AddBoard(vec3 pos){
-		num_of_boards++;
-		mBoardList.push_back(pos);
+	void setPosition(vec3& p){
+		Position = p;
 	}
 	void setWidth(float f){
 		width = f;
@@ -139,10 +119,9 @@ private:
 	GLuint m_vao;
 	GLSLProgram* shader;
 	vector<int> uniformLoc;
-	vector<vec3> mBoardList;
-	int num_of_boards;
 	float width;
 	float height;
+	vec3 Position=vec3(0,0,0);
 };
 
 #endif	/* PARTICLE_ANIMATED_H */

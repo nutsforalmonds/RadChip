@@ -549,7 +549,7 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(5, 0.5, 7)));
+		md51->postTrans(glm::translate(vec3(5, 0.5, 7)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model1");
@@ -558,7 +558,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(10, 0.5, 7)));
+		md52->postTrans(glm::translate(vec3(10, 0.5, 7)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model2");
@@ -567,7 +567,7 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(5);
-		md50->postTrans(glm::translate(vec3(15, 0.5, 7)));
+		md53->postTrans(glm::translate(vec3(15, 0.5, 7)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model3");

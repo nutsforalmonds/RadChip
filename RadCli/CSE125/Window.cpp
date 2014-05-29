@@ -139,9 +139,14 @@ Ground* ground;
 SkyBox* skybox;
 Sphere* sphere;
 TextureScreen* texScreen;
-Mesh* mother_of_wrench;
-Mesh* mother_of_banana;
-Mesh* mother_of_nut;
+
+struct Mother{
+	Mesh* mother_of_wrench;
+	Mesh* mother_of_banana;
+	Mesh* mother_of_nut;
+	ParticleAnimated* mother_of_p_anim;
+}MOM;
+
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
@@ -321,16 +326,16 @@ void projectileAttack(int playerID, Camera * cam)
 
 	Projectile* pjt = new Projectile(player_list.size());
 	if (playerID % 2){//monkey throws
-		pjt->setVAO(mother_of_banana->getVAO());
-		pjt->setEntries(mother_of_banana->getEntries());
-		pjt->setTextures(mother_of_banana->getTextures());
-		pjt->setAdjustM(mother_of_banana->getAdjustM());
+		pjt->setVAO(MOM.mother_of_banana->getVAO());
+		pjt->setEntries(MOM.mother_of_banana->getEntries());
+		pjt->setTextures(MOM.mother_of_banana->getTextures());
+		pjt->setAdjustM(MOM.mother_of_banana->getAdjustM());
 	}
 	else{//chipmonk throws
-		pjt->setVAO(mother_of_nut->getVAO());
-		pjt->setEntries(mother_of_nut->getEntries());
-		pjt->setTextures(mother_of_nut->getTextures());
-		pjt->setAdjustM(mother_of_nut->getAdjustM());
+		pjt->setVAO(MOM.mother_of_nut->getVAO());
+		pjt->setEntries(MOM.mother_of_nut->getEntries());
+		pjt->setTextures(MOM.mother_of_nut->getTextures());
+		pjt->setAdjustM(MOM.mother_of_nut->getAdjustM());
 	}
 	pjt->setShader(sdrCtl.getShader("basic_model"));
 	pjt->setShininess(30);
@@ -1875,29 +1880,29 @@ void initialize(int argc, char *argv[])
 	draw_list.push_back(skybox);
 
 	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
-	mother_of_wrench = new Mesh();
-	mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
-	mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
-	mother_of_wrench->setShadowTex(shadow_map_id);
-	mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-	mother_of_wrench->setShininess(30);
-	mother_of_wrench->setFog(fog);
+	MOM.mother_of_wrench = new Mesh();
+	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
+	MOM.mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_wrench->setShadowTex(shadow_map_id);
+	MOM.mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	MOM.mother_of_wrench->setShininess(30);
+	MOM.mother_of_wrench->setFog(fog);
 
-	mother_of_banana = new Mesh();
-	mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
-	mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
-	mother_of_banana->setShadowTex(shadow_map_id);
-	mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
-	mother_of_banana->setShininess(30);
-	mother_of_banana->setFog(fog);
+	MOM.mother_of_banana = new Mesh();
+	MOM.mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
+	MOM.mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_banana->setShadowTex(shadow_map_id);
+	MOM.mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+	MOM.mother_of_banana->setShininess(30);
+	MOM.mother_of_banana->setFog(fog);
 
-	mother_of_nut = new Mesh();
-	mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
-	mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
-	mother_of_nut->setShadowTex(shadow_map_id);
-	mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
-	mother_of_nut->setShininess(30);
-	mother_of_nut->setFog(fog);
+	MOM.mother_of_nut = new Mesh();
+	MOM.mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
+	MOM.mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_nut->setShadowTex(shadow_map_id);
+	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
+	MOM.mother_of_nut->setShininess(30);
+	MOM.mother_of_nut->setFog(fog);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
@@ -1956,26 +1961,6 @@ void initialize(int argc, char *argv[])
 	tryThis->setShadowTex(shadow_map_id);
 	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 
-	////*md5 = new MD5Model();
-	//md5->LoadModel("Model/monky_MD5_try1.md5mesh");
-	//md5->LoadAnim("Model/monky_MD5_try1.md5anim");
-	//md5->setShader(sdrCtl.getShader("basic_texture"));
-	//md5->setShininess(30);
-	//md5->setAdjustM(glm::translate(vec3(-15.05, 4.1, -1.2))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.2, 0.2, 0.2)));
-	//md5->setShadowTex(shadow_map_id);
-	////player_list.push_back(md5);*/
-
-	//md6 = new MD5Model();
-	//md6->LoadModel("Model/fleurOptonl.md5mesh");
-	//md6->LoadAnim("Model/fleurOptonl.md5anim");
-	//md6->setShader(sdrCtl.getShader("basic_texture"));
-	//md6->setShininess(30);
-	//md6->setAdjustM(glm::translate(vec3(0.0, 1.7, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.05, 0.05, 0.05)));
-	//md6->setModelM(glm::translate(vec3(10.0, 0.0, 0.0)));
-	//md6->setShadowTex(shadow_map_id);
-	//md6->setType("Model");
-	//md6->setName("Player Model");
-
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList.AddBoard(vec3(9.0f, 1.0f, 9.0f));
@@ -1999,13 +1984,15 @@ void initialize(int argc, char *argv[])
 	m_billboardList4.AddBoard(vec3(1.0f, 1.0f, -6.0f));
 	m_billboardList4.BindBoards();
 
-	ParticleAnimated* p_anim = new ParticleAnimated();
-	p_anim->Init("img/monster_hellknight.png", "PNG");
-	p_anim->setShader(sdrCtl.getShader("billboard"));
-	p_anim->AddBoard(vec3(0.0f, 2.0f, 0.0f));
-	p_anim->setWidth(1.0f);
-	p_anim->setHeight(1.0f);
-	p_anim->BindBoards();
+	MOM.mother_of_p_anim = new ParticleAnimated();
+	MOM.mother_of_p_anim->Init("img/monster_hellknight.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 2.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(1.0f);
+	MOM.mother_of_p_anim->setHeight(1.0f);
+	MOM.mother_of_p_anim->Bind();
+
+	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	draw_list.push_back(p_anim);
 
 	particle = new ParticleSystem();
