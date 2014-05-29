@@ -349,7 +349,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(50);
+	pjt->setDistance(20);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -361,7 +361,7 @@ void projectileAttack(int playerID, Camera * cam)
 	projectile_list.push_back(pjt);
 	pjt->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(vec3(holder)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }

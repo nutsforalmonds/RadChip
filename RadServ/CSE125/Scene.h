@@ -59,20 +59,22 @@ public:
 		while (t > sub){
 			t -= sub;
 			resolvePlayerTransition(sub);
+			resolveProjectileTransition(sub);
+			resolveTowerTransition(sub);
 		//	//octree here
 			collisionDetection();
 			collisionDetectionPlayer();
-			collisionDetectionTower();
 			collisionDetectionProjectile();
 			despawnProjectile();
 			rechargeJump();
 			respawnPlayer();
 		}
 		resolvePlayerTransition(t);
+		resolveProjectileTransition(t);
+		resolveTowerTransition(t);
 		////octree here
 		collisionDetection();
 		collisionDetectionPlayer();
-		collisionDetectionTower();
 		collisionDetectionProjectile();
 		despawnProjectile();
 		rechargeJump();
@@ -115,25 +117,9 @@ public:
 					stationary[j]->touchGround(touchGround2);
 				}
 			}
-			//player-tower detection
-			for (uint j = 0; j < tower.size(); j++){
-				AABB pBox = player[i]->getAABB();
-				AABB sBox = tower[j]->getAABB();
-				bool collide = true;
-				for (int v = 0; v < 3; v++){
-					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
-						collide = false;
-						break;
-					}
-				}
-				if (collide){
-					fixCollision(player[i], tower[j], pBox, sBox, touchGround1, touchGround2);
-				}
-				tower[j]->touchGround(touchGround2);
-			}
-
 			player[i]->touchGround(touchGround1);
 		}
+		collisionDetectionTower();
 	}
 
 	void collisionDetectionTower(){
@@ -177,9 +163,26 @@ public:
 		}
 	}
 	void collisionDetectionPlayer(){
-		//player-player detection
 		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = player[i]->getTouchGround();
+			//player-tower detection
+			for (uint j = 0; j < tower.size(); j++){
+				bool touchGround2 = tower[j]->getTouchGround();
+				AABB pBox = player[i]->getAABB();
+				AABB sBox = tower[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					fixCollision(player[i], tower[j], pBox, sBox, touchGround1, touchGround2);
+				}
+				tower[j]->touchGround(touchGround2);
+			}
+			//player-player detection
 			for (uint j = i + 1; j < player.size(); j++){
 				bool touchGround2 = player[j]->getTouchGround();
 				AABB pBox = player[i]->getAABB();
@@ -267,6 +270,16 @@ public:
 			player[i]->addVelocity(gravity*extra_speed);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
+	}
+	void resolveTowerTransition(float t){
+		float extra_speed = t*GRAVITY_SCALE;
+		for (uint i = 0; i < tower.size(); i++){
+			tower[i]->addVelocity(gravity*extra_speed);
+			tower[i]->postTrans(glm::translate(tower[i]->getVelocity()*t));
+		}
+	}
+	void resolveProjectileTransition(float t){
+		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < projectile.size(); i++){
 			projectile[i]->addVelocity(gravity*t);
 			projectile[i]->postTrans(glm::translate(projectile[i]->getVelocity()*t));
@@ -593,7 +606,7 @@ public:
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(PLAYER_SPEED);
-		md50->postTrans(glm::translate(vec3(-20, 0.5, -20)));
+		md50->postTrans(glm::translate(vec3(-10, 0.5, 25)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
 		md50->setName("Player Model0");
@@ -602,7 +615,8 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(PLAYER_SPEED);
-		md51->postTrans(glm::translate(vec3(5, 0.5, 7)));
+		md51->postTrans(glm::translate(vec3(-10, 0.5, -25)));
+		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model1");
@@ -611,7 +625,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(PLAYER_SPEED);
-		md52->postTrans(glm::translate(vec3(10, 0.5, 7)));
+		md52->postTrans(glm::translate(vec3(10, 0.5, 25)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model2");
@@ -620,7 +634,8 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(PLAYER_SPEED);
-		md53->postTrans(glm::translate(vec3(15, 0.5, 7)));
+		md53->postTrans(glm::translate(vec3(10, 0.5, -25)));
+		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model3");
@@ -629,8 +644,8 @@ public:
 
 		//triplet tower
 		MD5Model* tw0 = new MD5Model();
-		tw0->postTrans(glm::translate(vec3(0, 0, -5)));
-		tw0->setAABB(AABB(vec3(-0.7, 0.55, -0.7), vec3(0.7, 3.77, 0.7)));
+		tw0->postTrans(glm::translate(vec3(0, 0, -25)));
+		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
 		tw0->setPlayerID(0);
@@ -638,8 +653,8 @@ public:
 
 		//pctopus tower
 		MD5Model* tw1 = new MD5Model();
-		tw1->postTrans(glm::translate(vec3(0, 0, 5)));
-		tw1->setAABB(AABB(vec3(-0.7, 0.55, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw1->postTrans(glm::translate(vec3(0, 0, 25)));
+		tw1->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw1->setType("Model");
 		tw1->setName("Tower Model1");
 		tw1->setPlayerID(1);
