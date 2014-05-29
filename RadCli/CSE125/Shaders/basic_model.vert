@@ -39,7 +39,7 @@ void main()
 	}
 
 	if(BoneTransform == mat4(0.0)){
-		BoneTransform = mat4(1.0);
+		BoneTransform[3][3] = 1.0;
 	}
 
     vec4 PosL    = BoneTransform * vec4(VertexPosition, 1.0);
