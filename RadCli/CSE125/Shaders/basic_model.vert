@@ -31,11 +31,15 @@ void main()
 	mat4 BoneTransform = mat4(0.0);
 
 	for(int i=0; i<BoneCount; i++){
-		if(i<4 && BoneIDs1[i]!=-1){
+		if(i<4 ){
 			BoneTransform += gBones[BoneIDs1[i]] * Weights1[i];
-		}else if(BoneIDs2[i%4]!=-1){
+		}else{
 			BoneTransform += gBones[BoneIDs2[i%4]] * Weights2[i%4];
 		}
+	}
+
+	if(BoneTransform == mat4(0.0)){
+		BoneTransform = mat4(1.0);
 	}
 
     vec4 PosL    = BoneTransform * vec4(VertexPosition, 1.0);

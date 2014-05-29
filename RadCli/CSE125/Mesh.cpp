@@ -354,6 +354,7 @@ void Mesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>
 			m_BoneMapping[node_map[BoneName]] = BoneIndex;
 		}
 		else {
+			assert(false);
 			BoneIndex = m_BoneMapping[node_map[BoneName]];
 		}
 
