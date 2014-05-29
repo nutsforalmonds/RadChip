@@ -1074,6 +1074,8 @@ void server_update(int value){
 
 		tower_list[0]->setModelM((*recvVec)[4].second);
 		tower_list[1]->setModelM((*recvVec)[5].second);
+		tower_list[2]->setModelM((*recvVec)[6].second);
+		tower_list[3]->setModelM((*recvVec)[7].second);
 
 		i++;
 
@@ -1535,6 +1537,8 @@ void mouseFunc(int button, int state, int x, int y)
 				testSound[7]->Play();
 				if (!connected){
 					
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
@@ -2185,10 +2189,10 @@ void initialize(int argc, char *argv[])
 	tower2->setShader(sdrCtl.getShader("basic_model"));
 	tower2->setShadowTex(shadow_map_id);
 	tower2->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
-	tower2->setModelM(glm::translate(vec3(30.0, 0.0, 30.0)));
+	tower2->setModelM(glm::translate(vec3(30.0, 2.5, 30.0)));
 	tower2->setShininess(30);
 	tower2->setFog(fog);
-	stationary_list.push_back(tower2);
+	tower_list.push_back(tower2);
 
 	t2_ps_01 = new ParticleSystem(GL_POINTS);
 	t2_ps_01->setShader(sdrCtl.getShader("halo"));
@@ -2204,7 +2208,7 @@ void initialize(int argc, char *argv[])
 	t2_ps_01->setTime_Min(5.0);
 	t2_ps_01->setTime((float)5.0);
 	t2_ps_01->setLoopInf(true);
-	t2_ps_01->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t2_ps_01->setModelM(glm::translate(vec3(30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	t2_ps_02 = new ParticleSystem(GL_POINTS);
 	t2_ps_02->setShader(sdrCtl.getShader("halo"));
@@ -2220,7 +2224,7 @@ void initialize(int argc, char *argv[])
 	t2_ps_02->setTime_Min(5.0);
 	t2_ps_02->setTime((float)21.0);
 	t2_ps_02->setLoopInf(true);
-	t2_ps_02->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t2_ps_02->setModelM(glm::translate(vec3(30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	t2_ps_03 = new ParticleSystem(GL_POINTS);
 	t2_ps_03->setShader(sdrCtl.getShader("halo"));
@@ -2236,17 +2240,17 @@ void initialize(int argc, char *argv[])
 	t2_ps_03->setTime_Min(5.0);
 	t2_ps_03->setTime((float)37.0);
 	t2_ps_03->setLoopInf(true);
-	t2_ps_03->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t2_ps_03->setModelM(glm::translate(vec3(30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	Mesh* tower3 = new Mesh();
 	tower3->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
 	tower3->setShader(sdrCtl.getShader("basic_model"));
 	tower3->setShadowTex(shadow_map_id);
 	tower3->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
-	tower3->setModelM(glm::translate(vec3(-30.0, 0.0, 30.0)));
+	tower3->setModelM(glm::translate(vec3(-30.0, 2.5, 30.0)));
 	tower3->setShininess(30);
 	tower3->setFog(fog);
-	stationary_list.push_back(tower3);
+	tower_list.push_back(tower3);
 
 	t3_ps_01 = new ParticleSystem(GL_POINTS);
 	t3_ps_01->setShader(sdrCtl.getShader("halo"));
@@ -2262,7 +2266,7 @@ void initialize(int argc, char *argv[])
 	t3_ps_01->setTime_Min(5.0);
 	t3_ps_01->setTime((float)5.0);
 	t3_ps_01->setLoopInf(true);
-	t3_ps_01->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t3_ps_01->setModelM(glm::translate(vec3(-30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	t3_ps_02 = new ParticleSystem(GL_POINTS);
 	t3_ps_02->setShader(sdrCtl.getShader("halo"));
@@ -2278,7 +2282,7 @@ void initialize(int argc, char *argv[])
 	t3_ps_02->setTime_Min(5.0);
 	t3_ps_02->setTime((float)21.0);
 	t3_ps_02->setLoopInf(true);
-	t3_ps_02->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t3_ps_02->setModelM(glm::translate(vec3(-30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	t3_ps_03 = new ParticleSystem(GL_POINTS);
 	t3_ps_03->setShader(sdrCtl.getShader("halo"));
@@ -2294,7 +2298,7 @@ void initialize(int argc, char *argv[])
 	t3_ps_03->setTime_Min(5.0);
 	t3_ps_03->setTime((float)37.0);
 	t3_ps_03->setLoopInf(true);
-	t3_ps_03->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+	t3_ps_03->setModelM(glm::translate(vec3(-30.0f, 6.75f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	//Bottom Mid Platform
 	Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);

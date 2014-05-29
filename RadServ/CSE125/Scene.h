@@ -561,10 +561,10 @@ public:
 	{
 		return getPlayerObj(i);
 	}
-	boost::array<mat4, 2> getTowerMats(){
-		boost::array<mat4, 2> m;
-		assert(tower.size() == 2);
-		for (uint i = 0; i < 2; i++){
+	boost::array<mat4, 4> getTowerMats(){
+		boost::array<mat4, 4> m;
+		assert(tower.size() == 4);
+		for (uint i = 0; i < 4; i++){
 			m[i] = tower[i]->getModelM();
 		}
 		return m;
@@ -644,21 +644,39 @@ public:
 
 		//triplet tower
 		MD5Model* tw0 = new MD5Model();
-		tw0->postTrans(glm::translate(vec3(0, 0, -25)));
+		tw0->postTrans(glm::translate(vec3(-30.0, 0.0, -30.0)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
 		tw0->setPlayerID(0);
 		addTower(tw0);
 
-		//pctopus tower
+		//triplet tower
 		MD5Model* tw1 = new MD5Model();
-		tw1->postTrans(glm::translate(vec3(0, 0, 25)));
-		tw1->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw1->postTrans(glm::translate(vec3(30.0, 0.0, -30.0)));
+		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setType("Model");
-		tw1->setName("Tower Model1");
-		tw1->setPlayerID(1);
+		tw1->setName("Tower Model0");
+		tw1->setPlayerID(0);
 		addTower(tw1);
+
+		//pctopus tower
+		MD5Model* tw2 = new MD5Model();
+		tw2->postTrans(glm::translate(vec3(30.0, 0, 30.0)));
+		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw2->setType("Model");
+		tw2->setName("Tower Model1");
+		tw2->setPlayerID(1);
+		addTower(tw2);
+
+		//pctopus tower
+		MD5Model* tw3 = new MD5Model();
+		tw3->postTrans(glm::translate(vec3(-30.0, 0, 30.0)));
+		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw3->setType("Model");
+		tw3->setName("Tower Model1");
+		tw3->setPlayerID(1);
+		addTower(tw3);
 
 		Ground* ground = new Ground();
 		ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");

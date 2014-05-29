@@ -794,6 +794,32 @@ std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str
 		glm::mat4 bbb = (glm::make_mat4(nums));
 		pos->push_back(std::make_pair("t1", bbb));
 	}
+	if (!parsedFromString["t2"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["t2"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("t2", bbb));
+	}
+	if (!parsedFromString["t3"].IsNull()){
+		float nums[16] = { 0.0 };
+		int k = 0;
+		for (int i = 0; i < 4; ++i){
+			for (int j = 0; j < 4; ++j){
+				nums[i * 4 + j] = (float)parsedFromString["t3"][k].GetDouble();
+				k++;
+			}
+		}
+
+		glm::mat4 bbb = (glm::make_mat4(nums));
+		pos->push_back(std::make_pair("t3", bbb));
+	}
 
 	return pos;
 }

@@ -154,6 +154,8 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -254,7 +256,7 @@ int main(int argc, char *argv[])
 
 		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
-		boost::array<mat4, 2> mt = scene->getTowerMats();
+		boost::array<mat4, 4> mt = scene->getTowerMats();
 
 		// Print out matrix contents
 		/*
@@ -288,6 +290,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[3] = std::make_pair(p3.c_str(), mp[3]);
 		(*sendVec)[4] = std::make_pair("t0", mt[0]);
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
+		(*sendVec)[6] = std::make_pair("t2", mt[2]);
+		(*sendVec)[7] = std::make_pair("t3", mt[3]);
 
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
