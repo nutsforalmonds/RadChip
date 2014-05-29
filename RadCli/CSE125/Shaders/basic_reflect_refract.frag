@@ -83,7 +83,7 @@ void main()
 	}
 
 	float depth = texture(shadowMap,vec2(shadow_coord[0],shadow_coord[1])).x;
-  	if(shadow_coord[2]<=depth+0.0002)
+  	if(shadow_coord[2]<=depth+0.000025)
 	  	lit=1;
 	 else
 	 	lit=0;

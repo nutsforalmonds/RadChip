@@ -666,11 +666,11 @@ public:
 		ground->loadNormalTex("img/moon_tex/moon_NRM.png", "PNG");
 		ground->loadOccTex("img/moon_tex/moon_OCC.png", "PNG");
 		ground->loadSpecTex("img/moon_tex/moon_SPEC.png", "PNG");
-		ground->setDimensionS(40);
-		ground->setDimensionT(40);
-		ground->setRow(501);
-		ground->setColumn(501);
-		ground->setHeight(1 / 1.0);
+		ground->setDimensionS(200);
+		ground->setDimensionT(200);
+		ground->setRow(100);
+		ground->setColumn(100);
+		ground->setHeight(6);
 		ground->generate();
 		ground->setType("Ground");
 		ground->setName("Ground");
@@ -679,7 +679,7 @@ public:
 		//Bottom Mid Platform
 		Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
 		//platform_01->setSpeed(5);
-		platform_01->postTrans(glm::translate(vec3(0, 10.0, 0)));
+		platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
 		platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
 		platform_01->setType("Cube");
 		platform_01->setName("Test Platform");
@@ -688,7 +688,7 @@ public:
 		//1st Bottom Side Step Platform
 		Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_02->postTrans(glm::translate(vec3(20.0, 5.0, 0)));
+		platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
 		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
@@ -697,7 +697,7 @@ public:
 		//2nd Bottom Side Step Platform
 		Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_03->postTrans(glm::translate(vec3(-20.0, 5.0, 0)));
+		platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
 		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
@@ -706,7 +706,7 @@ public:
 		//Platform Steps 1-1
 		Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_04->postTrans(glm::translate(vec3(0.0, 15.0, 20.0)));
+		platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
 		platform_04->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_04->setType("Cube");
 		platform_04->setName("Test Platform");
@@ -715,7 +715,7 @@ public:
 		//Platform Steps 1-2
 		Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_05->postTrans(glm::translate(vec3(0.0, 20.0, 40.0)));
+		platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
 		platform_05->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
 		platform_05->setType("Cube");
 		platform_05->setName("Test Platform");
@@ -724,7 +724,7 @@ public:
 		//Platform Steps 1-3
 		Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_06->postTrans(glm::translate(vec3(0.0, 25.0, 60.0)));
+		platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
 		platform_06->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_06->setType("Cube");
 		platform_06->setName("Test Platform");
@@ -733,7 +733,7 @@ public:
 		//Platform Steps 2-1
 		Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_07->postTrans(glm::translate(vec3(0.0, 15.0, -20.0)));
+		platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
 		platform_07->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_07->setType("Cube");
 		platform_07->setName("Test Platform");
@@ -742,7 +742,7 @@ public:
 		//Platform Steps 2-2
 		Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_08->postTrans(glm::translate(vec3(0.0, 20.0, -40.0)));
+		platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
 		platform_08->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
 		platform_08->setType("Cube");
 		platform_08->setName("Test Platform");
@@ -751,7 +751,7 @@ public:
 		//Platform Steps 2-3
 		Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_09->postTrans(glm::translate(vec3(0.0, 25.0, -60.0)));
+		platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
 		platform_09->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_09->setType("Cube");
 		platform_09->setName("Test Platform");
