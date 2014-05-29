@@ -184,6 +184,7 @@ void mouseFunc(int button, int state, int x, int y);
 void motionFunc(int x, int y);
 void passiveMotionFunc(int x, int y);
 void specialKeyboardFunc(int key, int x, int y);
+float randomFloatBetween(float min, float max);
 
 void updateShaders();
 void setupShaders();
@@ -1892,7 +1893,7 @@ void initialize(int argc, char *argv[])
 	ground->setName("Ground");
 	stationary_list.push_back(ground);
 
-	skybox = new SkyBox(-50, 50, -50, 50, -50, 50);
+	skybox = new SkyBox(-100, 100, -100, 100, -100, 100);
 	skybox->setShader(sdrCtl.getShader("basic_skybox"));
 	skybox->setTexUnit(3);
 	skybox->setFog(fog);
@@ -1983,6 +1984,211 @@ void initialize(int argc, char *argv[])
 	tower1->setShininess(30);
 	tower1->setFog(fog);
 	tower_list.push_back(tower1);
+
+	//Bottom Mid Platform
+	Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
+	//platform_01->setSpeed(5);
+	platform_01->setKd(vec3(0.8, 0.0, 0.0));
+	platform_01->setKa(vec3(0.3, 0.0, 0.0));
+	platform_01->setKs(vec3(0.4, 0.0, 0.0));
+	platform_01->setShininess(100);
+	platform_01->setFog(fog);
+	platform_01->setReflectFactor(vec2(0.2, 0.5));
+	platform_01->setEta(0.5);
+	platform_01->setCubeMapUnit(3);
+	platform_01->setSpeed(5);
+	platform_01->postTrans(glm::translate(vec3(0, 10.0, 0)));
+	//platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
+	platform_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_01->setShadowTex(shadow_map_id);
+	platform_01->setType("Cube");
+	platform_01->setName("Test Platform");
+	stationary_list.push_back(platform_01);
+
+	//1st Bottom Side Step Platform
+	Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
+	//platform_01->setSpeed(5);
+	platform_02->setKd(vec3(0.15, 0.15, 0.92));
+	platform_02->setKa(vec3(0.0, 0.0, 0.3));
+	platform_02->setKs(vec3(0.0, 0.0, 0.4));
+	platform_02->setShininess(100);
+	platform_02->setFog(fog);
+	platform_02->setReflectFactor(vec2(0.2, 0.5));
+	platform_02->setEta(0.5);
+	platform_02->setCubeMapUnit(3);
+	platform_02->setSpeed(5);
+	platform_02->postTrans(glm::translate(vec3(20.0, 5.0, 0)));
+	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_02->setShadowTex(shadow_map_id);
+	platform_02->setType("Cube");
+	platform_02->setName("Test Platform");
+	stationary_list.push_back(platform_02);
+
+	//2nd Bottom Side Step Platform
+	Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
+	//platform_01->setSpeed(5);
+	platform_03->setKd(vec3(0.11, 0.67, 0.09));
+	platform_03->setKa(vec3(0.0, 0.2, 0.0));
+	platform_03->setKs(vec3(0.0, 0.3, 0.0));
+	platform_03->setShininess(100);
+	platform_03->setFog(fog);
+	platform_03->setReflectFactor(vec2(0.2, 0.5));
+	platform_03->setEta(0.5);
+	platform_03->setCubeMapUnit(3);
+	platform_03->setSpeed(5);
+	platform_03->postTrans(glm::translate(vec3(-20.0, 5.0, 0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_03->setShadowTex(shadow_map_id);
+	platform_03->setType("Cube");
+	platform_03->setName("Test Platform");
+	stationary_list.push_back(platform_03);
+
+	//Platform Steps 1-1
+	Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//platform_01->setSpeed(5);
+	platform_04->setKd(vec3(0.8, 0.8, 0.0));
+	platform_04->setKa(vec3(0.3, 0.3, 0.0));
+	platform_04->setKs(vec3(0.4, 0.4, 0.0));
+	platform_04->setShininess(100);
+	platform_04->setFog(fog);
+	platform_04->setReflectFactor(vec2(0.2, 0.5));
+	platform_04->setEta(0.5);
+	platform_04->setCubeMapUnit(3);
+	platform_04->setSpeed(5);
+	platform_04->postTrans(glm::translate(vec3(0.0, 15.0, 20.0)));
+	//platform_04->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_04->setShadowTex(shadow_map_id);
+	platform_04->setType("Cube");
+	platform_04->setName("Test Platform");
+	stationary_list.push_back(platform_04);
+
+	//Platform Steps 1-2
+	Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
+	//platform_05->setSpeed(5);
+	platform_05->setKd(vec3(0.0, 0.8, 0.8));
+	platform_05->setKa(vec3(0.0, 0.3, 0.3));
+	platform_05->setKs(vec3(0.0, 0.4, 0.4));
+	platform_05->setShininess(100);
+	platform_05->setFog(fog);
+	platform_05->setReflectFactor(vec2(0.2, 0.5));
+	platform_05->setEta(0.5);
+	platform_05->setCubeMapUnit(3);
+	platform_05->setSpeed(5);
+	platform_05->postTrans(glm::translate(vec3(0.0, 20.0, 40.0)));
+	//platform_05->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_05->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_05->setShadowTex(shadow_map_id);
+	platform_05->setType("Cube");
+	platform_05->setName("Test Platform");
+	stationary_list.push_back(platform_05);
+
+	//Platform Steps 1-3
+	Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//platform_06->setSpeed(5);
+	platform_06->setKd(vec3(0.8, 0.0, 0.8));
+	platform_06->setKa(vec3(0.3, 0.0, 0.3));
+	platform_06->setKs(vec3(0.4, 0.0, 0.4));
+	platform_06->setShininess(100);
+	platform_06->setFog(fog);
+	platform_06->setReflectFactor(vec2(0.2, 0.5));
+	platform_06->setEta(0.5);
+	platform_06->setCubeMapUnit(3);
+	platform_06->setSpeed(5);
+	platform_06->postTrans(glm::translate(vec3(0.0, 25.0, 60.0)));
+	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_06->setShadowTex(shadow_map_id);
+	platform_06->setType("Cube");
+	platform_06->setName("Test Platform");
+	stationary_list.push_back(platform_06);
+
+	//Platform Steps 2-1
+	Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//platform_07->setSpeed(5);
+	platform_07->setKd(vec3(0.8, 0.0, 0.8));
+	platform_07->setKa(vec3(0.3, 0.0, 0.3));
+	platform_07->setKs(vec3(0.4, 0.0, 0.4));
+	platform_07->setShininess(100);
+	platform_07->setFog(fog);
+	platform_07->setReflectFactor(vec2(0.2, 0.5));
+	platform_07->setEta(0.5);
+	platform_07->setCubeMapUnit(3);
+	platform_07->setSpeed(5);
+	platform_07->postTrans(glm::translate(vec3(0.0, 15.0, -20.0)));
+	//platform_07->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_07->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_07->setShadowTex(shadow_map_id);
+	platform_07->setType("Cube");
+	platform_07->setName("Test Platform");
+	stationary_list.push_back(platform_07);
+
+	//Platform Steps 2-2
+	Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
+	//platform_08->setSpeed(5);
+	platform_08->setKd(vec3(0.0, 0.8, 0.8));
+	platform_08->setKa(vec3(0.0, 0.3, 0.3));
+	platform_08->setKs(vec3(0.0, 0.4, 0.4));
+	platform_08->setShininess(100);
+	platform_08->setFog(fog);
+	platform_08->setReflectFactor(vec2(0.2, 0.5));
+	platform_08->setEta(0.5);
+	platform_08->setCubeMapUnit(3);
+	platform_08->setSpeed(5);
+	platform_08->postTrans(glm::translate(vec3(0.0, 20.0, -40.0)));
+	//platform_08->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_08->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_08->setShadowTex(shadow_map_id);
+	platform_08->setType("Cube");
+	platform_08->setName("Test Platform");
+	stationary_list.push_back(platform_08);
+
+	//Platform Steps 2-3
+	Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//platform_09->setSpeed(5);
+	platform_09->setKd(vec3(0.8, 0.8, 0.0));
+	platform_09->setKa(vec3(0.3, 0.3, 0.0));
+	platform_09->setKs(vec3(0.4, 0.4, 0.0));
+	platform_09->setShininess(100);
+	platform_09->setFog(fog);
+	platform_09->setReflectFactor(vec2(0.2, 0.5));
+	platform_09->setEta(0.5);
+	platform_09->setCubeMapUnit(3);
+	platform_09->setSpeed(5);
+	platform_09->postTrans(glm::translate(vec3(0.0, 25.0, -60.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_09->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_09->setShadowTex(shadow_map_id);
+	platform_09->setType("Cube");
+	platform_09->setName("Test Platform");
+	stationary_list.push_back(platform_09);
+
+
+	/*
+	float temp_x = randomFloatBetween(0.0, 1.0);
+	float temp_y = randomFloatBetween(0.0, 1.0);
+	float temp_z = randomFloatBetween(0.0, 1.0);
+	Cube* platform_04 = new Cube(0.0, 0.0, -0.5, 0.5, -5.0, 5.0);
+	//platform_01->setSpeed(5);
+	platform_04->setKd(vec3(temp_x, temp_y, temp_z));
+	platform_04->setKa(vec3(temp_x*0.2, temp_y*0.2, temp_z*0.2));
+	platform_04->setKs(vec3(temp_x*0.3, temp_y*0.3, temp_z*0.3));
+	platform_04->setShininess(100);
+	platform_04->setFog(fog);
+	platform_04->setReflectFactor(vec2(0.2, 0.5));
+	platform_04->setEta(0.5);
+	platform_04->setCubeMapUnit(3);
+	platform_04->setSpeed(5);
+	platform_04->postTrans(glm::translate(vec3(0.0, 2.5, 0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_04->setShadowTex(shadow_map_id);
+	platform_04->setType("Cube");
+	platform_04->setName("Test Platform");
+	stationary_list.push_back(platform_04);
+	*/
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
@@ -2269,6 +2475,12 @@ void Window::removeDrawList(const std::string& name)
 		if ((*draw_list[j]).getName() == name)
 			draw_list.erase(draw_list.begin() + j);
 	}
+}
+
+float randomFloatBetween(float min, float max)
+{
+	float myRand = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+	return myRand;
 }
 
 
