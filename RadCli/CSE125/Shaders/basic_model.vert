@@ -31,9 +31,9 @@ void main()
 	mat4 BoneTransform = mat4(0.0);
 
 	for(int i=0; i<BoneCount; i++){
-		if(i<4){
+		if(i<4 && BoneIDs1[i]!=-1){
 			BoneTransform += gBones[BoneIDs1[i]] * Weights1[i];
-		}else{
+		}else if(BoneIDs2[i%4]!=-1){
 			BoneTransform += gBones[BoneIDs2[i%4]] * Weights2[i%4];
 		}
 	}

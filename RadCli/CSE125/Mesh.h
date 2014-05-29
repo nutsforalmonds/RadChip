@@ -160,6 +160,10 @@ private:
 
 		VertexBoneData()
 		{
+			for (uint i = 0; i < NUM_BONES_PER_VEREX; i++){
+				IDs[i] = -1;
+				Weights[i] = 0;
+			}
 			Reset();
 		};
 
