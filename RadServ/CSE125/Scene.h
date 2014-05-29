@@ -19,6 +19,9 @@ using namespace std;
 
 #define MAX_DAMAGE -50
 
+#define GRAVITY_SCALE 2.5
+#define PLAYER_SPEED 10
+
 
 class Scene
 {
@@ -202,8 +205,9 @@ public:
 		camM[playerID] = m;
 	}
 	void resolvePlayerTransition(float t){
+		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < player.size(); i++){
-			player[i]->addVelocity(gravity*t);
+			player[i]->addVelocity(gravity*extra_speed);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
 		for (uint i = 0; i < projectile.size(); i++){
@@ -539,7 +543,7 @@ public:
 		addPlayer(cube3);*/
 
 		MD5Model* md50 = new MD5Model();
-		md50->setSpeed(5);
+		md50->setSpeed(PLAYER_SPEED);
 		md50->postTrans(glm::translate(vec3(-20, 0.5, -20)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
@@ -548,7 +552,7 @@ public:
 		addPlayer(md50);
 
 		MD5Model* md51 = new MD5Model();
-		md51->setSpeed(5);
+		md51->setSpeed(PLAYER_SPEED);
 		md51->postTrans(glm::translate(vec3(5, 0.5, 7)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
@@ -557,7 +561,7 @@ public:
 		addPlayer(md51);
 
 		MD5Model* md52 = new MD5Model();
-		md52->setSpeed(5);
+		md52->setSpeed(PLAYER_SPEED);
 		md52->postTrans(glm::translate(vec3(10, 0.5, 7)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
@@ -566,14 +570,13 @@ public:
 		addPlayer(md52);
 
 		MD5Model* md53 = new MD5Model();
-		md53->setSpeed(5);
+		md53->setSpeed(PLAYER_SPEED);
 		md53->postTrans(glm::translate(vec3(15, 0.5, 7)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model3");
 		md53->setPlayerID(3);
 		addPlayer(md53);
-
 
 		Ground* ground = new Ground();
 		ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
@@ -590,6 +593,87 @@ public:
 		ground->setType("Ground");
 		ground->setName("Ground");
 		addStationary(ground);
+
+		//Bottom Mid Platform
+		Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
+		//platform_01->setSpeed(5);
+		platform_01->postTrans(glm::translate(vec3(0, 10.0, 0)));
+		platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
+		platform_01->setType("Cube");
+		platform_01->setName("Test Platform");
+		addStationary(platform_01);
+
+		//1st Bottom Side Step Platform
+		Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
+		//platform_01->setSpeed(5);
+		platform_02->postTrans(glm::translate(vec3(20.0, 5.0, 0)));
+		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		platform_02->setType("Cube");
+		platform_02->setName("Test Platform");
+		addStationary(platform_02);
+
+		//2nd Bottom Side Step Platform
+		Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
+		//platform_01->setSpeed(5);
+		platform_03->postTrans(glm::translate(vec3(-20.0, 5.0, 0)));
+		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		platform_03->setType("Cube");
+		platform_03->setName("Test Platform");
+		addStationary(platform_03);
+
+		//Platform Steps 1-1
+		Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+		//platform_01->setSpeed(5);
+		platform_04->postTrans(glm::translate(vec3(0.0, 15.0, 20.0)));
+		platform_04->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_04->setType("Cube");
+		platform_04->setName("Test Platform");
+		addStationary(platform_04);
+
+		//Platform Steps 1-2
+		Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
+		//platform_01->setSpeed(5);
+		platform_05->postTrans(glm::translate(vec3(0.0, 20.0, 40.0)));
+		platform_05->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_05->setType("Cube");
+		platform_05->setName("Test Platform");
+		addStationary(platform_05);
+
+		//Platform Steps 1-3
+		Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+		//platform_01->setSpeed(5);
+		platform_06->postTrans(glm::translate(vec3(0.0, 25.0, 60.0)));
+		platform_06->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_06->setType("Cube");
+		platform_06->setName("Test Platform");
+		addStationary(platform_06);
+
+		//Platform Steps 2-1
+		Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+		//platform_01->setSpeed(5);
+		platform_07->postTrans(glm::translate(vec3(0.0, 15.0, -20.0)));
+		platform_07->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_07->setType("Cube");
+		platform_07->setName("Test Platform");
+		addStationary(platform_07);
+
+		//Platform Steps 2-2
+		Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
+		//platform_01->setSpeed(5);
+		platform_08->postTrans(glm::translate(vec3(0.0, 20.0, -40.0)));
+		platform_08->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_08->setType("Cube");
+		platform_08->setName("Test Platform");
+		addStationary(platform_08);
+
+		//Platform Steps 2-3
+		Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+		//platform_01->setSpeed(5);
+		platform_09->postTrans(glm::translate(vec3(0.0, 25.0, -60.0)));
+		platform_09->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_09->setType("Cube");
+		platform_09->setName("Test Platform");
+		addStationary(platform_09);
 
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
