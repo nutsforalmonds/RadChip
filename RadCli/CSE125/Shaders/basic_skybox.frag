@@ -32,9 +32,14 @@ void main()
 	//apply fog
 	//ads = mix(ads,vec4(fog.color,1.0),fog.visibility); 
 
-	float height = abs(position.y);
-	float height_factor = (fog.maxHeight-height)/(fog.maxHeight-fog.minHeight);
-	height_factor = pow(clamp(height_factor,0.0,1.0),2.0)*fog.visibility;
+	float height = position.y-4;
+	float height_factor;
+	if(height>=0){
+		height_factor = (fog.maxHeight-height)/(fog.maxHeight-fog.minHeight);
+		height_factor = pow(clamp(height_factor,0.0,1.0),2.0)*fog.visibility;
+	}else{
+		height_factor = fog.visibility;
+	}
 	ads = mix(ads,vec4(fog.color,1.0),height_factor);
 
 	FragColor = ads;

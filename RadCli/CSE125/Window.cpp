@@ -102,6 +102,7 @@ Sound* testSound[10];
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
+std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
@@ -144,7 +145,7 @@ ShaderController sdrCtl;
 int oldX,oldY,mouseDown,mouseButton;
 
 Light light[1];
-Fog fog(60, 10, 20, 0, 0.8f, vec3(1, 1, 1));
+Fog fog(150, 10, 40, 0, 0.9f, vec3(0.8, 0.8, 1));
 Fog emptyFog(1,0,1,0,0.0f,vec3(0,0,0));
 
 //Scene* scene;
@@ -171,8 +172,8 @@ float cam_dx = 0;
 
 GLuint fboHandle;
 GLuint depth_fbo;
-GLsizei depth_texture_width = 1024;
-GLsizei depth_texture_height = 1024;
+GLsizei depth_texture_width = 4096;//4096
+GLsizei depth_texture_height = 4096;
 GLuint shadow_map_id = 10;//shadow map stored in GL_TEXTURE10
 
 string configBuf;
@@ -390,7 +391,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(50);
+	pjt->setDistance(20);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -402,7 +403,7 @@ void projectileAttack(int playerID, Camera * cam)
 	projectile_list.push_back(pjt);
 	pjt->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(vec3(holder)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(vec3(holder)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 }
@@ -848,6 +849,10 @@ void Window::displayCallback(void)
 		{
 			player_list[i]->draw(LightProjection, LightView);
 		}
+		for (uint i = 0; i < tower_list.size(); ++i)
+		{
+			tower_list[i]->draw(LightProjection, LightView);
+		}
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw(LightProjection, LightView);
@@ -870,6 +875,10 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < player_list.size(); ++i)
 		{
 			player_list[i]->draw();
+		}
+		for (uint i = 0; i < tower_list.size(); ++i)
+		{
+			tower_list[i]->draw();
 		}
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
@@ -990,6 +999,7 @@ void server_update(int value){
 	{
 		unsigned pos = out.find("`");
 		out = out.substr(0, pos);
+		delete recvVec;
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
 	}
@@ -998,6 +1008,11 @@ void server_update(int value){
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 2: " << atoi(&((*recvVec)[2].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
+
+	//cout << "size: " << recvVec->size() << endl;
+	//for (int i = 0; i < 6; i++){
+	//	cout <<i<<" : "<< (*recvVec)[i].first.c_str()<<endl;
+	//}
 
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
 	if (recvValid)
@@ -1056,6 +1071,10 @@ void server_update(int value){
 		player_list[1]->setModelM(mats[1]);
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
+
+		tower_list[0]->setModelM((*recvVec)[4].second);
+		tower_list[1]->setModelM((*recvVec)[5].second);
+
 		i++;
 
 		simulateProjectile(diff);
@@ -1520,6 +1539,8 @@ void mouseFunc(int button, int state, int x, int y)
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
@@ -1883,13 +1904,13 @@ void initialize(int argc, char *argv[])
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
 	light[0].type=1;
-	light[0].pos = vec4(0,40,0,1);
+	light[0].pos = vec4(0,200,0,1);
 	light[0].specular = vec3(0.1,0.1,0.1);
 	light[0].diffuse = vec3(0.9, 0.9, 0.9);
 	light[0].ambient = vec3(0.5, 0.5, 0.5);
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
-	LightView = glm::lookAt(vec3(0,40,0), vec3(0, 0, 0), vec3(1, 0, 0));
+	LightView = glm::lookAt(vec3(light[0].pos), vec3(0, 0, 0), vec3(1, 0, 0));
 	LightProjection = glm::frustum(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1000.0f);
 
 	//fog.maxDist=4;
@@ -1929,11 +1950,11 @@ void initialize(int argc, char *argv[])
 	ground->loadNormalTex("img/moon_tex/moon_NRM.png", "PNG");
 	ground->loadOccTex("img/moon_tex/moon_OCC.png", "PNG");
 	ground->loadSpecTex("img/moon_tex/moon_SPEC.png", "PNG");
-	ground->setDimensionS(40);
-	ground->setDimensionT(40);
-	ground->setRow(51);
-	ground->setColumn(51);
-	ground->setHeight(1 / 1.0);
+	ground->setDimensionS(200);
+	ground->setDimensionT(200);
+	ground->setRow(100);
+	ground->setColumn(100);
+	ground->setHeight(6);
 	ground->setShadowTex(shadow_map_id);
 	ground->setFog(fog);
 	ground->generate();
@@ -1941,7 +1962,7 @@ void initialize(int argc, char *argv[])
 	ground->setName("Ground");
 	stationary_list.push_back(ground);
 
-	skybox = new SkyBox(-100, 100, -100, 100, -100, 100);
+	skybox = new SkyBox(-200, 200, -200, 200, -200, 200);
 	skybox->setShader(sdrCtl.getShader("basic_skybox"));
 	skybox->setTexUnit(3);
 	skybox->setFog(fog);
@@ -2021,7 +2042,7 @@ void initialize(int argc, char *argv[])
 	tower0->setModelM(glm::translate(vec3(-30.0,0.0,-30.0)));
 	tower0->setShininess(30);
 	tower0->setFog(fog);
-	stationary_list.push_back(tower0);
+	tower_list.push_back(tower0);
 
 	t0_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t0_ps_01->setShader(sdrCtl.getShader("pe_torus"));
@@ -2094,7 +2115,7 @@ void initialize(int argc, char *argv[])
 	tower1->setModelM(glm::translate(vec3(30.0, 0.0, -30.0)));
 	tower1->setShininess(30);
 	tower1->setFog(fog);
-	stationary_list.push_back(tower1);
+	tower_list.push_back(tower1);
 
 	t1_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t1_ps_01->setShader(sdrCtl.getShader("pe_torus"));
@@ -2287,7 +2308,7 @@ void initialize(int argc, char *argv[])
 	platform_01->setEta(0.5);
 	platform_01->setCubeMapUnit(3);
 	platform_01->setSpeed(5);
-	platform_01->postTrans(glm::translate(vec3(0, 10.0, 0)));
+	platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
 	//platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
 	platform_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_01->setShadowTex(shadow_map_id);
@@ -2307,7 +2328,7 @@ void initialize(int argc, char *argv[])
 	platform_02->setEta(0.5);
 	platform_02->setCubeMapUnit(3);
 	platform_02->setSpeed(5);
-	platform_02->postTrans(glm::translate(vec3(20.0, 5.0, 0)));
+	platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
 	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_02->setShadowTex(shadow_map_id);
@@ -2327,7 +2348,7 @@ void initialize(int argc, char *argv[])
 	platform_03->setEta(0.5);
 	platform_03->setCubeMapUnit(3);
 	platform_03->setSpeed(5);
-	platform_03->postTrans(glm::translate(vec3(-20.0, 5.0, 0)));
+	platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_03->setShadowTex(shadow_map_id);
@@ -2347,7 +2368,7 @@ void initialize(int argc, char *argv[])
 	platform_04->setEta(0.5);
 	platform_04->setCubeMapUnit(3);
 	platform_04->setSpeed(5);
-	platform_04->postTrans(glm::translate(vec3(0.0, 15.0, 20.0)));
+	platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
 	//platform_04->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_04->setShadowTex(shadow_map_id);
@@ -2367,7 +2388,7 @@ void initialize(int argc, char *argv[])
 	platform_05->setEta(0.5);
 	platform_05->setCubeMapUnit(3);
 	platform_05->setSpeed(5);
-	platform_05->postTrans(glm::translate(vec3(0.0, 20.0, 40.0)));
+	platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
 	//platform_05->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_05->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_05->setShadowTex(shadow_map_id);
@@ -2387,7 +2408,7 @@ void initialize(int argc, char *argv[])
 	platform_06->setEta(0.5);
 	platform_06->setCubeMapUnit(3);
 	platform_06->setSpeed(5);
-	platform_06->postTrans(glm::translate(vec3(0.0, 25.0, 60.0)));
+	platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
 	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_06->setShadowTex(shadow_map_id);
@@ -2407,7 +2428,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setEta(0.5);
 	platform_07->setCubeMapUnit(3);
 	platform_07->setSpeed(5);
-	platform_07->postTrans(glm::translate(vec3(0.0, 15.0, -20.0)));
+	platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
 	//platform_07->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_07->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_07->setShadowTex(shadow_map_id);
@@ -2427,7 +2448,7 @@ void initialize(int argc, char *argv[])
 	platform_08->setEta(0.5);
 	platform_08->setCubeMapUnit(3);
 	platform_08->setSpeed(5);
-	platform_08->postTrans(glm::translate(vec3(0.0, 20.0, -40.0)));
+	platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
 	//platform_08->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_08->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_08->setShadowTex(shadow_map_id);
@@ -2447,7 +2468,7 @@ void initialize(int argc, char *argv[])
 	platform_09->setEta(0.5);
 	platform_09->setCubeMapUnit(3);
 	platform_09->setSpeed(5);
-	platform_09->postTrans(glm::translate(vec3(0.0, 25.0, -60.0)));
+	platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_09->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_09->setShadowTex(shadow_map_id);
@@ -2494,31 +2515,31 @@ void initialize(int argc, char *argv[])
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList.AddBoard(vec3(9.0f, 1.0f, 9.0f));
-	m_billboardList.AddBoard(vec3(-9.0f, 1.0f, -9.0f));
-	m_billboardList.AddBoard(vec3(-9.0f, 1.0f, 9.0f));
-	m_billboardList.AddBoard(vec3(9.0f, 1.0f, -9.0f));
+	m_billboardList.AddBoard(vec3(9.0f, 7.0f, 9.0f));
+	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, -9.0f));
+	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, 9.0f));
+	m_billboardList.AddBoard(vec3(9.0f, 7.0f, -9.0f));
 	m_billboardList.BindBoards();
 
 	m_billboardList2.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList2.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList2.AddBoard(vec3(1.0f, 1.0f, 9.0f));
+	m_billboardList2.AddBoard(vec3(1.0f, 7.0f, 9.0f));
 	m_billboardList2.BindBoards();
 
 	m_billboardList3.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList3.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList3.AddBoard(vec3(1.0f, 1.0f, -9.0f));
+	m_billboardList3.AddBoard(vec3(1.0f, 7.0f, -9.0f));
 	m_billboardList3.BindBoards();
 
 	m_billboardList4.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList4.AddBoard(vec3(1.0f, 1.0f, -6.0f));
+	m_billboardList4.AddBoard(vec3(1.0f, 7.0f, -6.0f));
 	m_billboardList4.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
 	MOM.mother_of_p_anim->Init("img/monster_hellknight.png", "PNG");
 	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 2.0f, 0.0f));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 7.0f, 0.0f));
 	MOM.mother_of_p_anim->setWidth(1.0f);
 	MOM.mother_of_p_anim->setHeight(1.0f);
 	MOM.mother_of_p_anim->Bind();

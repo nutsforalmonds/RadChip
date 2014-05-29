@@ -54,12 +54,13 @@ public:
 		return NULL;
 	}
 
-
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
 			t -= sub;
 			resolvePlayerTransition(sub);
+			resolveProjectileTransition(sub);
+			resolveTowerTransition(sub);
 		//	//octree here
 			collisionDetection();
 			collisionDetectionPlayer();
@@ -69,6 +70,8 @@ public:
 			respawnPlayer();
 		}
 		resolvePlayerTransition(t);
+		resolveProjectileTransition(t);
+		resolveTowerTransition(t);
 		////octree here
 		collisionDetection();
 		collisionDetectionPlayer();
@@ -79,10 +82,10 @@ public:
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
-		//player-stationary detection
 		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = false;
 			bool touchGround2 = false;
+			//player-stationary detection
 			for (uint j = 0; j < stationary.size(); j++){
 				if (strcmp(stationary[j]->getType().c_str(), "Ground") == 0){
 					AABB pBox = player[i]->getAABB();
@@ -114,15 +117,72 @@ public:
 					stationary[j]->touchGround(touchGround2);
 				}
 			}
-
 			player[i]->touchGround(touchGround1);
 		}
+		collisionDetectionTower();
 	}
 
+	void collisionDetectionTower(){
+		//tower-stationary detection
+		for (uint i = 0; i < tower.size(); i++){
+			bool touchGround1 = false;
+			bool touchGround2 = false;
+			for (uint j = 0; j < stationary.size(); j++){
+				if (strcmp(stationary[j]->getType().c_str(), "Ground") == 0){
+					AABB pBox = tower[i]->getAABB();
+					vec3 mid = (pBox.max + pBox.min) / 2.0f;
+					float disp = ((Ground*)stationary[j])->getDispY(mid[0], mid[2]);
+					if (disp != -1){
+						if (pBox.min[1] < disp){
+							touchGround1 = true;
+							tower[i]->postTrans(glm::translate(vec3(0.0f, disp - pBox.min[1], 0.0f)));
+							tower[i]->clearYVelocity();
+						}
+						if (pBox.min[1] - disp < 0.1)
+							touchGround1 = true;
+					}
+				}
+				else{
+					AABB pBox = tower[i]->getAABB();
+					AABB sBox = stationary[j]->getAABB();
+					bool collide = true;
+					for (int v = 0; v < 3; v++){
+						if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+							collide = false;
+							break;
+						}
+					}
+					if (collide){
+						fixCollision(tower[i], stationary[j], pBox, sBox, touchGround1, touchGround2);
+					}
+					stationary[j]->touchGround(touchGround2);
+				}
+			}
+
+			tower[i]->touchGround(touchGround1);
+		}
+	}
 	void collisionDetectionPlayer(){
-		//player-stationary detection
 		for (uint i = 0; i < player.size(); i++){
 			bool touchGround1 = player[i]->getTouchGround();
+			//player-tower detection
+			for (uint j = 0; j < tower.size(); j++){
+				bool touchGround2 = tower[j]->getTouchGround();
+				AABB pBox = player[i]->getAABB();
+				AABB sBox = tower[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					fixCollision(player[i], tower[j], pBox, sBox, touchGround1, touchGround2);
+				}
+				tower[j]->touchGround(touchGround2);
+			}
+			//player-player detection
 			for (uint j = i + 1; j < player.size(); j++){
 				bool touchGround2 = player[j]->getTouchGround();
 				AABB pBox = player[i]->getAABB();
@@ -142,7 +202,6 @@ public:
 			player[i]->touchGround(touchGround1);
 		}
 	}
-
 
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
 		float Rewind[3];
@@ -188,6 +247,7 @@ public:
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
+	void addTower(Object* t){ tower.push_back(t); }
 	void addStationary(Object* s){ stationary.push_back(s); }
 	void addProjectile(Projectile* p){ projectile.push_back(p); }
 	void setGravity(vec3& g){ gravity = g; }
@@ -210,6 +270,16 @@ public:
 			player[i]->addVelocity(gravity*extra_speed);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
+	}
+	void resolveTowerTransition(float t){
+		float extra_speed = t*GRAVITY_SCALE;
+		for (uint i = 0; i < tower.size(); i++){
+			tower[i]->addVelocity(gravity*extra_speed);
+			tower[i]->postTrans(glm::translate(tower[i]->getVelocity()*t));
+		}
+	}
+	void resolveProjectileTransition(float t){
+		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < projectile.size(); i++){
 			projectile[i]->addVelocity(gravity*t);
 			projectile[i]->postTrans(glm::translate(projectile[i]->getVelocity()*t));
@@ -220,7 +290,6 @@ public:
 	void cancelHMove(int playerID, int m){ getPlayerObj(playerID)->cancelHMove(m); }
 	void setVMove(int playerID, int m){ getPlayerObj(playerID)->setVMove(m); }
 	void cancelVMove(int playerID, int m){ getPlayerObj(playerID)->cancelVMove(m); }
-
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
@@ -266,8 +335,6 @@ public:
 			}
 		}
 	}
-
-
 	void collisionDetectionProjectile(){
 		//player-stationary detection
 		for (uint i = 0; i < projectile.size(); i++)
@@ -314,7 +381,6 @@ public:
 			}
 		}
 	}
-
 	void damagePlayer(int targetId, int playerId)
 	{
 		Object * playerHolder = getPlayerObj(playerId);
@@ -356,7 +422,6 @@ public:
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
 		}
 	}
-
 	void basicAttack(int playerID)
 	{
 	  for (uint j = 0; j < player.size(); j++)
@@ -395,7 +460,6 @@ public:
 	    }
 	  
 	}
-
 	void projectileAttack(int playerID, mat4 * cam)
 	{
 		mat4 test = *cam; //cam->getCamM();
@@ -437,7 +501,6 @@ public:
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
-
 	void despawnProjectile()
 	{
 		for (uint i = 0; i < projectile.size(); i++)
@@ -455,12 +518,10 @@ public:
 			}
 		}
 	}
-
 	void recover(int playerId)
 	{
 		getPlayerObj(playerId)->jump(20);
 	}
-
 	void rechargeJump()
 	{
 		for (uint i = 0; i < player.size(); i++)
@@ -469,43 +530,44 @@ public:
 				player[i]->incNumJumps();
 		}
 	}
-
 	void takeItem()
 	{
 
 	}
-
 	void resetVelocity(int playerId)
 	{
 		player[playerId]->resetVelocity();
 	}
-
 	int numPlayers()
 	{
 		return player.size();
 	}
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// END OF PLAYER ACTIONS ///////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	vector<mat4> getPlayerMats(){
-		vector<mat4> m;
-		for (uint i = 0; i < player.size(); i++){
-			m.push_back(player[i]->getModelM());
+	boost::array<mat4, 4> getPlayerMats(){
+		boost::array<mat4, 4> m;
+		assert(player.size() == 4);
+		for (uint i = 0; i < 4; i++){
+			m[i] = player[i]->getModelM();
 		}
 		return m;
 	}
-
 	Object * getPlayerElement(int i)
 	{
 		return player[i];
 	}
-
 	Object * getPlayer(int i)
 	{
 		return getPlayerObj(i);
+	}
+	boost::array<mat4, 2> getTowerMats(){
+		boost::array<mat4, 2> m;
+		assert(tower.size() == 2);
+		for (uint i = 0; i < 2; i++){
+			m[i] = tower[i]->getModelM();
+		}
+		return m;
 	}
 	void initialize(){
 
@@ -544,7 +606,7 @@ public:
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(PLAYER_SPEED);
-		md50->postTrans(glm::translate(vec3(-20, 0.5, -20)));
+		md50->postTrans(glm::translate(vec3(-10, 0.5, 25)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
 		md50->setName("Player Model0");
@@ -553,7 +615,8 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(PLAYER_SPEED);
-		md51->postTrans(glm::translate(vec3(5, 0.5, 7)));
+		md51->postTrans(glm::translate(vec3(-10, 0.5, -25)));
+		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
 		md51->setName("Player Model1");
@@ -562,7 +625,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(PLAYER_SPEED);
-		md52->postTrans(glm::translate(vec3(10, 0.5, 7)));
+		md52->postTrans(glm::translate(vec3(10, 0.5, 25)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->setType("Model");
 		md52->setName("Player Model2");
@@ -571,12 +634,31 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(PLAYER_SPEED);
-		md53->postTrans(glm::translate(vec3(15, 0.5, 7)));
+		md53->postTrans(glm::translate(vec3(10, 0.5, -25)));
+		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
 		md53->setName("Player Model3");
 		md53->setPlayerID(3);
 		addPlayer(md53);
+
+		//triplet tower
+		MD5Model* tw0 = new MD5Model();
+		tw0->postTrans(glm::translate(vec3(0, 0, -25)));
+		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
+		tw0->setType("Model");
+		tw0->setName("Tower Model0");
+		tw0->setPlayerID(0);
+		addTower(tw0);
+
+		//pctopus tower
+		MD5Model* tw1 = new MD5Model();
+		tw1->postTrans(glm::translate(vec3(0, 0, 25)));
+		tw1->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw1->setType("Model");
+		tw1->setName("Tower Model1");
+		tw1->setPlayerID(1);
+		addTower(tw1);
 
 		Ground* ground = new Ground();
 		ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
@@ -584,11 +666,11 @@ public:
 		ground->loadNormalTex("img/moon_tex/moon_NRM.png", "PNG");
 		ground->loadOccTex("img/moon_tex/moon_OCC.png", "PNG");
 		ground->loadSpecTex("img/moon_tex/moon_SPEC.png", "PNG");
-		ground->setDimensionS(40);
-		ground->setDimensionT(40);
-		ground->setRow(501);
-		ground->setColumn(501);
-		ground->setHeight(1 / 1.0);
+		ground->setDimensionS(200);
+		ground->setDimensionT(200);
+		ground->setRow(100);
+		ground->setColumn(100);
+		ground->setHeight(6);
 		ground->generate();
 		ground->setType("Ground");
 		ground->setName("Ground");
@@ -597,7 +679,7 @@ public:
 		//Bottom Mid Platform
 		Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
 		//platform_01->setSpeed(5);
-		platform_01->postTrans(glm::translate(vec3(0, 10.0, 0)));
+		platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
 		platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
 		platform_01->setType("Cube");
 		platform_01->setName("Test Platform");
@@ -606,7 +688,7 @@ public:
 		//1st Bottom Side Step Platform
 		Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_02->postTrans(glm::translate(vec3(20.0, 5.0, 0)));
+		platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
 		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
@@ -615,7 +697,7 @@ public:
 		//2nd Bottom Side Step Platform
 		Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_03->postTrans(glm::translate(vec3(-20.0, 5.0, 0)));
+		platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
 		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
@@ -624,7 +706,7 @@ public:
 		//Platform Steps 1-1
 		Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_04->postTrans(glm::translate(vec3(0.0, 15.0, 20.0)));
+		platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
 		platform_04->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_04->setType("Cube");
 		platform_04->setName("Test Platform");
@@ -633,7 +715,7 @@ public:
 		//Platform Steps 1-2
 		Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_05->postTrans(glm::translate(vec3(0.0, 20.0, 40.0)));
+		platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
 		platform_05->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
 		platform_05->setType("Cube");
 		platform_05->setName("Test Platform");
@@ -642,7 +724,7 @@ public:
 		//Platform Steps 1-3
 		Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_06->postTrans(glm::translate(vec3(0.0, 25.0, 60.0)));
+		platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
 		platform_06->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_06->setType("Cube");
 		platform_06->setName("Test Platform");
@@ -651,7 +733,7 @@ public:
 		//Platform Steps 2-1
 		Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_07->postTrans(glm::translate(vec3(0.0, 15.0, -20.0)));
+		platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
 		platform_07->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_07->setType("Cube");
 		platform_07->setName("Test Platform");
@@ -660,7 +742,7 @@ public:
 		//Platform Steps 2-2
 		Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 		//platform_01->setSpeed(5);
-		platform_08->postTrans(glm::translate(vec3(0.0, 20.0, -40.0)));
+		platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
 		platform_08->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
 		platform_08->setType("Cube");
 		platform_08->setName("Test Platform");
@@ -669,7 +751,7 @@ public:
 		//Platform Steps 2-3
 		Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
 		//platform_01->setSpeed(5);
-		platform_09->postTrans(glm::translate(vec3(0.0, 25.0, -60.0)));
+		platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
 		platform_09->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_09->setType("Cube");
 		platform_09->setName("Test Platform");
