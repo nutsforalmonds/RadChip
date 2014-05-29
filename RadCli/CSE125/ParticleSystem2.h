@@ -70,7 +70,7 @@ public:
 		for (int i = 0; i<NUM_PARTICLES; i++)
 		{
 			myTheta = randomFloatBetween(0.0, 360.00);
-			myPhi = randomFloatBetween(0.0, 360.00);
+			myPhi = randomFloatBetween(0.0, 180.00);
 			myEmitter.eParticles[i].pID = (myTheta*(3.14159265359 / 180));
 			myEmitter.eParticles[i].pID2 = (myPhi*(3.14159265359 / 180));
 			// Assign a unique ID to each particle, between 0 and 360 (in radians)
@@ -102,6 +102,78 @@ public:
 		life = growth + myEmitter.eDecay + oDecay;                    // Simulation lifetime
 	
 		float drag = 10.00f;                                   // Drag (air resistance)
+		gravity = vec2(0.00f, -9.81f*(1.0f / drag));           // World gravity
+
+		vao.generate();
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 0, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pID)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pID2)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pRadiusOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pVelocityOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pDecayOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
+		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 6, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
+
+		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
+		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+	}
+
+	ParticleSystem2(float oRadius, float oVelocity, float oDecay, float oSize, float oColor, float theta_min, float theta_max, float phi_min, float phi_max, float drag){
+
+		gravity = vec2(0.0f, 0.0f);
+		life = 0.0f;
+		//time = 0.0f;
+
+		// Offset bounds
+		//float oRadius = 0.25f;      // 0.0 = circle; 1.0 = ring
+		//float oVelocity = 0.50f;    // Speed
+		//float oDecay = 0.25f;       // Time
+		//float oSize = 8.00f;        // Pixels
+		//float oColor = 0.25f;       // 0.5 = 50% shade offset
+
+		awesome_time = 0.0;
+		time_Max = 40.0;
+		time_Min = 0.0;
+		time_Step = 0.5;
+		current_loop = 0;
+		loopInf = false;
+		float myTheta, myPhi;
+
+		// Load Particles
+		for (int i = 0; i<NUM_PARTICLES; i++)
+		{
+			myTheta = randomFloatBetween(theta_min, theta_max);
+			myPhi = randomFloatBetween(phi_min, phi_max);
+			myEmitter.eParticles[i].pID = (myTheta*(3.14159265359 / 180));
+			myEmitter.eParticles[i].pID2 = (myPhi*(3.14159265359 / 180));
+			// Assign a unique ID to each particle, between 0 and 360 (in radians)
+			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			// Assign random offsets within bounds
+			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
+			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
+			myEmitter.eParticles[i].pDecayOffset = (-oDecay) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oDecay)-(-oDecay))));
+			myEmitter.eParticles[i].pSizeOffset = (-oSize) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oSize)-(-oSize))));
+			float r = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			float g = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			float b = (-oColor) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((oColor)-(-oColor))));
+			myEmitter.eParticles[i].pColorOffset = vec3(r, g, b);
+		}
+
+		// Load Properties
+		myEmitter.eRadius = 3.75f;							// Blast radius
+		myEmitter.eVelocity = 3.00f;                        // Explosion velocity
+		myEmitter.eDecay = 4.00f;                           // Explosion decay
+		myEmitter.eSizeStart = 32.00f;                      // Fragment start size
+		myEmitter.eSizeEnd = 8.00f;                         // Fragment end size
+		myEmitter.eColorStart = vec3(1.00f, 0.50f, 0.00f);  // Fragment start color
+		myEmitter.eColorEnd = vec3(0.25f, 0.00f, 0.00f);    // Fragment end color
+		myEmitter.ePosition = vec3(0.00f, 0.00f, 0.00f);    // Emitter position
+
+		// Set global factors
+		float growth = myEmitter.eRadius / myEmitter.eVelocity;       // Growth time
+		life = growth + myEmitter.eDecay + oDecay;                    // Simulation lifetime
+
+		//float drag = 10.00f;                                   // Drag (air resistance)
 		gravity = vec2(0.00f, -9.81f*(1.0f / drag));           // World gravity
 
 		vao.generate();
@@ -264,6 +336,38 @@ public:
 		current_loop = 0;
 		awesome_time = time_Min;
 	}
+
+	// Blast radius
+	void setBlastRadius(float br){ myEmitter.eRadius = br; }
+	float getBlastRadius(){ return myEmitter.eRadius; }
+
+	// Explosion velocity
+	void setExplosionVelocity(float ev){ myEmitter.eVelocity = ev; }
+	float getExplosionVelocity(){ return myEmitter.eVelocity; }
+
+	// Explosion decay
+	void setExplosionDecay(float ed){ myEmitter.eDecay = ed; }
+	float getExplosionDecay(){ return myEmitter.eDecay; }
+	
+	// Fragment start size
+	void setFragStartSize(float fss){ myEmitter.eSizeStart = fss; }
+	float getFragStartSize(){ return myEmitter.eSizeStart; }
+
+	// Fragment end size
+	void setFragEndSize(float fes){ myEmitter.eSizeEnd = fes; }
+	float getFragEndSize(){ return myEmitter.eSizeEnd; }
+
+	// Fragment start color
+	void setFragStartColor(vec3 fsc){ myEmitter.eColorStart = fsc; }
+	vec3 getFragStartColor(){ return myEmitter.eColorStart; }
+                 
+	// Fragment end color
+	void setFragEndColor(vec3 fec){ myEmitter.eColorEnd = fec; }
+	vec3 getFragEndColor(){ return myEmitter.eColorEnd; }
+
+	// Emitter position
+	void setEmitterPosition(vec3 ep){ myEmitter.ePosition = ep; }
+	vec3 getEmitterPosition(){ return myEmitter.ePosition; }
 
 private:
 	void generate(){

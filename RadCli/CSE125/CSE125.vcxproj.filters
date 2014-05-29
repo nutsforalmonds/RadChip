@@ -310,5 +310,11 @@
     <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\pe_torus.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\pe_torus.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -43,6 +43,7 @@
 
 #include <assert.h>
 #include "ParticleSystem.h"
+#include "ParticleSystem2.h"
 ParticleSystem* particle;
 ParticleSystem* particle2;
 ParticleSystem* particle3;
@@ -51,10 +52,24 @@ ParticleSystem* particle5;
 ParticleSystem* particle6;
 ParticleSystem* particle7;
 ParticleSystem* particle8;
+
+ParticleSystem2* t0_ps_01;
+ParticleSystem2* t0_ps_02;
+ParticleSystem2* t0_ps_03;
+ParticleSystem2* t1_ps_01;
+ParticleSystem2* t1_ps_02;
+ParticleSystem2* t1_ps_03;
+ParticleSystem* t2_ps_01;
+ParticleSystem* t2_ps_02;
+ParticleSystem* t2_ps_03;
+ParticleSystem* t3_ps_01;
+ParticleSystem* t3_ps_02;
+ParticleSystem* t3_ps_03;
 long long m_currentTimeMillis;
 
-#include "ParticleSystem2.h"
 ParticleSystem2* testSystem;
+
+std::vector<ParticleSystem2*> explosion_list;
 
 enum {
 	MENU_LIGHTING = 1,
@@ -306,6 +321,33 @@ int gettimeofday(struct timeval2 *tv/*in*/, struct timezone2 *tz/*in*/)
 
 	return 0;
 }
+
+void createExplosion(){
+
+	float x = randomFloatBetween(-90.0, 90.0);
+	float y = randomFloatBetween(5.0, 90.0);
+	float z = randomFloatBetween(-90.0, 90.0);
+
+	float s = randomFloatBetween(0, 40);
+
+	ParticleSystem2* temp = new ParticleSystem2();
+	temp->setShader(sdrCtl.getShader("pe_system"));
+	temp->setType("Particle_System");
+	temp->setName("Particle_Test");
+	//temp->setLoopInf(false);
+	//temp->setLoopCount(1);
+	temp->setLoopInf(true);
+	temp->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	temp->setFog(fog);
+	temp->setModelM(glm::translate(vec3(x, y, z)));
+	temp->setTime(s);
+	explosion_list.push_back(temp);
+
+	cout << "BOOM! (" << x << "," << y << "," << z << ") t=" << s << endl;
+	
+}
+
+
 
 void stopVibrate(int i){
 	Player1->Vibrate(0, 0);
@@ -735,9 +777,12 @@ void Window::idleCallback(void)
 		}
 	}
 
+	//createExplosion();
+
 	updateShaders();
 	mySoundSystem->update();
     displayCallback();  
+	
 }
 void Window::reshapeCallback(int w, int h)
 {
@@ -810,9 +855,8 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw(LightProjection, LightView);
-		}
+		}		
 		
-
 		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -862,7 +906,28 @@ void Window::displayCallback(void)
 		//particle6->draw(Projection, View);
 		//particle7->draw(Projection, View);
 		//particle8->draw();
+		t0_ps_01->draw(Projection, View);
+		t0_ps_02->draw(Projection, View);
+		t0_ps_03->draw(Projection, View);
+
+		t1_ps_01->draw(Projection, View);
+		t1_ps_02->draw(Projection, View);
+		t1_ps_03->draw(Projection, View);
+
+		t2_ps_01->draw(Projection, View);
+		t2_ps_02->draw(Projection, View);
+		t2_ps_03->draw(Projection, View);
+
+		t3_ps_01->draw(Projection, View);
+		t3_ps_02->draw(Projection, View);
+		t3_ps_03->draw(Projection, View);
+
 		testSystem->draw(Projection, View);
+
+		for (uint i = 0; i < explosion_list.size(); ++i)
+		{
+			explosion_list[i]->draw(Projection, View);
+		}
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
@@ -1269,6 +1334,10 @@ void keyboard(unsigned char key, int, int){
 		if (key == 'm'){
 			particle8->StartLoop();
 			Vibrate(65535, 65535, 500);
+		}
+		//This creates random explosion
+		if (key == 'n'){
+			createExplosion();
 		}
 		if (key == 27){
 			//running = false;
@@ -1949,20 +2018,262 @@ void initialize(int argc, char *argv[])
 	tower0->setShader(sdrCtl.getShader("basic_model"));
 	tower0->setShadowTex(shadow_map_id);
 	tower0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
-	tower0->setModelM(glm::translate(vec3(0,0,-5)));
+	tower0->setModelM(glm::translate(vec3(-30.0,0.0,-30.0)));
 	tower0->setShininess(30);
 	tower0->setFog(fog);
 	stationary_list.push_back(tower0);
 
+	t0_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t0_ps_01->setShader(sdrCtl.getShader("pe_torus"));
+	t0_ps_01->setType("Particle_System");
+	t0_ps_01->setName("Particle_Test");
+	t0_ps_01->setLoopInf(true);
+	t0_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t0_ps_01->setFog(fog);
+	t0_ps_01->setBlastRadius(1.0f);// Blast radius
+	t0_ps_01->setExplosionVelocity(0.5f);// Explosion velocity
+	t0_ps_01->setExplosionDecay(10.0f);// Explosion decay
+	t0_ps_01->setFragStartSize(12.0f);// Fragment start size
+	t0_ps_01->setFragEndSize(1.0f);// Fragment end size
+	t0_ps_01->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t0_ps_01->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t0_ps_01->setTime_Step(0.1);
+	t0_ps_01->setTime_Max(100.0);
+	t0_ps_01->setTime_Min(0.0);
+	t0_ps_01->setTime(0.0);
+	//t0_ps_01->setEmitterPosition();// Emitter position
+	t0_ps_01->setModelM(glm::translate(vec3(-32.0, 4.5f, -30.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+
+	t0_ps_02 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t0_ps_02->setShader(sdrCtl.getShader("pe_torus"));
+	t0_ps_02->setType("Particle_System");
+	t0_ps_02->setName("Particle_Test");
+	t0_ps_02->setLoopInf(true);
+	t0_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t0_ps_02->setFog(fog);
+	t0_ps_02->setBlastRadius(1.0f);// Blast radius
+	t0_ps_02->setExplosionVelocity(0.5f);// Explosion velocity
+	t0_ps_02->setExplosionDecay(10.0f);// Explosion decay
+	t0_ps_02->setFragStartSize(12.0f);// Fragment start size
+	t0_ps_02->setFragEndSize(1.0f);// Fragment end size
+	t0_ps_02->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t0_ps_02->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t0_ps_02->setTime_Step(0.1);
+	t0_ps_02->setTime_Max(100.0);
+	t0_ps_02->setTime_Min(0.0);
+	t0_ps_02->setTime(33.0);
+	//t0_ps_02->setEmitterPosition();// Emitter position
+	t0_ps_02->setModelM(glm::translate(vec3(-30.0, 4.5f, -28.0)));
+
+	t0_ps_03 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t0_ps_03->setShader(sdrCtl.getShader("pe_torus"));
+	t0_ps_03->setType("Particle_System");
+	t0_ps_03->setName("Particle_Test");
+	t0_ps_03->setLoopInf(true);
+	t0_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t0_ps_03->setFog(fog);
+	t0_ps_03->setBlastRadius(1.0f);// Blast radius
+	t0_ps_03->setExplosionVelocity(0.5f);// Explosion velocity
+	t0_ps_03->setExplosionDecay(10.0f);// Explosion decay
+	t0_ps_03->setFragStartSize(12.0f);// Fragment start size
+	t0_ps_03->setFragEndSize(1.0f);// Fragment end size
+	t0_ps_03->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t0_ps_03->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t0_ps_03->setTime_Step(0.1);
+	t0_ps_03->setTime_Max(100.0);
+	t0_ps_03->setTime_Min(0.0);
+	t0_ps_03->setTime(66.0);
+	//t0_ps_03->setEmitterPosition();// Emitter position
+	t0_ps_03->setModelM(glm::translate(vec3(-30.0, 4.5f, -32.0)));
+
 	Mesh* tower1 = new Mesh();
-	tower1->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
+	tower1->LoadMesh("Model/2Tower_6_bone.dae", false);
 	tower1->setShader(sdrCtl.getShader("basic_model"));
 	tower1->setShadowTex(shadow_map_id);
-	tower1->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
-	tower1->setModelM(glm::translate(vec3(0,0,5)));
+	tower1->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
+	tower1->setModelM(glm::translate(vec3(30.0, 0.0, -30.0)));
 	tower1->setShininess(30);
 	tower1->setFog(fog);
 	stationary_list.push_back(tower1);
+
+	t1_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t1_ps_01->setShader(sdrCtl.getShader("pe_torus"));
+	t1_ps_01->setType("Particle_System");
+	t1_ps_01->setName("Particle_Test");
+	t1_ps_01->setLoopInf(true);
+	t1_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t1_ps_01->setFog(fog);
+	t1_ps_01->setBlastRadius(1.0f);// Blast radius
+	t1_ps_01->setExplosionVelocity(0.5f);// Explosion velocity
+	t1_ps_01->setExplosionDecay(10.0f);// Explosion decay
+	t1_ps_01->setFragStartSize(12.0f);// Fragment start size
+	t1_ps_01->setFragEndSize(1.0f);// Fragment end size
+	t1_ps_01->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t1_ps_01->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t1_ps_01->setTime_Step(0.1);
+	t1_ps_01->setTime_Max(100.0);
+	t1_ps_01->setTime_Min(0.0);
+	t1_ps_01->setTime(0.0);
+	//t1_ps_01->setEmitterPosition();// Emitter position
+	t1_ps_01->setModelM(glm::translate(vec3(28.0, 4.5f, -30.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+
+	t1_ps_02 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t1_ps_02->setShader(sdrCtl.getShader("pe_torus"));
+	t1_ps_02->setType("Particle_System");
+	t1_ps_02->setName("Particle_Test");
+	t1_ps_02->setLoopInf(true);
+	t1_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t1_ps_02->setFog(fog);
+	t1_ps_02->setBlastRadius(1.0f);// Blast radius
+	t1_ps_02->setExplosionVelocity(0.5f);// Explosion velocity
+	t1_ps_02->setExplosionDecay(10.0f);// Explosion decay
+	t1_ps_02->setFragStartSize(12.0f);// Fragment start size
+	t1_ps_02->setFragEndSize(1.0f);// Fragment end size
+	t1_ps_02->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t1_ps_02->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t1_ps_02->setTime_Step(0.1);
+	t1_ps_02->setTime_Max(100.0);
+	t1_ps_02->setTime_Min(0.0);
+	t1_ps_02->setTime(33.0);
+	//t1_ps_02->setEmitterPosition();// Emitter position
+	t1_ps_02->setModelM(glm::translate(vec3(30.0, 4.5f, -28.0)));
+
+	t1_ps_03 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t1_ps_03->setShader(sdrCtl.getShader("pe_torus"));
+	t1_ps_03->setType("Particle_System");
+	t1_ps_03->setName("Particle_Test");
+	t1_ps_03->setLoopInf(true);
+	t1_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t1_ps_03->setFog(fog);
+	t1_ps_03->setBlastRadius(1.0f);// Blast radius
+	t1_ps_03->setExplosionVelocity(0.5f);// Explosion velocity
+	t1_ps_03->setExplosionDecay(10.0f);// Explosion decay
+	t1_ps_03->setFragStartSize(12.0f);// Fragment start size
+	t1_ps_03->setFragEndSize(1.0f);// Fragment end size
+	t1_ps_03->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t1_ps_03->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t1_ps_03->setTime_Step(0.1);
+	t1_ps_03->setTime_Max(100.0);
+	t1_ps_03->setTime_Min(0.0);
+	t1_ps_03->setTime(66.0);
+	//t1_ps_03->setEmitterPosition();// Emitter position
+	t1_ps_03->setModelM(glm::translate(vec3(30.0, 4.5f, -32.0)));
+
+	Mesh* tower2 = new Mesh();
+	tower2->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
+	tower2->setShader(sdrCtl.getShader("basic_model"));
+	tower2->setShadowTex(shadow_map_id);
+	tower2->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
+	tower2->setModelM(glm::translate(vec3(30.0, 0.0, 30.0)));
+	tower2->setShininess(30);
+	tower2->setFog(fog);
+	stationary_list.push_back(tower2);
+
+	t2_ps_01 = new ParticleSystem(GL_POINTS);
+	t2_ps_01->setShader(sdrCtl.getShader("halo"));
+	t2_ps_01->setType("Particle_System");
+	t2_ps_01->setName("Particle_Test");
+	t2_ps_01->setK(1.0f);
+	t2_ps_01->setColor(vec3(1.0, 1.0, 1.0));
+	t2_ps_01->setShade(vec3(1.0, 1.0, 1.0));
+	t2_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t2_ps_01->setFog(fog);
+	t2_ps_01->setTime_Step(0.25);
+	t2_ps_01->setTime_Max(53.0);
+	t2_ps_01->setTime_Min(5.0);
+	t2_ps_01->setTime((float)5.0);
+	t2_ps_01->setLoopInf(true);
+	t2_ps_01->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t2_ps_02 = new ParticleSystem(GL_POINTS);
+	t2_ps_02->setShader(sdrCtl.getShader("halo"));
+	t2_ps_02->setType("Particle_System");
+	t2_ps_02->setName("Particle_Test");
+	t2_ps_02->setK(1.0f);
+	t2_ps_02->setColor(vec3(1.0, 1.0, 1.0));
+	t2_ps_02->setShade(vec3(1.0, 1.0, 1.0));
+	t2_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t2_ps_02->setFog(fog);
+	t2_ps_02->setTime_Step(0.25);
+	t2_ps_02->setTime_Max(53.0);
+	t2_ps_02->setTime_Min(5.0);
+	t2_ps_02->setTime((float)21.0);
+	t2_ps_02->setLoopInf(true);
+	t2_ps_02->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t2_ps_03 = new ParticleSystem(GL_POINTS);
+	t2_ps_03->setShader(sdrCtl.getShader("halo"));
+	t2_ps_03->setType("Particle_System");
+	t2_ps_03->setName("Particle_Test");
+	t2_ps_03->setK(1.0f);
+	t2_ps_03->setColor(vec3(1.0, 1.0, 1.0));
+	t2_ps_03->setShade(vec3(1.0, 1.0, 1.0));
+	t2_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t2_ps_03->setFog(fog);
+	t2_ps_03->setTime_Step(0.25);
+	t2_ps_03->setTime_Max(53.0);
+	t2_ps_03->setTime_Min(5.0);
+	t2_ps_03->setTime((float)37.0);
+	t2_ps_03->setLoopInf(true);
+	t2_ps_03->setModelM(glm::translate(vec3(30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	Mesh* tower3 = new Mesh();
+	tower3->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
+	tower3->setShader(sdrCtl.getShader("basic_model"));
+	tower3->setShadowTex(shadow_map_id);
+	tower3->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
+	tower3->setModelM(glm::translate(vec3(-30.0, 0.0, 30.0)));
+	tower3->setShininess(30);
+	tower3->setFog(fog);
+	stationary_list.push_back(tower3);
+
+	t3_ps_01 = new ParticleSystem(GL_POINTS);
+	t3_ps_01->setShader(sdrCtl.getShader("halo"));
+	t3_ps_01->setType("Particle_System");
+	t3_ps_01->setName("Particle_Test");
+	t3_ps_01->setK(1.0f);
+	t3_ps_01->setColor(vec3(1.0, 1.0, 1.0));
+	t3_ps_01->setShade(vec3(1.0, 1.0, 1.0));
+	t3_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t3_ps_01->setFog(fog);
+	t3_ps_01->setTime_Step(0.25);
+	t3_ps_01->setTime_Max(53.0);
+	t3_ps_01->setTime_Min(5.0);
+	t3_ps_01->setTime((float)5.0);
+	t3_ps_01->setLoopInf(true);
+	t3_ps_01->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t3_ps_02 = new ParticleSystem(GL_POINTS);
+	t3_ps_02->setShader(sdrCtl.getShader("halo"));
+	t3_ps_02->setType("Particle_System");
+	t3_ps_02->setName("Particle_Test");
+	t3_ps_02->setK(1.0f);
+	t3_ps_02->setColor(vec3(1.0, 1.0, 1.0));
+	t3_ps_02->setShade(vec3(1.0, 1.0, 1.0));
+	t3_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t3_ps_02->setFog(fog);
+	t3_ps_02->setTime_Step(0.25);
+	t3_ps_02->setTime_Max(53.0);
+	t3_ps_02->setTime_Min(5.0);
+	t3_ps_02->setTime((float)21.0);
+	t3_ps_02->setLoopInf(true);
+	t3_ps_02->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t3_ps_03 = new ParticleSystem(GL_POINTS);
+	t3_ps_03->setShader(sdrCtl.getShader("halo"));
+	t3_ps_03->setType("Particle_System");
+	t3_ps_03->setName("Particle_Test");
+	t3_ps_03->setK(1.0f);
+	t3_ps_03->setColor(vec3(1.0, 1.0, 1.0));
+	t3_ps_03->setShade(vec3(1.0, 1.0, 1.0));
+	t3_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t3_ps_03->setFog(fog);
+	t3_ps_03->setTime_Step(0.25);
+	t3_ps_03->setTime_Max(53.0);
+	t3_ps_03->setTime_Min(5.0);
+	t3_ps_03->setTime((float)37.0);
+	t3_ps_03->setLoopInf(true);
+	t3_ps_03->setModelM(glm::translate(vec3(-30.0f, 4.25f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	//Bottom Mid Platform
 	Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
@@ -2215,7 +2526,7 @@ void initialize(int argc, char *argv[])
 	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	draw_list.push_back(p_anim);
 
-	particle = new ParticleSystem();
+	particle = new ParticleSystem(GL_POINTS);
 	particle->setShader(sdrCtl.getShader("emitter"));
 	particle->setType("Particle_System");
 	particle->setName("Particle_Test");
@@ -2231,7 +2542,7 @@ void initialize(int argc, char *argv[])
 	particle->setLoopInf(true);
 	particle->setModelM(glm::translate(vec3(0.0f, 2.0f, -40.0f)));
 
-	particle2 = new ParticleSystem();
+	particle2 = new ParticleSystem(GL_POINTS);
 	particle2->setShader(sdrCtl.getShader("emitter"));
 	particle2->setType("Particle_System");
 	particle2->setName("Particle_Test");
@@ -2247,7 +2558,7 @@ void initialize(int argc, char *argv[])
 	particle2->setLoopInf(true);
 	particle2->setModelM(glm::translate(vec3(0.0f, 2.0f, -20.0f)));
 
-	particle3 = new ParticleSystem();
+	particle3 = new ParticleSystem(GL_POINTS);
 	particle3->setShader(sdrCtl.getShader("emitter"));
 	particle3->setType("Particle_System");
 	particle3->setName("Particle_Test");
@@ -2260,7 +2571,7 @@ void initialize(int argc, char *argv[])
 	particle3->setLoopInf(true);
 	particle3->setModelM(glm::translate(vec3(0.0f, 2.0f, -10.0f)));
 
-	particle4 = new ParticleSystem();
+	particle4 = new ParticleSystem(GL_POINTS);
 	particle4->setShader(sdrCtl.getShader("halo"));
 	particle4->setType("Particle_System");
 	particle4->setName("Particle_Test");
@@ -2273,7 +2584,7 @@ void initialize(int argc, char *argv[])
 	particle4->setLoopInf(true);
 	particle4->setModelM(glm::translate(vec3(0.0f, 2.0f, 0.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
-	particle5 = new ParticleSystem();
+	particle5 = new ParticleSystem(GL_POINTS);
 	particle5->setShader(sdrCtl.getShader("emitter"));
 	particle5->setType("Particle_System");
 	particle5->setName("Particle_Test");
@@ -2286,7 +2597,7 @@ void initialize(int argc, char *argv[])
 	particle5->setLoopInf(true);
 	particle5->setModelM(glm::translate(vec3(0.0f, 2.0f, 10.0f)));
 
-	particle6 = new ParticleSystem();
+	particle6 = new ParticleSystem(GL_POINTS);
 	particle6->setShader(sdrCtl.getShader("emitter"));
 	particle6->setType("Particle_System");
 	particle6->setName("Particle_Test");
@@ -2299,7 +2610,7 @@ void initialize(int argc, char *argv[])
 	particle6->setLoopInf(true);
 	particle6->setModelM(glm::translate(vec3(0.0f, 2.0f, 20.0f)));
 
-	particle7 = new ParticleSystem();
+	particle7 = new ParticleSystem(GL_POINTS);
 	particle7->setShader(sdrCtl.getShader("emitter"));
 	particle7->setType("Particle_System");
 	particle7->setName("Particle_Test");
@@ -2311,7 +2622,7 @@ void initialize(int argc, char *argv[])
 	particle7->setFog(fog);
 	particle7->setModelM(glm::translate(vec3(0.0f, 2.0f, 40.0f)));
 
-	particle8 = new ParticleSystem();
+	particle8 = new ParticleSystem(GL_POINTS);
 	particle8->setShader(sdrCtl.getShader("ui_particle"));
 	particle8->setType("Particle_System");
 	particle8->setName("Particle_Test");
@@ -2327,7 +2638,6 @@ void initialize(int argc, char *argv[])
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	particle8->setFog(emptyFog);
 
-
 	testSystem = new ParticleSystem2();
 	testSystem->setShader(sdrCtl.getShader("pe_system"));
 	testSystem->setType("Particle_System");
@@ -2335,7 +2645,7 @@ void initialize(int argc, char *argv[])
 	testSystem->setLoopInf(true);
 	testSystem->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
 	testSystem->setFog(fog);
-	testSystem->setModelM(glm::translate(vec3(-30.0f, 5.0f, 0.0f)));
+	testSystem->setModelM(glm::translate(vec3(0.0f, 5.0f, 0.0f)));
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));

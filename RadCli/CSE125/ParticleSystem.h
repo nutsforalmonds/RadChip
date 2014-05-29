@@ -13,7 +13,7 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 36000
+#define NUM_PARTICLES 3600
 
 typedef struct Particle
 {
@@ -34,7 +34,7 @@ Emitter;
 class ParticleSystem : public Object
 {
 public:
-	ParticleSystem(void){
+	ParticleSystem(GLenum mode){
 
 		awesome_time = 1.5;
 		time_Max = 50.0;
@@ -59,7 +59,8 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(emitter.particles), &emitter.particles, GL_STATIC_DRAW, 1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(offsetof(Particle, shade)));
 
 		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
-		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+		//vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+		vao.setDrawMode(mode, 0, NUM_PARTICLES);
 	}
 	
 	~ParticleSystem(void){}
