@@ -1947,11 +1947,21 @@ void initialize(int argc, char *argv[])
 	tower0->LoadMesh("Model/2Tower_6_bone.dae",false);
 	tower0->setShader(sdrCtl.getShader("basic_model"));
 	tower0->setShadowTex(shadow_map_id);
-	tower0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));//glm::translate(vec3(0.0, 1.0, 0.0))*
-	tower0->setModelM(mat4(1.0));
+	tower0->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
+	tower0->setModelM(glm::translate(vec3(0,0,-5)));
 	tower0->setShininess(30);
 	tower0->setFog(fog);
 	stationary_list.push_back(tower0);
+
+	Mesh* tower1 = new Mesh();
+	tower1->LoadMesh("Model/OctopusTower1_11_bonefix.dae", false);
+	tower1->setShader(sdrCtl.getShader("basic_model"));
+	tower1->setShadowTex(shadow_map_id);
+	tower1->setAdjustM(glm::translate(vec3(0.0, 3.7, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
+	tower1->setModelM(glm::translate(vec3(0,0,5)));
+	tower1->setShininess(30);
+	tower1->setFog(fog);
+	stationary_list.push_back(tower1);
 
 	//m_pMesh2 = new Mesh();
 	//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
