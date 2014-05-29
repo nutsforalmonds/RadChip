@@ -21,7 +21,7 @@ public:
 
 	bool Init(const std::string& TexFilename, const char* FileType);
 
-	void Render(const mat4 Projection, const mat4& viewM, const vec3& CameraPos, float size, const mat4 MM, const mat4 MVP, int tex, ShaderController &sd);
+	void Render(const mat4 Projection, const mat4& viewM, float size);
 
 	void setShader(GLSLProgram* shader);
 

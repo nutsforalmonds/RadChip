@@ -838,23 +838,23 @@ void Window::displayCallback(void)
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 
-		m_billboardList.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-		m_billboardList2.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
-		m_billboardList3.Render(Projection, View, vec3((glm::inverse(View)*vec4(0, 0, 0, 1))), (1.0f), mat4(1.0), Projection*View, 0, sdrCtl);
+		m_billboardList.Render(Projection, View, 1.0f);
+		m_billboardList2.Render(Projection, View, 1.0f);
+		m_billboardList3.Render(Projection, View, 1.0f);
 
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDepthMask(GL_FALSE);
-		particle->draw(Projection, View);
-		particle2->draw(Projection, View);
-		particle3->draw(Projection, View);
-		particle4->draw(Projection, View);
-		particle5->draw(Projection, View);
-		particle6->draw(Projection, View);
-		particle7->draw(Projection, View);
-		particle8->draw();
+		//particle->draw(Projection, View);
+		//particle2->draw(Projection, View);
+		//particle3->draw(Projection, View);
+		//particle4->draw(Projection, View);
+		//particle5->draw(Projection, View);
+		//particle6->draw(Projection, View);
+		//particle7->draw(Projection, View);
+		//particle8->draw();
 		testSystem->draw(Projection, View);
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);

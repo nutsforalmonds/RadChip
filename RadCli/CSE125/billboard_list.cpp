@@ -97,15 +97,14 @@ void BillboardList::AddBoard(vec3 pos)
 	mBoardList.push_back(pos);
 }
 
-void BillboardList::Render(const mat4 Projection, const mat4& viewM, const vec3& CameraPos, float size, const mat4 MM, const mat4 MVP, int tex, ShaderController &sd)
+void BillboardList::Render(const mat4 Projection, const mat4& viewM, float size)
 {
 	shader->setUniform(uniformLoc[0], Projection);
 	shader->setUniform(uniformLoc[1], viewM);
-	shader->setUniform(uniformLoc[2], CameraPos);
+	shader->setUniform(uniformLoc[2], vec3((glm::inverse(viewM)*vec4(0, 0, 0, 1))));
 	shader->setUniform(uniformLoc[3], size);
-	shader->setUniform(uniformLoc[4], MM);
-	shader->setUniform(uniformLoc[5], MVP);
-	shader->setUniform(uniformLoc[6], tex);
+	shader->setUniform(uniformLoc[4], getModelM());
+	shader->setUniform(uniformLoc[5], 0);
 	shader->use();
 	m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
@@ -122,7 +121,6 @@ void BillboardList::setShader(GLSLProgram* shader)
 	uniformLoc.push_back(shader->getUniformLoc("gCameraPos"));
 	uniformLoc.push_back(shader->getUniformLoc("gBillboardSize"));
 	uniformLoc.push_back(shader->getUniformLoc("ModelMatrix"));
-	uniformLoc.push_back(shader->getUniformLoc("MVP"));
 	uniformLoc.push_back(shader->getUniformLoc("texUnit"));
 }
 
