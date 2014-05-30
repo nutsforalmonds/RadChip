@@ -12,6 +12,9 @@
 
 #define SHOOTBIT 1
 
+#define PSPEEDINDEX 2
+#define PSPEEDLEN 3
+
 using glm::mat4;
 
 class ParseOpts
@@ -43,31 +46,50 @@ public:
 		}
 	}
 
-	// Parameters are the pointer to the recvVec vector and the desired player ID
-	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	int getPSpeed(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
-		// Determine which index of the recvVec is the player we want
+		speed = "";
 		for (i = 0; i < 3; i++)
 		{
 			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
 				break;
 		}
 
-		// Extract player's (i) info from the #defined SHOOTBIT flag in the string
-		if ((*vec)[i].first.c_str()[SHOOTBIT] == 's')
+		for (j = 0; j < PSPEEDLEN; j++)
 		{
-			return true;
+			speed += (*vec)[i].first.c_str()[PSPEEDINDEX + j];
 		}
-		// Must have placeholder false value to maintain constant string length for index
-		else
-		{
-			return false;
-		}
+
+
+		return atoi(speed.c_str());
+	}
+
+	// Parameters are the pointer to the recvVec vector and the desired player ID
+	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+	// Determine which index of the recvVec is the player we want
+	for (i = 0; i < 3; i++)
+	{
+	if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+	break;
+	}
+
+	// Extract player's (i) info from the #defined SHOOTBIT flag in the string
+	if ((*vec)[i].first.c_str()[SHOOTBIT] == 's')
+	{
+	return true;
+	}
+	// Must have placeholder false value to maintain constant string length for index
+	else
+	{
+	return false;
+	}
 	}*/
 
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
 	int health;
-	int i;
+	int i, j;
+	std::string speed;
 };

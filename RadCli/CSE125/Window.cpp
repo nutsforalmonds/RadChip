@@ -997,11 +997,11 @@ void server_update(int value){
 
 	//std::cout << out << std::endl;
 
-	if (out[0] == '{')
+	if (out[0] == '[')
 	{
 		unsigned pos = out.find("`");
 		out = out.substr(0, pos);
-		delete recvVec;
+		//delete recvVec;
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
 	}
@@ -1074,10 +1074,10 @@ void server_update(int value){
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
 
-		tower_list[0]->setModelM((*recvVec)[4].second);
-		tower_list[1]->setModelM((*recvVec)[5].second);
-		tower_list[2]->setModelM((*recvVec)[6].second);
-		tower_list[3]->setModelM((*recvVec)[7].second);
+		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
+		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
+		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
+		tower_list[atoi(&((*recvVec)[7].first.c_str())[1])]->setModelM((*recvVec)[7].second);
 
 		i++;
 
@@ -1556,7 +1556,7 @@ void mouseFunc(int button, int state, int x, int y)
 					
 					try
 					{
-						cli = new tcp_client(io_service, "localhost", "13");
+						cli = new tcp_client(io_service, "128.54.70.31", "13");
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();

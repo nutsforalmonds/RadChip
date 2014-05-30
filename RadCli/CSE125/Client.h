@@ -57,9 +57,26 @@ public:
 	{
 		//if (last_str.compare(ret_str) != 0)
 		//{
-			return ret_str;
+		std::string str((std::istreambuf_iterator<char>(&b)),
+			std::istreambuf_iterator<char>());
+		last_str = ret_str;
+		ret_str = str;
+		//std::cout << ret_str << std::endl;
+		b.consume(bytes_);
+		receive();
+
+		return ret_str;
 		//}
 		//else return "";
+	}
+
+	void receive()
+	{
+		boost::asio::async_read_until(socket_,
+			b, "`",
+			boost::bind(&tcp_client::handle_read, this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred));
 	}
 
 	int pID()
@@ -81,6 +98,7 @@ private:
 	boost::asio::streambuf b;
 	std::string ret_str;
 	std::string last_str;
+	size_t bytes_;
 
 	void handle_connect(const boost::system::error_code& error)
 	{
@@ -124,37 +142,8 @@ private:
 	{
 		if (!error)
 		{
-			/*std::cout << "read called" << std::endl;
-			std::cout << "recvVec string:" << ret_.front().first << std::endl;
-			std::cout << "recvVec dat:" << ret_.front().second[0][0] <<
-			ret_.front().second[0][1] <<
-			ret_.front().second[0][2] <<
-			ret_.front().second[0][3] <<
-			ret_.front().second[1][0] <<
-			ret_.front().second[1][1] <<
-			ret_.front().second[1][2] <<
-			ret_.front().second[1][3] <<
-			ret_.front().second[2][0] <<
-			ret_.front().second[2][1] <<
-			ret_.front().second[2][2] <<
-			ret_.front().second[2][3] <<
-			ret_.front().second[3][0] <<
-			ret_.front().second[3][1] <<
-			ret_.front().second[3][2] <<
-			ret_.front().second[3][3] << std::endl;
-			std::cout << "Reading" << std::endl;*/
-
-			std::string str((std::istreambuf_iterator<char>(&b)),
-				std::istreambuf_iterator<char>());
-			last_str = ret_str;
-			ret_str = str;
-			//std::cout << ret_str << std::endl;
-			b.consume(bytes);
-			boost::asio::async_read_until(socket_,
-				b, "`",
-				boost::bind(&tcp_client::handle_read, this,
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
+			bytes_ = bytes;
+			
 		}
 		else
 		{
