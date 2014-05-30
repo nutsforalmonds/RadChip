@@ -222,6 +222,9 @@ int myFPS = 0;
 
 ClientState* myClientState;
 
+bool alive = true;
+bool first_change = true;
+
 // Stuff Erik added
 int playerID = -1; // THIS USED TO BE 1 - it gets set by the server
 int stateID = -1;
@@ -451,6 +454,16 @@ void Window::idleCallback(void)
 	case 2:
 	case 3:
 		
+		if (alive){
+			first_change = true;
+			cam->setCamM(mat4(1.0));
+			cam->setCamMode(0);
+		}
+		else if(first_change){
+			cam->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam->setCamMode(1);
+			first_change = false;
+		}
 		cam->update();
 
 		/*
@@ -1220,6 +1233,15 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
+  if (buf){
+	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
+	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
+	  Window::width = screen_width;
+	  Window::height = screen_height;
+	  glViewport(0, 0, screen_width, screen_height);  // set new view port size
+	  Projection = glm::perspective(fov, (float)screen_width / screen_height, nearClip, farClip);
+  }
+
   do{
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
@@ -1496,6 +1518,9 @@ void keyUp (unsigned char key, int x, int y) {
 			keyState = keyState & ~(1 << 4);
 			space_up = 1;
 		}
+		if (key == 'l'){
+			alive = !alive;
+		}
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
 			if (sprint_up < 10){
@@ -1556,7 +1581,7 @@ void mouseFunc(int button, int state, int x, int y)
 					
 					try
 					{
-						cli = new tcp_client(io_service, "128.54.70.31", "13");
+						cli = new tcp_client(io_service, "localhost", "13");
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();

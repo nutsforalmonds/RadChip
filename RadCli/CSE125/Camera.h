@@ -40,15 +40,22 @@ public:
 	}
 
 	void update(){
-		setPreRot(glm::rotate(mat4(1.0), pendingRot, vec3(1, 0, 0)));
+		if (CamMode == 0){
+			setPreRot(glm::rotate(mat4(1.0), pendingRot, vec3(1, 0, 0)));
 
-		if (pendingRot > angle_limit){
-			setPostTrans(glm::translate(vec3(0,0,bottom/sin(pendingRot/180.0*M_PI))));
-			setPreTrans(glm::translate(vec3(right, up, 0)));
+			if (pendingRot > angle_limit){
+				setPostTrans(glm::translate(vec3(0, 0, bottom / sin(pendingRot / 180.0*M_PI))));
+				setPreTrans(glm::translate(vec3(right, up, 0)));
+			}
+			else{
+				setPostTrans(glm::translate(vec3(0, 0, back)));
+				setPreTrans(glm::translate(vec3(right, up, 0)));
+			}
 		}
-		else{
-			setPostTrans(glm::translate(vec3(0,0,back)));
-			setPreTrans(glm::translate(vec3(right, up, 0)));
+		else if (CamMode == 1){
+			setPreRot(mat4(1.0));
+			setPostTrans(mat4(1.0));
+			setPreTrans(mat4(1.0));
 		}
 	}
 
@@ -57,6 +64,8 @@ public:
 	mat4 getCamToWorldM(){ return obj->getModelM()*(pretrans*prerot*CamM*posttrans*postrot); }// camera space to world space
 
 	Object* getObjAppended(){ return obj; }
+
+	void setCamMode(int i){ CamMode = i; }
 
 private:
 	mat4 prerot,postrot;
@@ -69,5 +78,6 @@ private:
 	float bottom;
 	float angle_limit;
 	float right;
+	int CamMode;//0: normal 1: death view
 };
 
