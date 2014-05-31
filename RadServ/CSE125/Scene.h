@@ -282,7 +282,7 @@ public:
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < projectile.size(); i++){
 			projectile[i]->addVelocity(gravity*t);
-			projectile[i]->postTrans(glm::translate(projectile[i]->getVelocity()*t));
+			projectile[i]->preTrans(glm::translate(projectile[i]->getVelocity()*t));
 		}
 	}
 
@@ -346,55 +346,25 @@ public:
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
 				bool collide = true;
-				//[p][s]
-				if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
 				}
-				//[s][p]
-				else if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
+				if (collide){
+					vec3 pv = projectile[i]->getVelocity();
+					//vec3 pv = vec3(player[projectile[i]->getPlayerID()]->getModelM()*vec4(projectile[i]->getVelocity(), 0.0));
+					pv[1] = 0;
+					pv = glm::normalize(pv);
+					pv[1] = 1;
+					player[j]->preTrans(glm::translate(pv));
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					delete projectile[i];
+					projectile.erase(projectile.begin() + i);
+					i--;
+					break;
 				}
-				//[p]
-				//[s]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
-				}
-				//[s]
-				//[p]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2] + 1) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
-				}
-
-				//for (int v = 0; v < 3; v++){
-				//	if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
-				//		collide = false;
-				//		break;
-				//	}
-				//}
-				//if (collide){
-				//	vec3 pv = vec3(player[projectile[i]->getPlayerID()]->getModelM()*vec4(projectile[i]->getVelocity(),0.0));
-				//	pv[1] = 0;
-				//	pv = glm::normalize(pv);
-				//	pv[1] = 1;
-				//	player[j]->preTrans(glm::translate(pv));
-				//	damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
-				//	delete projectile[i];
-				//	projectile.erase(projectile.begin() + i);
-				//	i--;
-				//	break;
-				//}
 			}
 		}
 	}
@@ -515,7 +485,7 @@ public:
 		projectile.push_back(cubeT);
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
-		cubeT->setVelocity(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cubeT->setVelocity(vec3(player1*vec4(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed(),0.0)));// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
