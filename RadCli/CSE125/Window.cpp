@@ -2590,6 +2590,23 @@ void initialize(int argc, char *argv[])
 	platform_09->setName("Test Platform");
 	stationary_list.push_back(platform_09);
 
+	//Trampoline
+	Cube* tramp_01 = new Cube(-2.0,2.0,-0.5,0.5,-2.0,2.0);
+	tramp_01->setKd(vec3(0.0, 0.0, 0.0));
+	tramp_01->setKa(vec3(0.0, 0.0, 0.0));
+	tramp_01->setKs(vec3(0.0, 0.0, 0.0));
+	tramp_01->setShininess(100);
+	tramp_01->setFog(fog);
+	tramp_01->setReflectFactor(vec2(0.2, 0.5));
+	tramp_01->setEta(0.5);
+	tramp_01->setCubeMapUnit(3);
+	tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
+	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tramp_01->setShadowTex(shadow_map_id);
+	tramp_01->setType("Trampoline");
+	tramp_01->setName("Test Trampoline");
+	stationary_list.push_back(tramp_01);
+
 
 	/*
 	float temp_x = randomFloatBetween(0.0, 1.0);

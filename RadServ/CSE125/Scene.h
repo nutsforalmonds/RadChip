@@ -10,6 +10,7 @@
 #include "MD5Model.h"
 #include "Camera.h"
 #include "Ground.h"
+#include "Trampoline.h"
 using namespace std;
 
 
@@ -243,10 +244,17 @@ public:
 		rwVelocity2[minID] = -v2[minID];
 		obj2->preTrans(glm::translate(rwVelocity2*minRewind));
 		if (minID == 1){
-			obj1->clearYVelocity();
-			onGround1 = true;
-			obj2->clearYVelocity();
-			onGround2 = true;
+
+			if (obj1->getAABB().min[1] >= obj2->getAABB().min[1]){
+				obj1->clearYVelocity();
+				obj2->clearYVelocity();
+				onGround1 = true;
+			}
+			else{
+				obj1->clearYVelocity();
+				obj2->clearYVelocity();
+				onGround2 = true;
+			}
 		}
 		else{//stair effect
 			AABB b1 = obj1->getAABB();
@@ -254,6 +262,9 @@ public:
 			if (b2.max[1] > b1.min[1] && b2.max[1] - b1.min[1] <= 0.11){
 				obj1->preTrans(glm::translate(glm::vec3(0.0f, b2.max[1]-b1.min[1]+0.01f, 0.0f)));
 			}
+		}
+		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
+			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -853,6 +864,17 @@ public:
 		platform_09->setType("Cube");
 		platform_09->setName("Test Platform");
 		addStationary(platform_09);
+
+
+		//Trampoline
+		Trampoline* tramp_01 = new Trampoline();
+		//platform_01->setSpeed(5);
+		tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
+		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tramp_01->setBoost(vec3(0, 60, 0));
+		tramp_01->setType("Trampoline");
+		tramp_01->setName("Test Trampoline");
+		addStationary(tramp_01);
 
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
