@@ -54,6 +54,16 @@ public:
 		return NULL;
 	}
 
+	Object * getTowerObj(int playerID)
+	{
+		for (uint i = 0; i < player.size(); i++)
+		{
+			if (tower[i]->getPlayerID() == playerID)
+				return tower[i];
+		}
+		return NULL;
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -336,7 +346,7 @@ public:
 		}
 	}
 	void collisionDetectionProjectile(){
-		//player-stationary detection
+		//player-projectile detection
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			for (uint j = 0; j < player.size(); j++)
@@ -360,6 +370,36 @@ public:
 					pv[1] = 1;
 					player[j]->preTrans(glm::translate(pv));
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					delete projectile[i];
+					projectile.erase(projectile.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
+		//tower-projectile detection
+		for (uint i = 0; i < projectile.size(); i++)
+		{
+			for (uint j = 0; j < tower.size(); j++)
+			{
+				if (projectile[i]->getTeamID() == tower[j]->getTeamID())
+					continue;
+				AABB pBox = projectile[i]->getAABB();
+				AABB sBox = tower[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					//vec3 pv = projectile[i]->getVelocity();
+					//pv[1] = 0;
+					//pv = glm::normalize(pv);
+					//pv[1] = 1;
+					//tower[j]->preTrans(glm::translate(pv));
+					damageTower(tower[j]->getPlayerID(), projectile[i]->getPlayerID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
 					i--;
@@ -403,6 +443,47 @@ public:
 			RangeWeapon * newItem = new RangeWeapon(dist,
 													spd,
 													dmg);
+			playerHolder->setWeapon(newItem);
+			playerHolder->setKills(1);
+			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
+			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
+		}
+	}
+	void damageTower(int targetId, int playerId)
+	{
+		Object * playerHolder = getPlayerObj(playerId);
+		Object * targetHolder = getTowerObj(targetId);
+		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		if (targetHolder->getHealth() < 1)
+		{
+			int dist, spd, dmg;
+			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
+			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
+			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
+			//restricting speed and distance
+			if (dist > MAX_DISTANCE)
+				dist = MAX_DISTANCE;
+			if (spd > MAX_SPEED)
+				spd = MAX_SPEED;
+			if (dmg < MAX_DAMAGE)
+				dmg = MAX_DAMAGE;
+
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			for (uint i = 0; i < tower.size(); i++)
+			{
+				if (tower[i]->getPlayerID() == targetId)
+				{
+					tower[i]->setAliveModelM(tower[i]->getModelM());
+					tower[i]->setModelM(tower[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+				}
+			}
+			//cout << playerId << " " << dmg << endl;
+			RangeWeapon * newItem = new RangeWeapon(dist,
+				spd,
+				dmg);
 			playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
@@ -642,7 +723,8 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
-		tw0->setTeamID(0);
+		tw0->setTeamID(1);
+		tw0->setPlayerID(0);
 		addTower(tw0);
 
 		//triplet tower
@@ -651,7 +733,8 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
-		tw1->setTeamID(0);
+		tw1->setTeamID(1);
+		tw1->setPlayerID(1);
 		addTower(tw1);
 
 		//pctopus tower
@@ -660,7 +743,8 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
-		tw2->setTeamID(1);
+		tw2->setTeamID(0);
+		tw2->setPlayerID(2);
 		addTower(tw2);
 
 		//pctopus tower
@@ -669,7 +753,8 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
-		tw3->setTeamID(1);
+		tw3->setTeamID(0);
+		tw3->setPlayerID(3);
 		addTower(tw3);
 
 		Ground* ground = new Ground();
