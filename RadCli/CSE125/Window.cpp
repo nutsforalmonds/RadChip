@@ -1310,13 +1310,13 @@ int main(int argc, char *argv[])
 	  last = current;
 
 	  glutMainLoopEvent();
+	  
+	  Window::idleCallback();
 
 	  //printf("LOOP!\n");
 	  if (connected){
 		  server_update(0);
 	  }
-
-	  Window::idleCallback();
 	  
 	  QueryPerformanceCounter(&loop_end);
 	  diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
@@ -1683,6 +1683,7 @@ void mouseFunc(int button, int state, int x, int y)
 				menuMusic->Stop();
 			//	gameMusic->setFade(0.75, 0.005);
 				gameMusic->Play();
+				server_update(0);
 			}
 			else if (click == 2){
 				testSound[7]->Play();
