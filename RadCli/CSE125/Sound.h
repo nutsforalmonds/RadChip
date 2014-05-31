@@ -158,6 +158,20 @@ public:
 		return song;
 	}
 
+	FMOD::Sound* create3DMusic(string path){
+		FMOD::Sound *song;
+
+		// Open music as a stream
+		result = system->createStream(path.c_str(), FMOD_3D, 0, &song);
+		FMODErrorCheck(result);
+
+		// Assign each song to a channel and start them paused
+		result = system->playSound(FMOD_CHANNEL_FREE, song, true, &music);
+		FMODErrorCheck(result);
+
+		return song;
+	}
+
 	FMOD::Channel* getLastMusicChan(){ return music; }
 
 	void playMusic(FMOD::Channel *chan){
@@ -243,9 +257,16 @@ private:
 class Music
 {
 public:
-	Music(SoundSystem *s, string path){
+	Music(SoundSystem *s, string path, bool set3D){
 		system = s;
-		me = system->createMusic(path);
+		amI3D = set3D;
+		if (set3D){
+			me = system->create3DMusic(path);
+		}
+		else{
+			me = system->createMusic(path);
+		}
+		
 		myChan = s->getLastMusicChan();
 		fadeDone = true;
 	}
@@ -328,6 +349,8 @@ public:
 
 	bool getFadeDone(){ return fadeDone; }
 
+	bool get3D(){ return amI3D; }
+
 private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
@@ -342,19 +365,22 @@ private:
 
 	float minDistance;
 	float maxDistance;
+
+	float amI3D;
 };
 
 class Sound
 {
 public:
-	Sound(SoundSystem *s, string path){
+	Sound(SoundSystem *s, string path, bool set3D){
 		system = s;
-		me = system->createSound(path);
-	}
-
-	Sound(SoundSystem *s, string path, int i){
-		system = s;
-		me = system->create3DSound(path);
+		amI3D = set3D;
+		if (set3D){
+			me = system->create3DSound(path);
+		}
+		else{
+			me = system->createSound(path);
+		}
 	}
 	~Sound(){
 		system->free(me);
@@ -389,8 +415,11 @@ public:
 		setVelocity(vel);
 	}
 
-	void Play3D(){
-		system->play3DSound(me, volume, position, velocity, minDistance, maxDistance);
+	void Play3D(mat4 v){
+		glm::vec4 temp(position.x, position.y, position.z, 1.0);
+		temp = v*temp;
+		FMOD_VECTOR np = { temp.x, temp.y, temp.z };
+		system->play3DSound(me, volume, np, velocity, minDistance, maxDistance);
 		cout << "Me: "<< me << "Vol: " << volume << "Min: " << minDistance << "Max: " << maxDistance << endl;
 		cout << position.x << position.y << position.z << endl;
 		cout << velocity.x << velocity.y << velocity.z << endl;
@@ -408,6 +437,8 @@ public:
 
 	float getVolume(){ return volume; }
 
+	bool get3D(){ return amI3D; }
+
 private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
@@ -420,6 +451,8 @@ private:
 
 	float minDistance;
 	float maxDistance;
+
+	float amI3D;
 };
 
 #endif	/* SOUND_H */
