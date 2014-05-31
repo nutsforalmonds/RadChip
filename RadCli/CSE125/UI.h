@@ -184,41 +184,41 @@ public:
 		life_back->setColor(vec3(1.0, 0.0, 0.0));
 		life_back->setShader(sdrCtl.getShader("basic_2D"));
 		//life_back->loadColorTex("img/UI_TEST.png", "PNG");
-		life_back->setModelM(glm::scale(vec3(0.0905, 0.02, 1.0))*glm::translate(vec3(0.0f, 22.5f, -1.0f)));
+		life_back->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
 		life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
 		life_front->setColor(vec3(0.0, 1.0, 0.0));
 		life_front->setShader(sdrCtl.getShader("basic_2D"));
 		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-		life_front->setModelM(glm::scale(vec3(0.0905, 0.02, 1.0))*glm::translate(vec3(0.0f, 22.5f, -1.0f)));
+		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
-		life_frame = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
+		life_frame = new UI_Panel(-0.3f, 0.3, -0.2f, 0.2f);
 		life_frame->setColor(vec3(1.0, 0.0, 0.0));
 		life_frame->setShader(sdrCtl.getShader("basic_2D"));
 		life_frame->loadColorTex("img/UI_elements/healthBAR_2", "PNG");
 		life_frame->setTex(true);
-		life_frame->setModelM(glm::scale(vec3(0.1, 0.08, 1.0))*glm::translate(vec3(0.0f, 5.5f, -1.0f)));
+		life_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
 		//overheat bars
 		heat_back = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
 		heat_back->setColor(vec3(1.0, 1.0, 1.0));
 		heat_back->setShader(sdrCtl.getShader("basic_2D"));
 		//heat_back->loadColorTex("img/UI_TEST.png", "PNG");
-		heat_back->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
+		heat_back->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f, 0.0f, -1.0f)));
 
 		heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 		heat_front->setColor(vec3(0.0, 1.0, 0.0));
 		heat_front->setShader(sdrCtl.getShader("basic_2D"));
 		//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-		heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+		heat_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f, 0.0f, -1.0f)));
 
 		heat_frame = new UI_Panel(x1_heat, x2_heat, y1_heat, -1.0*(y2_heat));
 		heat_frame->setColor(vec3(1.0, 1.0, 1.0));
 		heat_frame->setShader(sdrCtl.getShader("basic_2D"));
 		heat_frame->loadColorTex("img/UI_FRAME_VERT.png", "PNG");
 		heat_frame->setTex(true);
-		heat_frame->setModelM(glm::scale(vec3(0.01, 0.1, 1.0))*glm::translate(vec3(-75.0f, 0.0f, -1.0f)));
-		
+		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f, 0.0f, -1.0f)));
+
 	}
 	~UI(){
 		life_back->		~UI_Panel();
@@ -230,7 +230,7 @@ public:
 	}
 
 	int draw(){
-	
+
 		//Status Bars
 		if (less_life)
 		{
@@ -256,7 +256,7 @@ public:
 		heat_front->draw();
 		heat_frame->draw();
 
-		
+
 
 		return 0;
 	}
@@ -270,14 +270,14 @@ public:
 		if (x2_life <= x1_life)
 		{
 			//x2_life = x1_life;
-			x2_life = (-1.0)*x1_life;
+			x2_life = 0.275f;
 		}
 
 		life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
 		life_front->setColor(vec3(0.0, 1.0, 0.0));
 		life_front->setShader(sdrCtl.getShader("basic_2D"));
 		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-		life_front->setModelM(glm::scale(vec3(0.0905, 0.02, 1.0))*glm::translate(vec3(0.0f, 22.5f, -1.0f)));
+		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
 		return 0;
 
@@ -304,9 +304,9 @@ public:
 
 				y2_heat = y2_heat + ((heat_bar_size) / 7.0); //# of shots
 
-				if (y2_heat >= 2.0)
+				if (y2_heat >= 0.2)
 				{
-					y2_heat = 2;
+					y2_heat = 0.2;
 					overheat = 1;
 				}
 
@@ -314,7 +314,9 @@ public:
 				heat_front->setColor(vec3(0.0, 1.0, 0.0));
 				heat_front->setShader(sdrCtl.getShader("basic_2D"));
 				//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-				heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+				heat_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f - x, 0.0f, -1.0f)));
+
+
 
 				over_de = clock();
 				shots = 0;
@@ -336,11 +338,12 @@ public:
 					y2_heat = y1_heat;
 				}
 
+
 				heat_front = new UI_Panel(x1_heat, x2_heat, y1_heat, y2_heat);
 				heat_front->setColor(vec3(0.0, 1.0, 0.0));
 				heat_front->setShader(sdrCtl.getShader("basic_2D"));
 				//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-				heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+				heat_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f - x, 0.0f, -1.0f)));
 			}
 
 			else if (hot == 1)
@@ -363,7 +366,7 @@ public:
 				heat_front->setColor(vec3(1.0, 0.0, 0.0));
 				heat_front->setShader(sdrCtl.getShader("basic_2D"));
 				//heat_front->loadColorTex("img/UI_TEST.png", "PNG");
-				heat_front->setModelM(glm::scale(vec3(0.005, 0.1, 1.0))*glm::translate(vec3(-150.0f, 0.0f, -1.0f)));
+				heat_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f - x, 0.0f, -1.0f)));
 
 			}
 		}
@@ -371,11 +374,26 @@ public:
 		return 0;
 	}
 
+
+
 	float getLess_Life(){ return less_life; }
 	void setLess_Life(float l){ less_life = l; }
 
 	float getShots(){ return shots; }
 	void setShots(float s){ shots = s; }
+
+	void setOffSet(float w){ x += w; }
+	void updateUIposition(float w){
+		// needs to include the height as well, it affects the scaling 
+		y = -0.00067f * w;
+
+		heat_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(y, 0.0f, -1.0f)));
+		heat_back->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(y, 0.0f, -1.0f)));
+		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(y, 0.0f, -1.0f)));
+
+		x = -0.85f - y;
+
+	}
 
 private:
 
@@ -386,15 +404,18 @@ private:
 	UI_Panel* heat_front;
 	UI_Panel* heat_frame;
 
-	float x1_life = -2.0; //life
-	float x2_life = 2.0;
-	float y1_life = -2.0;
-	float y2_life = 2.0;
+	float x1_life = -0.27f; //life
+	float x2_life = 0.275f;
+	float y1_life = -0.035f;
+	float y2_life = 0.06f;
 
-	float x1_heat = -2.0; // overheat bar
-	float x2_heat = 2.0;
-	float y1_heat = -2.0;
-	float y2_heat = -2.0;
+	float x1_heat = -0.02f; // overheat bar
+	float x2_heat = 0.02f;
+	float y1_heat = -0.2f;
+	float y2_heat = -0.2f;
+
+	float x = 0;
+	float y = 0;
 
 	int lock = 0;
 
@@ -403,7 +424,7 @@ private:
 	float shots = 0;
 	float damage_taken = (float)0.1; //set to default 1/7 of the life bar
 	float health_bar_size = x2_life - x1_life;
-	float heat_bar_size = x2_heat - x1_heat;
+	float heat_bar_size = (-1)*y2_heat - y1_heat;
 
 	time_t over_de; //rate of decay of overheat bar
 
@@ -414,68 +435,68 @@ class MainMenu
 {
 public:
 	MainMenu(){
-		menu = new UI_Panel(-1, 1, -1, 1);
+		menu = new UI_Panel(-0.9f, 0.9f, -0.5f, 0.5f);
 		menu->setColor(vec3(1.0, 0.0, 0.0));
 		menu->setShader(sdrCtl.getShader("basic_2D"));
 		menu->loadColorTex("img/back", "PNG");
 		menu->setTex(true);
-		menu->setModelM(glm::scale(vec3(0.90, 0.50, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		menu->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0f))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
-		game_name = new UI_Panel(-1, 1, -1, 1);
+		game_name = new UI_Panel(-0.5f, 0.5f, -0.05f, 0.05f);
 		game_name->setColor(vec3(1.0, 0.0, 0.0));
 		game_name->setShader(sdrCtl.getShader("basic_2D"));
 		game_name->loadColorTex("img/team4", "PNG");
 		game_name->setTex(true);
-		game_name->setModelM(glm::scale(vec3(0.5, 0.05, 1.0))*glm::translate(vec3(0.0f, 9.0, -1.0f)));
+		game_name->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.45f, -1.0f)));
 
-		start_button = new UI_Panel(-1, 1, -1, 1);
+		start_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		start_button->setColor(vec3(1.0, 0.0, 0.0));
 		start_button->setShader(sdrCtl.getShader("basic_2D"));
 		start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartOFF_1.png", "PNG");
 		start_button->setTex(true);
-		start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
+		start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1f, -1.0f)));
 
-		exit_button = new UI_Panel(-1, 1, -1, 1);
+		exit_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		exit_button->setColor(vec3(1.0, 0.0, 0.0));
 		exit_button->setShader(sdrCtl.getShader("basic_2D"));
 		exit_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitOFF_1.png", "PNG");
 		exit_button->setTex(true);
-		exit_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -6.0, -1.0f)));
+		exit_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
 
-		setting_button = new UI_Panel(-1, 1, -1, 1);
+		setting_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		setting_button->setColor(vec3(1.0, 0.0, 0.0));
 		setting_button->setShader(sdrCtl.getShader("basic_2D"));
 		setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsOFF.png", "PNG");
 		setting_button->setTex(true);
-		setting_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
+		setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
 
-		selected_start_button = new UI_Panel(-1, 1, -1, 1);
+		selected_start_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_start_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_start_button->setShader(sdrCtl.getShader("basic_2D"));
 		selected_start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartON_1.png", "PNG");
 		selected_start_button->setTex(true);
-		selected_start_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, 2.0, -1.0f)));
+		selected_start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1f, -1.0f)));
 
-		selected_end_button = new UI_Panel(-1, 1, -1, 1);
+		selected_end_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_end_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_end_button->setShader(sdrCtl.getShader("basic_2D"));
 		selected_end_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON.png", "PNG");
 		selected_end_button->setTex(true);
-		selected_end_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -6.0, -1.0f)));
+		selected_end_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
 
-		selected_setting_button = new UI_Panel(-1, 1, -1, 1);
+		selected_setting_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_setting_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_setting_button->setShader(sdrCtl.getShader("basic_2D"));
 		selected_setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON.png", "PNG");
 		selected_setting_button->setTex(true);
-		selected_setting_button->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(0.0f, -2.0, -1.0f)));
+		selected_setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
 
-		address_bar = new UI_Panel(-1, 1, -1, 1);
+		address_bar = new UI_Panel(-0.2f, 0.2f, -0.1f, 0.1f);
 		address_bar->setColor(vec3(1.0, 0.0, 0.0));
 		address_bar->setShader(sdrCtl.getShader("basic_2D"));
 		address_bar->loadColorTex("img/UI_elements/IP_adressBAR", "PNG");
 		address_bar->setTex(true);
-		address_bar->setModelM(glm::scale(vec3(0.20, 0.1, 1.0))*glm::translate(vec3(0.0f, 3.0f, -1.0f)));
+		address_bar->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0f))*glm::translate(vec3(0.0f, 0.3f, -1.0f)));
 	}
 	~MainMenu(){
 		menu->					  ~UI_Panel();
@@ -500,7 +521,7 @@ public:
 		exit_button->draw();
 		setting_button->draw();
 		address_bar->draw();
-		
+
 		if (drawStartHighlight){
 			selected_start_button->draw();
 		}
@@ -528,7 +549,7 @@ public:
 				drawStartHighlight = true;
 				drawEndHighlight = false;
 				drawSettingHighlight = false;
-				
+
 				return 1;
 				//cout << "Start Monica!" << endl;
 			}
@@ -542,7 +563,7 @@ public:
 				return 1;
 				//cout << "End Monica!" << endl;
 			}
-			
+
 			//Spot for third button
 			else if ((y > 0.71) && (y < 0.81))
 			{
@@ -624,41 +645,41 @@ public:
 	GameMenu(){
 
 
-		quit = new UI_Panel(-1, 1, -1, 1);
+		quit = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		quit->setColor(vec3(1.0, 0.0, 0.0));
 		quit->setShader(sdrCtl.getShader("basic_2D"));
 		quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitOFF.png", "PNG");
 		quit->setTex(true);
-		quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
+		quit->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.3f, 0.0, -1.0f)));
 
-		resume = new UI_Panel(-1, 1, -1, 1);
+		resume = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		resume->setColor(vec3(1.0, 0.0, 0.0));
 		resume->setShader(sdrCtl.getShader("basic_2D"));
 		resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
 		resume->setTex(true);
-		resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+		resume->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.3f, 0.0, -1.0f)));
 
-		selected_resume = new UI_Panel(-1, 1, -1, 1);
+		selected_resume = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_resume->setColor(vec3(1.0, 0.0, 0.0));
 		selected_resume->setShader(sdrCtl.getShader("basic_2D"));
 		selected_resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
 		selected_resume->setTex(true);
-		selected_resume->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(2.0f, 0.0, -1.0f)));
+		selected_resume->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.3f, 0.0, -1.0f)));
 
-		selected_quit = new UI_Panel(-1, 1, -1, 1);
+		selected_quit = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_quit->setColor(vec3(1.0, 0.0, 0.0));
 		selected_quit->setShader(sdrCtl.getShader("basic_2D"));
 		selected_quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitON.png", "PNG");
 		selected_quit->setTex(true);
-		selected_quit->setModelM(glm::scale(vec3(0.15, 0.05, 1.0))*glm::translate(vec3(-2.0f, 0.0, -1.0f)));
+		selected_quit->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.3f, 0.0, -1.0f)));
 
 
-		frame = new UI_Panel(-1, 1, -1, 1);
+		frame = new UI_Panel(-0.5f, 0.5f, -0.25, 0.25);
 		frame->setColor(vec3(1.0, 1.0, 1.0));
 		frame->setShader(sdrCtl.getShader("basic_2D"));
 		frame->loadColorTex("img/UI_elements/glassPanel.png", "PNG");
 		frame->setTex(true);
-		frame->setModelM(glm::scale(vec3(0.5, 0.25, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
 	}
 	~GameMenu(){
@@ -673,13 +694,13 @@ public:
 	int draw(){
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		frame->draw();
 
 		glDisable(GL_BLEND);
-	
+
 		glDisable(GL_DEPTH_TEST);
-	
+
 		//frame->draw();
 		resume->draw();
 		quit->draw();
@@ -772,18 +793,59 @@ class DeathScreen
 {
 public:
 	DeathScreen(){
+		respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
+		respawn->setColor(vec3(1.0, 0.0, 0.0));
+		respawn->setShader(sdrCtl.getShader("basic_2D"));
+		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
+		respawn->setTex(true);
+		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.2f, -1.0f)));
 
+		selected_respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
+		selected_respawn->setColor(vec3(1.0, 0.0, 0.0));
+		selected_respawn->setShader(sdrCtl.getShader("basic_2D"));
+		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
+		selected_respawn->setTex(true);
+		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.2, -1.0f)));
+
+		countdown = new UI_Panel(-0.15f, 0.15f, -0.15f, 0.15f);
+		countdown->setColor(vec3(1.0, 0.0, 0.0));
+		countdown->setShader(sdrCtl.getShader("basic_2D"));
+		countdown->loadColorTex("img/UI_elements/ten.png", "PNG");
+		countdown->setTex(true);
+		countdown->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1, -1.0f)));
+
+		frame = new UI_Panel(-0.5f, 0.5f, -0.5, 0.5);
+		frame->setColor(vec3(1.0, 0.0, 0.0));
+		frame->setShader(sdrCtl.getShader("basic_2D"));
+		frame->loadColorTex("img/UI_elements/glassPanel.png", "PNG");
+		frame->setTex(true);
+		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
 	}
 	~DeathScreen(){
-
-	
-
+		respawn->           ~UI_Panel();
+		selected_respawn->  ~UI_Panel();
+		countdown->         ~UI_Panel();
+		frame->             ~UI_Panel();
 	}
 
 	int draw(){
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		frame->draw();
 
+		glDisable(GL_BLEND);
+
+		glDisable(GL_DEPTH_TEST);
+
+		respawn->draw();
+
+		//selected_respawn->draw();
+
+		countdown->draw();
+
+		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
 
@@ -822,6 +884,10 @@ public:
 	}
 
 private:
+	UI_Panel * frame;
+	UI_Panel * respawn;
+	UI_Panel * selected_respawn;
+	UI_Panel * countdown;
 	float highlightTrans = 0;
 };
 
@@ -830,12 +896,12 @@ class Logo
 public:
 	Logo()
 	{
-		logo = new UI_Panel(-1, 1, -1, 1);
+		logo = new UI_Panel(-0.1f, 0.1f, -0.08f, 0.08f);
 		logo->setColor(vec3(1.0, 0.0, 0.0));
 		logo->setShader(sdrCtl.getShader("basic_2D"));
 		logo->loadColorTex("img/UI_elements/logoB", "PNG");
 		logo->setTex(true);
-		logo->setModelM(glm::scale(vec3(0.1, 0.1, 1.0))*glm::translate(vec3(0.0f, -4.5, -1.0f)));
+		logo->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.45, -1.0f)));
 	}
 	~Logo()
 	{
@@ -860,12 +926,12 @@ class Settings
 public:
 	Settings()
 	{
-		settings = new UI_Panel(-1, 1, -1, 1);
+		settings = new UI_Panel(-0.5f, 0.5f, -0.5f, 0.5f);
 		settings->setColor(vec3(1.0, 0.0, 0.0));
 		settings->setShader(sdrCtl.getShader("basic_2D"));
 		settings->loadColorTex("img/UI_elements/logoB", "PNG");
 		settings->setTex(true);
-		settings->setModelM(glm::scale(vec3(0.5, 0.5, 1.0))*glm::translate(vec3(0.0f, 0.0f, -1.0f)));
+		settings->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.0f, -1.0f)));
 
 		address_bar = new UI_Panel(-1, 1, -1, 1);
 		address_bar->setColor(vec3(1.0, 0.0, 0.0));
