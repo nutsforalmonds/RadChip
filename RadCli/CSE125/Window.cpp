@@ -1091,6 +1091,8 @@ void server_update(int value){
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
 
+		cout << player_list[0]->getAABB().max[0] << " " << player_list[0]->getAABB().max[1] << " " << player_list[0]->getAABB().max[2] << endl;
+
 		switch (playerID){
 		case 0:
 			break;
@@ -1359,33 +1361,51 @@ void keyboard(unsigned char key, int, int){
 		break;
 	case 1:
 
-		if (key == 'a'){
+		if (key == 'a' || key == 'A'){
 			if (!(keyState & 1)){
 				keyState = keyState | 1;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 'd'){
-			if (!(keyState & 1<<1)){
+		if (key == 'd' || key == 'D'){
+			if (!(keyState & 1 << 1)){
 				keyState = keyState | 1 << 1;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 'w'){
-			if (!(keyState & 1<<2)){
+		if (key == 'w' || key == 'W'){
+			if (!(keyState & 1 << 2)){
 				keyState = keyState | 1 << 2;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 's'){
-			if (!(keyState & 1<<3)){
+		if (key == 's' || key == 'S'){
+			if (!(keyState & 1 << 3)){
 				keyState = keyState | 1 << 3;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
 		if (key == 'W'){
-			if (!(keyState & 1<<5)){
+			if (!(keyState & 1 << 5)){
 				keyState = keyState | 1 << 5;
+				player_list[playerID]->setAnimLoop(1, time);
+			}
+		}
+		if (key == 'A'){
+			if (!(keyState & 1 << 6)){
+				keyState = keyState | 1 << 6;
+				player_list[playerID]->setAnimLoop(1, time);
+			}
+		}
+		if (key == 'S'){
+			if (!(keyState & 1 << 7)){
+				keyState = keyState | 1 << 7;
+				player_list[playerID]->setAnimLoop(1, time);
+			}
+		}
+		if (key == 'D'){
+			if (!(keyState & 1 << 8)){
+				keyState = keyState | 1 << 8;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
@@ -1497,10 +1517,12 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 'a'){
 			keyState = keyState & ~1;
+			keyState = keyState & ~(1 << 6);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'd'){
 			keyState = keyState & ~(1 << 1);
+			keyState = keyState & ~(1 << 8);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'w'){
@@ -1508,7 +1530,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+					//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -1519,14 +1541,32 @@ void keyUp (unsigned char key, int x, int y) {
 				}
 			}
 			keyState = keyState & ~(1 << 2);
+			keyState = keyState & ~(1 << 5);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 's'){
 			keyState = keyState & ~(1 << 3);
+			keyState = keyState & ~(1 << 7);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == 'W'){
 			keyState = keyState & ~(1 << 5);
+			keyState = keyState & ~(1 << 2);
+			player_list[playerID]->unsetAnimLoop(1, time);
+		}
+		if (key == 'A'){
+			keyState = keyState & ~1;
+			keyState = keyState & ~(1 << 6);
+			player_list[playerID]->unsetAnimLoop(1, time);
+		}
+		if (key == 'S'){
+			keyState = keyState & ~(1 << 3);
+			keyState = keyState & ~(1 << 7);
+			player_list[playerID]->unsetAnimLoop(1, time);
+		}
+		if (key == 'D'){
+			keyState = keyState & ~(1 << 1);
+			keyState = keyState & ~(1 << 8);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		if (key == ' '){
@@ -2563,7 +2603,7 @@ void initialize(int argc, char *argv[])
 
 	m_billboardList.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList.AddBoard(vec3(9.0f, 7.0f, 9.0f));
+	m_billboardList.AddBoard(vec3(-20.0f, 9.0f, 0.0f));
 	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, -9.0f));
 	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, 9.0f));
 	m_billboardList.AddBoard(vec3(9.0f, 7.0f, -9.0f));

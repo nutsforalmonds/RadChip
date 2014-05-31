@@ -126,3 +126,8 @@ void BillboardList::setShader(GLSLProgram* shader)
 	uniformLoc.push_back(shader->getUniformLoc("texUnit"));
 }
 
+
+vector<vec3> * BillboardList::getPos()
+{
+	return &mBoardList;
+}

@@ -10,6 +10,7 @@
 using namespace std;
 
 #define BASE_JUMPS 20
+#define NUM_POWERUPS 5
 
 static int iohjworihorhi = 0;
 
@@ -28,6 +29,10 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(1, 10, 2);
+		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
 	}
 	Object(string n, string t){
 		name = n;
@@ -42,8 +47,14 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(1, 10, 2);
+		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
 	}
-	~Object(){}
+	~Object()
+	{
+	}
 	virtual void draw(){/* This is a placeholder*/ }
 
 	void setType(string t){type = t;}
@@ -173,6 +184,12 @@ public:
 	int getTeamID(){ return teamID; }
 	void setTeamID(int i){ teamID = i; }
 
+	bool * getPowerUp() { return powerUp; }
+	void setPowerUp(int i, bool val) { powerUp[i] = val; }
+
+	int * getPowerUpDuration() { return powerUpDuration; }
+	void setPowerUpDuration(int i, int val) { powerUpDuration[i] = val; }
+
 protected:
 	mat4 modelM;
 	mat4 Rotation;
@@ -195,4 +212,6 @@ protected:
 	RangeWeapon * weapon;
 	Boots * boots;
 	mat4 aliveModelM;
+	bool * powerUp;
+	int * powerUpDuration;
 };

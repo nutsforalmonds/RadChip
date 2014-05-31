@@ -10,14 +10,18 @@
 #include "MD5Model.h"
 #include "Camera.h"
 #include "Ground.h"
+#include "billboard_list.h"
 using namespace std;
 
 
 #define RESPAWN_COUNTER 100
+
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
-
 #define MAX_DAMAGE -50
+
+#define POWERUP_DURATION 50
+#define NUM_POWERUPS 5
 
 #define GRAVITY_SCALE 2.5
 #define PLAYER_SPEED 10
@@ -65,6 +69,7 @@ public:
 			collisionDetection();
 			collisionDetectionPlayer();
 			collisionDetectionProjectile();
+			collisionDetectionPowerUp();
 			despawnProjectile();
 			rechargeJump();
 			respawnPlayer();
@@ -76,6 +81,7 @@ public:
 		collisionDetection();
 		collisionDetectionPlayer();
 		collisionDetectionProjectile();
+		collisionDetectionPowerUp();
 		despawnProjectile();
 		rechargeJump();
 		respawnPlayer();
@@ -203,6 +209,35 @@ public:
 		}
 	}
 
+	void collisionDetectionPowerUp()
+	{
+		bool inX, inY, inZ;
+		AABB playerAABB;
+		vec3 powerUpPos;
+		for (int i = 0; i < player.size(); i++)
+		{
+			playerAABB = player[i]->getAABB();
+			for (int j = 0; j < powerUps.size(); j++)
+			{
+				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
+				{
+					powerUpPos = (*powerUps[j]->getPos())[l];
+					inX = (playerAABB.min[0] <= powerUpPos[0]) && (powerUpPos[0] <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1]) && (powerUpPos[1] <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2]) && (powerUpPos[2] <= playerAABB.max[2]);
+
+					if (inX && inY && inZ && !(player[i]->getPowerUp())[1])
+					{
+						cout << "PowerUp" << endl;
+						player[i]->setBoots(new Boots(player[i]->getBoots()->getMoveSpeed() * 2 ,10,2));
+						player[i]->setPowerUp(1, 1);
+						player[i]->setPowerUpDuration(1, POWERUP_DURATION);
+					}
+				}
+			}
+		}
+	}
+
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
 		float Rewind[3];
 		float minRewind = 999;
@@ -298,6 +333,17 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void removePowerUp()
+	{
+		bool * playerPowerUp;
+		int * powerUpDuration;
+		for (int i = 0; i < player.size(); i++)
+		{
+			playerPowerUp = player[i]->getPowerUp();
+			powerUpDuration = player[i]->getPowerUpDuration();
+
+		}
+	}
 
 	void respawnPlayer()
 	{
@@ -822,7 +868,10 @@ public:
 		//md6->setType("Model");
 		//md6->setName("Player Model");
 
-
+		///////////////////////////////////////////////////////////////////////////Initialize PowerUps//////////////////////////////////////////////////////////////////////
+		BillboardList * speedUp = new BillboardList();
+		speedUp->AddBoard(vec3(-20.0f, 9.0f, 0.0f));
+		powerUps.push_back(speedUp);
 
 
 		counter = 0;
@@ -837,6 +886,7 @@ protected:
 	vector<Object*> skillShot;
 	vector<Object*> virtualTower;
 	vector<Projectile*> projectile;
+	vector<BillboardList *> powerUps;
 	vector<Item *> items;
 	vector<mat4> camM;
 	vec3 gravity;
