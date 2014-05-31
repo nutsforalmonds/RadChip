@@ -86,10 +86,27 @@ public:
 			result = system->init(100, FMOD_INIT_NORMAL, 0);
 		}
 		FMODErrorCheck(result);
+		
 	}
 
 	~SoundSystem(){
 		FMODErrorCheck(system->release());
+	}
+
+	void set3DAttributes(FMOD_VECTOR pt, FMOD_VECTOR vt){
+		cout << "New Listener Pos: <" << pt.x << "," << pt.y << "," << pt.z << ">" << endl;
+		cout << "New Listener Pos: <" << vt.x << "," << vt.y << "," << vt.z << ">" << endl;
+		system->set3DListenerAttributes(0, &pt, &vt, 0, 0);
+	}
+
+	void set3DSettings(float dopplerscale, float distancefactor, float rolloffscale){
+		system->set3DSettings(dopplerscale, distancefactor, rolloffscale);
+	}
+
+	void view3DSettings(){
+		float dopplerscale, distancefactor, rolloffscale;
+		system->get3DSettings(&dopplerscale, &distancefactor, &rolloffscale);
+		cout << "Dop: " << dopplerscale << " Dis: " << distancefactor << " Rol: " << rolloffscale << endl;
 	}
 
 
@@ -98,6 +115,16 @@ public:
 
 		// Load sound effects into memory (not streaming)
 		result = system->createSound(path.c_str(), FMOD_DEFAULT, 0, &sound);
+		FMODErrorCheck(result);
+
+		return sound;
+	}
+
+	FMOD::Sound* create3DSound(string path){
+		FMOD::Sound *sound;
+
+		// Load sound effects into memory (not streaming)
+		result = system->createSound(path.c_str(), FMOD_3D, 0, &sound);
 		FMODErrorCheck(result);
 
 		return sound;
@@ -179,6 +206,8 @@ public:
 	}
 
 	void updateListener(){
+	//	cout << "UpdateListener - Listener Pos: <" << listenerPos.x << "," << listenerPos.y << "," << listenerPos.z << ">" << endl;
+	//	cout << "UpdateListener - Listener Pos: <" << listenerVel.x << "," << listenerVel.y << "," << listenerVel.z << ">" << endl;
 		system->set3DListenerAttributes(0, &listenerPos, &listenerVel, 0, 0);
 	}
 
@@ -322,6 +351,11 @@ public:
 		system = s;
 		me = system->createSound(path);
 	}
+
+	Sound(SoundSystem *s, string path, int i){
+		system = s;
+		me = system->create3DSound(path);
+	}
 	~Sound(){
 		system->free(me);
 	}
@@ -357,6 +391,9 @@ public:
 
 	void Play3D(){
 		system->play3DSound(me, volume, position, velocity, minDistance, maxDistance);
+		cout << "Me: "<< me << "Vol: " << volume << "Min: " << minDistance << "Max: " << maxDistance << endl;
+		cout << position.x << position.y << position.z << endl;
+		cout << velocity.x << velocity.y << velocity.z << endl;
 	}
 	
 	void setVolume(double v){

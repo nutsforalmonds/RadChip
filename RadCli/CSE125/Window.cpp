@@ -101,6 +101,8 @@ Music *gameMusic;
 Sound* testSound[10];
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
+Sound* posTestSound;
+Music* posTestMusic;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
@@ -1248,6 +1250,26 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
+  FMOD_VECTOR pt = { 0.0f, 0.0f, 0.0f };
+  FMOD_VECTOR vt = { 0.0f, 0.0f, 0.0f };
+
+  posTestSound = new Sound(mySoundSystem, "Sound/hard_hit.ogg", 1);
+  posTestSound->setVolume(0.5);
+  posTestSound->setPosition(pt);
+  posTestSound->setVelocity(vt);
+  posTestSound->setMinDistance(2.0f);
+  posTestSound->setMaxDistance(50000.0f);
+
+  posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg");
+  posTestMusic->setLoopCount(-1);
+  posTestMusic->setVolume(0.75);
+  posTestMusic->setPosition(pt);
+  posTestMusic->setVelocity(vt);
+  posTestMusic->setMinDistance(2.0f);
+  posTestMusic->setMaxDistance(50000.0f);
+
+  
+
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
 	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
@@ -1399,6 +1421,99 @@ void keyboard(unsigned char key, int, int){
 		if (key == 'n'){
 			createExplosion();
 		}
+
+		//This plays sound at <0,0,0>
+		if (key == 'i'){
+			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
+
+			posTestSound->Play3D();
+
+			cout << "Playing Sound!" << endl;
+		}
+
+		//This creates looping music at <0,0,0>
+		if (key == 'o'){
+			posTestMusic->Play3D();
+
+			cout << "Playing Music!" << endl;
+		}
+
+		if (key == 'b'){
+			mySoundSystem->view3DSettings();
+		}
+
+		//This moves sound position forward
+		if (key == 't'){
+			myPosition.x = myPosition.x + 1.0f;
+			myPosition.y = myPosition.y + 1.0f;
+			myPosition.z = myPosition.z + 1.0f;
+
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
+		//This moves sound position forward
+		if (key == 'g'){
+			myPosition.x = myPosition.x - 1.0f;
+			myPosition.y = myPosition.y - 1.0f;
+			myPosition.z = myPosition.z - 1.0f;
+
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
+		//This moves sound position forward
+		if (key == 'y'){
+			myPosition.x = myPosition.x;
+			myPosition.y = myPosition.y;
+			myPosition.z = myPosition.z + 1.0f;
+
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
+		//This moves sound position backward
+		if (key == 'u'){
+			myPosition.x = myPosition.x;
+			myPosition.y = myPosition.y;
+			myPosition.z = myPosition.z - 1.0f;
+			
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
+		//This moves sound position left
+		if (key == 'h'){
+			myPosition.x = myPosition.x - 1.0f;
+			myPosition.y = myPosition.y;
+			myPosition.z = myPosition.z;
+
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
+		//This moves sound position right
+		if (key == 'j'){
+			myPosition.x = myPosition.x + 1.0f;
+			myPosition.y = myPosition.y;
+			myPosition.z = myPosition.z;
+
+			mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+			mySoundSystem->updateListener();
+			mySoundSystem->update();
+			cout << "New Listener Pos: <" << myPosition.x << "," << myPosition.y << "," << myPosition.z << ">" << endl;
+		}
+
 		if (key == 27){
 			//running = false;
 			//exit(0);
@@ -1618,7 +1733,7 @@ void mouseFunc(int button, int state, int x, int y)
 				}
 				menuMusic->Stop();
 			//	gameMusic->setFade(0.75, 0.005);
-				gameMusic->Play();
+				//gameMusic->Play();
 			}
 			else if (click == 2){
 				testSound[7]->Play();
@@ -1924,11 +2039,12 @@ void initialize(int argc, char *argv[])
 	}
 	else{
 		printf("FMOD Init successful!\n");
-		FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
-		FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
-		mySoundSystem->setListenerPosVel(myPosition, myVelocity);
-		mySoundSystem->updateListener();
 	}
+
+	FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
+	FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
+	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+	mySoundSystem->updateListener();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
