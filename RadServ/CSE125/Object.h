@@ -170,7 +170,8 @@ public:
 
 	int getPlayerID() { return playerID; }
 	void setPlayerID(int i) { playerID = i; }
-
+	int getTeamID(){ return teamID; }
+	void setTeamID(int i){ teamID = i; }
 
 protected:
 	mat4 modelM;
@@ -190,6 +191,7 @@ protected:
 	int respawnCounter;
 	int kills;
 	int playerID;
+	int teamID;
 	RangeWeapon * weapon;
 	Boots * boots;
 	mat4 aliveModelM;

@@ -339,15 +339,13 @@ public:
 		//player-stationary detection
 		for (uint i = 0; i < projectile.size(); i++)
 		{
-			bool touchGround1 = projectile[i]->getTouchGround();
 			for (uint j = 0; j < player.size(); j++)
 			{
-				if (projectile[i]->getPlayerID() == player[j]->getPlayerID())
+				if (projectile[i]->getTeamID() == player[j]->getTeamID())
 					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
-				bool touchGround2 = player[j]->getTouchGround();
-				bool collide = false;
+				bool collide = true;
 				//[p][s]
 				if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
 				{
@@ -378,6 +376,25 @@ public:
 					(*projectile[i]).setHit(player[j]->getPlayerID());
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
 				}
+
+				//for (int v = 0; v < 3; v++){
+				//	if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+				//		collide = false;
+				//		break;
+				//	}
+				//}
+				//if (collide){
+				//	vec3 pv = vec3(player[projectile[i]->getPlayerID()]->getModelM()*vec4(projectile[i]->getVelocity(),0.0));
+				//	pv[1] = 0;
+				//	pv = glm::normalize(pv);
+				//	pv[1] = 1;
+				//	player[j]->preTrans(glm::translate(pv));
+				//	damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				//	delete projectile[i];
+				//	projectile.erase(projectile.begin() + i);
+				//	i--;
+				//	break;
+				//}
 			}
 		}
 	}
@@ -480,11 +497,12 @@ public:
 		cubeT->setSpeed(5);
 		//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
 		cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-		cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+		cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
 		cubeT->setStartY(hold.max[2]);
 		cubeT->setPlayerID(playerID);
+		cubeT->setTeamID(player[playerID]->getTeamID());
 
 		//Name and type
 		cubeT->setType("Cube");
@@ -510,10 +528,12 @@ public:
 			AABB curr = projectile[i]->getAABB();
 			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
 
+
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
 			if (distance >= (*projectile[i]).getDistance())
 			{
 				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+				delete projectile[i];
 				projectile.erase(projectile.begin() + i);
 			}
 		}
@@ -611,6 +631,7 @@ public:
 		md50->setType("Model");
 		md50->setName("Player Model0");
 		md50->setPlayerID(0);
+		md50->setTeamID(0);
 		addPlayer(md50);
 
 		MD5Model* md51 = new MD5Model();
@@ -621,6 +642,7 @@ public:
 		md51->setType("Model");
 		md51->setName("Player Model1");
 		md51->setPlayerID(1);
+		md51->setTeamID(1);
 		addPlayer(md51);
 
 		MD5Model* md52 = new MD5Model();
@@ -630,6 +652,7 @@ public:
 		md52->setType("Model");
 		md52->setName("Player Model2");
 		md52->setPlayerID(2);
+		md52->setTeamID(0);
 		addPlayer(md52);
 
 		MD5Model* md53 = new MD5Model();
@@ -640,6 +663,7 @@ public:
 		md53->setType("Model");
 		md53->setName("Player Model3");
 		md53->setPlayerID(3);
+		md53->setTeamID(1);
 		addPlayer(md53);
 
 		//triplet tower
@@ -648,7 +672,7 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
-		tw0->setPlayerID(0);
+		tw0->setTeamID(0);
 		addTower(tw0);
 
 		//triplet tower
@@ -657,7 +681,7 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
-		tw1->setPlayerID(0);
+		tw1->setTeamID(0);
 		addTower(tw1);
 
 		//pctopus tower
@@ -666,7 +690,7 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
-		tw2->setPlayerID(1);
+		tw2->setTeamID(1);
 		addTower(tw2);
 
 		//pctopus tower
@@ -675,7 +699,7 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
-		tw3->setPlayerID(1);
+		tw3->setTeamID(1);
 		addTower(tw3);
 
 		Ground* ground = new Ground();

@@ -1202,7 +1202,7 @@ int main(int argc, char *argv[])
   glClearColor(0, 0, 0, 0);
   //glClearColor(1, 1, 1, 0);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // set polygon drawing mode to fill front and back of each polygon
-  glDisable(GL_CULL_FACE);     // disable back face culling to render both sides of polygons
+  glEnable(GL_CULL_FACE);     // disable back face culling to render both sides of polygons
   glShadeModel(GL_SMOOTH);             	      // set shading to smooth
 
   // Generate material properties:

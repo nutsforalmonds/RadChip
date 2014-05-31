@@ -157,7 +157,7 @@ private:
 	void generate(float negx, float posx, float negy, float posy){
 		std::array<float, 8> positions = {negx, posy, negx, negy, posx, posy, posx, negy}; 
 		std::array<float, 8> texCord = { 0, 1, 0, 0, 1, 1, 1, 0 };
-		std::array<int, 6> indices = {0, 1, 2, 1, 2, 3};    
+		std::array<int, 6> indices = {0, 1, 2, 1, 3, 2};    
 		vertex_positions = positions;
 		tex_positions = texCord;
 		triangle_indices = indices;
