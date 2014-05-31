@@ -13,7 +13,7 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 1000
+#define NUM_PARTICLES2 1000
 
 typedef struct Particle2
 {
@@ -29,7 +29,7 @@ Particle2;
 
 typedef struct Emitter2
 {
-	Particle2    eParticles[NUM_PARTICLES];
+	Particle2    eParticles[NUM_PARTICLES2];
 	float       eRadius;
 	float       eVelocity;
 	float       eDecay;
@@ -67,15 +67,15 @@ public:
 		float myTheta, myPhi;
 
 		// Load Particles
-		for (int i = 0; i<NUM_PARTICLES; i++)
+		for (int i = 0; i<NUM_PARTICLES2; i++)
 		{
 			myTheta = randomFloatBetween(0.0, 360.00);
 			myPhi = randomFloatBetween(0.0, 180.00);
 			myEmitter.eParticles[i].pID = (myTheta*(3.14159265359 / 180));
 			myEmitter.eParticles[i].pID2 = (myPhi*(3.14159265359 / 180));
 			// Assign a unique ID to each particle, between 0 and 360 (in radians)
-			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
-			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES2)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES2)*360.0f)*(3.14159265359 / 180));
 			// Assign random offsets within bounds
 			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
 			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
@@ -113,8 +113,8 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 6, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
 
-		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
-		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES2);
+		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES2);
 	}
 
 	ParticleSystem2(float oRadius, float oVelocity, float oDecay, float oSize, float oColor, float theta_min, float theta_max, float phi_min, float phi_max, float drag){
@@ -139,15 +139,15 @@ public:
 		float myTheta, myPhi;
 
 		// Load Particles
-		for (int i = 0; i<NUM_PARTICLES; i++)
+		for (int i = 0; i<NUM_PARTICLES2; i++)
 		{
 			myTheta = randomFloatBetween(theta_min, theta_max);
 			myPhi = randomFloatBetween(phi_min, phi_max);
 			myEmitter.eParticles[i].pID = (myTheta*(3.14159265359 / 180));
 			myEmitter.eParticles[i].pID2 = (myPhi*(3.14159265359 / 180));
 			// Assign a unique ID to each particle, between 0 and 360 (in radians)
-			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
-			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID = ((((float)i/(float)NUM_PARTICLES2)*360.0f)*(3.14159265359 / 180));
+			//myEmitter.eParticles[i].pID2 = ((((float)i / (float)NUM_PARTICLES2)*360.0f)*(3.14159265359 / 180));
 			// Assign random offsets within bounds
 			myEmitter.eParticles[i].pRadiusOffset = oRadius + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.0 - oRadius)));
 			myEmitter.eParticles[i].pVelocityOffset = (-oVelocity) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (oVelocity - (-oVelocity))));
@@ -185,8 +185,8 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 5, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pSizeOffset)));
 		vao.addAttrib(GL_ARRAY_BUFFER, sizeof(myEmitter.eParticles), &myEmitter.eParticles, GL_STATIC_DRAW, 6, 3, GL_FLOAT, GL_FALSE, sizeof(Particle2), (void*)(offsetof(Particle2, pColorOffset)));
 
-		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES);
-		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES);
+		//vao.setDrawMode(GL_LINE_STRIP, 0, NUM_PARTICLES2);
+		vao.setDrawMode(GL_POINTS, 0, NUM_PARTICLES2);
 	}
 
 	void updateLifeCycle(float timeElapsed){

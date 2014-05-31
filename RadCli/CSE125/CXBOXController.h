@@ -2,7 +2,8 @@
 #define _XBOX_CONTROLLER_H_
 
 // No MFC
-#define WIN32_LEAN_AND_MEAN
+//Already defined in freeglut_std.h
+//#define WIN32_LEAN_AND_MEAN
 
 // We need the Windows Header and the XInput Header
 #include <windows.h>

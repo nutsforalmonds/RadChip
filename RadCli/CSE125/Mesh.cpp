@@ -21,7 +21,7 @@ extern mat4 View;
 extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
-
+extern void printLoadingString(string s);
 /*
 Mesh::MeshEntry::MeshEntry()
 {
@@ -422,6 +422,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 				}
 				else {
 					printf("Loaded texture '%s'\n", FixedPath.c_str());
+					printLoadingString(FixedPath);
 				}
 			}
 		}

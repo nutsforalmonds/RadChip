@@ -99,6 +99,8 @@ SoundSystem *mySoundSystem;
 Music *menuMusic;
 Music *gameMusic;
 Sound* testSound[10];
+FMOD_VECTOR myPosition;
+FMOD_VECTOR myVelocity;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
@@ -200,6 +202,7 @@ void motionFunc(int x, int y);
 void passiveMotionFunc(int x, int y);
 void specialKeyboardFunc(int key, int x, int y);
 float randomFloatBetween(float min, float max);
+void update3DSound();
 
 void updateShaders();
 void setupShaders();
@@ -347,16 +350,12 @@ void createExplosion(){
 	temp->setTime(s);
 	explosion_list.push_back(temp);
 
-	cout << "BOOM! (" << x << "," << y << "," << z << ") t=" << s << endl;
-	
+	cout << "BOOM! (" << x << "," << y << "," << z << ") t=" << s << endl;	
 }
-
-
 
 void stopVibrate(int i){
 	Player1->Vibrate(0, 0);
 }
-
 void Vibrate(int L, int R, int time){
 	if (USE_JOYSTICK){
 		Player1->Vibrate(65535, 65535);
@@ -794,7 +793,12 @@ void Window::idleCallback(void)
 	//createExplosion();
 
 	updateShaders();
+
+	update3DSound();
+	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+	mySoundSystem->updateListener();
 	mySoundSystem->update();
+
     displayCallback();  
 	
 }
@@ -1087,6 +1091,19 @@ void server_update(int value){
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
 
+		switch (playerID){
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			break;
+		}
+
 		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
 		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
 		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
@@ -1159,8 +1176,6 @@ int main(int argc, char *argv[])
 
   struct timeval2 tv;
   struct timezone2 tz;
-  struct tm *tm1;
-  time_t time1;
   ZeroMemory(&tv, sizeof(tv));
   ZeroMemory(&tz, sizeof(tz));
   gettimeofday(&tv, &tz); // call gettimeofday()
@@ -1860,10 +1875,8 @@ void setupShaders()
 		glutSwapBuffers();
 
 		sdrCtl.createVFShader(name, vert.c_str(), frag.c_str());
+		
 		printf("done!\n");
-
-		printf("Loading Shader: %s...", name.c_str());
-
 		sprintf_s(buf, "%s %s %s", "Loading Shader: ", name.c_str(), "...done!");
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1911,6 +1924,10 @@ void initialize(int argc, char *argv[])
 	}
 	else{
 		printf("FMOD Init successful!\n");
+		FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
+		FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
+		mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+		mySoundSystem->updateListener();
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -2089,7 +2106,7 @@ void initialize(int argc, char *argv[])
 	t0_ps_01->setFragEndSize(1.0f);// Fragment end size
 	t0_ps_01->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t0_ps_01->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t0_ps_01->setTime_Step(0.1);
+	t0_ps_01->setTime_Step(0.1f);
 	t0_ps_01->setTime_Max(100.0);
 	t0_ps_01->setTime_Min(0.0);
 	t0_ps_01->setTime(0.0);
@@ -2110,7 +2127,7 @@ void initialize(int argc, char *argv[])
 	t0_ps_02->setFragEndSize(1.0f);// Fragment end size
 	t0_ps_02->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t0_ps_02->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t0_ps_02->setTime_Step(0.1);
+	t0_ps_02->setTime_Step(0.1f);
 	t0_ps_02->setTime_Max(100.0);
 	t0_ps_02->setTime_Min(0.0);
 	t0_ps_02->setTime(33.0);
@@ -2131,7 +2148,7 @@ void initialize(int argc, char *argv[])
 	t0_ps_03->setFragEndSize(1.0f);// Fragment end size
 	t0_ps_03->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t0_ps_03->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t0_ps_03->setTime_Step(0.1);
+	t0_ps_03->setTime_Step(0.1f);
 	t0_ps_03->setTime_Max(100.0);
 	t0_ps_03->setTime_Min(0.0);
 	t0_ps_03->setTime(66.0);
@@ -2162,7 +2179,7 @@ void initialize(int argc, char *argv[])
 	t1_ps_01->setFragEndSize(1.0f);// Fragment end size
 	t1_ps_01->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t1_ps_01->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t1_ps_01->setTime_Step(0.1);
+	t1_ps_01->setTime_Step(0.1f);
 	t1_ps_01->setTime_Max(100.0);
 	t1_ps_01->setTime_Min(0.0);
 	t1_ps_01->setTime(0.0);
@@ -2183,7 +2200,7 @@ void initialize(int argc, char *argv[])
 	t1_ps_02->setFragEndSize(1.0f);// Fragment end size
 	t1_ps_02->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t1_ps_02->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t1_ps_02->setTime_Step(0.1);
+	t1_ps_02->setTime_Step(0.1f);
 	t1_ps_02->setTime_Max(100.0);
 	t1_ps_02->setTime_Min(0.0);
 	t1_ps_02->setTime(33.0);
@@ -2204,7 +2221,7 @@ void initialize(int argc, char *argv[])
 	t1_ps_03->setFragEndSize(1.0f);// Fragment end size
 	t1_ps_03->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
 	t1_ps_03->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
-	t1_ps_03->setTime_Step(0.1);
+	t1_ps_03->setTime_Step(0.1f);
 	t1_ps_03->setTime_Max(100.0);
 	t1_ps_03->setTime_Min(0.0);
 	t1_ps_03->setTime(66.0);
@@ -2822,6 +2839,20 @@ float randomFloatBetween(float min, float max)
 {
 	float myRand = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 	return myRand;
+}
+
+void update3DSound(){
+	myPosition = myPosition;
+	myVelocity = myVelocity;
+}
+
+void printLoadingString(string s){
+	sprintf_s(buf, "%s %s %s", "Loaded texture: '", s.c_str(), "'");
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
+
+	glutSwapBuffers();
 }
 
 

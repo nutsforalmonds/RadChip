@@ -109,6 +109,14 @@ public:
 		temp->setVolume(v);
 	}
 
+	void play3DSound(FMOD::Sound *s, double v, FMOD_VECTOR pos, FMOD_VECTOR vel, float minD, float maxD){
+		FMOD::Channel *temp;
+		system->playSound(FMOD_CHANNEL_FREE, s, false, &temp);
+		temp->set3DAttributes(&pos, &vel);
+		temp->set3DMinMaxDistance(minD, maxD);
+		temp->setVolume(v);
+	}
+
 	FMOD::Sound* createMusic(string path){
 		FMOD::Sound *song;
 		
@@ -126,6 +134,12 @@ public:
 	FMOD::Channel* getLastMusicChan(){ return music; }
 
 	void playMusic(FMOD::Channel *chan){
+		chan->setPaused(false);
+	}
+
+	void play3DMusic(FMOD::Channel *chan, FMOD_VECTOR pos, FMOD_VECTOR vel, float minD, float maxD){
+		chan->get3DAttributes(&pos, &vel);
+		chan->set3DMinMaxDistance(minD, maxD);
 		chan->setPaused(false);
 	}
 
@@ -147,6 +161,25 @@ public:
 
 	void free(FMOD::Sound *t){
 		FMODErrorCheck(t->release());
+	}
+
+	//position of listener needed for spatial & reverb effects
+	void setListenerPos(FMOD_VECTOR p){
+		listenerPos = p;
+	}
+
+	//velocity of listener needed for dopper effects
+	void setListenerVel(FMOD_VECTOR v){
+		listenerVel = v;
+	}
+
+	void setListenerPosVel(FMOD_VECTOR p, FMOD_VECTOR v){
+		setListenerPos(p);
+		setListenerVel(v);
+	}
+
+	void updateListener(){
+		system->set3DListenerAttributes(0, &listenerPos, &listenerVel, 0, 0);
 	}
 
 private:
@@ -173,6 +206,9 @@ private:
 	FMOD::Channel *music; 
 	FMOD::Channel *sound;
 
+	FMOD_VECTOR listenerPos;
+	FMOD_VECTOR listenerVel;
+
 };
 
 class Music
@@ -190,6 +226,35 @@ public:
 
 	void Play(){
 		system->playMusic(myChan);
+	}
+
+	void setPosition(FMOD_VECTOR pos){
+		position = pos;
+	}
+
+	void setVelocity(FMOD_VECTOR vel){
+		velocity = vel;
+	}
+
+	void setPosVel(FMOD_VECTOR pos, FMOD_VECTOR vel){
+		setPosition(pos);
+		setVelocity(vel);
+	}
+
+	void setMinDistance(float min){
+		minDistance = min;
+	}
+
+	float getMinDistance(){ return minDistance; }
+
+	void setMaxDistance(float max){
+		maxDistance = max;
+	}
+
+	float getMaxDistance(){ return maxDistance; }
+
+	void Play3D(){
+		system->play3DMusic(myChan, position, velocity, minDistance, maxDistance);
 	}
 
 	void Stop(){
@@ -242,6 +307,12 @@ private:
 	int loopCount;
 	double fade, fadeStep;
 	bool fadeDone;
+
+	FMOD_VECTOR position;
+	FMOD_VECTOR velocity;
+
+	float minDistance;
+	float maxDistance;
 };
 
 class Sound
@@ -259,6 +330,34 @@ public:
 		system->playSound(me, volume);
 	}
 
+	void setPosition(FMOD_VECTOR pos){
+		position = pos;
+	}
+
+	void setVelocity(FMOD_VECTOR vel){
+		velocity = vel;
+	}
+
+	void setMinDistance(float min){
+		minDistance = min;
+	}
+
+	float getMinDistance(){ return minDistance; }
+
+	void setMaxDistance(float max){
+		maxDistance = max;
+	}
+
+	float getMaxDistance(){ return maxDistance; }
+
+	void setPosVel(FMOD_VECTOR pos, FMOD_VECTOR vel){
+		setPosition(pos);
+		setVelocity(vel);
+	}
+
+	void Play3D(){
+		system->play3DSound(me, volume, position, velocity, minDistance, maxDistance);
+	}
 	
 	void setVolume(double v){
 		volume = v;
@@ -278,6 +377,12 @@ private:
 	SoundSystem *system;
 	double volume;
 	int loopCount;
+
+	FMOD_VECTOR position;
+	FMOD_VECTOR velocity;
+
+	float minDistance;
+	float maxDistance;
 };
 
 #endif	/* SOUND_H */
