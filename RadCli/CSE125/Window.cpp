@@ -487,9 +487,10 @@ void Window::idleCallback(void)
 		//particle animation
 		for (uint i = 0; i < panim_list.size(); i++){
 			if (!panim_list[i]->update()){
-				delete panim_list[i];
-				panim_list.erase(panim_list.begin() + i);
-				i--;
+				//delete panim_list[i];
+				//panim_list.erase(panim_list.begin() + i);
+				//i--;
+				panim_list[i]->setStartTime(ct);
 			}
 		}
 
@@ -915,9 +916,12 @@ void Window::displayCallback(void)
 		{
 			projectile_list[i]->draw();
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
 		}
+		glDisable(GL_BLEND);
 
 		//	md5->draw();
 
@@ -2695,14 +2699,14 @@ void initialize(int argc, char *argv[])
 	m_billboardList4.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/monster_hellknight.png", "PNG");
+	MOM.mother_of_p_anim->Init("img/explosion.png", "PNG");
 	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 7.0f, 0.0f));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 14.0f, 0.0f));
 	MOM.mother_of_p_anim->setWidth(1.0f);
 	MOM.mother_of_p_anim->setHeight(1.0f);
-	MOM.mother_of_p_anim->setNumColumn(4);
+	MOM.mother_of_p_anim->setNumColumn(5);
 	MOM.mother_of_p_anim->setNumRow(4);
-	MOM.mother_of_p_anim->setDuration(10);
+	MOM.mother_of_p_anim->setDuration(1);
 	MOM.mother_of_p_anim->Bind();
 
 	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);

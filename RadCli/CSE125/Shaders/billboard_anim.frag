@@ -15,7 +15,7 @@ void main()
     }   
     */        
 
-    if(FragColor.a<0.1){
-    	discard;
-    }                                                                    
+    // if(FragColor.a<0.1){
+    // 	discard;
+    // }                                                                    
 }
