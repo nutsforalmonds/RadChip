@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <deque>
 #include <boost/array.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -55,25 +56,21 @@ public:
 
 	std::string read()
 	{
-		//if (last_str.compare(ret_str) != 0)
-		//{
-		std::string str((std::istreambuf_iterator<char>(&b)),
-			std::istreambuf_iterator<char>());
-		last_str = ret_str;
-		ret_str = str;
-		//std::cout << ret_str << std::endl;
-		b.consume(bytes_);
-		receive();
-
-		return ret_str;
-		//}
-		//else return "";
+		if (!strqueue.empty())
+		{
+			ret_str = strqueue.front();
+			strqueue.pop_front();
+			//std::cout << "pop" << std::endl;
+			return ret_str;
+		}
+		else
+			return "";
 	}
 
 	void receive()
 	{
 		boost::asio::async_read_until(socket_,
-			b, "`",
+			b, "\n",
 			boost::bind(&tcp_client::handle_read, this,
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred));
@@ -92,13 +89,15 @@ private:
 	boost::asio::io_service& io_service_;
 	tcp::socket socket_;
 	tcp::endpoint endpoint_;
-	char ret_ [2048*2]; // possible concurrence problems
+	//char ret_ [2048*2]; // possible concurrence problems
 	std::vector <std::pair<string, mat4>> pIDVec_;
 	bool pID_ready = 0;
 	boost::asio::streambuf b;
 	std::string ret_str;
 	std::string last_str;
 	size_t bytes_;
+	std::string data;
+	std::deque<std::string> strqueue;
 
 	void handle_connect(const boost::system::error_code& error)
 	{
@@ -125,7 +124,7 @@ private:
 			pID_ready = 1;
 			//std::cout << "Reading" << std::endl;
 			boost::asio::async_read_until(socket_,
-				b, "`",
+				b, "\n",
 				boost::bind(&tcp_client::handle_read, this,
 				boost::asio::placeholders::error,
 				boost::asio::placeholders::bytes_transferred));
@@ -140,10 +139,15 @@ private:
 	void handle_read(const boost::system::error_code& error,
 					 size_t bytes)
 	{
+		std::cout << "size of queue: " << strqueue.size() << std::endl;
 		if (!error)
 		{
-			bytes_ = bytes;
-			
+			std::istream response_strm(&b);
+			//response_strm >> data;
+			std::getline(response_strm, data);
+			strqueue.push_back(data);
+			//b.consume(bytes);
+			receive();
 		}
 		else
 		{
@@ -151,14 +155,6 @@ private:
 			socket_.close();
 		}
 	}
-
-	/*void write(std::vector <pair<string, mat4>>& in)
-	{
-	boost::asio::async_write(socket_,
-	boost::asio::buffer(in, 2048),
-	boost::bind(&tcp_client::handle_write, this,
-	boost::asio::placeholders::error));
-	}*/
 
 	void handle_write(const boost::system::error_code& error)
 	{

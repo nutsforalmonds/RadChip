@@ -58,12 +58,19 @@ bool player1shoot, player2shoot, player3shoot, player4shoot;
 std::string str;
 gameState gs;
 
+bool sendddddddddddedededed = false;
+int p0Shots = 0;
+int p1Shots = 0;
+int p2Shots = 0;
+int p3Shots = 0;
+
+
 void handle_mouse_state(int pid, int mouseState){
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		//std::cout << "projectile attack from client" << std::endl;
+		std::cout << "projectile attack from client" << std::endl;
 		if (pid == 0)
 			player1shoot = true;
 		else if (pid == 1)
@@ -148,15 +155,25 @@ int main(int argc, char *argv[])
 	scene = new Scene();
 	scene->setGravity(vec3(0, -9.8, 0));
 
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	//Payer Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	//Tower Mats
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	/*
+	//Player Cam Mats
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	*/
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -257,6 +274,7 @@ int main(int argc, char *argv[])
 		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
+		boost::array<mat4, 4> ca = scene->getPlayerCams();
 
 		// Print out matrix contents
 		/*
@@ -265,22 +283,47 @@ int main(int argc, char *argv[])
 		cout << (m[0])[2][0] << (m[0])[2][1] << (m[0])[2][2] << (m[0])[2][3] << endl;
 		cout << (m[0])[3][0] << (m[0])[3][1] << (m[0])[3][2] << (m[0])[3][3] << endl;
 		*/
-		if (player1shoot == true)
+
+		if (player1shoot == true){
+			p0Shots += 2;
+		}
+		if (player2shoot == true){
+			p1Shots += 2;
+		}
+		if (player3shoot == true){
+			p2Shots += 2;
+		}
+		if (player4shoot == true){
+			p3Shots += 2;
+		}
+
+		if (p0Shots > 0){
 			p0 = "0s";
-		else
+			p0Shots--;
+		}else{
 			p0 = "0S";
-		if (player2shoot == true)
+		}
+
+		if (p1Shots > 0){
 			p1 = "1s";
-		else
+			p1Shots--;
+		}else{
 			p1 = "1S";
-		if (player3shoot == true)
+		}
+
+		if (p2Shots > 0){
 			p2 = "2s";
-		else
+			p2Shots--;
+		}else{
 			p2 = "2S";
-		if (player4shoot == true)
+		}
+
+		if (p3Shots > 0){
 			p3 = "3s";
-		else
+			p3Shots--;
+		}else{
 			p3 = "3S";
+		}
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//
 
@@ -302,10 +345,13 @@ int main(int argc, char *argv[])
 		else
 			p3 += "D";
 		//reset the playerDamaged flags
-		scene->setPlayerDamaged(0, false);
-		scene->setPlayerDamaged(1, false);
-		scene->setPlayerDamaged(2, false);
-		scene->setPlayerDamaged(3, false);
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDamaged(0, false);
+			scene->setPlayerDamaged(1, false);
+			scene->setPlayerDamaged(2, false);
+			scene->setPlayerDamaged(3, false);
+		}
 
 		//sending if a player was killed
 		if (scene->getPlayerDead(0))
@@ -325,21 +371,30 @@ int main(int argc, char *argv[])
 		else
 			p3 += "K";
 
-		scene->setPlayerDead(0, false);
-		scene->setPlayerDead(1, false);
-		scene->setPlayerDead(2, false);
-		scene->setPlayerDead(3, false);
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDead(0, false);
+			scene->setPlayerDead(1, false);
+			scene->setPlayerDead(2, false);
+			scene->setPlayerDead(3, false);
+		}
 
 
 		(*sendVec)[0] = std::make_pair(p0.c_str(), mp[0]);
 		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);
 		(*sendVec)[2] = std::make_pair(p2.c_str(), mp[2]);
 		(*sendVec)[3] = std::make_pair(p3.c_str(), mp[3]);
+
 		(*sendVec)[4] = std::make_pair("t0", mt[0]);
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
 		(*sendVec)[6] = std::make_pair("t2", mt[2]);
 		(*sendVec)[7] = std::make_pair("t3", mt[3]);
-
+		/*
+		(*sendVec)[8] = std::make_pair("c0", ca[0]);
+		(*sendVec)[9] = std::make_pair("c1", ca[1]);
+		(*sendVec)[10] = std::make_pair("c2", ca[2]);
+		(*sendVec)[11] = std::make_pair("c3", ca[3]);
+		*/
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
@@ -347,26 +402,14 @@ int main(int argc, char *argv[])
 		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
 		//server->send(*sendVec);
 
-		/*int num = rand() % 1000 + 1;
+		if (sendddddddddddedededed){
+			str = gs.getPosString(sendVec);
 
-		for (int i = 0; i < num; i++)
-		{
-			str = str + "a";
+			server->send(str + '\n');
+			io_service.poll();
 		}
-
-		num = rand() % 1000 + 1;
-
-		for (int i = 0; i < num; i++)
-		{
-			str = str + "b";
-		}
-
-		str = "{" + str + "}";*/
-
-		str = gs.getPosString(sendVec);
-
-		server->send(str + '`');
-		io_service.poll();
+		
+		sendddddddddddedededed = (!sendddddddddddedededed);
 
 		//str = "";
 

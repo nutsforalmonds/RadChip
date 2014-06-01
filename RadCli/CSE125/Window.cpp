@@ -112,6 +112,7 @@ std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
+std::vector<ParticleAnimated*> panim_list;
 
 Mesh_Static* tryThis;
 
@@ -220,6 +221,7 @@ MainMenu * myMainMenu;
 GameMenu * myGameMenu;
 DeathScreen * myDeathScreen;
 Settings * settings;
+End_Screen * endScreen;
 Logo * logo;
 
 Texture * shadow;
@@ -254,7 +256,7 @@ int test = 0;
 float test2 = 0;
 
 const int m_lenght = 25;
-unsigned char s_test[m_lenght];
+unsigned char ip_adress[m_lenght];
 int but_up = 1;
 int m_pos = 0;
 int text_flag = 0;
@@ -495,6 +497,20 @@ void Window::idleCallback(void)
 		for (uint i = 0; i < player_list.size(); i++){
 			((Mesh*)player_list[i])->BoneTransform(player_list[i]->getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
 			((Mesh*)player_list[i])->setTransforms(Transforms);
+		}
+
+		//particle animation
+		for (uint i = 0; i < panim_list.size(); i++){
+			if (!panim_list[i]->update()){
+				if (panim_list[i] == 0){//one time
+					delete panim_list[i];
+					panim_list.erase(panim_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					panim_list[i]->setStartTime(ct);
+				}
+			}
 		}
 
 		//simulateProjectile(delta);
@@ -861,7 +877,7 @@ void Window::displayCallback(void)
 		logo->draw();
 
 		glDisable(GL_DEPTH_TEST);
-		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, s_test, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
@@ -919,6 +935,12 @@ void Window::displayCallback(void)
 		{
 			projectile_list[i]->draw();
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		for (uint i = 0; i < panim_list.size(); i++){
+			panim_list[i]->draw();
+		}
+		glDisable(GL_BLEND);
 
 		//	md5->draw();
 
@@ -1016,9 +1038,10 @@ void server_update(int value){
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
 	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
 	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
-	mouseState = 0;
+	
 	cli->write(*sendVec);
 	io_service.poll();
+	mouseState = 0;
 	cam_dx = 0;
 
 	// RECEIVE STUFF
@@ -1036,6 +1059,8 @@ void server_update(int value){
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
 	}
+	else
+		recvValid = false;
 	
 	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
@@ -1174,7 +1199,12 @@ void server_update(int value){
 		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
 		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
 		tower_list[atoi(&((*recvVec)[7].first.c_str())[1])]->setModelM((*recvVec)[7].second);
-
+		/*
+		mats[atoi(&((*recvVec)[8].first.c_str())[0])]  = (*recvVec)[8].second;
+		mats[atoi(&((*recvVec)[9].first.c_str())[0])]  = (*recvVec)[9].second;
+		mats[atoi(&((*recvVec)[10].first.c_str())[0])] = (*recvVec)[10].second;
+		mats[atoi(&((*recvVec)[11].first.c_str())[0])] = (*recvVec)[11].second;
+		*/
 		i++;
 
 		vec4 temp(0.0, 0.0, 0.0, 1.0);
@@ -1356,9 +1386,7 @@ int main(int argc, char *argv[])
   posTestSound2->setPosition(pt);
   posTestSound2->setVelocity(vt);
   posTestSound2->setMinDistance(5.0f);
-  posTestSound2->setMaxDistance(10000.0f);
-
-  
+  posTestSound2->setMaxDistance(10000.0f);  
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
   posTestMusic->setLoopCount(-1);
@@ -1367,9 +1395,7 @@ int main(int argc, char *argv[])
   posTestMusic->setVelocity(vt);
   posTestMusic->setMinDistance(5.0f);
   posTestMusic->setMaxDistance(10000.0f);
-
   
-
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
 	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
@@ -1446,14 +1472,14 @@ void keyboard(unsigned char key, int, int){
 		}
 
 		if (((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46) && text_flag){
-			if (but_up && m_pos < m_lenght){
+			if (but_up && m_pos < m_lenght - 1){
 				but_up = 0;
-				s_test[m_pos] = key;
+				ip_adress[m_pos] = key;
 				m_pos++;
 
 				if (m_pos < m_lenght)
 				{
-					s_test[m_pos] = '|';
+					ip_adress[m_pos] = '|';
 				}
 			}
 		}
@@ -1465,11 +1491,11 @@ void keyboard(unsigned char key, int, int){
 
 				if (m_pos < m_lenght)
 				{
-					s_test[m_pos] = 0;
+					ip_adress[m_pos] = 0;
 				}
 
 				m_pos--;
-				s_test[m_pos] = '|';
+				ip_adress[m_pos] = '|';
 			}
 		}
 
@@ -1718,24 +1744,35 @@ void mouseFunc(int button, int state, int x, int y)
 				testSound[7]->Play();
 				if (!connected){
 					
+					//Player mats
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+
+					//Tower mats
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					/*
+					//Player cam mats
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					*/
 					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
 
 					parseOpts = new ParseOpts();
-					
+
+					std::string	mine = ConvertAddress(ip_adress);
 					try
 					{
-						cli = new tcp_client(io_service, "localhost", "13");
+						cli = new tcp_client(io_service, mine, "13");
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();
@@ -2026,6 +2063,7 @@ void setupShaders()
 	}
 
 	sdrCtl.createVGFShader("billboard", "Shaders/billboard.vert", "Shaders/billboard.geom", "Shaders/billboard.frag");
+	sdrCtl.createVGFShader("billboard_anim", "Shaders/billboard_anim.vert", "Shaders/billboard_anim.geom", "Shaders/billboard_anim.frag");
 	sdrCtl.createVCEFShader("ground_tess", "Shaders/ground_tess.vert", "Shaders/ground_tess.cntl", "Shaders/ground_tess.eval", "Shaders/ground_tess.frag");
 
 	updateShaders();
@@ -2130,6 +2168,7 @@ void initialize(int argc, char *argv[])
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
 	settings = new Settings();
+	endScreen = new End_Screen();
 	logo = new Logo();
 
 	ground = new Ground();
@@ -2745,15 +2784,23 @@ void initialize(int argc, char *argv[])
 	m_billboardList4.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/monster_hellknight.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 7.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(1.0f);
-	MOM.mother_of_p_anim->setHeight(1.0f);
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
+	MOM.mother_of_p_anim->setNumColumn(5);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setDuration(1);
 	MOM.mother_of_p_anim->Bind();
 
 	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	draw_list.push_back(p_anim);
+	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	p_anim->setType(1);
+	LARGE_INTEGER time_p_anim;
+	QueryPerformanceCounter(&time_p_anim);
+	p_anim->setStartTime(time_p_anim);
+	panim_list.push_back(p_anim);
 
 	particle = new ParticleSystem(GL_POINTS);
 	particle->setShader(sdrCtl.getShader("emitter"));

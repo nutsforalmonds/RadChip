@@ -370,6 +370,8 @@ public:
 		}
 		camM[playerID] = m;
 	}
+
+
 	void resolvePlayerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < player.size(); i++){
@@ -789,10 +791,19 @@ public:
 	}
 
 	boost::array<mat4, 4> getPlayerMats(){
+		boost::array<mat4, 4> c;
+		assert(player.size() == 4);
+		for (uint i = 0; i < 4; i++){
+			c[i] = player[i]->getModelM();
+		}
+		return c;
+	}
+
+	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
 		for (uint i = 0; i < 4; i++){
-			m[i] = player[i]->getModelM();
+			m[i] = camM[i];
 		}
 		return m;
 	}
@@ -1089,6 +1100,7 @@ public:
 		BillboardList * shotRngUp = new BillboardList();
 		shotRngUp->AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
 		powerUps.push_back(shotRngUp);
+
 
 		counter = 0;
 		projectile_counter = 0;

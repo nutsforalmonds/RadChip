@@ -49,7 +49,7 @@ public:
 	{
 		ret_.front() = std::make_pair(std::to_string(pID), mat4(0.0f));
 		boost::asio::async_write(socket_,
-			boost::asio::buffer(ret_, 2048*2),
+			boost::asio::buffer(ret_, 2048*4),
 			boost::bind(&tcp_connection::handle_read, this,
 			boost::asio::placeholders::error));
 	}
@@ -66,7 +66,7 @@ public:
 		stream << obj;
 		
 		boost::asio::async_write(socket_,
-			boost::asio::buffer(*obj, 2048),
+			boost::asio::buffer(*obj, 2048*4),
 			boost::bind(&tcp_connection::handle_write, this,
 			boost::asio::placeholders::error,
 			obj));
@@ -78,7 +78,7 @@ public:
 		{
 			ripe = true;
 			boost::asio::async_read(socket_,
-				boost::asio::buffer(ret_, 2048*2),
+				boost::asio::buffer(ret_, 2048*4),
 				boost::bind(&tcp_connection::handle_read, shared_from_this(),
 				boost::asio::placeholders::error));
 		}
@@ -137,23 +137,25 @@ public:
 		: io_service_(io_service),
 		acceptor_(io_service, tcp::endpoint(tcp::v4(), 13))
 	{
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(0.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
-		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
+		emptyRet.push_back(std::make_pair("", mat4(3.0f)));
 
 		retVec_.push_back(std::make_pair("", mat4(3.0f)));
 		retVec_.push_back(std::make_pair("", mat4(3.0f)));

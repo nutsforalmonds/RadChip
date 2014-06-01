@@ -9,12 +9,22 @@ uniform mat4 ViewMatrix;
 uniform mat4 MVP;                                                                   
 uniform vec3 gCameraPos;
 uniform float width;  
-uniform float height;                                                
+uniform float height;               
+uniform int column;
+uniform int row;
+uniform int num_column;
+uniform int num_row;                                      
                                                                                     
 out vec2 TexCoord;                                                                  
                                                                                     
 void main()                                                                         
-{                                                                                   
+{                                               
+
+	float seg_width = 1.0/num_column;
+	float seg_height = 1.0/num_row;
+	float a = column*seg_width;
+	float b = 1-row*seg_height;
+
     vec3 Pos = gl_in[0].gl_Position.xyz;                                            
     vec3 toCamera = normalize(gCameraPos - Pos);                                    
     vec3 up = vec3(0.0, 1.0, 0.0);                                                  
@@ -25,26 +35,26 @@ void main()
 	Pos -= right/2.0;   
     Pos.y -= height/2.0;
     gl_Position = ProjectionMatrix * ViewMatrix * vec4(Pos, 1.0);                                             
-    TexCoord = vec2(0.0, 0.0);                                                      
+    TexCoord = vec2(a, b-seg_height);                                                      
     EmitVertex();                                                                   
                                                                                     
     //Pos.y += 1.0;          
     Pos.y += height;   	
     gl_Position = ProjectionMatrix * ViewMatrix * vec4(Pos, 1.0);                                             
-    TexCoord = vec2(0.0, 1.0);                                                      
+    TexCoord = vec2(a, b);                                                      
     EmitVertex();                                                                   
                                                                                     
     //Pos.y -= 1.0;     
     Pos.y -= height;	
     Pos += right;                                                                   
     gl_Position = ProjectionMatrix * ViewMatrix * vec4(Pos, 1.0);                                             
-    TexCoord = vec2(1.0, 0.0);                                                      
+    TexCoord = vec2(a+seg_width, b-seg_height);                                                      
     EmitVertex();                                                                   
                                                                                     
     //Pos.y += 1.0;     
     Pos.y += height;    	
     gl_Position = ProjectionMatrix * ViewMatrix * vec4(Pos, 1.0);                                             
-    TexCoord = vec2(1.0, 1.0);                                                      
+    TexCoord = vec2(a+seg_width, b);                                                      
     EmitVertex();                                                                   
                                                                                     
     EndPrimitive();                                                                 
