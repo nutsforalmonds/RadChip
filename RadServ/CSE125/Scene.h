@@ -420,16 +420,16 @@ public:
 				if (playerPowerUp[j])
 				{
 					powerUpDuration[j]--;
-					if (j == 0)
-						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
-					if (j == 1)
-						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
-					if (j == 2)
-						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
-					if (j == 3)
-						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
-					if (j == 4)
-						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
+					//if (j == 0)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
+					//if (j == 1)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
+					//if (j == 2)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
+					//if (j == 3)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
+					//if (j == 4)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
 
 					if (powerUpDuration[j] <= 0)
 					{
@@ -635,10 +635,10 @@ public:
 				}
 			}
 			//cout << playerId << " " << dmg << endl;
-			RangeWeapon * newItem = new RangeWeapon(dist,
-				spd,
-				dmg);
-			playerHolder->setWeapon(newItem);
+			//RangeWeapon * newItem = new RangeWeapon(dist,
+			//	spd,
+			//	dmg);
+			//playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);

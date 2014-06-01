@@ -2768,7 +2768,7 @@ void initialize(int argc, char *argv[])
 	m_billboardList.AddBoard(vec3(-20.0f, 9.0f, 0.0f));//speed up
 	m_billboardList.BindBoards();
 
-	m_billboardList2.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList2.Init("img/dmgup.png", "PNG");
 	m_billboardList2.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList2.AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
 	m_billboardList2.BindBoards();
@@ -2778,12 +2778,12 @@ void initialize(int argc, char *argv[])
 	m_billboardList3.AddBoard(vec3(0.0f, 19.0f, -20.0f));//health up
 	m_billboardList3.BindBoards();
 
-	m_billboardList4.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList4.Init("img/projspd.png", "PNG");
 	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList4.AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
 	m_billboardList4.BindBoards();
 
-	m_billboardList5.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList5.Init("img/rngup.png", "PNG");
 	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
 	m_billboardList5.BindBoards();
