@@ -10,15 +10,19 @@
 #include "MD5Model.h"
 #include "Camera.h"
 #include "Ground.h"
+#include "billboard_list.h"
 #include "Trampoline.h"
 using namespace std;
 
 
 #define RESPAWN_COUNTER 100
+
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
-
 #define MAX_DAMAGE -50
+
+#define POWERUP_DURATION 1000
+#define NUM_POWERUPS 5
 
 #define GRAVITY_SCALE 2.5
 #define PLAYER_SPEED 10
@@ -76,9 +80,11 @@ public:
 			collisionDetection();
 			collisionDetectionPlayer();
 			collisionDetectionProjectile();
+			collisionDetectionPowerUp();
 			despawnProjectile();
 			rechargeJump();
 			respawnPlayer();
+			removePowerUp();
 		}
 		resolvePlayerTransition(t);
 		resolveProjectileTransition(t);
@@ -87,9 +93,11 @@ public:
 		collisionDetection();
 		collisionDetectionPlayer();
 		collisionDetectionProjectile();
+		collisionDetectionPowerUp();
 		despawnProjectile();
 		rechargeJump();
 		respawnPlayer();
+		removePowerUp();
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -214,6 +222,83 @@ public:
 		}
 	}
 
+	void collisionDetectionPowerUp()
+	{
+		bool inX, inY, inZ;
+		AABB playerAABB;
+		vec3 powerUpPos;
+		for (int i = 0; i < player.size(); i++)
+		{
+			playerAABB = player[i]->getAABB();
+			//iterate through list of power up types
+			for (int j = 0; j < powerUps.size(); j++)
+			{
+				//iterate through all billboard positions for a given powerup, in case there are multiple copies of a type
+				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
+				{
+					powerUpPos = (*powerUps[j]->getPos())[l];
+					inX = (playerAABB.min[0] <= powerUpPos[0]) && (powerUpPos[0] <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1]) && (powerUpPos[1] <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2]) && (powerUpPos[2] <= playerAABB.max[2]);
+
+					if (inX && inY && inZ)
+					{
+						//MS boost , uses index 0
+						if (j == 0)
+						{
+							if (!(player[i]->getPowerUp())[0])
+							{
+								player[i]->getBoots()->setMoveSpeed(6);
+								player[i]->setPowerUp(j, 1);
+							}
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//MS boost , uses index 1
+						else if ( j == 1)
+						{
+							if (!(player[i]->getPowerUp())[1])
+							{
+								player[i]->getWeapon()->setDamage(-4);
+								player[i]->setPowerUp(j, 1);
+							}
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//Health boost , uses index 2
+						else if (j == 2)
+						{
+							if (!(player[i]->getPowerUp())[2])
+							{
+								player[i]->setHealth(4);
+								player[i]->setPowerUp(j, 1);
+							}
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//Shot Spd boost , uses index 3
+						else if (j == 3)
+						{
+							if (!(player[i]->getPowerUp())[3])
+							{
+								player[i]->getWeapon()->setSpeed(70);
+								player[i]->setPowerUp(j, 1);
+							}
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//Shot Range boost , uses index 4
+						else if (j == 4)
+						{
+							if (!(player[i]->getPowerUp())[4])
+							{
+								player[i]->getWeapon()->setDistance(70);
+								player[i]->setPowerUp(j, 1);
+							}
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
 		float Rewind[3];
 		float minRewind = 999;
@@ -309,10 +394,10 @@ public:
 		}
 	}
 
-	void setHMove(int playerID, int m){ getPlayerObj(playerID)->setHMove(m); }
-	void cancelHMove(int playerID, int m){ getPlayerObj(playerID)->cancelHMove(m); }
-	void setVMove(int playerID, int m){ getPlayerObj(playerID)->setVMove(m); }
-	void cancelVMove(int playerID, int m){ getPlayerObj(playerID)->cancelVMove(m); }
+	void setHMove(int playerID, int m){ player[playerID]->setHMove(m); }
+	void cancelHMove(int playerID, int m){ player[playerID]->cancelHMove(m); }
+	void setVMove(int playerID, int m){ player[playerID]->setVMove(m);  }
+	void cancelVMove(int playerID, int m){ player[playerID]->cancelVMove(m); }
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
@@ -321,6 +406,60 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void removePowerUp()
+	{
+		bool * playerPowerUp;
+		int * powerUpDuration;
+		for (int i = 0; i < player.size(); i++)
+		{
+			playerPowerUp = player[i]->getPowerUp();
+			powerUpDuration = player[i]->getPowerUpDuration();
+
+			for (int j = 0; j < NUM_POWERUPS; j++)
+			{
+				if (playerPowerUp[j])
+				{
+					powerUpDuration[j]--;
+					//if (j == 0)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
+					//if (j == 1)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
+					//if (j == 2)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
+					//if (j == 3)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
+					//if (j == 4)
+					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
+
+					if (powerUpDuration[j] <= 0)
+					{
+						player[i]->setPowerUp(j, 0);
+
+						if (j == 0)
+						{
+							player[i]->getBoots()->setMoveSpeed(2);
+						}
+						else if (j == 1)
+						{
+							player[i]->getWeapon()->setDamage(-1);
+						}
+						else if (j == 2)
+						{
+							player[i]->setHealth(-4);
+						}
+						else if (j == 3)
+						{
+							player[i]->getWeapon()->setSpeed(50);
+						}
+						else if (j == 4)
+						{
+							player[i]->getWeapon()->setDistance(40);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	void respawnPlayer()
 	{
@@ -353,7 +492,7 @@ public:
 					//	player.push_back(holder);
 					//}
 
-					cout << "" << endl;
+					//cout << "" << endl;
 				}
 			}
 		}
@@ -420,14 +559,18 @@ public:
 				}
 			}
 		}
+
+
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getPlayerObj(targetId);
 		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
+			playerDead[targetId] = true;
 			int dist, spd, dmg;
 			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
 			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
@@ -449,14 +592,14 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
 				}
 			}
-			cout << playerId << " " << dmg << endl;
-			RangeWeapon * newItem = new RangeWeapon(dist,
-													spd,
-													dmg);
-			playerHolder->setWeapon(newItem);
+			//cout << playerId << " " << dmg << endl;
+			//RangeWeapon * newItem = new RangeWeapon(dist,
+													//spd,
+													//dmg);
+			//playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
@@ -494,10 +637,10 @@ public:
 				}
 			}
 			//cout << playerId << " " << dmg << endl;
-			RangeWeapon * newItem = new RangeWeapon(dist,
-				spd,
-				dmg);
-			playerHolder->setWeapon(newItem);
+			//RangeWeapon * newItem = new RangeWeapon(dist,
+			//	spd,
+			//	dmg);
+			//playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
@@ -629,6 +772,26 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// END OF PLAYER ACTIONS ///////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	bool getPlayerDamaged(int i)
+	{
+		return playerDamaged[i];
+	}
+
+	void setPlayerDamaged(int i, bool b)
+	{
+		playerDamaged[i] = b;
+	}
+
+	bool getPlayerDead(int i)
+	{
+		return playerDead[i];
+	}
+
+	void setPlayerDead(int i, bool b)
+	{
+		playerDead[i] = b;
+	}
+
 	boost::array<mat4, 4> getPlayerMats(){
 		boost::array<mat4, 4> c;
 		assert(player.size() == 4);
@@ -738,6 +901,12 @@ public:
 		md53->setPlayerID(3);
 		md53->setTeamID(1);
 		addPlayer(md53);
+
+		for (int i = 0; i < player.size(); i++)
+		{
+			playerDamaged.push_back(false);
+			playerDead.push_back(false);
+		}
 
 		//triplet tower
 		MD5Model* tw0 = new MD5Model();
@@ -887,6 +1056,7 @@ public:
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
+
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 		//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
@@ -910,6 +1080,30 @@ public:
 		//md6->setType("Model");
 		//md6->setName("Player Model");
 
+		///////////////////////////////////////////////////////////////////////////Initialize PowerUps//////////////////////////////////////////////////////////////////////
+		BillboardList * speedUp = new BillboardList();
+		speedUp->AddBoard(vec3(-20.0f, 9.0f, 0.0f));//spd
+		powerUps.push_back(speedUp);
+
+
+
+		BillboardList * pwrUp = new BillboardList();
+		pwrUp->AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
+		powerUps.push_back(pwrUp);
+
+		BillboardList * healthUp = new BillboardList();
+		healthUp->AddBoard(vec3(0.0f, 19.0f, -20.0f));//health up
+		powerUps.push_back(healthUp);
+
+		BillboardList * shotSpdUp = new BillboardList();
+		shotSpdUp->AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
+		powerUps.push_back(shotSpdUp);
+
+		BillboardList * shotRngUp = new BillboardList();
+		shotRngUp->AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+		powerUps.push_back(shotRngUp);
+
+
 		counter = 0;
 		projectile_counter = 0;
 	}
@@ -922,10 +1116,13 @@ protected:
 	vector<Object*> skillShot;
 	vector<Object*> virtualTower;
 	vector<Projectile*> projectile;
+	vector<BillboardList *> powerUps;
 	vector<Item *> items;
 	vector<mat4> camM;
 	vec3 gravity;
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
+	vector<bool> playerDamaged;
+	vector<bool> playerDead;
 	int counter;
 	int projectile_counter;
 };

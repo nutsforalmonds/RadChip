@@ -120,6 +120,8 @@ BillboardList m_billboardList;
 BillboardList m_billboardList2;
 BillboardList m_billboardList3;
 BillboardList m_billboardList4;
+BillboardList m_billboardList5;
+BillboardList m_billboardList6;
 
 JSON_Parser *map_info;
 
@@ -303,6 +305,21 @@ struct timeval2 {
 	__int32    tv_usec;        /* microseconds */
 };
 
+
+void spawnDamageParticle(int id)
+{
+	ParticleSystem2 * damagePart = new ParticleSystem2();
+	damagePart->setShader(sdrCtl.getShader("pe_system"));
+	damagePart->setType("Particle_System");
+	damagePart->setName("Particle_Test");
+	damagePart->setLoopInf(false);
+	damagePart->setLoopCount(1);
+	damagePart->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	damagePart->setFog(fog);
+	damagePart->setModelM(player_list[id]->getModelM());
+	explosion_list.push_back(damagePart);
+}
+
 int gettimeofday(struct timeval2 *tv/*in*/, struct timezone2 *tz/*in*/)
 {
 	FILETIME ft;
@@ -398,7 +415,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(20);
+	pjt->setDistance(40);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -939,6 +956,9 @@ void Window::displayCallback(void)
 		m_billboardList.Render(Projection, View, 1.0f);
 		m_billboardList2.Render(Projection, View, 1.0f);
 		m_billboardList3.Render(Projection, View, 1.0f);
+		m_billboardList4.Render(Projection, View, 1.0f);
+		m_billboardList5.Render(Projection, View, 1.0f);
+		//m_billboardList6.Render(Projection, View, 1.0f);
 
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -970,10 +990,17 @@ void Window::displayCallback(void)
 		t3_ps_03->draw(Projection, View);
 
 		testSystem->draw(Projection, View);
+		//damagePart->draw(Projection, View);
+
 
 		for (uint i = 0; i < explosion_list.size(); ++i)
 		{
 			explosion_list[i]->draw(Projection, View);
+			if (explosion_list[i]->getCurrentLoopCount() == explosion_list[i]->getLoopCount())
+			{
+				delete explosion_list[i];
+				explosion_list.erase(explosion_list.begin() + i);
+			}
 		}
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
@@ -1110,15 +1137,73 @@ void server_update(int value){
 			p3f = true;
 		}
 
+
+
+		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
+		if (parseOpts->getDamaged(recvVec, 0))
+		{
+			//cout << "damaged 0" << endl;
+			spawnDamageParticle(0);
+		}
+
+		if (parseOpts->getDamaged(recvVec, 1))
+		{
+			//cout << "damaged 1" << endl;
+			spawnDamageParticle(1);
+		}
+
+		if (parseOpts->getDamaged(recvVec, 2))
+		{
+			//cout << "damaged 2" << endl;
+			spawnDamageParticle(2);
+		}
+
+		if (parseOpts->getDamaged(recvVec, 3))
+		{
+			//cout << "damaged 3" << endl;
+			spawnDamageParticle(3);
+		}
+
+		if (parseOpts->getKilled(recvVec, 0))
+		{
+			//cout << "Killed 0" << endl;
+			spawnDamageParticle(0);
+		}
+
+		if (parseOpts->getKilled(recvVec, 1))
+		{
+			//cout << "Killed 1" << endl;
+			spawnDamageParticle(1);
+		}
+
+		if (parseOpts->getKilled(recvVec, 2))
+		{
+			//cout << "Killed 2" << endl;
+			spawnDamageParticle(2);
+		}
+
+		if (parseOpts->getKilled(recvVec, 3))
+		{
+			//cout << "Killed 3" << endl;
+			spawnDamageParticle(3);
+		}
+
+
+
+
+
 		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
 		mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
 		mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
 		mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
-
+		
 		player_list[0]->setModelM(mats[0]);
 		player_list[1]->setModelM(mats[1]);
 		player_list[2]->setModelM(mats[2]);
 		player_list[3]->setModelM(mats[3]);
+
+
+		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
 		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
 		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
@@ -2683,28 +2768,30 @@ void initialize(int argc, char *argv[])
 	tryThis->setShadowTex(shadow_map_id);
 	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 
-	m_billboardList.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList.Init("img/boots.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList.AddBoard(vec3(9.0f, 7.0f, 9.0f));
-	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, -9.0f));
-	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, 9.0f));
-	m_billboardList.AddBoard(vec3(9.0f, 7.0f, -9.0f));
+	m_billboardList.AddBoard(vec3(-20.0f, 9.0f, 0.0f));//speed up
 	m_billboardList.BindBoards();
 
-	m_billboardList2.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList2.Init("img/dmgup.png", "PNG");
 	m_billboardList2.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList2.AddBoard(vec3(1.0f, 7.0f, 9.0f));
+	m_billboardList2.AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
 	m_billboardList2.BindBoards();
 
-	m_billboardList3.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList3.Init("img/heart.png", "PNG");
 	m_billboardList3.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList3.AddBoard(vec3(1.0f, 7.0f, -9.0f));
+	m_billboardList3.AddBoard(vec3(0.0f, 19.0f, -20.0f));//health up
 	m_billboardList3.BindBoards();
 
-	m_billboardList4.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList4.Init("img/projspd.png", "PNG");
 	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList4.AddBoard(vec3(1.0f, 7.0f, -6.0f));
+	m_billboardList4.AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
 	m_billboardList4.BindBoards();
+
+	m_billboardList5.Init("img/rngup.png", "PNG");
+	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+	m_billboardList5.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
 	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");

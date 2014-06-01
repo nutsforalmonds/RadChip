@@ -11,6 +11,8 @@
 #include <vector>
 
 #define SHOOTBIT 1
+#define DAMAGEDBIT 2
+#define KILLEDBIT 3
 
 #define PSPEEDINDEX 2
 #define PSPEEDLEN 3
@@ -62,6 +64,42 @@ public:
 
 
 		return atoi(speed.c_str());
+	}
+
+	bool getDamaged(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		for (i = 0; i < 3; i++)
+		{
+			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+				break;
+		}
+
+		if ((*vec)[i].first.c_str()[DAMAGEDBIT] == 'd')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool getKilled(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		for (i = 0; i < 3; i++)
+		{
+			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+				break;
+		}
+
+		if ((*vec)[i].first.c_str()[KILLEDBIT] == 'k')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	// Parameters are the pointer to the recvVec vector and the desired player ID

@@ -122,12 +122,12 @@ void handle_key_state(int pid, int keyState){
 	{
 
 	}
-	if (keyState & 1 << 5){ //'W' for sprint
-		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
-	}
-	else{
-		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
-	}
+	//if (keyState & 1 << 5){ //'W' for sprint
+	//	scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	//}
+	//else{
+	//	scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	//}
 }
 void handle_cam_rot(int pid, float cam_rot){
 	if (scene->getPlayerObj(pid) == NULL)
@@ -326,6 +326,59 @@ int main(int argc, char *argv[])
 		}
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//
+
+		//sending if a player was damaged
+		if (scene->getPlayerDamaged(0))
+			p0 += "d";
+		else
+			p0 += "D";
+		if (scene->getPlayerDamaged(1))
+			p1 += "d";
+		else
+			p1 += "D";
+		if (scene->getPlayerDamaged(2))
+			p2 += "d";
+		else
+			p2 += "D";
+		if (scene->getPlayerDamaged(3))
+			p3 += "d";
+		else
+			p3 += "D";
+		//reset the playerDamaged flags
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDamaged(0, false);
+			scene->setPlayerDamaged(1, false);
+			scene->setPlayerDamaged(2, false);
+			scene->setPlayerDamaged(3, false);
+		}
+
+		//sending if a player was killed
+		if (scene->getPlayerDead(0))
+			p0 += "k";
+		else
+			p0 += "K";
+		if (scene->getPlayerDead(1))
+			p1 += "k";
+		else
+			p1 += "K";
+		if (scene->getPlayerDead(2))
+			p2 += "k";
+		else
+			p2 += "K";
+		if (scene->getPlayerDead(3))
+			p3 += "k";
+		else
+			p3 += "K";
+
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDead(0, false);
+			scene->setPlayerDead(1, false);
+			scene->setPlayerDead(2, false);
+			scene->setPlayerDead(3, false);
+		}
+
 
 		(*sendVec)[0] = std::make_pair(p0.c_str(), mp[0]);
 		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);

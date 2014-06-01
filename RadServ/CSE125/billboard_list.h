@@ -29,6 +29,7 @@ public:
 	void CreateSinglePositionBuffer(vec3 pos);
 	void BindBoards();
 	void AddBoard(vec3 pos);
+	vector<vec3> * getPos();
 
 private:
 	

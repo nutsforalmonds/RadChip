@@ -10,6 +10,7 @@
 using namespace std;
 
 #define BASE_JUMPS 20
+#define NUM_POWERUPS 5
 
 static int iohjworihorhi = 0;
 
@@ -22,12 +23,17 @@ public:
 		Rotation = mat4(1.0);
 		onGround = true;
 		health = 7;
+		maxHealth = 7;
 		numJumps = 5;
 		respawnCounter = 0;
 		kills = 0;
 		playerID = -1;
 		weapon = new RangeWeapon();
-		boots = new Boots(1, 10, 2);
+		boots = new Boots(2, 10, 2);
+		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
 	}
 	Object(string n, string t){
 		name = n;
@@ -36,14 +42,21 @@ public:
 		modelM = mat4(1.0);
 		onGround = true;
 		health = 7;
+		maxHealth = 7;
 		numJumps = 5;
 		respawnCounter = 0;
 		kills = 0;
 		playerID = -1;
 		weapon = new RangeWeapon();
-		boots = new Boots(1, 10, 2);
+		boots = new Boots(2, 10, 2);
+		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
 	}
-	~Object(){}
+	~Object()
+	{
+	}
 	virtual void draw(){/* This is a placeholder*/ }
 
 	void setType(string t){type = t;}
@@ -144,7 +157,9 @@ public:
 
 	int getHealth(){ return health; }
 
-	int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
+	int getMaxHealth() { return maxHealth; }
+
+	void setMaxHealth(int i) { maxHealth += i; }
 
 	void setHealth(int i){ health += i; }
 
@@ -173,6 +188,12 @@ public:
 	int getTeamID(){ return teamID; }
 	void setTeamID(int i){ teamID = i; }
 
+	bool * getPowerUp() { return powerUp; }
+	void setPowerUp(int i, bool val) { powerUp[i] = val; }
+
+	int * getPowerUpDuration() { return powerUpDuration; }
+	void setPowerUpDuration(int i, int val) { powerUpDuration[i] = val; }
+
 protected:
 	mat4 modelM;
 	mat4 Rotation;
@@ -187,6 +208,7 @@ protected:
 	float jumpVelocity;
 	bool onGround;
 	int health;
+	int maxHealth;
 	int numJumps;
 	int respawnCounter;
 	int kills;
@@ -195,4 +217,6 @@ protected:
 	RangeWeapon * weapon;
 	Boots * boots;
 	mat4 aliveModelM;
+	bool * powerUp;
+	int * powerUpDuration;
 };
