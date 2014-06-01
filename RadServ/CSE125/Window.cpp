@@ -58,6 +58,13 @@ bool player1shoot, player2shoot, player3shoot, player4shoot;
 std::string str;
 gameState gs;
 
+bool sendddddddddddedededed = false;
+int p0Shots = 0;
+int p1Shots = 0;
+int p2Shots = 0;
+int p3Shots = 0;
+
+
 void handle_mouse_state(int pid, int mouseState){
 	if (mouseState & 1){
 		scene->basicAttack(pid);
@@ -276,22 +283,47 @@ int main(int argc, char *argv[])
 		cout << (m[0])[2][0] << (m[0])[2][1] << (m[0])[2][2] << (m[0])[2][3] << endl;
 		cout << (m[0])[3][0] << (m[0])[3][1] << (m[0])[3][2] << (m[0])[3][3] << endl;
 		*/
-		if (player1shoot == true)
+
+		if (player1shoot == true){
+			p0Shots += 2;
+		}
+		if (player2shoot == true){
+			p1Shots += 2;
+		}
+		if (player3shoot == true){
+			p2Shots += 2;
+		}
+		if (player4shoot == true){
+			p3Shots += 2;
+		}
+
+		if (p0Shots > 0){
 			p0 = "0s";
-		else
+			p0Shots--;
+		}else{
 			p0 = "0S";
-		if (player2shoot == true)
+		}
+
+		if (p1Shots > 0){
 			p1 = "1s";
-		else
+			p1Shots--;
+		}else{
 			p1 = "1S";
-		if (player3shoot == true)
+		}
+
+		if (p2Shots > 0){
 			p2 = "2s";
-		else
+			p2Shots--;
+		}else{
 			p2 = "2S";
-		if (player4shoot == true)
+		}
+
+		if (p3Shots > 0){
 			p3 = "3s";
-		else
+			p3Shots--;
+		}else{
 			p3 = "3S";
+		}
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//
 
@@ -317,11 +349,14 @@ int main(int argc, char *argv[])
 		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
 		//server->send(*sendVec);
 
+		if (sendddddddddddedededed){
+			str = gs.getPosString(sendVec);
 
-		str = gs.getPosString(sendVec);
-
-		server->send(str + '\n');
-		io_service.poll();
+			server->send(str + '\n');
+			io_service.poll();
+		}
+		
+		sendddddddddddedededed = (!sendddddddddddedededed);
 
 		//str = "";
 
