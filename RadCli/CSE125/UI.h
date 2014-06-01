@@ -219,6 +219,51 @@ public:
 		heat_frame->setTex(true);
 		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f, 0.0f, -1.0f)));
 
+		//tower indicators in the top right and left coreners of the screen
+
+		m_tower1 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower1->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower1->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower1->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower1->setTex(true);
+		m_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.55f, 0.45f, -1.0f)));
+
+		m_tower2 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower2->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower2->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower2->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower2->setTex(true);
+		m_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.60f, 0.45f, -1.0f)));
+
+		m_tower3 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower3->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower3->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower3->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower3->setTex(true);
+		m_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.65f, 0.45f, -1.0f)));
+
+		c_tower1 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		c_tower1->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower1->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower1->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower1->setTex(true);
+		c_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.55f, 0.45f, -1.0f)));
+
+		c_tower2 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		c_tower2->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower2->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower2->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower2->setTex(true);
+		c_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.60f, 0.45f, -1.0f)));
+
+		c_tower3 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		c_tower3->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower3->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower3->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower3->setTex(true);
+		c_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.65f, 0.45f, -1.0f)));
+
+
 	}
 	~UI(){
 		life_back->		~UI_Panel();
@@ -227,6 +272,13 @@ public:
 		heat_back->		~UI_Panel();
 		heat_front->	~UI_Panel();
 		heat_frame->	~UI_Panel();
+
+		m_tower1->		~UI_Panel();
+		m_tower2->	    ~UI_Panel();
+		m_tower3->	    ~UI_Panel();
+		c_tower1->		~UI_Panel();
+		c_tower2->	    ~UI_Panel();
+		c_tower3->	    ~UI_Panel();
 	}
 
 	int draw(){
@@ -256,8 +308,44 @@ public:
 		heat_front->draw();
 		heat_frame->draw();
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		switch (m_towers_left){
+		case 3:
+			m_tower3->draw();
+		case 2:
+			m_tower2->draw();
+		case 1:
+			m_tower1->draw();
+		default:
+			break;
+		}
 
+		switch (c_towers_left){
+		case 3:
+			c_tower3->draw();
+		case 2:
+			c_tower2->draw();
+		case 1:
+			c_tower1->draw();
+		default:
+			break;
+		}
+
+		
+	
+		/*m_tower3->draw();
+		m_tower2->draw();
+		m_tower1->draw();
+
+		c_tower3->draw();
+		c_tower2->draw();
+		c_tower1->draw(); */
+		
+
+		glDisable(GL_BLEND);
+		
 		return 0;
 	}
 
@@ -382,6 +470,16 @@ public:
 	float getShots(){ return shots; }
 	void setShots(float s){ shots = s; }
 
+	void setTowers(char team){
+		if (team == 'm'){
+			m_towers_left-- ;
+		}
+
+		else{
+			c_towers_left--;
+		}
+	}
+
 	void setOffSet(float w){ x += w; }
 	void updateUIposition(float w){
 		// needs to include the height as well, it affects the scaling 
@@ -404,6 +502,14 @@ private:
 	UI_Panel* heat_front;
 	UI_Panel* heat_frame;
 
+	UI_Panel* m_tower1;
+	UI_Panel* m_tower2;
+	UI_Panel* m_tower3;
+	UI_Panel* c_tower1;
+	UI_Panel* c_tower2;
+	UI_Panel* c_tower3;
+	
+
 	float x1_life = -0.27f; //life
 	float x2_life = 0.275f;
 	float y1_life = -0.035f;
@@ -425,6 +531,9 @@ private:
 	float damage_taken = (float)0.1; //set to default 1/7 of the life bar
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
+
+	int c_towers_left = 3;
+	int m_towers_left = 3;
 
 	time_t over_de; //rate of decay of overheat bar
 
@@ -798,14 +907,14 @@ public:
 		respawn->setShader(sdrCtl.getShader("basic_2D"));
 		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
 		respawn->setTex(true);
-		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.2f, -1.0f)));
+		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
 
 		selected_respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_respawn->setColor(vec3(1.0, 0.0, 0.0));
 		selected_respawn->setShader(sdrCtl.getShader("basic_2D"));
 		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
 		selected_respawn->setTex(true);
-		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.2, -1.0f)));
+		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
 
 		countdown = new UI_Panel(-0.15f, 0.15f, -0.15f, 0.15f);
 		countdown->setColor(vec3(1.0, 0.0, 0.0));
@@ -841,7 +950,9 @@ public:
 
 		respawn->draw();
 
-		//selected_respawn->draw();
+		if (drawRespawnHighlight){
+			selected_respawn->draw();
+		}
 
 		countdown->draw();
 
@@ -849,38 +960,45 @@ public:
 		return 0;
 	}
 
-	void checkHighlight(float x, float y){
+	int checkHighlight(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((x > 0.42) && (x < 0.57)){
 
-			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((y > 0.71) && (y < 0.81)){
+				drawRespawnHighlight = true;
+				return 1;
 			}
 
-			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
-
+			else{
+				drawRespawnHighlight = false;
+				return 0;
 			}
+		}
+
+		else{
+			drawRespawnHighlight = false;
+			return 0;
 		}
 	}
 
-	void checkClick(float x, float y){
+	int checkClick(float x, float y){
 
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.2) && (x < 0.8)){
+		if ((x > 0.42) && (x < 0.57)){
 
-			//Spot for first button
-			if ((y > 0.2) && (y < 0.8)){
-
+			if ((y > 0.71) && (y < 0.81)){
+				return 1;
 			}
-
-			//Spot for second button
-			if ((y > 0.2) && (y < 0.8)){
-
+			else{
+				return 0;
 			}
 		}
+
+		else{
+			return 0;
+		}
+	
 	}
 
 private:
@@ -888,7 +1006,7 @@ private:
 	UI_Panel * respawn;
 	UI_Panel * selected_respawn;
 	UI_Panel * countdown;
-	float highlightTrans = 0;
+	bool drawRespawnHighlight = false;
 };
 
 class Logo
@@ -962,4 +1080,122 @@ private:
 	UI_Panel * settings;
 	UI_Panel * address_bar;
 
+};
+
+class End_Screen
+{
+public:
+	End_Screen()
+	{
+		victory = new UI_Panel(-0.3f, 0.3f, -0.1, 0.1);
+		victory->setColor(vec3(1.0, 0.0, 0.0));
+		victory->setShader(sdrCtl.getShader("basic_2D"));
+		victory->loadColorTex("img/UI_elements/victory.png", "PNG");
+		victory->setTex(true);
+		victory->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
+		defeat = new UI_Panel(-0.3f, 0.3f, -0.1, 0.1);
+		defeat->setColor(vec3(1.0, 0.0, 0.0));
+		defeat->setShader(sdrCtl.getShader("basic_2D"));
+		defeat->loadColorTex("img/UI_elements/defeat.png", "PNG");
+		defeat->setTex(true);
+		defeat->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
+		button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
+		button->setColor(vec3(1.0, 0.0, 0.0));
+		button->setShader(sdrCtl.getShader("basic_2D"));
+		button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitOFF_1.png", "PNG");
+		button->setTex(true);
+		button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
+
+		selected_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
+		selected_button->setColor(vec3(1.0, 0.0, 0.0));
+		selected_button->setShader(sdrCtl.getShader("basic_2D"));
+		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON", "PNG");
+		selected_button->setTex(true);
+		selected_button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
+
+	}
+
+	~End_Screen()
+	{
+		victory->          ~UI_Panel();
+		defeat->           ~UI_Panel();
+		button->           ~UI_Panel();
+		selected_button->  ~UI_Panel();
+	}
+
+	int draw(int x)
+	{
+
+		glDisable(GL_DEPTH_TEST);
+
+		if (x)
+		{
+			victory->draw();
+		}
+		else
+		{
+			defeat->draw();
+		}
+	
+		button->draw();
+
+		if (drawButtonHighlight){
+			selected_button->draw();
+		}
+
+		glEnable(GL_DEPTH_TEST);
+
+		return 0;
+	}
+
+	int checkHighlight(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.42) && (x < 0.57)){
+
+			if ((y > 0.71) && (y < 0.81)){
+				drawButtonHighlight = true;
+				return 1;
+			}
+
+			else{
+				drawButtonHighlight = false;
+				return 0;
+			}
+		}
+
+		else{
+			drawButtonHighlight = false;
+			return 0;
+		}
+	}
+
+	int checkClick(float x, float y){
+
+		//Check the x bounds first cause all buttons are the same width
+		if ((x > 0.42) && (x < 0.57)){
+
+			if ((y > 0.71) && (y < 0.81)){
+				return 1;
+			}
+			else{
+				return 0;
+			}
+		}
+
+		else{
+			return 0;
+		}
+
+	}
+
+private:
+	UI_Panel * victory;
+	UI_Panel * defeat;
+	UI_Panel * button;
+	UI_Panel * selected_button;
+
+	bool drawButtonHighlight = false;
 };

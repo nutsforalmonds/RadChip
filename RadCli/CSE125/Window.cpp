@@ -221,6 +221,7 @@ MainMenu * myMainMenu;
 GameMenu * myGameMenu;
 DeathScreen * myDeathScreen;
 Settings * settings;
+End_Screen * endScreen;
 Logo * logo;
 
 Texture * shadow;
@@ -2080,6 +2081,7 @@ void initialize(int argc, char *argv[])
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
 	settings = new Settings();
+	endScreen = new End_Screen();
 	logo = new Logo();
 
 	ground = new Ground();
