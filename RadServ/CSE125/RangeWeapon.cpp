@@ -5,7 +5,7 @@ RangeWeapon::RangeWeapon()
 {
 	distance = 20;
 	speed = 10;
-	damage = -1;
+	damage = -4;
 }
 
 RangeWeapon::RangeWeapon(int dist, float spd, int dam)

@@ -2661,7 +2661,7 @@ void initialize(int argc, char *argv[])
 
 	m_billboardList3.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList3.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList3.AddBoard(vec3(1.0f, 7.0f, -9.0f));
+	m_billboardList3.AddBoard(vec3(10.0f, 5.0f, 22.0f));//health up
 	m_billboardList3.BindBoards();
 
 	m_billboardList4.Init("img/monster_hellknight.png", "PNG");

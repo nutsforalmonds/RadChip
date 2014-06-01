@@ -23,6 +23,7 @@ public:
 		Rotation = mat4(1.0);
 		onGround = true;
 		health = 7;
+		maxHealth = 7;
 		numJumps = 5;
 		respawnCounter = 0;
 		kills = 0;
@@ -41,6 +42,7 @@ public:
 		modelM = mat4(1.0);
 		onGround = true;
 		health = 7;
+		maxHealth = 7;
 		numJumps = 5;
 		respawnCounter = 0;
 		kills = 0;
@@ -155,7 +157,9 @@ public:
 
 	int getHealth(){ return health; }
 
-	int getMaxHealth() { return health + boots->getHealth() + weapon->getHealth(); }
+	int getMaxHealth() { return maxHealth; }
+
+	void setMaxHealth(int i) { maxHealth += i; }
 
 	void setHealth(int i){ health += i; }
 
@@ -204,6 +208,7 @@ protected:
 	float jumpVelocity;
 	bool onGround;
 	int health;
+	int maxHealth;
 	int numJumps;
 	int respawnCounter;
 	int kills;

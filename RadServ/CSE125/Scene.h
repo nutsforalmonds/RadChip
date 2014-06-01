@@ -250,10 +250,17 @@ public:
 							player[i]->setPowerUp(j, 1);
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
 						}
-						//MS boost , uses index 0
+						//MS boost , uses index 1
 						else if ( j == 1 && !(player[i]->getPowerUp())[1])
 						{
 							player[i]->getWeapon()->setDamage(-4);
+							player[i]->setPowerUp(j, 1);
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//Health boost , uses index 2
+						else if (j == 2 && !(player[i]->getPowerUp())[2])
+						{
+							player[i]->setHealth(4);
 							player[i]->setPowerUp(j, 1);
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
 						}
@@ -386,6 +393,8 @@ public:
 						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
 					if (j == 1)
 						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
+					if (j == 2)
+						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
 					if (powerUpDuration[j] <= 0)
 					{
 						player[i]->setPowerUp(j, 0);
@@ -397,6 +406,10 @@ public:
 						else if (j == 1)
 						{
 							player[i]->getWeapon()->setDamage(-1);
+						}
+						else if (j == 2)
+						{
+							player[i]->setHealth(-4);
 						}
 					}
 				}
@@ -993,6 +1006,10 @@ public:
 		BillboardList * pwrUp = new BillboardList();
 		pwrUp->AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
 		powerUps.push_back(pwrUp);
+
+		BillboardList * healthUp = new BillboardList();
+		healthUp->AddBoard(vec3(10.0f, 5.0f, 22.0f));//health up
+		powerUps.push_back(healthUp);
 
 		counter = 0;
 		projectile_counter = 0;
