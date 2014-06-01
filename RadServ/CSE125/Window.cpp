@@ -63,7 +63,7 @@ void handle_mouse_state(int pid, int mouseState){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		//std::cout << "projectile attack from client" << std::endl;
+		std::cout << "projectile attack from client" << std::endl;
 		if (pid == 0)
 			player1shoot = true;
 		else if (pid == 1)
@@ -317,25 +317,10 @@ int main(int argc, char *argv[])
 		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
 		//server->send(*sendVec);
 
-		/*int num = rand() % 1000 + 1;
-
-		for (int i = 0; i < num; i++)
-		{
-			str = str + "a";
-		}
-
-		num = rand() % 1000 + 1;
-
-		for (int i = 0; i < num; i++)
-		{
-			str = str + "b";
-		}
-
-		str = "{" + str + "}";*/
 
 		str = gs.getPosString(sendVec);
 
-		server->send(str + '`');
+		server->send(str + '\n');
 		io_service.poll();
 
 		//str = "";
