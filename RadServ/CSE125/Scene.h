@@ -264,6 +264,20 @@ public:
 							player[i]->setPowerUp(j, 1);
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
 						}
+						//Shot Spd boost , uses index 3
+						else if (j == 3 && !(player[i]->getPowerUp())[3])
+						{
+							player[i]->getWeapon()->setSpeed(40);
+							player[i]->setPowerUp(j, 1);
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//Shot Range boost , uses index 4
+						else if (j == 4 && !(player[i]->getPowerUp())[4])
+						{
+							player[i]->getWeapon()->setDistance(40);
+							player[i]->setPowerUp(j, 1);
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
 					}
 				}
 			}
@@ -395,6 +409,11 @@ public:
 						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
 					if (j == 2)
 						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
+					if (j == 3)
+						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
+					if (j == 4)
+						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
+
 					if (powerUpDuration[j] <= 0)
 					{
 						player[i]->setPowerUp(j, 0);
@@ -410,6 +429,14 @@ public:
 						else if (j == 2)
 						{
 							player[i]->setHealth(-4);
+						}
+						else if (j == 3)
+						{
+							player[i]->getWeapon()->setSpeed(10);
+						}
+						else if (j == 4)
+						{
+							player[i]->getWeapon()->setDistance(20);
 						}
 					}
 				}
@@ -544,10 +571,10 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
 				}
 			}
-			cout << playerId << " " << dmg << endl;
+			//cout << playerId << " " << dmg << endl;
 			//RangeWeapon * newItem = new RangeWeapon(dist,
 													//spd,
 													//dmg);
@@ -1008,8 +1035,16 @@ public:
 		powerUps.push_back(pwrUp);
 
 		BillboardList * healthUp = new BillboardList();
-		healthUp->AddBoard(vec3(10.0f, 5.0f, 22.0f));//health up
+		healthUp->AddBoard(vec3(0.0f, 19.0f, -20.0f));//health up
 		powerUps.push_back(healthUp);
+
+		BillboardList * shotSpdUp = new BillboardList();
+		shotSpdUp->AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
+		powerUps.push_back(shotSpdUp);
+
+		BillboardList * shotRngUp = new BillboardList();
+		shotRngUp->AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+		powerUps.push_back(shotRngUp);
 
 		counter = 0;
 		projectile_counter = 0;
