@@ -76,6 +76,29 @@ void RenderString(float x, float y, void *font, const unsigned char* string, vec
 	glutBitmapString(font, string);
 }
 
+std::string ConvertAddress(unsigned char* string)
+{
+	int i = 0;
+	std::string word;
+	while (string[i] != 0 && string[i] != '|')
+	{
+		if (!((string[i] > 47 && string[i] < 58) || string[i] == 46))
+		{
+			word = "localhost";
+			break;
+		}
+		word += string[i];
+		i++;
+	}
+
+	if (i == 0)
+	{
+		word = "localhost";
+	}
+	
+	return word;
+}
+
 class UI_Panel : public Object
 {
 public:

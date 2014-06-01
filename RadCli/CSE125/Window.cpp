@@ -256,7 +256,7 @@ int test = 0;
 float test2 = 0;
 
 const int m_lenght = 25;
-unsigned char s_test[m_lenght];
+unsigned char ip_adress[m_lenght];
 int but_up = 1;
 int m_pos = 0;
 int text_flag = 0;
@@ -862,7 +862,7 @@ void Window::displayCallback(void)
 		logo->draw();
 
 		glDisable(GL_DEPTH_TEST);
-		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, s_test, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
@@ -1394,14 +1394,14 @@ void keyboard(unsigned char key, int, int){
 		}
 
 		if (((key > 96 && key < 123) || (key > 47 && key < 58) || key == 46) && text_flag){
-			if (but_up && m_pos < m_lenght){
+			if (but_up && m_pos < m_lenght - 1){
 				but_up = 0;
-				s_test[m_pos] = key;
+				ip_adress[m_pos] = key;
 				m_pos++;
 
 				if (m_pos < m_lenght)
 				{
-					s_test[m_pos] = '|';
+					ip_adress[m_pos] = '|';
 				}
 			}
 		}
@@ -1413,11 +1413,11 @@ void keyboard(unsigned char key, int, int){
 
 				if (m_pos < m_lenght)
 				{
-					s_test[m_pos] = 0;
+					ip_adress[m_pos] = 0;
 				}
 
 				m_pos--;
-				s_test[m_pos] = '|';
+				ip_adress[m_pos] = '|';
 			}
 		}
 
@@ -1690,10 +1690,11 @@ void mouseFunc(int button, int state, int x, int y)
 					sendVec->push_back(std::make_pair("initCamRot_c", mat4(0.0f)));
 
 					parseOpts = new ParseOpts();
-					
+
+					std::string	mine = ConvertAddress(ip_adress);
 					try
 					{
-						cli = new tcp_client(io_service, "localhost", "13");
+						cli = new tcp_client(io_service, mine, "13");
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();
