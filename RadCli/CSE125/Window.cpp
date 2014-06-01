@@ -1099,7 +1099,12 @@ void server_update(int value){
 		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
 		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
 		tower_list[atoi(&((*recvVec)[7].first.c_str())[1])]->setModelM((*recvVec)[7].second);
-
+		/*
+		mats[atoi(&((*recvVec)[8].first.c_str())[0])]  = (*recvVec)[8].second;
+		mats[atoi(&((*recvVec)[9].first.c_str())[0])]  = (*recvVec)[9].second;
+		mats[atoi(&((*recvVec)[10].first.c_str())[0])] = (*recvVec)[10].second;
+		mats[atoi(&((*recvVec)[11].first.c_str())[0])] = (*recvVec)[11].second;
+		*/
 		i++;
 
 		vec4 temp(0.0, 0.0, 0.0, 1.0);
@@ -1281,9 +1286,7 @@ int main(int argc, char *argv[])
   posTestSound2->setPosition(pt);
   posTestSound2->setVelocity(vt);
   posTestSound2->setMinDistance(5.0f);
-  posTestSound2->setMaxDistance(10000.0f);
-
-  
+  posTestSound2->setMaxDistance(10000.0f);  
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
   posTestMusic->setLoopCount(-1);
@@ -1292,9 +1295,7 @@ int main(int argc, char *argv[])
   posTestMusic->setVelocity(vt);
   posTestMusic->setMinDistance(5.0f);
   posTestMusic->setMaxDistance(10000.0f);
-
   
-
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
 	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
@@ -1643,14 +1644,24 @@ void mouseFunc(int button, int state, int x, int y)
 				testSound[7]->Play();
 				if (!connected){
 					
+					//Player mats
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+
+					//Tower mats
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					/*
+					//Player cam mats
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
+					*/
 					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));

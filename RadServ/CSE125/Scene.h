@@ -285,6 +285,8 @@ public:
 		}
 		camM[playerID] = m;
 	}
+
+
 	void resolvePlayerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < player.size(); i++){
@@ -628,10 +630,19 @@ public:
 	////////////////////////////////////////////////////////////////////// END OF PLAYER ACTIONS ///////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	boost::array<mat4, 4> getPlayerMats(){
+		boost::array<mat4, 4> c;
+		assert(player.size() == 4);
+		for (uint i = 0; i < 4; i++){
+			c[i] = player[i]->getModelM();
+		}
+		return c;
+	}
+
+	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
 		for (uint i = 0; i < 4; i++){
-			m[i] = player[i]->getModelM();
+			m[i] = camM[i];
 		}
 		return m;
 	}
@@ -898,9 +909,6 @@ public:
 		//md6->setModelM(glm::translate(vec3(1.0, 0.0, 0.0)));
 		//md6->setType("Model");
 		//md6->setName("Player Model");
-
-
-
 
 		counter = 0;
 		projectile_counter = 0;

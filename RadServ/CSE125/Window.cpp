@@ -148,15 +148,25 @@ int main(int argc, char *argv[])
 	scene = new Scene();
 	scene->setGravity(vec3(0, -9.8, 0));
 
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	//Payer Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	//Tower Mats
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	/*
+	//Player Cam Mats
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	*/
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -257,6 +267,7 @@ int main(int argc, char *argv[])
 		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
+		boost::array<mat4, 4> ca = scene->getPlayerCams();
 
 		// Print out matrix contents
 		/*
@@ -288,11 +299,17 @@ int main(int argc, char *argv[])
 		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);
 		(*sendVec)[2] = std::make_pair(p2.c_str(), mp[2]);
 		(*sendVec)[3] = std::make_pair(p3.c_str(), mp[3]);
+
 		(*sendVec)[4] = std::make_pair("t0", mt[0]);
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
 		(*sendVec)[6] = std::make_pair("t2", mt[2]);
 		(*sendVec)[7] = std::make_pair("t3", mt[3]);
-
+		/*
+		(*sendVec)[8] = std::make_pair("c0", ca[0]);
+		(*sendVec)[9] = std::make_pair("c1", ca[1]);
+		(*sendVec)[10] = std::make_pair("c2", ca[2]);
+		(*sendVec)[11] = std::make_pair("c3", ca[3]);
+		*/
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
