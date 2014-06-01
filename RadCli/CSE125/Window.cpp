@@ -487,10 +487,14 @@ void Window::idleCallback(void)
 		//particle animation
 		for (uint i = 0; i < panim_list.size(); i++){
 			if (!panim_list[i]->update()){
-				//delete panim_list[i];
-				//panim_list.erase(panim_list.begin() + i);
-				//i--;
-				panim_list[i]->setStartTime(ct);
+				if (panim_list[i] == 0){//one time
+					delete panim_list[i];
+					panim_list.erase(panim_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					panim_list[i]->setStartTime(ct);
+				}
 			}
 		}
 
@@ -2699,17 +2703,19 @@ void initialize(int argc, char *argv[])
 	m_billboardList4.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/explosion.png", "PNG");
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
 	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 14.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(1.0f);
-	MOM.mother_of_p_anim->setHeight(1.0f);
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
 	MOM.mother_of_p_anim->setNumColumn(5);
 	MOM.mother_of_p_anim->setNumRow(4);
 	MOM.mother_of_p_anim->setDuration(1);
 	MOM.mother_of_p_anim->Bind();
 
 	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
+	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	p_anim->setType(1);
 	LARGE_INTEGER time_p_anim;
 	QueryPerformanceCounter(&time_p_anim);
 	p_anim->setStartTime(time_p_anim);

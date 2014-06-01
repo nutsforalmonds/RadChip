@@ -62,6 +62,7 @@ public:
 		duration = other.duration;
 		current = other.current;
 		freq = other.freq;
+		type = other.type;
 		return *this;
 	}
 
@@ -153,7 +154,8 @@ public:
 		column = block_ID % num_column;
 		return true;
 	}
-
+	void setType(int t){ type = t; }
+	int getType(){ return type; }
 
 private:
 	GLuint m_VB;
@@ -169,6 +171,7 @@ private:
 	int column=0, row=0;
 	double duration;
 	LARGE_INTEGER current, freq;
+	int type;//0: one time 1: continuous
 };
 
 #endif	/* PARTICLE_ANIMATED_H */
