@@ -171,6 +171,9 @@
     <ClInclude Include="gameState.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Trampoline.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

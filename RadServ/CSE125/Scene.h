@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Ground.h"
 #include "billboard_list.h"
+#include "Trampoline.h"
 using namespace std;
 
 
@@ -54,6 +55,16 @@ public:
 		{
 			if (player[i]->getPlayerID() == playerID)
 				return player[i];
+		}
+		return NULL;
+	}
+
+	Object * getTowerObj(int playerID)
+	{
+		for (uint i = 0; i < player.size(); i++)
+		{
+			if (tower[i]->getPlayerID() == playerID)
+				return tower[i];
 		}
 		return NULL;
 	}
@@ -282,10 +293,17 @@ public:
 		rwVelocity2[minID] = -v2[minID];
 		obj2->preTrans(glm::translate(rwVelocity2*minRewind));
 		if (minID == 1){
-			obj1->clearYVelocity();
-			onGround1 = true;
-			obj2->clearYVelocity();
-			onGround2 = true;
+
+			if (obj1->getAABB().min[1] >= obj2->getAABB().min[1]){
+				obj1->clearYVelocity();
+				obj2->clearYVelocity();
+				onGround1 = true;
+			}
+			else{
+				obj1->clearYVelocity();
+				obj2->clearYVelocity();
+				onGround2 = true;
+			}
 		}
 		else{//stair effect
 			AABB b1 = obj1->getAABB();
@@ -293,6 +311,9 @@ public:
 			if (b2.max[1] > b1.min[1] && b2.max[1] - b1.min[1] <= 0.11){
 				obj1->preTrans(glm::translate(glm::vec3(0.0f, b2.max[1]-b1.min[1]+0.01f, 0.0f)));
 			}
+		}
+		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
+			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -331,7 +352,7 @@ public:
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < projectile.size(); i++){
 			projectile[i]->addVelocity(gravity*t);
-			projectile[i]->postTrans(glm::translate(projectile[i]->getVelocity()*t));
+			projectile[i]->preTrans(glm::translate(projectile[i]->getVelocity()*t));
 		}
 	}
 
@@ -420,7 +441,7 @@ public:
 		}
 	}
 	void collisionDetectionProjectile(){
-		//player-stationary detection
+		//player-projectile detection
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			for (uint j = 0; j < player.size(); j++)
@@ -430,55 +451,55 @@ public:
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
 				bool collide = true;
-				//[p][s]
-				if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(1, 0.5, 0)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
 				}
-				//[s][p]
-				else if ((pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2] - 1) && (pBox.max[0] <= sBox.max[0]) && (pBox.max[0] >= sBox.max[0] - 1) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(-1, 0.5, 0)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
+				if (collide){
+					vec3 pv = projectile[i]->getVelocity();
+					//vec3 pv = vec3(player[projectile[i]->getPlayerID()]->getModelM()*vec4(projectile[i]->getVelocity(), 0.0));
+					pv[1] = 0;
+					pv = glm::normalize(pv);
+					pv[1] = 1;
+					player[j]->preTrans(glm::translate(pv));
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					delete projectile[i];
+					projectile.erase(projectile.begin() + i);
+					i--;
+					break;
 				}
-				//[p]
-				//[s]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2]) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, -1)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+			}
+		}
+		//tower-projectile detection
+		for (uint i = 0; i < projectile.size(); i++)
+		{
+			for (uint j = 0; j < tower.size(); j++)
+			{
+				if (projectile[i]->getTeamID() == tower[j]->getTeamID())
+					continue;
+				AABB pBox = projectile[i]->getAABB();
+				AABB sBox = tower[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
 				}
-				//[s]
-				//[p]
-				else if ((pBox.max[0] <= sBox.max[0] + 1) && (pBox.max[0] >= sBox.max[0]) && (pBox.max[2] <= sBox.max[2] + 1) && (pBox.max[2] >= sBox.max[2]) && !(*projectile[i]).checkHit(player[j]->getPlayerID()))
-				{
-					player[j]->postTrans(glm::translate(vec3(0, 0.5, 1)));
-					(*projectile[i]).setHit(player[j]->getPlayerID());
-					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+				if (collide){
+					//vec3 pv = projectile[i]->getVelocity();
+					//pv[1] = 0;
+					//pv = glm::normalize(pv);
+					//pv[1] = 1;
+					//tower[j]->preTrans(glm::translate(pv));
+					damageTower(tower[j]->getPlayerID(), projectile[i]->getPlayerID());
+					delete projectile[i];
+					projectile.erase(projectile.begin() + i);
+					i--;
+					break;
 				}
-
-				//for (int v = 0; v < 3; v++){
-				//	if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
-				//		collide = false;
-				//		break;
-				//	}
-				//}
-				//if (collide){
-				//	vec3 pv = vec3(player[projectile[i]->getPlayerID()]->getModelM()*vec4(projectile[i]->getVelocity(),0.0));
-				//	pv[1] = 0;
-				//	pv = glm::normalize(pv);
-				//	pv[1] = 1;
-				//	player[j]->preTrans(glm::translate(pv));
-				//	damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
-				//	delete projectile[i];
-				//	projectile.erase(projectile.begin() + i);
-				//	i--;
-				//	break;
-				//}
 			}
 		}
 	}
@@ -518,6 +539,47 @@ public:
 													//spd,
 													//dmg);
 			//playerHolder->setWeapon(newItem);
+			playerHolder->setKills(1);
+			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
+			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
+		}
+	}
+	void damageTower(int targetId, int playerId)
+	{
+		Object * playerHolder = getPlayerObj(playerId);
+		Object * targetHolder = getTowerObj(targetId);
+		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		if (targetHolder->getHealth() < 1)
+		{
+			int dist, spd, dmg;
+			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
+			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
+			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
+			//restricting speed and distance
+			if (dist > MAX_DISTANCE)
+				dist = MAX_DISTANCE;
+			if (spd > MAX_SPEED)
+				spd = MAX_SPEED;
+			if (dmg < MAX_DAMAGE)
+				dmg = MAX_DAMAGE;
+
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			for (uint i = 0; i < tower.size(); i++)
+			{
+				if (tower[i]->getPlayerID() == targetId)
+				{
+					tower[i]->setAliveModelM(tower[i]->getModelM());
+					tower[i]->setModelM(tower[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+				}
+			}
+			//cout << playerId << " " << dmg << endl;
+			RangeWeapon * newItem = new RangeWeapon(dist,
+				spd,
+				dmg);
+			playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
@@ -599,7 +661,7 @@ public:
 		projectile.push_back(cubeT);
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
-		cubeT->setVelocity(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cubeT->setVelocity(vec3(player1*vec4(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed(),0.0)));// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}
@@ -756,7 +818,8 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
-		tw0->setTeamID(0);
+		tw0->setTeamID(1);
+		tw0->setPlayerID(0);
 		addTower(tw0);
 
 		//triplet tower
@@ -765,7 +828,8 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
-		tw1->setTeamID(0);
+		tw1->setTeamID(1);
+		tw1->setPlayerID(1);
 		addTower(tw1);
 
 		//pctopus tower
@@ -774,7 +838,8 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
-		tw2->setTeamID(1);
+		tw2->setTeamID(0);
+		tw2->setPlayerID(2);
 		addTower(tw2);
 
 		//pctopus tower
@@ -783,7 +848,8 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
-		tw3->setTeamID(1);
+		tw3->setTeamID(0);
+		tw3->setPlayerID(3);
 		addTower(tw3);
 
 		Ground* ground = new Ground();
@@ -882,6 +948,17 @@ public:
 		platform_09->setType("Cube");
 		platform_09->setName("Test Platform");
 		addStationary(platform_09);
+
+
+		//Trampoline
+		Trampoline* tramp_01 = new Trampoline();
+		//platform_01->setSpeed(5);
+		tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
+		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tramp_01->setBoost(vec3(0, 60, 0));
+		tramp_01->setType("Trampoline");
+		tramp_01->setName("Test Trampoline");
+		addStationary(tramp_01);
 
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");

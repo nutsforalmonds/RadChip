@@ -101,6 +101,9 @@ Music *gameMusic;
 Sound* testSound[10];
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
+Sound* posTestSound;
+Sound* posTestSound2;
+Music* posTestMusic;
 
 std::vector<Object*> draw_list;
 std::vector<Object*> player_list;
@@ -791,14 +794,8 @@ void Window::idleCallback(void)
 	}
 
 	//createExplosion();
-
-	updateShaders();
-
-	update3DSound();
-	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
-	mySoundSystem->updateListener();
 	mySoundSystem->update();
-
+	updateShaders();
     displayCallback();  
 	
 }
@@ -1032,7 +1029,10 @@ void server_update(int value){
 	//for (int i = 0; i < 6; i++){
 	//	cout <<i<<" : "<< (*recvVec)[i].first.c_str()<<endl;
 	//}
-
+	bool p0f = false;
+	bool p1f = false;
+	bool p2f = false;
+	bool p3f = false;
 	//stateID = atoi(&((*recvVec)[0].first.c_str())[0]);
 	if (recvValid)
 	{
@@ -1046,6 +1046,7 @@ void server_update(int value){
 				myUI->setShots(1);
 			}
 			cout << "FIRE 0!" << endl;
+			p0f = true;
 		}
 
 		if (parseOpts->getShoot(recvVec, 1))
@@ -1057,6 +1058,7 @@ void server_update(int value){
 				myUI->setShots(1);
 			}
 			cout << "FIRE 1!" << endl;
+			p1f = true;
 		}
 
 		if (parseOpts->getShoot(recvVec, 2))
@@ -1068,6 +1070,7 @@ void server_update(int value){
 				myUI->setShots(1);
 			}
 			cout << "FIRE 2!" << endl;
+			p2f = true;
 		}
 
 		if (parseOpts->getShoot(recvVec, 3))
@@ -1079,6 +1082,7 @@ void server_update(int value){
 				myUI->setShots(1);
 			}
 			cout << "FIRE 3!" << endl;
+			p3f = true;
 		}
 
 		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
@@ -1093,19 +1097,6 @@ void server_update(int value){
 		
 		cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
-		switch (playerID){
-		case 0:
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		default:
-			break;
-		}
-
 		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
 		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
 		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
@@ -1113,7 +1104,34 @@ void server_update(int value){
 
 		i++;
 
+		vec4 temp(0.0, 0.0, 0.0, 1.0);
+		if (p0f && (playerID!=0)){
+			temp = player_list[0]->getModelM() *temp;
+			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
+			posTestSound2->setPosition(pt);
+			posTestSound2->Play3D(View);
+		}
+		if (p1f && (playerID != 1)){
+			temp = player_list[1]->getModelM() * temp;
+			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
+			posTestSound2->setPosition(pt);
+			posTestSound2->Play3D(View);
+		}
+		if (p2f && (playerID != 2)){
+			temp = player_list[2]->getModelM() * temp;
+			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
+			posTestSound2->setPosition(pt);
+			posTestSound2->Play3D(View);
+		}
+		if (p3f && (playerID != 3)){
+			temp = player_list[3]->getModelM() * temp;
+			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
+			posTestSound2->setPosition(pt);
+			posTestSound2->Play3D(View);
+		}
+
 		simulateProjectile(diff);
+
 	}
 
 	//Particles are instantly despawning
@@ -1250,6 +1268,35 @@ int main(int argc, char *argv[])
   connected = false;
   myClientState->setState(0);
 
+  FMOD_VECTOR pt = { 0.0f, 0.0f, 0.0f };
+  FMOD_VECTOR vt = { 0.0f, 0.0f, 0.0f };
+
+  posTestSound = new Sound(mySoundSystem, "Sound/hard_hit.ogg", true);
+  posTestSound->setVolume(0.5);
+  posTestSound->setPosition(pt);
+  posTestSound->setVelocity(vt);
+  posTestSound->setMinDistance(5.0f);
+  posTestSound->setMaxDistance(10000.0f);
+
+  posTestSound2 = new Sound(mySoundSystem, "Sound/disc_fire.ogg", true);
+  posTestSound2->setVolume(0.5);
+  posTestSound2->setPosition(pt);
+  posTestSound2->setVelocity(vt);
+  posTestSound2->setMinDistance(5.0f);
+  posTestSound2->setMaxDistance(10000.0f);
+
+  
+
+  posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
+  posTestMusic->setLoopCount(-1);
+  posTestMusic->setVolume(0.75);
+  posTestMusic->setPosition(pt);
+  posTestMusic->setVelocity(vt);
+  posTestMusic->setMinDistance(5.0f);
+  posTestMusic->setMaxDistance(10000.0f);
+
+  
+
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
 	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
@@ -1265,13 +1312,13 @@ int main(int argc, char *argv[])
 	  last = current;
 
 	  glutMainLoopEvent();
+	  
+	  Window::idleCallback();
 
 	  //printf("LOOP!\n");
 	  if (connected){
 		  server_update(0);
 	  }
-
-	  Window::idleCallback();
 	  
 	  QueryPerformanceCounter(&loop_end);
 	  diff = (double)(loop_end.QuadPart - last.QuadPart) / (double)freq.QuadPart * 1000;
@@ -1401,6 +1448,23 @@ void keyboard(unsigned char key, int, int){
 		if (key == 'n'){
 			createExplosion();
 		}
+
+		//This plays sound at <0,0,0>
+		if (key == 'i'){
+			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
+
+			posTestSound->Play3D(View);
+
+			cout << "Playing Sound!" << endl;
+		}
+
+		//This creates looping music at <0,0,0>
+		if (key == 'o'){
+			posTestMusic->Play3D();
+
+			cout << "Playing Music!" << endl;
+		}
+
 		if (key == 27){
 			//running = false;
 			//exit(0);
@@ -1621,6 +1685,7 @@ void mouseFunc(int button, int state, int x, int y)
 				menuMusic->Stop();
 			//	gameMusic->setFade(0.75, 0.005);
 				gameMusic->Play();
+				server_update(0);
 			}
 			else if (click == 2){
 				testSound[7]->Play();
@@ -1926,11 +1991,12 @@ void initialize(int argc, char *argv[])
 	}
 	else{
 		printf("FMOD Init successful!\n");
-		FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
-		FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
-		mySoundSystem->setListenerPosVel(myPosition, myVelocity);
-		mySoundSystem->updateListener();
 	}
+
+	FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
+	FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
+	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
+	mySoundSystem->updateListener();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
@@ -2526,6 +2592,23 @@ void initialize(int argc, char *argv[])
 	platform_09->setName("Test Platform");
 	stationary_list.push_back(platform_09);
 
+	//Trampoline
+	Cube* tramp_01 = new Cube(-2.0,2.0,-0.5,0.5,-2.0,2.0);
+	tramp_01->setKd(vec3(0.0, 0.0, 0.0));
+	tramp_01->setKa(vec3(0.0, 0.0, 0.0));
+	tramp_01->setKs(vec3(0.0, 0.0, 0.0));
+	tramp_01->setShininess(100);
+	tramp_01->setFog(fog);
+	tramp_01->setReflectFactor(vec2(0.2, 0.5));
+	tramp_01->setEta(0.5);
+	tramp_01->setCubeMapUnit(3);
+	tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
+	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tramp_01->setShadowTex(shadow_map_id);
+	tramp_01->setType("Trampoline");
+	tramp_01->setName("Test Trampoline");
+	stationary_list.push_back(tramp_01);
+
 
 	/*
 	float temp_x = randomFloatBetween(0.0, 1.0);
@@ -2735,14 +2818,14 @@ int loadAudio(){
 
 	mySoundSystem = new SoundSystem();
 	//mySoundSystem->createMusic();
-	menuMusic = new Music(mySoundSystem, "Music/backgroundMenu.wav");
+	menuMusic = new Music(mySoundSystem, "Music/backgroundMenu.wav", false);
 	menuMusic->setLoopCount(-1);
 	menuMusic->setVolume(0.75);
 	menuMusic->Play();
 
-	gameMusic = new Music(mySoundSystem, "Music/background_music.mp3");
+	gameMusic = new Music(mySoundSystem, "Music/background_music.mp3", false);
 	gameMusic->setLoopCount(-1);
-	gameMusic->setVolume(0.75);
+	gameMusic->setVolume(0.9);
 	//gameMusic->Play();
 
 	int NumberOfAudio = map_info->GetAudioCount();
@@ -2759,7 +2842,7 @@ int loadAudio(){
 
 		glutSwapBuffers();
 
-		testSound[i] = new Sound(mySoundSystem, path.c_str());
+		testSound[i] = new Sound(mySoundSystem, path.c_str(), false);
 		testSound[i]->setVolume(0.5);
 		sound_list.push_back(testSound[0]);
 		printf("done!\n");

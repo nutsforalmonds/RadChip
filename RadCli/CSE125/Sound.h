@@ -86,10 +86,27 @@ public:
 			result = system->init(100, FMOD_INIT_NORMAL, 0);
 		}
 		FMODErrorCheck(result);
+		
 	}
 
 	~SoundSystem(){
 		FMODErrorCheck(system->release());
+	}
+
+	void set3DAttributes(FMOD_VECTOR pt, FMOD_VECTOR vt){
+		cout << "New Listener Pos: <" << pt.x << "," << pt.y << "," << pt.z << ">" << endl;
+		cout << "New Listener Pos: <" << vt.x << "," << vt.y << "," << vt.z << ">" << endl;
+		system->set3DListenerAttributes(0, &pt, &vt, 0, 0);
+	}
+
+	void set3DSettings(float dopplerscale, float distancefactor, float rolloffscale){
+		system->set3DSettings(dopplerscale, distancefactor, rolloffscale);
+	}
+
+	void view3DSettings(){
+		float dopplerscale, distancefactor, rolloffscale;
+		system->get3DSettings(&dopplerscale, &distancefactor, &rolloffscale);
+		cout << "Dop: " << dopplerscale << " Dis: " << distancefactor << " Rol: " << rolloffscale << endl;
 	}
 
 
@@ -98,6 +115,16 @@ public:
 
 		// Load sound effects into memory (not streaming)
 		result = system->createSound(path.c_str(), FMOD_DEFAULT, 0, &sound);
+		FMODErrorCheck(result);
+
+		return sound;
+	}
+
+	FMOD::Sound* create3DSound(string path){
+		FMOD::Sound *sound;
+
+		// Load sound effects into memory (not streaming)
+		result = system->createSound(path.c_str(), FMOD_3D, 0, &sound);
 		FMODErrorCheck(result);
 
 		return sound;
@@ -128,6 +155,20 @@ public:
 		result = system->playSound(FMOD_CHANNEL_FREE, song, true, &music);
 		FMODErrorCheck(result);
 		
+		return song;
+	}
+
+	FMOD::Sound* create3DMusic(string path){
+		FMOD::Sound *song;
+
+		// Open music as a stream
+		result = system->createStream(path.c_str(), FMOD_3D, 0, &song);
+		FMODErrorCheck(result);
+
+		// Assign each song to a channel and start them paused
+		result = system->playSound(FMOD_CHANNEL_FREE, song, true, &music);
+		FMODErrorCheck(result);
+
 		return song;
 	}
 
@@ -179,6 +220,8 @@ public:
 	}
 
 	void updateListener(){
+	//	cout << "UpdateListener - Listener Pos: <" << listenerPos.x << "," << listenerPos.y << "," << listenerPos.z << ">" << endl;
+	//	cout << "UpdateListener - Listener Pos: <" << listenerVel.x << "," << listenerVel.y << "," << listenerVel.z << ">" << endl;
 		system->set3DListenerAttributes(0, &listenerPos, &listenerVel, 0, 0);
 	}
 
@@ -214,9 +257,16 @@ private:
 class Music
 {
 public:
-	Music(SoundSystem *s, string path){
+	Music(SoundSystem *s, string path, bool set3D){
 		system = s;
-		me = system->createMusic(path);
+		amI3D = set3D;
+		if (set3D){
+			me = system->create3DMusic(path);
+		}
+		else{
+			me = system->createMusic(path);
+		}
+		
 		myChan = s->getLastMusicChan();
 		fadeDone = true;
 	}
@@ -299,6 +349,8 @@ public:
 
 	bool getFadeDone(){ return fadeDone; }
 
+	bool get3D(){ return amI3D; }
+
 private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
@@ -313,14 +365,22 @@ private:
 
 	float minDistance;
 	float maxDistance;
+
+	float amI3D;
 };
 
 class Sound
 {
 public:
-	Sound(SoundSystem *s, string path){
+	Sound(SoundSystem *s, string path, bool set3D){
 		system = s;
-		me = system->createSound(path);
+		amI3D = set3D;
+		if (set3D){
+			me = system->create3DSound(path);
+		}
+		else{
+			me = system->createSound(path);
+		}
 	}
 	~Sound(){
 		system->free(me);
@@ -355,8 +415,14 @@ public:
 		setVelocity(vel);
 	}
 
-	void Play3D(){
-		system->play3DSound(me, volume, position, velocity, minDistance, maxDistance);
+	void Play3D(mat4 v){
+		glm::vec4 temp(position.x, position.y, position.z, 1.0);
+		temp = v*temp;
+		FMOD_VECTOR np = { temp.x, temp.y, temp.z };
+		system->play3DSound(me, volume, np, velocity, minDistance, maxDistance);
+		cout << "Me: "<< me << "Vol: " << volume << "Min: " << minDistance << "Max: " << maxDistance << endl;
+		cout << position.x << position.y << position.z << endl;
+		cout << velocity.x << velocity.y << velocity.z << endl;
 	}
 	
 	void setVolume(double v){
@@ -371,6 +437,8 @@ public:
 
 	float getVolume(){ return volume; }
 
+	bool get3D(){ return amI3D; }
+
 private:
 	FMOD::Sound *me;
 	FMOD::Channel *myChan;
@@ -383,6 +451,8 @@ private:
 
 	float minDistance;
 	float maxDistance;
+
+	float amI3D;
 };
 
 #endif	/* SOUND_H */
