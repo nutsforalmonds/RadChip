@@ -20,7 +20,7 @@ using namespace std;
 #define MAX_DISTANCE 100
 #define MAX_DAMAGE -50
 
-#define POWERUP_DURATION 50
+#define POWERUP_DURATION 1000
 #define NUM_POWERUPS 5
 
 #define GRAVITY_SCALE 2.5
@@ -73,6 +73,7 @@ public:
 			despawnProjectile();
 			rechargeJump();
 			respawnPlayer();
+			removePowerUp();
 		}
 		resolvePlayerTransition(t);
 		resolveProjectileTransition(t);
@@ -85,6 +86,7 @@ public:
 		despawnProjectile();
 		rechargeJump();
 		respawnPlayer();
+		removePowerUp();
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -217,8 +219,10 @@ public:
 		for (int i = 0; i < player.size(); i++)
 		{
 			playerAABB = player[i]->getAABB();
+			//iterate through list of power up types
 			for (int j = 0; j < powerUps.size(); j++)
 			{
+				//iterate through all billboard positions for a given powerup, in case there are multiple copies of a type
 				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
@@ -226,12 +230,22 @@ public:
 					inY = (playerAABB.min[1] <= powerUpPos[1]) && (powerUpPos[1] <= playerAABB.max[1]);
 					inZ = (playerAABB.min[2] <= powerUpPos[2]) && (powerUpPos[2] <= playerAABB.max[2]);
 
-					if (inX && inY && inZ && !(player[i]->getPowerUp())[1])
+					if (inX && inY && inZ)
 					{
-						cout << "PowerUp" << endl;
-						player[i]->setBoots(new Boots(player[i]->getBoots()->getMoveSpeed() * 2 ,10,2));
-						player[i]->setPowerUp(1, 1);
-						player[i]->setPowerUpDuration(1, POWERUP_DURATION);
+						//MS boost , uses index 0
+						if (j == 0 && !(player[i]->getPowerUp())[0])
+						{
+							player[i]->getBoots()->setMoveSpeed(6);
+							player[i]->setPowerUp(j, 1);
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
+						//MS boost , uses index 0
+						else if ( j == 1 && !(player[i]->getPowerUp())[1])
+						{
+							player[i]->getWeapon()->setDamage(-4);
+							player[i]->setPowerUp(j, 1);
+							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+						}
 					}
 				}
 			}
@@ -321,10 +335,10 @@ public:
 		}
 	}
 
-	void setHMove(int playerID, int m){ getPlayerObj(playerID)->setHMove(m); }
-	void cancelHMove(int playerID, int m){ getPlayerObj(playerID)->cancelHMove(m); }
-	void setVMove(int playerID, int m){ getPlayerObj(playerID)->setVMove(m); }
-	void cancelVMove(int playerID, int m){ getPlayerObj(playerID)->cancelVMove(m); }
+	void setHMove(int playerID, int m){ player[playerID]->setHMove(m); }
+	void cancelHMove(int playerID, int m){ player[playerID]->cancelHMove(m); }
+	void setVMove(int playerID, int m){ player[playerID]->setVMove(m);  }
+	void cancelVMove(int playerID, int m){ player[playerID]->cancelVMove(m); }
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
@@ -342,6 +356,30 @@ public:
 			playerPowerUp = player[i]->getPowerUp();
 			powerUpDuration = player[i]->getPowerUpDuration();
 
+			for (int j = 0; j < NUM_POWERUPS; j++)
+			{
+				if (playerPowerUp[j])
+				{
+					powerUpDuration[j]--;
+					if (j == 0)
+						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
+					if (j == 1)
+						cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
+					if (powerUpDuration[j] <= 0)
+					{
+						player[i]->setPowerUp(j, 0);
+
+						if (j == 0)
+						{
+							player[i]->getBoots()->setMoveSpeed(2);
+						}
+						else if (j == 1)
+						{
+							player[i]->getWeapon()->setDamage(-1);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -476,10 +514,10 @@ public:
 				}
 			}
 			cout << playerId << " " << dmg << endl;
-			RangeWeapon * newItem = new RangeWeapon(dist,
-													spd,
-													dmg);
-			playerHolder->setWeapon(newItem);
+			//RangeWeapon * newItem = new RangeWeapon(dist,
+													//spd,
+													//dmg);
+			//playerHolder->setWeapon(newItem);
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
@@ -870,9 +908,14 @@ public:
 
 		///////////////////////////////////////////////////////////////////////////Initialize PowerUps//////////////////////////////////////////////////////////////////////
 		BillboardList * speedUp = new BillboardList();
-		speedUp->AddBoard(vec3(-20.0f, 9.0f, 0.0f));
+		speedUp->AddBoard(vec3(-20.0f, 9.0f, 0.0f));//spd
 		powerUps.push_back(speedUp);
 
+
+
+		BillboardList * pwrUp = new BillboardList();
+		pwrUp->AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
+		powerUps.push_back(pwrUp);
 
 		counter = 0;
 		projectile_counter = 0;
