@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <deque>
 #include <boost/array.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -55,8 +56,15 @@ public:
 
 	std::string read()
 	{
-		
-		return data;
+		if (!strqueue.empty())
+		{
+			ret_str = strqueue.front();
+			strqueue.pop_front();
+			//std::cout << "pop" << std::endl;
+			return ret_str;
+		}
+		else
+			return "";
 	}
 
 	void receive()
@@ -89,6 +97,7 @@ private:
 	std::string last_str;
 	size_t bytes_;
 	std::string data;
+	std::deque<std::string> strqueue;
 
 	void handle_connect(const boost::system::error_code& error)
 	{
@@ -130,12 +139,13 @@ private:
 	void handle_read(const boost::system::error_code& error,
 					 size_t bytes)
 	{
-		
+		std::cout << "size of queue: " << strqueue.size() << std::endl;
 		if (!error)
 		{
 			std::istream response_strm(&b);
 			//response_strm >> data;
 			std::getline(response_strm, data);
+			strqueue.push_back(data);
 			//b.consume(bytes);
 			receive();
 		}

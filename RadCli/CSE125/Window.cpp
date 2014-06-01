@@ -1043,7 +1043,7 @@ void server_update(int value){
 		recvValid = true;
 	}
 	else
-		std::cout << out << std::endl;
+		recvValid = false;
 	
 	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
