@@ -112,6 +112,7 @@ std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
+std::vector<ParticleAnimated*> panim_list;
 
 Mesh_Static* tryThis;
 
@@ -480,6 +481,15 @@ void Window::idleCallback(void)
 		for (uint i = 0; i < player_list.size(); i++){
 			((Mesh*)player_list[i])->BoneTransform(player_list[i]->getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
 			((Mesh*)player_list[i])->setTransforms(Transforms);
+		}
+
+		//particle animation
+		for (uint i = 0; i < panim_list.size(); i++){
+			if (!panim_list[i]->update()){
+				delete panim_list[i];
+				panim_list.erase(panim_list.begin() + i);
+				i--;
+			}
 		}
 
 		//simulateProjectile(delta);
@@ -903,6 +913,9 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw();
+		}
+		for (uint i = 0; i < panim_list.size(); i++){
+			panim_list[i]->draw();
 		}
 
 		//	md5->draw();
@@ -1962,6 +1975,7 @@ void setupShaders()
 	}
 
 	sdrCtl.createVGFShader("billboard", "Shaders/billboard.vert", "Shaders/billboard.geom", "Shaders/billboard.frag");
+	sdrCtl.createVGFShader("billboard_anim", "Shaders/billboard_anim.vert", "Shaders/billboard_anim.geom", "Shaders/billboard_anim.frag");
 	sdrCtl.createVCEFShader("ground_tess", "Shaders/ground_tess.vert", "Shaders/ground_tess.cntl", "Shaders/ground_tess.eval", "Shaders/ground_tess.frag");
 
 	updateShaders();
@@ -2680,14 +2694,20 @@ void initialize(int argc, char *argv[])
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
 	MOM.mother_of_p_anim->Init("img/monster_hellknight.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard"));
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
 	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 7.0f, 0.0f));
 	MOM.mother_of_p_anim->setWidth(1.0f);
 	MOM.mother_of_p_anim->setHeight(1.0f);
+	MOM.mother_of_p_anim->setNumColumn(4);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setDuration(10);
 	MOM.mother_of_p_anim->Bind();
 
 	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	draw_list.push_back(p_anim);
+	LARGE_INTEGER time_p_anim;
+	QueryPerformanceCounter(&time_p_anim);
+	p_anim->setStartTime(time_p_anim);
+	panim_list.push_back(p_anim);
 
 	particle = new ParticleSystem(GL_POINTS);
 	particle->setShader(sdrCtl.getShader("emitter"));

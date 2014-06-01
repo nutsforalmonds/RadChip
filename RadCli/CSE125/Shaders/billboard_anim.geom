@@ -9,7 +9,11 @@ uniform mat4 ViewMatrix;
 uniform mat4 MVP;                                                                   
 uniform vec3 gCameraPos;
 uniform float width;  
-uniform float height;                                                
+uniform float height;               
+uniform int column;
+uniform int row;
+uniform int num_column;
+uniform int num_row;                                      
                                                                                     
 out vec2 TexCoord;                                                                  
                                                                                     

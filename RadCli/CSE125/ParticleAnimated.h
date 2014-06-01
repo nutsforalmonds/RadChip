@@ -32,6 +32,7 @@ public:
 		m_pTexture = NULL;
 		m_VB = INVALID_OGL_VALUE;
 		setModelM(mat4(1.0));
+		QueryPerformanceFrequency(&freq);
 	}
 	~ParticleAnimated(){//commented out because only mother of animated particles needs to be deleted
 		//SAFE_DELETE(m_pTexture);
@@ -54,6 +55,13 @@ public:
 		width = other.width;
 		height = other.height;
 		Position = other.Position;
+		num_column = other.num_column;
+		num_row = other.num_row;
+		column = other.column;
+		row = other.row;
+		duration = other.duration;
+		current = other.current;
+		freq = other.freq;
 		return *this;
 	}
 
@@ -74,6 +82,10 @@ public:
 		shader->setUniform(uniformLoc[4], height);
 		shader->setUniform(uniformLoc[5], getModelM());
 		shader->setUniform(uniformLoc[6], 0);
+		shader->setUniform(uniformLoc[7], column);
+		shader->setUniform(uniformLoc[8], row);
+		shader->setUniform(uniformLoc[9], num_column);
+		shader->setUniform(uniformLoc[10], num_row);
 		shader->use();
 		m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
@@ -91,6 +103,10 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("height"));
 		uniformLoc.push_back(shader->getUniformLoc("ModelMatrix"));
 		uniformLoc.push_back(shader->getUniformLoc("texUnit"));
+		uniformLoc.push_back(shader->getUniformLoc("column"));
+		uniformLoc.push_back(shader->getUniformLoc("row"));
+		uniformLoc.push_back(shader->getUniformLoc("num_column"));
+		uniformLoc.push_back(shader->getUniformLoc("num_row"));
 	}
 
 	void Bind(){
@@ -112,6 +128,32 @@ public:
 	void setHeight(float f){
 		height = f;
 	}
+	void setStartTime(LARGE_INTEGER& t){ start_time = t; }
+	LARGE_INTEGER getStartTime(){ return start_time; }
+	void setDuration(double d){ duration = d; }
+	double getDuration(){ return duration; }
+	void setNumColumn(int c){ num_column = c; }
+	int getNumColumn(){ return num_column; }
+	void setNumRow(int r){ num_row = r; }
+	int getNumRow(){ return num_row; }
+	void setColumn(int c){ column = c; }
+	int getColumn(){ return column; }
+	void setRow(int r){ row = r; }
+	int getRow(){ return row; }
+
+	bool update(){
+		QueryPerformanceCounter(&current);
+		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart;
+		if (anim_time > duration)
+			return false;
+
+		double seg_time = duration / (num_column*num_row);
+		int block_ID = (int)floor(anim_time/seg_time);
+		row = block_ID / num_column;
+		column = block_ID % num_column;
+		return true;
+	}
+
 
 private:
 	GLuint m_VB;
@@ -122,6 +164,11 @@ private:
 	float width;
 	float height;
 	vec3 Position=vec3(0,0,0);
+	LARGE_INTEGER start_time;
+	int num_column, num_row;
+	int column=0, row=0;
+	double duration;
+	LARGE_INTEGER current, freq;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */
