@@ -29,7 +29,7 @@ public:
 		kills = 0;
 		playerID = -1;
 		weapon = new RangeWeapon();
-		boots = new Boots(1, 10, 2);
+		boots = new Boots(2, 10, 2);
 		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
 		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
 		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
@@ -48,7 +48,7 @@ public:
 		kills = 0;
 		playerID = -1;
 		weapon = new RangeWeapon();
-		boots = new Boots(1, 10, 2);
+		boots = new Boots(2, 10, 2);
 		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
 		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
 		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
