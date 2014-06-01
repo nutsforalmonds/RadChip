@@ -30,7 +30,7 @@ public:
 
 	}
 
-	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid, int& shootID)
 	{
 		for (i = 0; i < 3; i++)
 		{

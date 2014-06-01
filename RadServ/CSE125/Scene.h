@@ -684,7 +684,7 @@ public:
 	    }
 	  
 	}
-	void projectileAttack(int playerID, mat4 * cam)
+	void projectileAttack(int playerID, mat4 * cam, int shootID)
 	{
 		mat4 test = *cam; //cam->getCamM();
 		vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
@@ -723,6 +723,7 @@ public:
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
 		cubeT->setVelocity(vec3(player1*vec4(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed(),0.0)));// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cubeT->setShootID(shootID);
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	}

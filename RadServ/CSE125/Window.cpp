@@ -64,6 +64,28 @@ int p1Shots = 0;
 int p2Shots = 0;
 int p3Shots = 0;
 
+#define PLAYER_PROJECTILE_COUNT 1000;
+int p1ShotID = 0;
+int p2ShotID = 0;
+int p3ShotID = 0;
+int p4ShotID = 0;
+int p_shoot_counter;
+
+string int_to_string(int num, int length){
+	string t = "";
+	int num_zero;
+	if (num > 1){
+		num_zero = length - (int)floor(log10(num*10));
+	}
+	else{
+		num_zero = length - 1;
+	} 
+	for (int i = 0; i < num_zero;i++)
+		t += "0";
+	t += std::to_string(num);
+	assert(t.length() == length);
+	return t;
+}
 
 void handle_mouse_state(int pid, int mouseState){
 	if (mouseState & 1){
@@ -71,16 +93,34 @@ void handle_mouse_state(int pid, int mouseState){
 	}
 	else if (mouseState & 1 << 1){
 		std::cout << "projectile attack from client" << std::endl;
-		if (pid == 0)
+		int shootID;
+		if (pid == 0){
 			player1shoot = true;
-		else if (pid == 1)
+			p1ShotID = p_shoot_counter;
+			shootID = p_shoot_counter;
+			p_shoot_counter++;
+			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+		}else if (pid == 1){
 			player2shoot = true;
-		else if (pid == 2)
+			p2ShotID = p_shoot_counter;
+			shootID = p_shoot_counter;
+			p_shoot_counter++;
+			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+		}else if (pid == 2){
 			player3shoot = true;
-		else if (pid == 3)
+			p3ShotID = p_shoot_counter;
+			shootID = p_shoot_counter;
+			p_shoot_counter++;
+			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+		}else if (pid == 3){
 			player4shoot = true;
+			p4ShotID = p_shoot_counter;
+			shootID = p_shoot_counter;
+			p_shoot_counter++;
+			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
-		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second);
+		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second, shootID);
 	}
 }
 void handle_key_state(int pid, int keyState){
@@ -298,31 +338,31 @@ int main(int argc, char *argv[])
 		}
 
 		if (p0Shots > 0){
-			p0 = "0s";
+			p0 = "0s" + int_to_string(p1ShotID, 3);
 			p0Shots--;
 		}else{
-			p0 = "0S";
+			p0 = "0S" + int_to_string(p1ShotID, 3);
 		}
 
 		if (p1Shots > 0){
-			p1 = "1s";
+			p1 = "1s" + int_to_string(p2ShotID, 3);
 			p1Shots--;
 		}else{
-			p1 = "1S";
+			p1 = "1S" + int_to_string(p2ShotID, 3);
 		}
 
 		if (p2Shots > 0){
-			p2 = "2s";
+			p2 = "2s" + int_to_string(p3ShotID, 3);
 			p2Shots--;
 		}else{
-			p2 = "2S";
+			p2 = "2S" + int_to_string(p3ShotID, 3);
 		}
 
 		if (p3Shots > 0){
-			p3 = "3s";
+			p3 = "3s" + int_to_string(p4ShotID, 3);
 			p3Shots--;
 		}else{
-			p3 = "3S";
+			p3 = "3S" + int_to_string(p4ShotID, 3);
 		}
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//

@@ -1089,7 +1089,8 @@ void server_update(int value){
 	if (recvValid)
 	{
 		// get shoot bit from recvVec for player 0
-		if (parseOpts->getShoot(recvVec, 0))
+		int shootID;
+		if (parseOpts->getShoot(recvVec, 0, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
 			projectileAttack(0, cam);
@@ -1101,7 +1102,7 @@ void server_update(int value){
 			p0f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 1))
+		if (parseOpts->getShoot(recvVec, 1, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
 			projectileAttack(1, cam);
@@ -1113,7 +1114,7 @@ void server_update(int value){
 			p1f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 2))
+		if (parseOpts->getShoot(recvVec, 2, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
 			projectileAttack(2, cam);
@@ -1125,7 +1126,7 @@ void server_update(int value){
 			p2f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 3))
+		if (parseOpts->getShoot(recvVec, 3, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
 			projectileAttack(3, cam);
@@ -1405,7 +1406,7 @@ int main(int argc, char *argv[])
   posTestMusic->setVelocity(vt);
   posTestMusic->setMinDistance(5.0f);
   posTestMusic->setMaxDistance(10000.0f);
-  
+
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
 	  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
