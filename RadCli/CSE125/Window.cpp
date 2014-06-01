@@ -996,6 +996,11 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < explosion_list.size(); ++i)
 		{
 			explosion_list[i]->draw(Projection, View);
+			if (explosion_list[i]->getCurrentLoopCount() == explosion_list[i]->getLoopCount())
+			{
+				delete explosion_list[i];
+				explosion_list.erase(explosion_list.begin() + i);
+			}
 		}
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);

@@ -492,7 +492,7 @@ public:
 					//	player.push_back(holder);
 					//}
 
-					cout << "" << endl;
+					//cout << "" << endl;
 				}
 			}
 		}
@@ -559,6 +559,8 @@ public:
 				}
 			}
 		}
+
+
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
