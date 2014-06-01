@@ -120,6 +120,8 @@ BillboardList m_billboardList;
 BillboardList m_billboardList2;
 BillboardList m_billboardList3;
 BillboardList m_billboardList4;
+BillboardList m_billboardList5;
+BillboardList m_billboardList6;
 
 JSON_Parser *map_info;
 
@@ -413,7 +415,7 @@ void projectileAttack(int playerID, Camera * cam)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(20);
+	pjt->setDistance(40);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -954,6 +956,9 @@ void Window::displayCallback(void)
 		m_billboardList.Render(Projection, View, 1.0f);
 		m_billboardList2.Render(Projection, View, 1.0f);
 		m_billboardList3.Render(Projection, View, 1.0f);
+		m_billboardList4.Render(Projection, View, 1.0f);
+		m_billboardList5.Render(Projection, View, 1.0f);
+		//m_billboardList6.Render(Projection, View, 1.0f);
 
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -2758,12 +2763,9 @@ void initialize(int argc, char *argv[])
 	tryThis->setShadowTex(shadow_map_id);
 	tryThis->setAdjustM(glm::translate(vec3(0.0, 1.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(1.0, 1.0, 1.0)));
 
-	m_billboardList.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList.Init("img/boots.png", "PNG");
 	m_billboardList.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList.AddBoard(vec3(-20.0f, 9.0f, 0.0f));//speed up
-	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, -9.0f));
-	m_billboardList.AddBoard(vec3(-9.0f, 7.0f, 9.0f));
-	m_billboardList.AddBoard(vec3(9.0f, 7.0f, -9.0f));
 	m_billboardList.BindBoards();
 
 	m_billboardList2.Init("img/monster_hellknight.png", "PNG");
@@ -2771,17 +2773,20 @@ void initialize(int argc, char *argv[])
 	m_billboardList2.AddBoard(vec3(20.0f, 9.0f, 0.0f));//dmg up
 	m_billboardList2.BindBoards();
 
-	m_billboardList3.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList3.Init("img/heart.png", "PNG");
 	m_billboardList3.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList3.AddBoard(vec3(0.0f, 19.0f, -20.0f));//health up
-	m_billboardList3.AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
-	m_billboardList3.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
 	m_billboardList3.BindBoards();
 
 	m_billboardList4.Init("img/monster_hellknight.png", "PNG");
 	m_billboardList4.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList4.AddBoard(vec3(0.0f, 19.0f, 20.0f));
+	m_billboardList4.AddBoard(vec3(0.0f, 19.0f, 20.0f));//Shot Speed up
 	m_billboardList4.BindBoards();
+
+	m_billboardList5.Init("img/monster_hellknight.png", "PNG");
+	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
+	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+	m_billboardList5.BindBoards();
 
 	MOM.mother_of_p_anim = new ParticleAnimated();
 	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");

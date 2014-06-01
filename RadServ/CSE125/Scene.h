@@ -278,7 +278,7 @@ public:
 						{
 							if (!(player[i]->getPowerUp())[3])
 							{
-								player[i]->getWeapon()->setSpeed(40);
+								player[i]->getWeapon()->setSpeed(70);
 								player[i]->setPowerUp(j, 1);
 							}
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
@@ -288,7 +288,7 @@ public:
 						{
 							if (!(player[i]->getPowerUp())[4])
 							{
-								player[i]->getWeapon()->setDistance(40);
+								player[i]->getWeapon()->setDistance(70);
 								player[i]->setPowerUp(j, 1);
 							}
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
@@ -449,11 +449,11 @@ public:
 						}
 						else if (j == 3)
 						{
-							player[i]->getWeapon()->setSpeed(10);
+							player[i]->getWeapon()->setSpeed(50);
 						}
 						else if (j == 4)
 						{
-							player[i]->getWeapon()->setDistance(20);
+							player[i]->getWeapon()->setDistance(40);
 						}
 					}
 				}
