@@ -338,31 +338,31 @@ int main(int argc, char *argv[])
 		}
 
 		if (p0Shots > 0){
-			p0 = "0s" + int_to_string(p1ShotID, 3);
+			p0 = "0s";
 			p0Shots--;
 		}else{
-			p0 = "0S" + int_to_string(p1ShotID, 3);
+			p0 = "0S";
 		}
 
 		if (p1Shots > 0){
-			p1 = "1s" + int_to_string(p2ShotID, 3);
+			p1 = "1s";
 			p1Shots--;
 		}else{
-			p1 = "1S" + int_to_string(p2ShotID, 3);
+			p1 = "1S";
 		}
 
 		if (p2Shots > 0){
-			p2 = "2s" + int_to_string(p3ShotID, 3);
+			p2 = "2s";
 			p2Shots--;
 		}else{
-			p2 = "2S" + int_to_string(p3ShotID, 3);
+			p2 = "2S";
 		}
 
 		if (p3Shots > 0){
-			p3 = "3s" + int_to_string(p4ShotID, 3);
+			p3 = "3s";
 			p3Shots--;
 		}else{
-			p3 = "3S" + int_to_string(p4ShotID, 3);
+			p3 = "3S";
 		}
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//
@@ -410,6 +410,11 @@ int main(int argc, char *argv[])
 			p3 += "k";
 		else
 			p3 += "K";
+
+		p0 += int_to_string(p1ShotID, 3);
+		p1 += int_to_string(p2ShotID, 3);
+		p2 += int_to_string(p3ShotID, 3);
+		p3 += int_to_string(p4ShotID, 3);
 
 		if (sendddddddddddedededed)
 		{
