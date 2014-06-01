@@ -1021,9 +1021,10 @@ void server_update(int value){
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
 	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
 	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
-	mouseState = 0;
+	
 	cli->write(*sendVec);
 	io_service.poll();
+	mouseState = 0;
 	cam_dx = 0;
 
 	// RECEIVE STUFF
@@ -1041,6 +1042,8 @@ void server_update(int value){
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
 	}
+	else
+		std::cout << out << std::endl;
 	
 	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
 	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
