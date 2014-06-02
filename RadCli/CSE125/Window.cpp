@@ -1214,10 +1214,11 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER3);
 		}
 
-
+		// TODO link up health to UI
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
-
+		// TODO display kills somewhere
+		parseOpts->getPKills(recvVec, 0);
 
 
 		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;

@@ -120,6 +120,24 @@ public:
 		return atoi(health.c_str());
 	}
 
+	int getPKills(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		kills = "";
+		/*for (i = 0; i < 3; i++)
+		{
+		if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+		break;
+		}*/
+
+		for (j = PKILLS_BEGIN; j < PKILLS_END; j++)
+		{
+			kills += (*vec)[i].first.c_str()[PKILLS_BEGIN + j];
+		}
+
+
+		return atoi(kills.c_str());
+	}
+
 	// Parameters are the pointer to the recvVec vector and the desired player ID
 	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
@@ -155,7 +173,6 @@ public:
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	std::string health;
+	std::string health, kills, speed;
 	int i, j;
-	std::string speed;
 };

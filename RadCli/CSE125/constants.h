@@ -17,6 +17,8 @@
 #define SHOOT_ID_END		6
 #define PHEALTH_BEGIN		7
 #define PHEALTH_END			9
+#define PKILLS_BEGIN		10
+#define PKILLS_END			12
 
 #define PLAYER0				0
 #define PLAYER1				1

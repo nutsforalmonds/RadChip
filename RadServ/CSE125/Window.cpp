@@ -465,6 +465,11 @@ int main(int argc, char *argv[])
 		p2 += int_to_string(scene->getPlayerHealth(PLAYER2), 3);
 		p3 += int_to_string(scene->getPlayerHealth(PLAYER3), 3);
 
+		p0 += int_to_string(scene->getPlayerKills(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerKills(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerKills(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
+
 
 
 		//despawn player projectile list

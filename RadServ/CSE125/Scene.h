@@ -71,8 +71,14 @@ public:
 
 	int getPlayerHealth(int playerID)
 	{
-		Object * pPtr = getPlayerObj(playerID);
+		pPtr = getPlayerObj(playerID);
 		return pPtr->getHealth();
+	}
+
+	int getPlayerKills(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getKills();
 	}
 
 	void simulate(float t, float sub){
@@ -1141,5 +1147,7 @@ protected:
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;
+
+	Object * pPtr;
 };
 
