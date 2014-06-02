@@ -175,7 +175,7 @@ struct Mother{
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
-Camera* cam;
+Camera* cam[4];
 float cam_sp = (float)0.1;
 float cam_dx = 0;
 
@@ -479,15 +479,15 @@ void Window::idleCallback(void)
 	case 3:
 		if (alive){
 			first_change = true;
-			cam->setCamM(mat4(1.0));
-			cam->setCamMode(0);
+			cam[playerID]->setCamM(mat4(1.0));
+			cam[playerID]->setCamMode(0);
 		}
 		else if(first_change){
-			cam->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
-			cam->setCamMode(1);
+			cam[playerID]->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam[playerID]->setCamMode(1);
 			first_change = false;
 		}
-		cam->update();
+		cam[playerID]->update();
 
 		/*
 		QueryPerformanceCounter(&current);
@@ -527,31 +527,31 @@ void Window::idleCallback(void)
 		}*/
 
 		if ((keyState & 1 << 2) && (keyState & 1)){//up left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 45.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 45.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 2) && (keyState & 1 << 1)){//up right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 3) && (keyState & 1)){//down left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 3) && (keyState & 1 << 1)){//down right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 2){//up
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 3){//down
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1){//left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 1){//right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
 		}
 
-		View = cam->getViewM();
+		View = cam[playerID]->getViewM();
 
 		if (myClientState->getState() == 2){
 			myGameMenu->draw();
@@ -1054,7 +1054,7 @@ void server_update(int value){
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
-	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
+	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam[playerID]->getCamM());
 	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
 	
 	cli->write(*sendVec);
@@ -1104,7 +1104,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, PLAYER0, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(PLAYER0, cam, shootID);
+			projectileAttack(PLAYER0, cam[PLAYER0], shootID);
 			if (playerID == PLAYER0)
 			{
 				myUI->setShots(1);
@@ -1116,7 +1116,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, PLAYER1, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(PLAYER1, cam, shootID);
+			projectileAttack(PLAYER1, cam[PLAYER1], shootID);
 			if (playerID == PLAYER1)
 			{
 				myUI->setShots(1);
@@ -1128,7 +1128,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, PLAYER2, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(PLAYER2, cam, shootID);
+			projectileAttack(PLAYER2, cam[PLAYER2], shootID);
 			if (playerID == PLAYER2)
 			{
 				myUI->setShots(1);
@@ -1140,7 +1140,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, PLAYER3, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(PLAYER3, cam, shootID);
+			projectileAttack(PLAYER3, cam[PLAYER3], shootID);
 			if (playerID == PLAYER3)
 			{
 				myUI->setShots(1);
@@ -1227,10 +1227,16 @@ void server_update(int value){
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
+
 		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
 		tower_list[1]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 1].second);
 		tower_list[2]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 2].second);
 		tower_list[3]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 3].second);
+
+		for (int i = 0; i < 4; i++){
+			if (i!=playerID)
+				cam[i]->setCamM((*recvVec)[i+9].second);
+		}
 		
 		i++;
 
@@ -1809,10 +1815,12 @@ void mouseFunc(int button, int state, int x, int y)
 						std::cerr << e.what() << std::endl;
 					}
 
-					cam = new Camera();
-					cam->attach(player_list[playerID]);
-					//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
-					cam->init(1.0,1.5, 6, 1.0);
+					for (int i = 0; i < 4; i++){
+						cam[i] = new Camera();
+						cam[i]->attach(player_list[i]);
+						//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
+						cam[i]->init(1.0, 1.5, 6, 1.0);
+					}
 
 					connected = true;
 				}
@@ -1980,7 +1988,7 @@ void passiveMotionFunc(int x, int y){
 		if (fabs(dx) < 250 && fabs(dy) < 250){
 			//cam->preRotate(glm::rotate(mat4(1.0), cam_sp*dy, vec3(1, 0, 0)));
 			//cube->postRotate(glm::rotate(mat4(1.0), -cam_sp*dx, vec3(0, 1, 0)));
-			cam->pushRot(cam_sp*dy);
+			cam[playerID]->pushRot(cam_sp*dy);
 			cam_dx += dx;
 		}
 
