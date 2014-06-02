@@ -934,10 +934,13 @@ void Window::displayCallback(void)
 		{
 			tower_list[i]->draw();
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw();
 		}
+		glDisable(GL_BLEND);
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw();
@@ -2568,6 +2571,7 @@ void initialize(int argc, char *argv[])
 	platform_01->setShadowTex(shadow_map_id);
 	platform_01->setType("Cube");
 	platform_01->setName("Test Platform");
+	//platform_01->setTransparency(0.5);
 	stationary_list.push_back(platform_01);
 
 	//1st Bottom Side Step Platform
