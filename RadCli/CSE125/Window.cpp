@@ -1589,7 +1589,6 @@ void keyboard(unsigned char key, int, int){
 			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
 			posTestSound->Play3D(View);
-
 			cout << "Playing Sound!" << endl;
 		}
 
@@ -1619,6 +1618,8 @@ void keyboard(unsigned char key, int, int){
 		//Added for sound debugging
 		if (key == 'f'){
 			testSound[2]->Play();
+			myDeathScreen->setDeathClock(clock());
+			myClientState->setState(3);
 		}
 		if (key == 13)
 		{
@@ -1861,10 +1862,6 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[4]->Play();
 					///scene->basicAttack(playerID);
-					
-					//UI testing purposes
-					myUI->setLess_Life(1);
-					myUI->setShots(1);
 
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -1940,7 +1937,10 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myDeathScreen->checkClick(newX, newY);
+			int click = myDeathScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
 		}
 		break;
 	case 4:
@@ -2024,6 +2024,17 @@ void passiveMotionFunc(int x, int y){
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
 		myDeathScreen->checkHighlight(newX, newY);
+		int sound3;
+		sound3 = myDeathScreen->checkHighlight(newX, newY);
+		if (sound3){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	case 4:
 		break;
