@@ -64,23 +64,54 @@ int p1Shots = 0;
 int p2Shots = 0;
 int p3Shots = 0;
 
+bool hasShot[4] = { false };
+
 
 void handle_mouse_state(int pid, int mouseState){
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		std::cout << "projectile attack from client" << std::endl;
+		//std::cout << "projectile attack from client" << std::endl;
 		if (pid == 0)
-			player1shoot = true;
+		{
+			if (!hasShot[0])
+			{
+				player1shoot = true;
+				hasShot[0] = true;
+			}
+		}
 		else if (pid == 1)
-			player2shoot = true;
+		{
+			if (!hasShot[1])
+			{
+				player2shoot = true;
+				hasShot[1] = true;
+			}
+		}
 		else if (pid == 2)
-			player3shoot = true;
+		{
+			if (!hasShot[2])
+			{
+				player3shoot = true;
+				hasShot[2] = true;
+			}
+		}
 		else if (pid == 3)
-			player4shoot = true;
+		{
+			if (!hasShot[3])
+			{
+				player4shoot = true;
+				hasShot[3] = true;
+			}
+		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
+
 		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second);
+	}
+	else if (!(mouseState & 1 << 1))
+	{
+		hasShot[pid] = false;
 	}
 }
 void handle_key_state(int pid, int keyState){
@@ -336,6 +367,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
 		(*sendVec)[6] = std::make_pair("t2", mt[2]);
 		(*sendVec)[7] = std::make_pair("t3", mt[3]);
+
+
 		/*
 		(*sendVec)[8] = std::make_pair("c0", ca[0]);
 		(*sendVec)[9] = std::make_pair("c1", ca[1]);
