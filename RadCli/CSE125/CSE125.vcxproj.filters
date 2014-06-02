@@ -168,6 +168,12 @@
     <ClInclude Include="ParticleAnimated.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="LightningGenerator.h">
+    	<Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

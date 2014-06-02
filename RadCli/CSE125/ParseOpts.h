@@ -9,20 +9,7 @@
 #include <glm/gtx/vector_angle.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-
-//vector position info
-#define PLAYER_MAT_BEGIN 0
-#define PLAYER_MAT_END 3
-#define TOWER_MAT_BEGIN 4
-#define TOWER_MAT_END	7
-#define PPDL_MAT		8
-
-//player bit info
-#define SHOOTBIT 1
-#define DAMAGEDBIT 2
-#define KILLEDBIT 3
-#define SHOOT_ID_BEGIN 4
-#define SHOOT_ID_END 6
+#include "constants.h"
 
 
 
@@ -57,7 +44,7 @@ public:
 		}
 		else
 		{
-			return false;
+			return false;                 
 		}
 	}
 
@@ -115,6 +102,42 @@ public:
 		}
 	}
 
+	int getPHealth(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		health = "";
+		/*for (i = 0; i < 3; i++)
+		{
+			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+				break;
+		}*/
+
+		for (j = PHEALTH_BEGIN; j < PHEALTH_END; j++)
+		{
+			health += (*vec)[i].first.c_str()[PHEALTH_BEGIN + j];
+		}
+
+
+		return atoi(health.c_str());
+	}
+
+	int getPKills(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		kills = "";
+		/*for (i = 0; i < 3; i++)
+		{
+		if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+		break;
+		}*/
+
+		for (j = PKILLS_BEGIN; j < PKILLS_END; j++)
+		{
+			kills += (*vec)[i].first.c_str()[PKILLS_BEGIN + j];
+		}
+
+
+		return atoi(kills.c_str());
+	}
+
 	// Parameters are the pointer to the recvVec vector and the desired player ID
 	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
@@ -150,7 +173,6 @@ public:
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	int health;
+	std::string health, kills, speed;
 	int i, j;
-	std::string speed;
 };

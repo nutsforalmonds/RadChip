@@ -63,6 +63,7 @@ public:
 		current = other.current;
 		freq = other.freq;
 		type = other.type;
+		fog = other.fog;
 		return *this;
 	}
 
@@ -87,6 +88,12 @@ public:
 		shader->setUniform(uniformLoc[8], row);
 		shader->setUniform(uniformLoc[9], num_column);
 		shader->setUniform(uniformLoc[10], num_row);
+		shader->setUniform(uniformLoc[11], fog->maxDist);
+		shader->setUniform(uniformLoc[12], fog->minDist);
+		shader->setUniform(uniformLoc[13], fog->color);
+		shader->setUniform(uniformLoc[14], fog->visibility);
+		shader->setUniform(uniformLoc[15], fog->maxHeight);
+		shader->setUniform(uniformLoc[16], fog->minHeight);
 		shader->use();
 		m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
@@ -108,6 +115,12 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("row"));
 		uniformLoc.push_back(shader->getUniformLoc("num_column"));
 		uniformLoc.push_back(shader->getUniformLoc("num_row"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.color"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
 	}
 
 	void Bind(){
@@ -157,6 +170,8 @@ public:
 	void setType(int t){ type = t; }
 	int getType(){ return type; }
 
+	void setFog(Fog& f){ fog = &f; }
+
 private:
 	GLuint m_VB;
 	Texture* m_pTexture;
@@ -172,6 +187,7 @@ private:
 	double duration;
 	LARGE_INTEGER current, freq;
 	int type;//0: one time 1: continuous
+	Fog* fog;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */

@@ -69,6 +69,18 @@ public:
 		return NULL;
 	}
 
+	int getPlayerHealth(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getHealth();
+	}
+
+	int getPlayerKills(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getKills();
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -1135,5 +1147,7 @@ protected:
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;
+
+	Object * pPtr;
 };
 

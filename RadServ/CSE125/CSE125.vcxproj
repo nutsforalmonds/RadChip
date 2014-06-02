@@ -88,6 +88,7 @@
     <ClInclude Include="Boots.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConfigSettings.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="gameState.h" />
     <ClInclude Include="glslprogram.h" />

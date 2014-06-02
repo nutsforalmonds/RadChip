@@ -98,6 +98,7 @@
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="JSON_Parse.h" />
+    <ClInclude Include="LightningGenerator.h" />
     <ClInclude Include="MD5Animation.h" />
     <ClInclude Include="MD5Model.h" />
     <ClInclude Include="MD5ModelLoaderPCH.h" />
@@ -186,6 +187,8 @@
     <None Include="Shaders\pe_system.vert" />
     <None Include="Shaders\pe_system_anim.frag" />
     <None Include="Shaders\pe_system_anim.vert" />
+    <None Include="Shaders\pe_system.frag" />
+    <None Include="Shaders\pe_system.vert" />
     <None Include="Shaders\pe_torus.frag" />
     <None Include="Shaders\pe_torus.vert" />
     <None Include="Shaders\ps_update.frag" />

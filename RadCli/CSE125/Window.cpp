@@ -36,6 +36,7 @@
 #include "ClientState.h"
 #include "AnimController.h"
 #include "ParticleAnimated.h"
+#include "LightningGenerator.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -44,6 +45,7 @@
 #include <assert.h>
 #include "ParticleSystem.h"
 #include "ParticleSystem2.h"
+
 ParticleSystem* particle;
 ParticleSystem* particle2;
 ParticleSystem* particle3;
@@ -113,6 +115,9 @@ std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 std::vector<ParticleAnimated*> panim_list;
+std::vector<ParticleAnimated*> lightning_list;
+
+LightningGenerator lightning_generator;
 
 Mesh_Static* tryThis;
 
@@ -169,12 +174,13 @@ struct Mother{
 	Mesh* mother_of_banana;
 	Mesh* mother_of_nut;
 	ParticleAnimated* mother_of_p_anim;
+	ParticleAnimated* mother_of_lightning;
 }MOM;
 
 int texScreenWidth = 512;
 int texScreenHeight = 512;
 
-Camera* cam;
+Camera* cam[4];
 float cam_sp = (float)0.1;
 float cam_dx = 0;
 
@@ -466,6 +472,7 @@ void Window::idleCallback(void)
 	vector<mat4> Transforms;
 	double dt;
 	vector<mat4> playerMs;
+	vector<vec2> lightning_pos;
 
 	switch (myClientState->getState()){
 	case 0:
@@ -478,15 +485,15 @@ void Window::idleCallback(void)
 	case 3:
 		if (alive){
 			first_change = true;
-			cam->setCamM(mat4(1.0));
-			cam->setCamMode(0);
+			cam[playerID]->setCamM(mat4(1.0));
+			cam[playerID]->setCamMode(0);
 		}
 		else if(first_change){
-			cam->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
-			cam->setCamMode(1);
+			cam[playerID]->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam[playerID]->setCamMode(1);
 			first_change = false;
 		}
-		cam->update();
+		cam[playerID]->update();
 
 		/*
 		QueryPerformanceCounter(&current);
@@ -507,13 +514,41 @@ void Window::idleCallback(void)
 		//particle animation
 		for (uint i = 0; i < panim_list.size(); i++){
 			if (!panim_list[i]->update()){
-				if (panim_list[i] == 0){//one time
+				if (panim_list[i]->getType() == 0){//one time
 					delete panim_list[i];
 					panim_list.erase(panim_list.begin() + i);
 					i--;
 				}
 				else{//continuous
 					panim_list[i]->setStartTime(ct);
+				}
+			}
+		}
+
+		//lightning
+		if (lightning_generator.generate(lightning_pos,3)){//generates 3 bolts per lightning generation
+			for (uint i = 0; i < lightning_pos.size(); i++){
+				ParticleAnimated* new_lightning = new ParticleAnimated(*MOM.mother_of_lightning);
+				new_lightning->setModelM(glm::translate(vec3(lightning_pos[i][0], 70, lightning_pos[i][1])));
+				new_lightning->setType(0);
+				new_lightning->setWidth(10);
+				new_lightning->setHeight(200);
+				new_lightning->setDuration(0.5);
+				LARGE_INTEGER time_lightning;
+				QueryPerformanceCounter(&time_lightning);
+				new_lightning->setStartTime(time_lightning);
+				lightning_list.push_back(new_lightning);
+			}
+		}
+		for (uint i = 0; i < lightning_list.size(); i++){
+			if (!lightning_list[i]->update()){
+				if (lightning_list[i]->getType() == 0){//one time
+					delete lightning_list[i];
+					lightning_list.erase(lightning_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					lightning_list[i]->setStartTime(ct);
 				}
 			}
 		}
@@ -526,31 +561,31 @@ void Window::idleCallback(void)
 		}*/
 
 		if ((keyState & 1 << 2) && (keyState & 1)){//up left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 45.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 45.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 2) && (keyState & 1 << 1)){//up right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -45.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 3) && (keyState & 1)){//down left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 135.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if ((keyState & 1 << 3) && (keyState & 1 << 1)){//down right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -135.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 2){//up
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 0.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 3){//down
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 180.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1){//left
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
 		}
 		else if (keyState & 1 << 1){//right
-			cam->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
+			cam[playerID]->getObjAppended()->setRotation(glm::rotate(mat4(1.0), -90.0f, vec3(0.0, 1.0, 0.0)));
 		}
 
-		View = cam->getViewM();
+		View = cam[playerID]->getViewM();
 
 		if (myClientState->getState() == 2){
 			myGameMenu->draw();
@@ -933,10 +968,13 @@ void Window::displayCallback(void)
 		{
 			tower_list[i]->draw();
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw();
 		}
+		glDisable(GL_BLEND);
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw();
@@ -945,6 +983,9 @@ void Window::displayCallback(void)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
+		}
+		for (uint i = 0; i < lightning_list.size(); i++){
+			lightning_list[i]->draw();
 		}
 		glDisable(GL_BLEND);
 
@@ -1050,12 +1091,12 @@ void server_update(int value){
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
 	(*sendVec)[1] = std::make_pair(std::to_string(playerID), mat4((float)mouseState));
-	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam->getCamM());
+	(*sendVec)[2] = std::make_pair(std::to_string(playerID), cam[playerID]->getCamM());
 	(*sendVec)[3] = std::make_pair(std::to_string(playerID), mat4((float)cam_dx));
 	
 	cli->write(*sendVec);
 	io_service.poll();
-	mouseState = 0;
+	//mouseState = 0;
 	cam_dx = 0;
 
 	// RECEIVE STUFF
@@ -1067,11 +1108,14 @@ void server_update(int value){
 
 	if (out[0] == '[')
 	{
-		unsigned pos = out.find("`");
+		unsigned pos = out.find("\n");
 		out = out.substr(0, pos);
-		//delete recvVec;
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
+		//cout << "size: " << recvVec->size() << endl;
+		//for (int i = 0; i < 6; i++){
+			//cout << i << " : " << (*recvVec)[i].first.c_str() << endl;
+		//}
 	}
 	else
 		recvValid = false;
@@ -1094,11 +1138,11 @@ void server_update(int value){
 	{
 		// get shoot bit from recvVec for player 0
 		int shootID;
-		if (parseOpts->getShoot(recvVec, 0, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER0, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(0, cam, shootID);
-			if (playerID == 0)
+			projectileAttack(PLAYER0, cam[PLAYER0], shootID);
+			if (playerID == PLAYER0)
 			{
 				myUI->setShots(1);
 			}
@@ -1106,11 +1150,11 @@ void server_update(int value){
 			p0f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 1, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER1, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(1, cam, shootID);
-			if (playerID == 1)
+			projectileAttack(PLAYER1, cam[PLAYER1], shootID);
+			if (playerID == PLAYER1)
 			{
 				myUI->setShots(1);
 			}
@@ -1118,11 +1162,11 @@ void server_update(int value){
 			p1f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 2, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER2, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(2, cam, shootID);
-			if (playerID == 2)
+			projectileAttack(PLAYER2, cam[PLAYER2], shootID);
+			if (playerID == PLAYER2)
 			{
 				myUI->setShots(1);
 			}
@@ -1130,11 +1174,11 @@ void server_update(int value){
 			p2f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 3, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER3, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(3, cam, shootID);
-			if (playerID == 3)
+			projectileAttack(PLAYER3, cam[PLAYER3], shootID);
+			if (playerID == PLAYER3)
 			{
 				myUI->setShots(1);
 			}
@@ -1155,104 +1199,112 @@ void server_update(int value){
 		}
 
 		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
-		if (parseOpts->getDamaged(recvVec, 0))
+		if (parseOpts->getDamaged(recvVec, PLAYER0))
 		{
 			//cout << "damaged 0" << endl;
-			spawnDamageParticle(0);
+			spawnDamageParticle(PLAYER0);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 1))
+		if (parseOpts->getDamaged(recvVec, PLAYER1))
 		{
 			//cout << "damaged 1" << endl;
-			spawnDamageParticle(1);
+			spawnDamageParticle(PLAYER1);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 2))
+		if (parseOpts->getDamaged(recvVec, PLAYER2))
 		{
 			//cout << "damaged 2" << endl;
-			spawnDamageParticle(2);
+			spawnDamageParticle(PLAYER2);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 3))
+		if (parseOpts->getDamaged(recvVec, PLAYER3))
 		{
 			//cout << "damaged 3" << endl;
-			spawnDamageParticle(3);
+			spawnDamageParticle(PLAYER3);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getKilled(recvVec, 0))
+		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
 			//cout << "Killed 0" << endl;
-			spawnDamageParticle(0);
+			spawnDamageParticle(PLAYER0);
 		}
 
-		if (parseOpts->getKilled(recvVec, 1))
+		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
-			spawnDamageParticle(1);
+			spawnDamageParticle(PLAYER1);
 		}
 
-		if (parseOpts->getKilled(recvVec, 2))
+		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
-			spawnDamageParticle(2);
+			spawnDamageParticle(PLAYER2);
 		}
 
-		if (parseOpts->getKilled(recvVec, 3))
+		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
 			//cout << "Killed 3" << endl;
-			spawnDamageParticle(3);
+			spawnDamageParticle(PLAYER3);
 		}
 
+		// TODO link up health to UI
+		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
+
+		// TODO display kills somewhere
+		parseOpts->getPKills(recvVec, 0);
 
 
-
-
-		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
-		mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
-		mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
-		mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
+		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
+		mats[PLAYER1] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER1].second;
+		mats[PLAYER2] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER2].second;
+		mats[PLAYER3] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER3].second;
 		
-		player_list[0]->setModelM(mats[0]);
-		player_list[1]->setModelM(mats[1]);
-		player_list[2]->setModelM(mats[2]);
-		player_list[3]->setModelM(mats[3]);
+		player_list[PLAYER0]->setModelM(mats[PLAYER0]);
+		player_list[PLAYER1]->setModelM(mats[PLAYER1]);
+		player_list[PLAYER2]->setModelM(mats[PLAYER2]);
+		player_list[PLAYER3]->setModelM(mats[PLAYER3]);
 
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
-		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
-		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
-		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
-		tower_list[atoi(&((*recvVec)[7].first.c_str())[1])]->setModelM((*recvVec)[7].second);
-		/*
-		mats[atoi(&((*recvVec)[8].first.c_str())[0])]  = (*recvVec)[8].second;
-		mats[atoi(&((*recvVec)[9].first.c_str())[0])]  = (*recvVec)[9].second;
-		mats[atoi(&((*recvVec)[10].first.c_str())[0])] = (*recvVec)[10].second;
-		mats[atoi(&((*recvVec)[11].first.c_str())[0])] = (*recvVec)[11].second;
-		*/
+
+		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
+		tower_list[1]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 1].second);
+		tower_list[2]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 2].second);
+		tower_list[3]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 3].second);
+
+		for (int i = 0; i < 4; i++){
+			if (i!=playerID)
+				cam[i]->setCamM((*recvVec)[CAM_MAT_BEGIN + i].second);
+		}
+		
 		i++;
 
 		vec4 temp(0.0, 0.0, 0.0, 1.0);
-		if (p0f && (playerID!=0)){
-			temp = player_list[0]->getModelM() *temp;
+		if (p0f && (playerID != PLAYER0)){
+			temp = player_list[PLAYER0]->getModelM() *temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p1f && (playerID != 1)){
-			temp = player_list[1]->getModelM() * temp;
+		if (p1f && (playerID != PLAYER1)){
+			temp = player_list[PLAYER1]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p2f && (playerID != 2)){
-			temp = player_list[2]->getModelM() * temp;
+		if (p2f && (playerID != PLAYER2)){
+			temp = player_list[PLAYER2]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p3f && (playerID != 3)){
-			temp = player_list[3]->getModelM() * temp;
+		if (p3f && (playerID != PLAYER3)){
+			temp = player_list[PLAYER3]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
@@ -1575,7 +1627,6 @@ void keyboard(unsigned char key, int, int){
 			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
 			posTestSound->Play3D(View);
-
 			cout << "Playing Sound!" << endl;
 		}
 
@@ -1605,6 +1656,8 @@ void keyboard(unsigned char key, int, int){
 		//Added for sound debugging
 		if (key == 'f'){
 			testSound[2]->Play();
+			myDeathScreen->setDeathClock(clock());
+			myClientState->setState(3);
 		}
 		if (key == 13)
 		{
@@ -1777,13 +1830,13 @@ void mouseFunc(int button, int state, int x, int y)
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-					/*
+					
 					//Player cam mats
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
 					recvVec->push_back(std::make_pair("initRecvPos_c", mat4(0.0f)));
-					*/
+					
 					sendVec->push_back(std::make_pair("initKey_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initMouse_c", mat4(0.0f)));
 					sendVec->push_back(std::make_pair("initCam_c", mat4(0.0f)));
@@ -1807,10 +1860,12 @@ void mouseFunc(int button, int state, int x, int y)
 						std::cerr << e.what() << std::endl;
 					}
 
-					cam = new Camera();
-					cam->attach(player_list[playerID]);
-					//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
-					cam->init(1.0,1.5, 6, 1.0);
+					for (int i = 0; i < 4; i++){
+						cam[i] = new Camera();
+						cam[i]->attach(player_list[i]);
+						//cam->postTrans(glm::translate(vec3(0, 2.5, 6)));
+						cam[i]->init(1.0, 1.5, 6, 1.0);
+					}
 
 					connected = true;
 				}
@@ -1845,10 +1900,6 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[4]->Play();
 					///scene->basicAttack(playerID);
-					
-					//UI testing purposes
-					myUI->setLess_Life(1);
-					myUI->setShots(1);
 
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -1924,7 +1975,10 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myDeathScreen->checkClick(newX, newY);
+			int click = myDeathScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
 		}
 		break;
 	case 4:
@@ -1978,7 +2032,7 @@ void passiveMotionFunc(int x, int y){
 		if (fabs(dx) < 250 && fabs(dy) < 250){
 			//cam->preRotate(glm::rotate(mat4(1.0), cam_sp*dy, vec3(1, 0, 0)));
 			//cube->postRotate(glm::rotate(mat4(1.0), -cam_sp*dx, vec3(0, 1, 0)));
-			cam->pushRot(cam_sp*dy);
+			cam[playerID]->pushRot(cam_sp*dy);
 			cam_dx += dx;
 		}
 
@@ -2008,6 +2062,17 @@ void passiveMotionFunc(int x, int y){
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
 		myDeathScreen->checkHighlight(newX, newY);
+		int sound3;
+		sound3 = myDeathScreen->checkHighlight(newX, newY);
+		if (sound3){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	case 4:
 		break;
@@ -2220,6 +2285,9 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
+	lightning_generator.setDt(0.1);//lightning generation per 0.1 seconds
+	lightning_generator.setSize(400);//size of the map
+
 	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
 	MOM.mother_of_wrench = new Mesh();
 	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
@@ -2244,6 +2312,39 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
 	MOM.mother_of_nut->setShininess(30);
 	MOM.mother_of_nut->setFog(fog);
+
+	MOM.mother_of_p_anim = new ParticleAnimated();
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
+	MOM.mother_of_p_anim->setNumColumn(5);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setDuration(1);
+	MOM.mother_of_p_anim->setFog(emptyFog);
+	MOM.mother_of_p_anim->Bind();
+
+	MOM.mother_of_lightning = new ParticleAnimated();
+	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
+	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_lightning->setWidth(2.0f);
+	MOM.mother_of_lightning->setHeight(2.0f);
+	MOM.mother_of_lightning->setNumColumn(10);
+	MOM.mother_of_lightning->setNumRow(1);
+	MOM.mother_of_lightning->setDuration(1);
+	MOM.mother_of_lightning->setType(0);
+	MOM.mother_of_lightning->setFog(fog);
+	MOM.mother_of_lightning->Bind();
+
+	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
+	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	p_anim->setType(1);
+	LARGE_INTEGER time_p_anim;
+	QueryPerformanceCounter(&time_p_anim);
+	p_anim->setStartTime(time_p_anim);
+	panim_list.push_back(p_anim);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
@@ -2564,6 +2665,7 @@ void initialize(int argc, char *argv[])
 	platform_01->setShadowTex(shadow_map_id);
 	platform_01->setType("Cube");
 	platform_01->setName("Test Platform");
+	//platform_01->setTransparency(0.5);
 	stationary_list.push_back(platform_01);
 
 	//1st Bottom Side Step Platform
@@ -2804,25 +2906,6 @@ void initialize(int argc, char *argv[])
 	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
 	m_billboardList5.BindBoards();
-
-	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(2.0f);
-	MOM.mother_of_p_anim->setHeight(2.0f);
-	MOM.mother_of_p_anim->setNumColumn(5);
-	MOM.mother_of_p_anim->setNumRow(4);
-	MOM.mother_of_p_anim->setDuration(1);
-	MOM.mother_of_p_anim->Bind();
-
-	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
-	p_anim->setType(1);
-	LARGE_INTEGER time_p_anim;
-	QueryPerformanceCounter(&time_p_anim);
-	p_anim->setStartTime(time_p_anim);
-	panim_list.push_back(p_anim);
 
 	particle = new ParticleSystem(GL_POINTS);
 	particle->setShader(sdrCtl.getShader("emitter"));

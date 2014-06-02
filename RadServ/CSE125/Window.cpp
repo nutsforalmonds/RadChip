@@ -34,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "gameState.h"
+#include "constants.h"
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
@@ -64,6 +65,9 @@ int p1Shots = 0;
 int p2Shots = 0;
 int p3Shots = 0;
 
+
+bool hasShot[4] = { false };
+
 #define PLAYER_PROJECTILE_COUNT 1000;
 int p1ShotID = 0;
 int p2ShotID = 0;
@@ -88,39 +92,68 @@ string int_to_string(int num, int length){
 }
 
 void handle_mouse_state(int pid, int mouseState){
+	int shootID = 0;
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		std::cout << "projectile attack from client" << std::endl;
-		int shootID;
-		if (pid == 0){
-			player1shoot = true;
-			p1ShotID = p_shoot_counter;
-			shootID = p_shoot_counter;
-			p_shoot_counter++;
-			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
-		}else if (pid == 1){
-			player2shoot = true;
-			p2ShotID = p_shoot_counter;
-			shootID = p_shoot_counter;
-			p_shoot_counter++;
-			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
-		}else if (pid == 2){
-			player3shoot = true;
-			p3ShotID = p_shoot_counter;
-			shootID = p_shoot_counter;
-			p_shoot_counter++;
-			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
-		}else if (pid == 3){
-			player4shoot = true;
-			p4ShotID = p_shoot_counter;
-			shootID = p_shoot_counter;
-			p_shoot_counter++;
-			p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+		//std::cout << "projectile attack from client" << std::endl;
+		
+		if (pid == 0)
+		{
+			if (!hasShot[0])
+			{
+				player1shoot = true;
+				p1ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[0] = true;
+			}
+		}
+		else if (pid == 1)
+		{
+			if (!hasShot[1])
+			{
+				player2shoot = true;
+				p2ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[1] = true;
+			}
+		}
+		else if (pid == 2)
+		{
+			if (!hasShot[2])
+			{
+				player3shoot = true;
+				p3ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[2] = true;
+			}
+		}
+		else if (pid == 3)
+		{
+			if (!hasShot[3])
+			{
+				player4shoot = true;
+				p4ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[3] = true;
+			}
 		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
+
 		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second, shootID);
+	}
+	else if (!(mouseState & 1 << 1))
+	{
+		hasShot[pid] = false;
 	}
 }
 void handle_key_state(int pid, int keyState){
@@ -210,13 +243,13 @@ int main(int argc, char *argv[])
 	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
-	/*
+	
 	//Player Cam Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	*/
+	
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -271,46 +304,46 @@ int main(int argc, char *argv[])
 		player2shoot = false;
 		player3shoot = false;
 		player4shoot = false;
-		if (strcmp((*recvVec)[0].first.c_str(), ""))
+		if (strcmp((*recvVec)[RECVINDEXP0].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[0].first.c_str()); 
-			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_key_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER].second[0][0]);
 			if (newData[0]){
-				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * VECSPERPLAYER + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 3].second[0][0]);
 			}
 		}
 		// VECTOR INDICES NEED UPDATE FOR MOUSE
-		if (strcmp((*recvVec)[numOfVecs].first.c_str(), ""))
+		if (strcmp((*recvVec)[RECVINDEXP1].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs].first.c_str());
-			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_key_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER].second[0][0]);
 			if (newData[1]){
-				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * VECSPERPLAYER + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 3].second[0][0]);
 			}
 			
 		}
-		if (strcmp((*recvVec)[numOfVecs * 2].first.c_str(), ""))
+		if (strcmp((*recvVec)[RECVINDEXP2].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 2].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
 			if (newData[2]){
-				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * VECSPERPLAYER + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 3].second[0][0]);
 			}
 		}
-		if (strcmp((*recvVec)[numOfVecs * 3].first.c_str(), ""))
+		if (strcmp((*recvVec)[RECVINDEXP3].first.c_str(), ""))
 		{
 			playerID = atoi((*recvVec)[numOfVecs * 3].first.c_str());
-			handle_key_state(playerID, (int)(*recvVec)[playerID * 4].second[0][0]);
+			handle_key_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER].second[0][0]);
 			if (newData[3]){
-				handle_mouse_state(playerID, (int)(*recvVec)[playerID * 4 + 1].second[0][0]);
-				handle_cam_mat(playerID, (*recvVec)[playerID * 4 + 2].second);
-				handle_cam_rot(playerID, (int)(*recvVec)[playerID * 4 + 3].second[0][0]);
+				handle_mouse_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 1].second[0][0]);
+				handle_cam_mat(playerID, (*recvVec)[playerID * VECSPERPLAYER + 2].second);
+				handle_cam_rot(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 3].second[0][0]);
 			}
 		}
 
@@ -371,45 +404,45 @@ int main(int argc, char *argv[])
 		//SEND SHIT HERE by adding to the p0-p3 strings//
 
 		//sending if a player was damaged
-		if (scene->getPlayerDamaged(0))
+		if (scene->getPlayerDamaged(PLAYER0))
 			p0 += "d";
 		else
 			p0 += "D";
-		if (scene->getPlayerDamaged(1))
+		if (scene->getPlayerDamaged(PLAYER1))
 			p1 += "d";
 		else
 			p1 += "D";
-		if (scene->getPlayerDamaged(2))
+		if (scene->getPlayerDamaged(PLAYER2))
 			p2 += "d";
 		else
 			p2 += "D";
-		if (scene->getPlayerDamaged(3))
+		if (scene->getPlayerDamaged(PLAYER3))
 			p3 += "d";
 		else
 			p3 += "D";
 		//reset the playerDamaged flags
 		if (sendddddddddddedededed)
 		{
-			scene->setPlayerDamaged(0, false);
-			scene->setPlayerDamaged(1, false);
-			scene->setPlayerDamaged(2, false);
-			scene->setPlayerDamaged(3, false);
+			scene->setPlayerDamaged(PLAYER0, false);
+			scene->setPlayerDamaged(PLAYER1, false);
+			scene->setPlayerDamaged(PLAYER2, false);
+			scene->setPlayerDamaged(PLAYER3, false);
 		}
 
 		//sending if a player was killed
-		if (scene->getPlayerDead(0))
+		if (scene->getPlayerDead(PLAYER0))
 			p0 += "k";
 		else
 			p0 += "K";
-		if (scene->getPlayerDead(1))
+		if (scene->getPlayerDead(PLAYER1))
 			p1 += "k";
 		else
 			p1 += "K";
-		if (scene->getPlayerDead(2))
+		if (scene->getPlayerDead(PLAYER2))
 			p2 += "k";
 		else
 			p2 += "K";
-		if (scene->getPlayerDead(3))
+		if (scene->getPlayerDead(PLAYER3))
 			p3 += "k";
 		else
 			p3 += "K";
@@ -427,6 +460,18 @@ int main(int argc, char *argv[])
 			scene->setPlayerDead(3, false);
 		}
 
+		p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerHealth(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerHealth(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerHealth(PLAYER3), 3);
+
+		p0 += int_to_string(scene->getPlayerKills(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerKills(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerKills(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
+
+
+
 		//despawn player projectile list
 		string ppdl_str;
 		if (sendddddddddddedededed){
@@ -439,24 +484,24 @@ int main(int argc, char *argv[])
 		}
 
 
-		(*sendVec)[0] = std::make_pair(p0.c_str(), mp[0]);
-		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);
-		(*sendVec)[2] = std::make_pair(p2.c_str(), mp[2]);
-		(*sendVec)[3] = std::make_pair(p3.c_str(), mp[3]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER1] = std::make_pair(p1.c_str(), mp[PLAYER1]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER2] = std::make_pair(p2.c_str(), mp[PLAYER2]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER3] = std::make_pair(p3.c_str(), mp[PLAYER3]);
 
-		(*sendVec)[4] = std::make_pair("t0", mt[0]);
-		(*sendVec)[5] = std::make_pair("t1", mt[1]);
-		(*sendVec)[6] = std::make_pair("t2", mt[2]);
-		(*sendVec)[7] = std::make_pair("t3", mt[3]);
+		(*sendVec)[TOWER_MAT_BEGIN + 0] = std::make_pair("t0", mt[0]);
+		(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair("t1", mt[1]);
+		(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair("t2", mt[2]);
+		(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair("t3", mt[3]);
 
-		(*sendVec)[8] = std::make_pair(ppdl_str, mat4(1.0));
+		(*sendVec)[PPDL_MAT] = std::make_pair(ppdl_str, mat4(1.0));
 
-		/*
-		(*sendVec)[8] = std::make_pair("c0", ca[0]);
-		(*sendVec)[9] = std::make_pair("c1", ca[1]);
-		(*sendVec)[10] = std::make_pair("c2", ca[2]);
-		(*sendVec)[11] = std::make_pair("c3", ca[3]);
-		*/
+		
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER0] = std::make_pair("c0", ca[PLAYER0]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER1] = std::make_pair("c1", ca[PLAYER1]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
+		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
