@@ -1235,7 +1235,7 @@ void server_update(int value){
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
-				cam[i]->setCamM((*recvVec)[i+9].second);
+				cam[i]->setCamM((*recvVec)[CAM_MAT_BEGIN + i].second);
 		}
 		
 		i++;
