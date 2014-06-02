@@ -935,6 +935,7 @@ void Window::displayCallback(void)
 		break;
 	case 1:
 	case 2:
+	case 5: //End screen
 	case 3:
 		///////  1st pass: render into depth map //////////
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, depth_fbo);
@@ -1076,6 +1077,10 @@ void Window::displayCallback(void)
 		}
 		else if (myClientState->getState() == 3){
 			myDeathScreen->draw();
+		}
+
+		else if (myClientState->getState() == 5){
+			endScreen->draw(1);
 		}
 		break;
 	case 4:
@@ -1721,7 +1726,7 @@ void keyboard(unsigned char key, int, int){
 		if (key == 27){
 			//running = false;
 			//exit(0);
-			myClientState->setState(1);
+			//myClientState->setState(1);
 		}
 		break;
 	case 4:
