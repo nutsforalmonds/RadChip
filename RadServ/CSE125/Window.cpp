@@ -91,7 +91,7 @@ string int_to_string(int num, int length){
 }
 
 void handle_mouse_state(int pid, int mouseState){
-	int shootID;
+	int shootID = -1;
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
@@ -242,13 +242,13 @@ int main(int argc, char *argv[])
 	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
-	/*
+	
 	//Player Cam Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
-	*/
+	
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -483,12 +483,12 @@ int main(int argc, char *argv[])
 
 		(*sendVec)[8] = std::make_pair(ppdl_str, mat4(1.0));
 
-		/*
-		(*sendVec)[8] = std::make_pair("c0", ca[0]);
-		(*sendVec)[9] = std::make_pair("c1", ca[1]);
-		(*sendVec)[10] = std::make_pair("c2", ca[2]);
-		(*sendVec)[11] = std::make_pair("c3", ca[3]);
-		*/
+		
+		(*sendVec)[9] = std::make_pair("c0", ca[0]);
+		(*sendVec)[10] = std::make_pair("c1", ca[1]);
+		(*sendVec)[11] = std::make_pair("c2", ca[2]);
+		(*sendVec)[12] = std::make_pair("c3", ca[3]);
+		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
 		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
