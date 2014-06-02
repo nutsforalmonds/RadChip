@@ -10,7 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-#define NUMOFVECS 8
+#define NUMOFVECS 9
 
 class gameState
 {

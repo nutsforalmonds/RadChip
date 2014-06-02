@@ -65,22 +65,94 @@ int p2Shots = 0;
 int p3Shots = 0;
 
 
+bool hasShot[4] = { false };
+
+#define PLAYER_PROJECTILE_COUNT 1000;
+int p1ShotID = 0;
+int p2ShotID = 0;
+int p3ShotID = 0;
+int p4ShotID = 0;
+int p_shoot_counter;
+
+string int_to_string(int num, int length){
+	string t = "";
+	int num_zero;
+	if (num > 1){
+		num_zero = length - (int)floor(log10(num*10));
+	}
+	else{
+		num_zero = length - 1;
+	} 
+	for (int i = 0; i < num_zero;i++)
+		t += "0";
+	t += std::to_string(num);
+	assert(t.length() == length);
+	return t;
+}
+
 void handle_mouse_state(int pid, int mouseState){
+	int shootID;
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
 	else if (mouseState & 1 << 1){
-		std::cout << "projectile attack from client" << std::endl;
+		//std::cout << "projectile attack from client" << std::endl;
+		
 		if (pid == 0)
-			player1shoot = true;
+		{
+			if (!hasShot[0])
+			{
+				player1shoot = true;
+				p1ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[0] = true;
+			}
+		}
 		else if (pid == 1)
-			player2shoot = true;
+		{
+			if (!hasShot[1])
+			{
+				player2shoot = true;
+				p2ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[1] = true;
+			}
+		}
 		else if (pid == 2)
-			player3shoot = true;
+		{
+			if (!hasShot[2])
+			{
+				player3shoot = true;
+				p3ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[2] = true;
+			}
+		}
 		else if (pid == 3)
-			player4shoot = true;
+		{
+			if (!hasShot[3])
+			{
+				player4shoot = true;
+				p4ShotID = p_shoot_counter;
+				shootID = p_shoot_counter;
+				p_shoot_counter++;
+				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
+				hasShot[3] = true;
+			}
+		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
-		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second);
+
+		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second, shootID);
+	}
+	else if (!(mouseState & 1 << 1))
+	{
+		hasShot[pid] = false;
 	}
 }
 void handle_key_state(int pid, int keyState){
@@ -122,12 +194,12 @@ void handle_key_state(int pid, int keyState){
 	{
 
 	}
-	if (keyState & 1 << 5){ //'W' for sprint
-		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
-	}
-	else{
-		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
-	}
+	//if (keyState & 1 << 5){ //'W' for sprint
+	//	scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	//}
+	//else{
+	//	scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getSprintSpeed());
+	//}
 }
 void handle_cam_rot(int pid, float cam_rot){
 	if (scene->getPlayerObj(pid) == NULL)
@@ -165,6 +237,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
 	/*
@@ -327,6 +402,75 @@ int main(int argc, char *argv[])
 
 		//SEND SHIT HERE by adding to the p0-p3 strings//
 
+		//sending if a player was damaged
+		if (scene->getPlayerDamaged(0))
+			p0 += "d";
+		else
+			p0 += "D";
+		if (scene->getPlayerDamaged(1))
+			p1 += "d";
+		else
+			p1 += "D";
+		if (scene->getPlayerDamaged(2))
+			p2 += "d";
+		else
+			p2 += "D";
+		if (scene->getPlayerDamaged(3))
+			p3 += "d";
+		else
+			p3 += "D";
+		//reset the playerDamaged flags
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDamaged(0, false);
+			scene->setPlayerDamaged(1, false);
+			scene->setPlayerDamaged(2, false);
+			scene->setPlayerDamaged(3, false);
+		}
+
+		//sending if a player was killed
+		if (scene->getPlayerDead(0))
+			p0 += "k";
+		else
+			p0 += "K";
+		if (scene->getPlayerDead(1))
+			p1 += "k";
+		else
+			p1 += "K";
+		if (scene->getPlayerDead(2))
+			p2 += "k";
+		else
+			p2 += "K";
+		if (scene->getPlayerDead(3))
+			p3 += "k";
+		else
+			p3 += "K";
+
+		p0 += int_to_string(p1ShotID, 3);
+		p1 += int_to_string(p2ShotID, 3);
+		p2 += int_to_string(p3ShotID, 3);
+		p3 += int_to_string(p4ShotID, 3);
+
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDead(0, false);
+			scene->setPlayerDead(1, false);
+			scene->setPlayerDead(2, false);
+			scene->setPlayerDead(3, false);
+		}
+
+		//despawn player projectile list
+		string ppdl_str;
+		if (sendddddddddddedededed){
+			vector<int> ppdl = scene->getPlayerProjectileDespawnList();
+			scene->clearPlayerProjectileDespawnList();
+			ppdl_str = "";
+			for (uint i = 0; i < ppdl.size(); i++){
+				ppdl_str += int_to_string(ppdl[i], 3);
+			}
+		}
+
+
 		(*sendVec)[0] = std::make_pair(p0.c_str(), mp[0]);
 		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);
 		(*sendVec)[2] = std::make_pair(p2.c_str(), mp[2]);
@@ -336,6 +480,9 @@ int main(int argc, char *argv[])
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
 		(*sendVec)[6] = std::make_pair("t2", mt[2]);
 		(*sendVec)[7] = std::make_pair("t3", mt[3]);
+
+		(*sendVec)[8] = std::make_pair(ppdl_str, mat4(1.0));
+
 		/*
 		(*sendVec)[8] = std::make_pair("c0", ca[0]);
 		(*sendVec)[9] = std::make_pair("c1", ca[1]);
