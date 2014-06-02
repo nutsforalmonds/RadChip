@@ -69,6 +69,12 @@ public:
 		return NULL;
 	}
 
+	int getPlayerHealth(int playerID)
+	{
+		Object * pPtr = getPlayerObj(playerID);
+		return pPtr->getHealth();
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){

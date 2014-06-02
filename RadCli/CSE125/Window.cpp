@@ -1166,24 +1166,28 @@ void server_update(int value){
 		{
 			//cout << "damaged 0" << endl;
 			spawnDamageParticle(PLAYER0);
+			myUI->setLess_Life(1);
 		}
 
 		if (parseOpts->getDamaged(recvVec, PLAYER1))
 		{
 			//cout << "damaged 1" << endl;
 			spawnDamageParticle(PLAYER1);
+			myUI->setLess_Life(1);
 		}
 
 		if (parseOpts->getDamaged(recvVec, PLAYER2))
 		{
 			//cout << "damaged 2" << endl;
 			spawnDamageParticle(PLAYER2);
+			myUI->setLess_Life(1);
 		}
 
 		if (parseOpts->getDamaged(recvVec, PLAYER3))
 		{
 			//cout << "damaged 3" << endl;
 			spawnDamageParticle(PLAYER3);
+			myUI->setLess_Life(1);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER0))
@@ -1210,6 +1214,8 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER3);
 		}
 
+
+		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 
 

@@ -460,6 +460,13 @@ int main(int argc, char *argv[])
 			scene->setPlayerDead(3, false);
 		}
 
+		p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerHealth(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerHealth(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerHealth(PLAYER3), 3);
+
+
+
 		//despawn player projectile list
 		string ppdl_str;
 		if (sendddddddddddedededed){
