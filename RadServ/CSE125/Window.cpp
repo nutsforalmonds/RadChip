@@ -91,7 +91,7 @@ string int_to_string(int num, int length){
 }
 
 void handle_mouse_state(int pid, int mouseState){
-	int shootID = -1;
+	int shootID = 0;
 	if (mouseState & 1){
 		scene->basicAttack(pid);
 	}
