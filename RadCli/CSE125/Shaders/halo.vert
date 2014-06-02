@@ -36,7 +36,7 @@ void main(void)
 
     gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*pos;
 	//gl_Position = position;
-    gl_PointSize = 25.0 / uTime;
+    gl_PointSize = (25.0 / uTime);
 	
 	//position = vec3(ModelMatrix*vec4(x, y, 0.0,1.0));
 	

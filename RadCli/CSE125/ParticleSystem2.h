@@ -215,29 +215,22 @@ public:
 			shader->setUniform(uniformLoc[12], 0);
 			shader->setUniform(uniformLoc[13], myEmitter.ePosition);
 
-			shader->setUniform(uniformLoc[14], fog->maxDist);
-			shader->setUniform(uniformLoc[15], fog->minDist);
-			shader->setUniform(uniformLoc[16], fog->color);
-			shader->setUniform(uniformLoc[17], fog->visibility);
-			shader->setUniform(uniformLoc[18], fog->maxHeight);
-			shader->setUniform(uniformLoc[19], fog->minHeight);
+			shader->setUniform(uniformLoc[14], time_Max);
+			shader->setUniform(uniformLoc[15], time_Min);
+			shader->setUniform(uniformLoc[16], time_Step);
+			shader->setUniform(uniformLoc[17], col);
+			shader->setUniform(uniformLoc[18], row);
+			shader->setUniform(uniformLoc[19], num_col);
+			shader->setUniform(uniformLoc[20], num_row);
+
+			shader->setUniform(uniformLoc[21], fog->maxDist);
+			shader->setUniform(uniformLoc[22], fog->minDist);
+			shader->setUniform(uniformLoc[23], fog->color);
+			shader->setUniform(uniformLoc[24], fog->visibility);
+			shader->setUniform(uniformLoc[25], fog->maxHeight);
+			shader->setUniform(uniformLoc[26], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
-			/*
-			shader->setUniform(uniformLoc[4], Projection*View*getModelM());
-			shader->setUniform(uniformLoc[5], material.Kd);
-			shader->setUniform(uniformLoc[6], material.Ka);
-			shader->setUniform(uniformLoc[7], material.Ks);
-			shader->setUniform(uniformLoc[8], material.Shininess);
-			shader->setUniform(uniformLoc[9], material.ReflectFactor);
-			shader->setUniform(uniformLoc[10], material.Eta);
-			shader->setUniform(uniformLoc[11], CubeMapUnit);
-			shader->setUniform(uniformLoc[12], color);
-			shader->setUniform(uniformLoc[13], shadowTex);
-			shader->setUniform(uniformLoc[14], LightView);
-			shader->setUniform(uniformLoc[15], LightProjection);
-			shader->setUniform(uniformLoc[16], ScaleBias);
-			*/
 			shader->use();
 			vao.draw();
 			glUseProgram(0);
@@ -264,12 +257,20 @@ public:
 			shader->setUniform(uniformLoc[12], 0);
 			shader->setUniform(uniformLoc[13], myEmitter.ePosition);
 
-			shader->setUniform(uniformLoc[14], fog->maxDist);
-			shader->setUniform(uniformLoc[15], fog->minDist);
-			shader->setUniform(uniformLoc[16], fog->color);
-			shader->setUniform(uniformLoc[17], fog->visibility);
-			shader->setUniform(uniformLoc[18], fog->maxHeight);
-			shader->setUniform(uniformLoc[19], fog->minHeight);
+			shader->setUniform(uniformLoc[14], time_Max);
+			shader->setUniform(uniformLoc[15], time_Min);
+			shader->setUniform(uniformLoc[16], time_Step);
+			shader->setUniform(uniformLoc[17], col);
+			shader->setUniform(uniformLoc[18], row);
+			shader->setUniform(uniformLoc[19], num_col);
+			shader->setUniform(uniformLoc[20], num_row);
+
+			shader->setUniform(uniformLoc[21], fog->maxDist);
+			shader->setUniform(uniformLoc[22], fog->minDist);
+			shader->setUniform(uniformLoc[23], fog->color);
+			shader->setUniform(uniformLoc[24], fog->visibility);
+			shader->setUniform(uniformLoc[25], fog->maxHeight);
+			shader->setUniform(uniformLoc[26], fog->minHeight);
 			m_Texture->Bind(GL_TEXTURE0);
 
 			shader->use();
@@ -294,6 +295,14 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("u_eColorEnd"));
 		uniformLoc.push_back(shader->getUniformLoc("u_Texture"));
 		uniformLoc.push_back(shader->getUniformLoc("u_ePosition"));
+
+		uniformLoc.push_back(shader->getUniformLoc("time_Max"));
+		uniformLoc.push_back(shader->getUniformLoc("time_Min"));
+		uniformLoc.push_back(shader->getUniformLoc("time_Step"));
+		uniformLoc.push_back(shader->getUniformLoc("column"));
+		uniformLoc.push_back(shader->getUniformLoc("row"));
+		uniformLoc.push_back(shader->getUniformLoc("num_column"));
+		uniformLoc.push_back(shader->getUniformLoc("num_row"));
 
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxDist"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minDist"));
@@ -369,6 +378,18 @@ public:
 	void setEmitterPosition(vec3 ep){ myEmitter.ePosition = ep; }
 	vec3 getEmitterPosition(){ return myEmitter.ePosition; }
 
+	void setTexCol(int c){ col = c; }
+	int getTexCol(){ return col; }
+
+	void setTexNumCol(int cn){ num_col = cn; }
+	int getTexNumCol(){ return num_col; }
+
+	void setTexRow(int r){ row = r; }
+	int getTexRow(){ return row; }
+
+	void setTexNumRow(int rn){ num_row = rn; }
+	int getTexNumRow(){ return num_row; }
+
 private:
 	void generate(){
 
@@ -415,6 +436,10 @@ private:
 	int current_loop;
 	bool loopInf;
 
+	float width;
+	float height;
+
+	int col, row, num_col, num_row;
 
 	vec2 gravity;
 	float life;

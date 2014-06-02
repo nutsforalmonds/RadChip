@@ -2937,11 +2937,15 @@ void initialize(int argc, char *argv[])
 	particle8->setFog(emptyFog);
 
 	testSystem = new ParticleSystem2();
-	testSystem->setShader(sdrCtl.getShader("pe_system"));
+	testSystem->setShader(sdrCtl.getShader("pe_system_anim"));
 	testSystem->setType("Particle_System");
 	testSystem->setName("Particle_Test");
 	testSystem->setLoopInf(true);
-	testSystem->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	testSystem->setTexture(GL_TEXTURE_2D, "img/sprite_sheets/explosion.png", "PNG");
+	testSystem->setTexNumCol(5);
+	testSystem->setTexNumRow(4);
+	testSystem->setTexRow(2);
+	testSystem->setTexCol(2);
 	testSystem->setFog(fog);
 	testSystem->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
 
