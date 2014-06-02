@@ -9,20 +9,7 @@
 #include <glm/gtx/vector_angle.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-
-//vector position info
-#define PLAYER_MAT_BEGIN 0
-#define PLAYER_MAT_END 3
-#define TOWER_MAT_BEGIN 4
-#define TOWER_MAT_END	7
-#define PPDL_MAT		8
-
-//player bit info
-#define SHOOTBIT 1
-#define DAMAGEDBIT 2
-#define KILLEDBIT 3
-#define SHOOT_ID_BEGIN 4
-#define SHOOT_ID_END 6
+#include "constants.h"
 
 
 
