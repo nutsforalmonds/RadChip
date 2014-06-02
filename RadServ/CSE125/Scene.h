@@ -522,6 +522,7 @@ public:
 					pv[1] = 1;
 					player[j]->preTrans(glm::translate(pv));
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
 					i--;
@@ -552,6 +553,7 @@ public:
 					//pv[1] = 1;
 					//tower[j]->preTrans(glm::translate(pv));
 					damageTower(tower[j]->getPlayerID(), projectile[i]->getPlayerID());
+					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
 					i--;
@@ -825,6 +827,12 @@ public:
 			m[i] = tower[i]->getModelM();
 		}
 		return m;
+	}
+	vector<int> getPlayerProjectileDespawnList(){
+		return despon_player_projectile_list;
+	}
+	void clearPlayerProjectileDespawnList(){
+		despon_player_projectile_list.clear();
 	}
 	void initialize(){
 
@@ -1126,5 +1134,6 @@ protected:
 	vector<bool> playerDead;
 	int counter;
 	int projectile_counter;
+	vector<int> despon_player_projectile_list;
 };
 

@@ -207,6 +207,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	//Player Projectile Despawn List
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
 	/*
 	//Player Cam Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -424,6 +427,17 @@ int main(int argc, char *argv[])
 			scene->setPlayerDead(3, false);
 		}
 
+		//despawn player projectile list
+		string ppdl_str;
+		if (sendddddddddddedededed){
+			vector<int> ppdl = scene->getPlayerProjectileDespawnList();
+			scene->clearPlayerProjectileDespawnList();
+			ppdl_str = "";
+			for (uint i = 0; i < ppdl.size(); i++){
+				ppdl_str += int_to_string(ppdl[i], 3);
+			}
+		}
+
 
 		(*sendVec)[0] = std::make_pair(p0.c_str(), mp[0]);
 		(*sendVec)[1] = std::make_pair(p1.c_str(), mp[1]);
@@ -434,6 +448,9 @@ int main(int argc, char *argv[])
 		(*sendVec)[5] = std::make_pair("t1", mt[1]);
 		(*sendVec)[6] = std::make_pair("t2", mt[2]);
 		(*sendVec)[7] = std::make_pair("t3", mt[3]);
+
+		(*sendVec)[8] = std::make_pair(ppdl_str, mat4(1.0));
+
 		/*
 		(*sendVec)[8] = std::make_pair("c0", ca[0]);
 		(*sendVec)[9] = std::make_pair("c1", ca[1]);

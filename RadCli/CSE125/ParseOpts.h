@@ -10,11 +10,21 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
+//vector position info
+#define PLAYER_MAT_BEGIN 0
+#define PLAYER_MAT_END 3
+#define TOWER_MAT_BEGIN 4
+#define TOWER_MAT_END	7
+#define PPDL_MAT		8
+
+//player bit info
 #define SHOOTBIT 1
 #define DAMAGEDBIT 2
 #define KILLEDBIT 3
 #define SHOOT_ID_BEGIN 4
 #define SHOOT_ID_END 6
+
+
 
 //#define PSPEEDINDEX 2
 
@@ -126,6 +136,16 @@ public:
 	return false;
 	}
 	}*/
+
+	std::vector<int> getPPDL(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::vector<int> result;
+		std::string s = (*vec)[PPDL_MAT].first;
+		for (int um = 0; um < s.length(); um += 3){
+			result.push_back(atoi(s.substr(um,3).c_str()));
+		}
+		return result;
+	}
 
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;

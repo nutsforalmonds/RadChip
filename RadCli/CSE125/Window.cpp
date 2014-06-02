@@ -1142,7 +1142,17 @@ void server_update(int value){
 			p3f = true;
 		}
 
-
+		//despawn projectiles from hit
+		vector<int> ppdl = parseOpts->getPPDL(recvVec);
+		for (uint i = 0; i < ppdl.size(); i++){
+			for (uint k = 0; k < projectile_list.size(); k++){
+				if (projectile_list[k]->getShootID() == ppdl[i]){
+					delete projectile_list[k];
+					projectile_list.erase(projectile_list.begin() + k);
+					break;
+				}
+			}
+		}
 
 		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
 		if (parseOpts->getDamaged(recvVec, 0))
