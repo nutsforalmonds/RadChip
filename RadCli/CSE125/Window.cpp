@@ -189,6 +189,7 @@ string configBuf;
 //time used in idleCallback
 LARGE_INTEGER freq, last, current, loop_begin, loop_end;
 double delta;
+LARGE_INTEGER idleCallbackTime;
 
 //Mouse press flags
 int left_mouse_up = 1;
@@ -385,7 +386,7 @@ void Vibrate(int L, int R, int time){
 	}
 }
 
-void projectileAttack(int playerID, Camera * cam)
+void projectileAttack(int playerID, Camera * cam, int shootID)
 {
 	mat4 test = cam->getCamToWorldM();
 	vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
@@ -430,6 +431,7 @@ void projectileAttack(int playerID, Camera * cam)
 	pjt->setVelocity(vec3(holder)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
+	pjt->setShootID(shootID);
 }
 void despawnProjectile()
 {
@@ -462,7 +464,7 @@ void Window::idleCallback(void)
 {
 	static float anim_time = 0;
 	vector<mat4> Transforms;
-	//GLSLProgram* sd;
+	double dt;
 	vector<mat4> playerMs;
 
 	switch (myClientState->getState()){
@@ -474,7 +476,6 @@ void Window::idleCallback(void)
 	case 1:
 	case 2:
 	case 3:
-		
 		if (alive){
 			first_change = true;
 			cam->setCamM(mat4(1.0));
@@ -496,6 +497,8 @@ void Window::idleCallback(void)
 
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
+		dt = ((double)ct.QuadPart - (double)idleCallbackTime.QuadPart) / (double)freq.QuadPart;
+		idleCallbackTime = ct;
 		for (uint i = 0; i < player_list.size(); i++){
 			((Mesh*)player_list[i])->BoneTransform(player_list[i]->getAnimation((double)ct.QuadPart / (double)freq.QuadPart), Transforms);
 			((Mesh*)player_list[i])->setTransforms(Transforms);
@@ -556,6 +559,7 @@ void Window::idleCallback(void)
 			myDeathScreen->draw();
 		}
 
+		simulateProjectile(dt);
 		despawnProjectile();
 
 		break;
@@ -1093,7 +1097,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, 0, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(0, cam);
+			projectileAttack(0, cam, shootID);
 			if (playerID == 0)
 			{
 				myUI->setShots(1);
@@ -1105,7 +1109,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, 1, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(1, cam);
+			projectileAttack(1, cam, shootID);
 			if (playerID == 1)
 			{
 				myUI->setShots(1);
@@ -1117,7 +1121,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, 2, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(2, cam);
+			projectileAttack(2, cam, shootID);
 			if (playerID == 2)
 			{
 				myUI->setShots(1);
@@ -1129,7 +1133,7 @@ void server_update(int value){
 		if (parseOpts->getShoot(recvVec, 3, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(3, cam);
+			projectileAttack(3, cam, shootID);
 			if (playerID == 3)
 			{
 				myUI->setShots(1);
@@ -1243,9 +1247,6 @@ void server_update(int value){
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-
-		simulateProjectile(diff);
-
 	}
 
 	//Particles are instantly despawning

@@ -12,6 +12,7 @@ protected:
 	int distance;
 	std::vector<int> playersHit;
 	int playerID;
+	int shootID;
 
 public:
 	Projectile(int numPlayers);
@@ -25,6 +26,8 @@ public:
 	int getDistance();
 	void setPlayerID(int id){ playerID = id; }
 	int getPlayerID(){ return playerID; }
+	void setShootID(int id){ shootID = id; }
+	int getShootID(){ return shootID; }
 };
 
 #endif

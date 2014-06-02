@@ -13,9 +13,10 @@
 #define SHOOTBIT 1
 #define DAMAGEDBIT 2
 #define KILLEDBIT 3
+#define SHOOT_ID_BEGIN 4
+#define SHOOT_ID_END 6
 
-#define PSPEEDINDEX 2
-#define PSPEEDLEN 3
+//#define PSPEEDINDEX 2
 
 using glm::mat4;
 
@@ -40,6 +41,8 @@ public:
 
 		if ((*vec)[i].first.c_str()[SHOOTBIT] == 's')
 		{
+			std::string shoot_id = (*vec)[i].first.substr(SHOOT_ID_BEGIN,SHOOT_ID_END+1-SHOOT_ID_BEGIN);
+			shootID = atoi(shoot_id.c_str());
 			return true;
 		}
 		else
@@ -48,23 +51,23 @@ public:
 		}
 	}
 
-	int getPSpeed(std::vector <std::pair<std::string, mat4>>* vec, int pid)
-	{
-		speed = "";
-		for (i = 0; i < 3; i++)
-		{
-			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
-				break;
-		}
+	//int getPSpeed(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	//{
+	//	speed = "";
+	//	for (i = 0; i < 3; i++)
+	//	{
+	//		if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+	//			break;
+	//	}
 
-		for (j = 0; j < PSPEEDLEN; j++)
-		{
-			speed += (*vec)[i].first.c_str()[PSPEEDINDEX + j];
-		}
+	//	for (j = 0; j < PSPEEDLEN; j++)
+	//	{
+	//		speed += (*vec)[i].first.c_str()[PSPEEDINDEX + j];
+	//	}
 
 
-		return atoi(speed.c_str());
-	}
+	//	return atoi(speed.c_str());
+	//}
 
 	bool getDamaged(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
