@@ -36,6 +36,7 @@
 #include "ClientState.h"
 #include "AnimController.h"
 #include "ParticleAnimated.h"
+#include "LightningGenerator.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -114,6 +115,9 @@ std::vector<Projectile*> projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 std::vector<ParticleAnimated*> panim_list;
+std::vector<ParticleAnimated*> lightning_list;
+
+LightningGenerator lightning_generator;
 
 Mesh_Static* tryThis;
 
@@ -170,6 +174,7 @@ struct Mother{
 	Mesh* mother_of_banana;
 	Mesh* mother_of_nut;
 	ParticleAnimated* mother_of_p_anim;
+	ParticleAnimated* mother_of_lightning;
 }MOM;
 
 int texScreenWidth = 512;
@@ -467,6 +472,7 @@ void Window::idleCallback(void)
 	vector<mat4> Transforms;
 	double dt;
 	vector<mat4> playerMs;
+	vector<vec2> lightning_pos;
 
 	switch (myClientState->getState()){
 	case 0:
@@ -508,13 +514,41 @@ void Window::idleCallback(void)
 		//particle animation
 		for (uint i = 0; i < panim_list.size(); i++){
 			if (!panim_list[i]->update()){
-				if (panim_list[i] == 0){//one time
+				if (panim_list[i]->getType() == 0){//one time
 					delete panim_list[i];
 					panim_list.erase(panim_list.begin() + i);
 					i--;
 				}
 				else{//continuous
 					panim_list[i]->setStartTime(ct);
+				}
+			}
+		}
+
+		//lightning
+		if (lightning_generator.generate(lightning_pos,3)){//generates 3 bolts per lightning generation
+			for (uint i = 0; i < lightning_pos.size(); i++){
+				ParticleAnimated* new_lightning = new ParticleAnimated(*MOM.mother_of_lightning);
+				new_lightning->setModelM(glm::translate(vec3(lightning_pos[i][0], 70, lightning_pos[i][1])));
+				new_lightning->setType(0);
+				new_lightning->setWidth(10);
+				new_lightning->setHeight(200);
+				new_lightning->setDuration(0.5);
+				LARGE_INTEGER time_lightning;
+				QueryPerformanceCounter(&time_lightning);
+				new_lightning->setStartTime(time_lightning);
+				lightning_list.push_back(new_lightning);
+			}
+		}
+		for (uint i = 0; i < lightning_list.size(); i++){
+			if (!lightning_list[i]->update()){
+				if (lightning_list[i]->getType() == 0){//one time
+					delete lightning_list[i];
+					lightning_list.erase(lightning_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					lightning_list[i]->setStartTime(ct);
 				}
 			}
 		}
@@ -949,6 +983,9 @@ void Window::displayCallback(void)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
+		}
+		for (uint i = 0; i < lightning_list.size(); i++){
+			lightning_list[i]->draw();
 		}
 		glDisable(GL_BLEND);
 
@@ -1590,7 +1627,6 @@ void keyboard(unsigned char key, int, int){
 			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
 			posTestSound->Play3D(View);
-
 			cout << "Playing Sound!" << endl;
 		}
 
@@ -1620,6 +1656,8 @@ void keyboard(unsigned char key, int, int){
 		//Added for sound debugging
 		if (key == 'f'){
 			testSound[2]->Play();
+			myDeathScreen->setDeathClock(clock());
+			myClientState->setState(3);
 		}
 		if (key == 13)
 		{
@@ -1862,10 +1900,6 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[4]->Play();
 					///scene->basicAttack(playerID);
-					
-					//UI testing purposes
-					myUI->setLess_Life(1);
-					myUI->setShots(1);
 
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -1941,7 +1975,10 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myDeathScreen->checkClick(newX, newY);
+			int click = myDeathScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
 		}
 		break;
 	case 4:
@@ -2025,6 +2062,17 @@ void passiveMotionFunc(int x, int y){
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
 		myDeathScreen->checkHighlight(newX, newY);
+		int sound3;
+		sound3 = myDeathScreen->checkHighlight(newX, newY);
+		if (sound3){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	case 4:
 		break;
@@ -2237,6 +2285,9 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
+	lightning_generator.setDt(0.1);//lightning generation per 0.1 seconds
+	lightning_generator.setSize(400);//size of the map
+
 	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
 	MOM.mother_of_wrench = new Mesh();
 	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
@@ -2261,6 +2312,39 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
 	MOM.mother_of_nut->setShininess(30);
 	MOM.mother_of_nut->setFog(fog);
+
+	MOM.mother_of_p_anim = new ParticleAnimated();
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
+	MOM.mother_of_p_anim->setNumColumn(5);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setDuration(1);
+	MOM.mother_of_p_anim->setFog(emptyFog);
+	MOM.mother_of_p_anim->Bind();
+
+	MOM.mother_of_lightning = new ParticleAnimated();
+	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
+	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_lightning->setWidth(2.0f);
+	MOM.mother_of_lightning->setHeight(2.0f);
+	MOM.mother_of_lightning->setNumColumn(10);
+	MOM.mother_of_lightning->setNumRow(1);
+	MOM.mother_of_lightning->setDuration(1);
+	MOM.mother_of_lightning->setType(0);
+	MOM.mother_of_lightning->setFog(fog);
+	MOM.mother_of_lightning->Bind();
+
+	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
+	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	p_anim->setType(1);
+	LARGE_INTEGER time_p_anim;
+	QueryPerformanceCounter(&time_p_anim);
+	p_anim->setStartTime(time_p_anim);
+	panim_list.push_back(p_anim);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
@@ -2822,25 +2906,6 @@ void initialize(int argc, char *argv[])
 	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
 	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
 	m_billboardList5.BindBoards();
-
-	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(2.0f);
-	MOM.mother_of_p_anim->setHeight(2.0f);
-	MOM.mother_of_p_anim->setNumColumn(5);
-	MOM.mother_of_p_anim->setNumRow(4);
-	MOM.mother_of_p_anim->setDuration(1);
-	MOM.mother_of_p_anim->Bind();
-
-	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
-	p_anim->setType(1);
-	LARGE_INTEGER time_p_anim;
-	QueryPerformanceCounter(&time_p_anim);
-	p_anim->setStartTime(time_p_anim);
-	panim_list.push_back(p_anim);
 
 	particle = new ParticleSystem(GL_POINTS);
 	particle->setShader(sdrCtl.getShader("emitter"));
