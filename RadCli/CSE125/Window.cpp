@@ -1138,11 +1138,11 @@ void server_update(int value){
 	{
 		// get shoot bit from recvVec for player 0
 		int shootID;
-		if (parseOpts->getShoot(recvVec, 0, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER0, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(0, cam[0], shootID);
-			if (playerID == 0)
+			projectileAttack(PLAYER0, cam[PLAYER0], shootID);
+			if (playerID == PLAYER0)
 			{
 				myUI->setShots(1);
 			}
@@ -1150,11 +1150,11 @@ void server_update(int value){
 			p0f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 1, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER1, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(1, cam[1], shootID);
-			if (playerID == 1)
+			projectileAttack(PLAYER1, cam[PLAYER1], shootID);
+			if (playerID == PLAYER1)
 			{
 				myUI->setShots(1);
 			}
@@ -1162,11 +1162,11 @@ void server_update(int value){
 			p1f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 2, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER2, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(2, cam[2], shootID);
-			if (playerID == 2)
+			projectileAttack(PLAYER2, cam[PLAYER2], shootID);
+			if (playerID == PLAYER2)
 			{
 				myUI->setShots(1);
 			}
@@ -1174,11 +1174,11 @@ void server_update(int value){
 			p2f = true;
 		}
 
-		if (parseOpts->getShoot(recvVec, 3, shootID))
+		if (parseOpts->getShoot(recvVec, PLAYER3, shootID))
 		{
 			//std::cout << "Projectile fire" << std::endl;
-			projectileAttack(3, cam[3], shootID);
-			if (playerID == 3)
+			projectileAttack(PLAYER3, cam[PLAYER3], shootID);
+			if (playerID == PLAYER3)
 			{
 				myUI->setShots(1);
 			}
@@ -1199,104 +1199,111 @@ void server_update(int value){
 		}
 
 		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
-		if (parseOpts->getDamaged(recvVec, 0))
+		if (parseOpts->getDamaged(recvVec, PLAYER0))
 		{
 			//cout << "damaged 0" << endl;
-			spawnDamageParticle(0);
+			spawnDamageParticle(PLAYER0);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 1))
+		if (parseOpts->getDamaged(recvVec, PLAYER1))
 		{
 			//cout << "damaged 1" << endl;
-			spawnDamageParticle(1);
+			spawnDamageParticle(PLAYER1);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 2))
+		if (parseOpts->getDamaged(recvVec, PLAYER2))
 		{
 			//cout << "damaged 2" << endl;
-			spawnDamageParticle(2);
+			spawnDamageParticle(PLAYER2);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getDamaged(recvVec, 3))
+		if (parseOpts->getDamaged(recvVec, PLAYER3))
 		{
 			//cout << "damaged 3" << endl;
-			spawnDamageParticle(3);
+			spawnDamageParticle(PLAYER3);
+			myUI->setLess_Life(1);
 		}
 
-		if (parseOpts->getKilled(recvVec, 0))
+		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
 			//cout << "Killed 0" << endl;
-			spawnDamageParticle(0);
+			spawnDamageParticle(PLAYER0);
 		}
 
-		if (parseOpts->getKilled(recvVec, 1))
+		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
-			spawnDamageParticle(1);
+			spawnDamageParticle(PLAYER1);
 		}
 
-		if (parseOpts->getKilled(recvVec, 2))
+		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
-			spawnDamageParticle(2);
+			spawnDamageParticle(PLAYER2);
 		}
 
-		if (parseOpts->getKilled(recvVec, 3))
+		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
 			//cout << "Killed 3" << endl;
-			spawnDamageParticle(3);
+			spawnDamageParticle(PLAYER3);
 		}
 
 
+		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 
 
-		mats[atoi(&((*recvVec)[0].first.c_str())[0])] = (*recvVec)[0].second;
-		mats[atoi(&((*recvVec)[1].first.c_str())[0])] = (*recvVec)[1].second;
-		mats[atoi(&((*recvVec)[2].first.c_str())[0])] = (*recvVec)[2].second;
-		mats[atoi(&((*recvVec)[3].first.c_str())[0])] = (*recvVec)[3].second;
+
+		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
+		mats[PLAYER1] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER1].second;
+		mats[PLAYER2] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER2].second;
+		mats[PLAYER3] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER3].second;
 		
-		player_list[0]->setModelM(mats[0]);
-		player_list[1]->setModelM(mats[1]);
-		player_list[2]->setModelM(mats[2]);
-		player_list[3]->setModelM(mats[3]);
+		player_list[PLAYER0]->setModelM(mats[PLAYER0]);
+		player_list[PLAYER1]->setModelM(mats[PLAYER1]);
+		player_list[PLAYER2]->setModelM(mats[PLAYER2]);
+		player_list[PLAYER3]->setModelM(mats[PLAYER3]);
 
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
-		tower_list[atoi(&((*recvVec)[4].first.c_str())[1])]->setModelM((*recvVec)[4].second);
-		tower_list[atoi(&((*recvVec)[5].first.c_str())[1])]->setModelM((*recvVec)[5].second);
-		tower_list[atoi(&((*recvVec)[6].first.c_str())[1])]->setModelM((*recvVec)[6].second);
-		tower_list[atoi(&((*recvVec)[7].first.c_str())[1])]->setModelM((*recvVec)[7].second);
+
+		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
+		tower_list[1]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 1].second);
+		tower_list[2]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 2].second);
+		tower_list[3]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 3].second);
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
-				cam[i]->setCamM((*recvVec)[i+9].second);
+				cam[i]->setCamM((*recvVec)[CAM_MAT_BEGIN + i].second);
 		}
 		
 		i++;
 
 		vec4 temp(0.0, 0.0, 0.0, 1.0);
-		if (p0f && (playerID!=0)){
-			temp = player_list[0]->getModelM() *temp;
+		if (p0f && (playerID != PLAYER0)){
+			temp = player_list[PLAYER0]->getModelM() *temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p1f && (playerID != 1)){
-			temp = player_list[1]->getModelM() * temp;
+		if (p1f && (playerID != PLAYER1)){
+			temp = player_list[PLAYER1]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p2f && (playerID != 2)){
-			temp = player_list[2]->getModelM() * temp;
+		if (p2f && (playerID != PLAYER2)){
+			temp = player_list[PLAYER2]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
 		}
-		if (p3f && (playerID != 3)){
-			temp = player_list[3]->getModelM() * temp;
+		if (p3f && (playerID != PLAYER3)){
+			temp = player_list[PLAYER3]->getModelM() * temp;
 			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			posTestSound2->setPosition(pt);
 			posTestSound2->Play3D(View);
@@ -1619,7 +1626,6 @@ void keyboard(unsigned char key, int, int){
 			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
 			posTestSound->Play3D(View);
-
 			cout << "Playing Sound!" << endl;
 		}
 
@@ -1649,6 +1655,8 @@ void keyboard(unsigned char key, int, int){
 		//Added for sound debugging
 		if (key == 'f'){
 			testSound[2]->Play();
+			myDeathScreen->setDeathClock(clock());
+			myClientState->setState(3);
 		}
 		if (key == 13)
 		{
@@ -1891,10 +1899,6 @@ void mouseFunc(int button, int state, int x, int y)
 
 					testSound[4]->Play();
 					///scene->basicAttack(playerID);
-					
-					//UI testing purposes
-					myUI->setLess_Life(1);
-					myUI->setShots(1);
 
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -1970,7 +1974,10 @@ void mouseFunc(int button, int state, int x, int y)
 			newX = (float)x / Window::width;
 			newY = (float)y / Window::height;
 			cout << "CLICK!" << newX << "," << newY << endl;
-			myDeathScreen->checkClick(newX, newY);
+			int click = myDeathScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
 		}
 		break;
 	case 4:
@@ -2054,6 +2061,17 @@ void passiveMotionFunc(int x, int y){
 		newX = (float)x / Window::width;
 		newY = (float)y / Window::height;
 		myDeathScreen->checkHighlight(newX, newY);
+		int sound3;
+		sound3 = myDeathScreen->checkHighlight(newX, newY);
+		if (sound3){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	case 4:
 		break;
