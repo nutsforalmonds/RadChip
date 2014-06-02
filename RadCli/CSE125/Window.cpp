@@ -528,6 +528,7 @@ void Window::idleCallback(void)
 		//lightning
 		if (lightning_generator.generate(lightning_pos,3)){//generates 3 bolts per lightning generation
 			for (uint i = 0; i < lightning_pos.size(); i++){
+				//lightning
 				ParticleAnimated* new_lightning = new ParticleAnimated(*MOM.mother_of_lightning);
 				new_lightning->setModelM(glm::translate(vec3(lightning_pos[i][0], 70, lightning_pos[i][1])));
 				new_lightning->setType(0);
@@ -538,6 +539,17 @@ void Window::idleCallback(void)
 				QueryPerformanceCounter(&time_lightning);
 				new_lightning->setStartTime(time_lightning);
 				lightning_list.push_back(new_lightning);
+				//lightning explosion
+				ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
+				p_anim->setModelM(glm::translate(vec3(lightning_pos[i][0], ground->getDispY(lightning_pos[i][0], lightning_pos[i][1])+0.3, lightning_pos[i][1])));
+				p_anim->setType(0);
+				p_anim->setDuration(0.7);
+				p_anim->setWidth(3);
+				p_anim->setHeight(3);
+				LARGE_INTEGER time_p_anim;
+				QueryPerformanceCounter(&time_p_anim);
+				p_anim->setStartTime(time_p_anim);
+				panim_list.push_back(p_anim);
 			}
 		}
 		for (uint i = 0; i < lightning_list.size(); i++){
