@@ -10,6 +10,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#define NUMOFVECS 8
+
 class gameState
 {
 
@@ -52,7 +54,7 @@ std::vector<std::pair<string, mat4> >* gameState::parsePosString(std::string str
 	str_.Parse<0>(str.c_str());
 	pos->clear();
 
-	for (int x = 0; x < 16; x = x + 2)
+	for (int x = 0; x < NUMOFVECS * 2; x = x + 2)
 	{
 		//if (!str_[(rapidjson::SizeType)(x + 1)].IsNull())
 		//{

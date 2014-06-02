@@ -44,6 +44,7 @@
 #include <assert.h>
 #include "ParticleSystem.h"
 #include "ParticleSystem2.h"
+
 ParticleSystem* particle;
 ParticleSystem* particle2;
 ParticleSystem* particle3;
@@ -1024,7 +1025,7 @@ void server_update(int value){
 	
 	cli->write(*sendVec);
 	io_service.poll();
-	mouseState = 0;
+	//mouseState = 0;
 	cam_dx = 0;
 
 	// RECEIVE STUFF
@@ -1036,11 +1037,14 @@ void server_update(int value){
 
 	if (out[0] == '[')
 	{
-		unsigned pos = out.find("`");
+		unsigned pos = out.find("\n");
 		out = out.substr(0, pos);
-		//delete recvVec;
 		recvVec = gs.parsePosString(out);
 		recvValid = true;
+		//cout << "size: " << recvVec->size() << endl;
+		//for (int i = 0; i < 6; i++){
+			//cout << i << " : " << (*recvVec)[i].first.c_str() << endl;
+		//}
 	}
 	else
 		recvValid = false;
