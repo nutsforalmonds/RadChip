@@ -994,12 +994,14 @@ void Window::displayCallback(void)
 		}
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
 		}
 		for (uint i = 0; i < lightning_list.size(); i++){
 			lightning_list[i]->draw();
 		}
+		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 
 		//	md5->draw();
