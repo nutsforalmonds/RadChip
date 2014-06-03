@@ -36,3 +36,15 @@
 #define PLAYER1				1
 #define PLAYER2				2
 #define PLAYER3				3
+
+//tower 
+#define SHOOTBIT			0
+#define TOWER_ID			1
+#define SHOOT_ID_BEGIN		2
+#define SHOOT_ID_END		5
+#define DIR_0_BEGIN			6
+#define DIR_0_END			11
+#define DIR_1_BEGIN			12
+#define DIR_1_END			17
+#define DIR_2_BEGIN			18
+#define DIR_2_END			23

@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include "constants.h"
+#include "Structures.h"
 
 
 
@@ -26,6 +27,22 @@ public:
 	~ParseOpts()
 	{
 
+	}
+
+	void getTowerShoot(std::vector <std::pair<std::string, mat4>>* vec,  vector<TowerShootInfoClient>& tsi){
+		tsi.clear();
+		for (int i = TOWER_MAT_BEGIN; i < TOWER_MAT_END+1; i++){
+			if ((*vec)[i].first.c_str()[0] == 'T'){
+				int towerID = atoi((*vec)[i].first.substr(TOWER_ID,1).c_str());
+				int projectileID = atoi((*vec)[i].first.substr(SHOOT_ID_BEGIN, SHOOT_ID_END + 1 - SHOOT_ID_BEGIN).c_str());
+				vec3 direction;
+				direction[0] = atoi((*vec)[i].first.substr(DIR_0_BEGIN, DIR_0_END + 1 - DIR_0_BEGIN).c_str()) / 100000.0-1;
+				direction[1] = atoi((*vec)[i].first.substr(DIR_1_BEGIN, DIR_1_END + 1 - DIR_1_BEGIN).c_str()) / 100000.0-1;
+				direction[2] = atoi((*vec)[i].first.substr(DIR_2_BEGIN, DIR_2_END + 1 - DIR_2_BEGIN).c_str()) / 100000.0-1;
+				//cout << "dirrrrr: " << direction[0] << " " << direction[1] << " " << direction[2] << endl;
+				tsi.push_back(TowerShootInfoClient(towerID,projectileID,direction));
+			}
+		}
 	}
 
 	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid, int& shootID)

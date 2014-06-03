@@ -122,6 +122,7 @@ std::vector<Object*> player_list;
 std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
+std::vector<Projectile*> tower_projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 std::vector<ParticleAnimated*> panim_list;
@@ -511,6 +512,48 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(shootID);
 }
+void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
+
+	Projectile* pjt = new Projectile(player_list.size());
+	//if (playerID % 2){//monkey throws
+		pjt->setVAO(MOM.mother_of_banana->getVAO());
+		pjt->setEntries(MOM.mother_of_banana->getEntries());
+		pjt->setTextures(MOM.mother_of_banana->getTextures());
+		pjt->setAdjustM(MOM.mother_of_banana->getAdjustM());
+	//}
+	//else{//chipmonk throws
+	//	pjt->setVAO(MOM.mother_of_nut->getVAO());
+	//	pjt->setEntries(MOM.mother_of_nut->getEntries());
+	//	pjt->setTextures(MOM.mother_of_nut->getTextures());
+	//	pjt->setAdjustM(MOM.mother_of_nut->getAdjustM());
+	//}
+	pjt->setShader(sdrCtl.getShader("basic_model"));
+	pjt->setShininess(30);
+	pjt->setFog(fog);
+
+	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
+	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	pjt->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
+	AABB hold = pjt->getAABB();
+	pjt->setStartX(hold.max[0]);
+	pjt->setStartY(hold.max[2]);
+	pjt->setDistance(20);
+	pjt->setShadowTex(shadow_map_id);
+
+	//Name and type
+	pjt->setType("Cube");
+	pjt->setName("Test Cube" + std::to_string(projectile_counter));
+	//projectile_counter++;
+	//Add Cube to the draw list
+	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
+	tower_projectile_list.push_back(pjt);
+	pjt->setSpeed(50);
+	//cubeT->setHMove((holder[0] / 4));
+	pjt->setVelocity(glm::normalize(direction)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
+	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
+	pjt->setShootID(projectileID);
+}
 void despawnProjectile()
 {
 	for (uint i = 0; i < projectile_list.size(); i++)
@@ -528,6 +571,21 @@ void despawnProjectile()
 			projectile_list.erase(projectile_list.begin() + i);
 		}
 	}
+	for (uint i = 0; i < tower_projectile_list.size(); i++)
+	{
+		float startX = tower_projectile_list[i]->getStartX();
+		float startY = tower_projectile_list[i]->getStartY();
+		AABB curr = tower_projectile_list[i]->getAABB();
+		int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+
+		//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
+		if (distance >= (*tower_projectile_list[i]).getDistance())
+		{
+			////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+			delete tower_projectile_list[i];
+			tower_projectile_list.erase(tower_projectile_list.begin() + i);
+		}
+	}
 }
 void simulateProjectile(float t)
 {
@@ -535,6 +593,10 @@ void simulateProjectile(float t)
 		projectile_list[i]->addVelocity(vec3(0.0, -9.8, 0.0)*t);
 		projectile_list[i]->preTrans(glm::translate(projectile_list[i]->getVelocity()*t));
 		projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*projectile_list[i]->getAdjustM());
+	}
+	for (uint i = 0; i < tower_projectile_list.size(); i++){
+		tower_projectile_list[i]->preTrans(glm::translate(tower_projectile_list[i]->getVelocity()*t));
+		tower_projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*tower_projectile_list[i]->getAdjustM());
 	}
 }
 
@@ -1039,7 +1101,11 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw(LightProjection, LightView);
-		}		
+		}	
+		for (uint i = 0; i < tower_projectile_list.size(); ++i)
+		{
+			tower_projectile_list[i]->draw(LightProjection, LightView);
+		}
 		
 		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1069,6 +1135,10 @@ void Window::displayCallback(void)
 		for (uint i = 0; i < projectile_list.size(); ++i)
 		{
 			projectile_list[i]->draw();
+		}
+		for (uint i = 0; i < tower_projectile_list.size(); ++i)
+		{
+			tower_projectile_list[i]->draw();
 		}
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1293,6 +1363,14 @@ void server_update(int value){
 			}
 			cout << "FIRE 3!" << endl;
 			p3f = true;
+		}
+
+		//tower shoot
+		vector<TowerShootInfoClient> tsi;
+		parseOpts->getTowerShoot(recvVec, tsi);
+		for (uint i = 0; i < tsi.size(); i++){
+			towerProjectileAttack(tsi[i].towerID, tsi[i].projectileID, tsi[i].direction);
+			//cout << "'dijiejfowjowefj: " << tsi[i].direction[0] << " " << tsi[i].direction[1] << " " << tsi[i].direction[2] << endl;
 		}
 
 		//despawn projectiles from hit

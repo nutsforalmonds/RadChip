@@ -58,6 +58,17 @@ struct Fog{
 	}
 };
 
+struct TowerShootInfoClient{
+	TowerShootInfoClient(int tid, int pid, vec3 dir){
+		towerID = tid;
+		projectileID = pid;
+		direction = dir;
+	}
+	int towerID;
+	int projectileID;
+	vec3 direction;
+};
+
 class AABB{
 public:
 	AABB(){}

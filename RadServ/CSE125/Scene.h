@@ -30,6 +30,8 @@ using namespace std;
 #define GRAVITY_SCALE 2.5
 #define PLAYER_SPEED 10
 
+#define NUM_TOWERS 4
+
 struct TowerShootInfo{
 	TowerShootInfo(int td, int pd, vec3 dir){
 		towerID = td;
@@ -46,6 +48,9 @@ class Scene
 {
 public:
 	Scene(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
 		tower_shoot_counter = 0;
 		camM.push_back(mat4(1.0));
 		camM.push_back(mat4(1.0));
@@ -899,7 +904,7 @@ public:
 				if (min_dist != 10000){
 					Projectile* cubeT = new Projectile(player.size() + respawn.size());
 					cubeT->setSpeed(5);
-					cubeT->setModelM(player[pid]->getModelM()*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+					cubeT->setModelM(player[pid]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 					cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
@@ -920,8 +925,10 @@ public:
 					tower_shoot_counter %= 1000;
 					cubeT->setShootID(shootID);
 					tower[i]->setLastShoot(ct);
+					tower[i]->setLastShootDir(dir);
 
 					tower_shoot.push_back(TowerShootInfo(i, shootID, dir));
+					tower_shoot_check[i] = true;
 				}
 			}
 		}
@@ -945,6 +952,22 @@ public:
 				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
 				delete projectile[i];
 				projectile.erase(projectile.begin() + i);
+			}
+		}
+		for (uint i = 0; i < tower_projectile.size(); i++)
+		{
+			float startX = tower_projectile[i]->getStartX();
+			float startY = tower_projectile[i]->getStartY();
+			AABB curr = tower_projectile[i]->getAABB();
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+
+
+			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
+			if (distance >= (*tower_projectile[i]).getDistance())
+			{
+				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+				delete tower_projectile[i];
+				tower_projectile.erase(tower_projectile.begin() + i);
 			}
 		}
 	}
@@ -1343,6 +1366,14 @@ public:
 		counter = 0;
 		projectile_counter = 0;
 	}
+	bool* getTowerShootCheck(){ return tower_shoot_check; }
+	void clearTowerShootCheck(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
+	}
+	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
+	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
 
 protected:
 	int counter2;
@@ -1370,6 +1401,7 @@ protected:
 	vector<int> despon_tower_projectile_list;
 	vector<TowerShootInfo> tower_shoot;
 	int tower_shoot_counter;
+	bool tower_shoot_check[NUM_TOWERS];
 
 	Object * pPtr;
 };
