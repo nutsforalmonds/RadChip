@@ -539,6 +539,7 @@ void Window::idleCallback(void)
 				}
 				else{//continuous
 					panim_list[i]->setStartTime(ct);
+					panim_list[i]->update();
 				}
 			}
 		}
@@ -2440,42 +2441,68 @@ void initialize(int argc, char *argv[])
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand
-	monkeyAnimController.add(0 / 24.0, 16 / 24.0);//walk
-	monkeyAnimController.add(25 / 24.0, 10 / 24.0);//jump
-	monkeyAnimController.add(40 / 24.0, 20 / 24.0);//attack
+	monkeyAnimController.add(0 / 24.0, 16 / 24.0,2);//walk
+	monkeyAnimController.add(25 / 24.0, 10 / 24.0,2);//jump
+	monkeyAnimController.add(40 / 24.0, 20 / 24.0,2);//attack
 	monkeyAnimController.setDefault(0);//stand is the default animation
-	AnimController chipmonkAnimController;
-	chipmonkAnimController.add(0 / 24.0, 5 / 24.0);//stand
-	chipmonkAnimController.add(10 / 24.0, 20 / 24.0);//walk
-	chipmonkAnimController.add(35 / 24.0, 10 / 24.0);//jump
-	chipmonkAnimController.add(50 / 24.0, 15 / 24.0);//attack
-	chipmonkAnimController.setDefault(0);//stand is the default animation
-	for (int i = 0; i < 4; i++){
-		if (i % 2){
-			Mesh* player0 = new Mesh();
-			player0->LoadMesh("Model/monky2014_delete2.dae");
-			//player0->LoadMesh("Model/nut_animated.dae",false);
-			player0->setAnimController(monkeyAnimController);
-			player0->setShader(sdrCtl.getShader("basic_model"));
-			player0->setShadowTex(shadow_map_id);
-			player0->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-			//player0->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
-			player0->setShininess(30);
-			player0->setFog(fog);
-			player_list.push_back(player0);
-		}
-		else{
-			Mesh* player0 = new Mesh();
-			player0->LoadMesh("Model/chipmunkOculus_animated_all3.dae");
-			player0->setAnimController(chipmonkAnimController);
-			player0->setShader(sdrCtl.getShader("basic_model"));
-			player0->setShadowTex(shadow_map_id);
-			player0->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
-			player0->setShininess(30);
-			player0->setFog(fog);
-			player_list.push_back(player0);
-		}
-	}
+	AnimController gorillaAnimController;
+	gorillaAnimController.add(0 / 24.0, 5 / 24.0);//stand
+	gorillaAnimController.add(26 / 24.0, 24 / 24.0, 2);//walk
+	gorillaAnimController.add(55 / 24.0, 25 / 24.0, 2);//jump
+	gorillaAnimController.add(82 / 24.0, 17 / 24.0, 2);//attack
+	gorillaAnimController.setDefault(0);//stand is the default animation
+	AnimController chipmonkOculusAnimController;
+	chipmonkOculusAnimController.add(0 / 24.0, 5 / 24.0);//stand
+	chipmonkOculusAnimController.add(10 / 24.0, 20 / 24.0,2);//walk
+	chipmonkOculusAnimController.add(35 / 24.0, 10 / 24.0);//jump
+	chipmonkOculusAnimController.add(50 / 24.0, 15 / 24.0,2);//attack
+	chipmonkOculusAnimController.setDefault(0);//stand is the default animation
+	AnimController chipmonk2AnimController;
+	chipmonk2AnimController.add(0 / 24.0, 5 / 24.0);//stand
+	chipmonk2AnimController.add(11 / 24.0, 19 / 24.0,1.2);//walk
+	chipmonk2AnimController.add(36 / 24.0, 9 / 24.0);//jump
+	chipmonk2AnimController.add(52 / 24.0, 10 / 24.0,2);//attack
+	chipmonk2AnimController.setDefault(0);//stand is the default animation
+
+	Mesh* player0 = new Mesh();
+	player0->LoadMesh("Model/2chipmunk_7_animated_6.dae");
+	player0->setAnimController(chipmonk2AnimController);
+	player0->setShader(sdrCtl.getShader("basic_model"));
+	player0->setShadowTex(shadow_map_id);
+	player0->setAdjustM(glm::translate(vec3(0.0, 0.95, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
+	player0->setShininess(30);
+	player0->setFog(fog);
+	player_list.push_back(player0);
+
+	Mesh* player1 = new Mesh();
+	player1->LoadMesh("Model/BlueGorilla_animation_9.dae");
+	player1->setAnimController(gorillaAnimController);
+	player1->setShader(sdrCtl.getShader("basic_model"));
+	player1->setShadowTex(shadow_map_id);
+	player1->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player1->setShininess(30);
+	player1->setFog(fog);
+	player_list.push_back(player1);
+
+	Mesh* player2 = new Mesh();
+	player2->LoadMesh("Model/chipmunkOculus_animated_all3.dae");
+	player2->setAnimController(chipmonkOculusAnimController);
+	player2->setShader(sdrCtl.getShader("basic_model"));
+	player2->setShadowTex(shadow_map_id);
+	player2->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.15, 0.15, 0.15)));
+	player2->setShininess(30);
+	player2->setFog(fog);
+	player_list.push_back(player2);
+
+	Mesh* player3 = new Mesh();
+	player3->LoadMesh("Model/monky2014_delete2.dae");
+	player3->setAnimController(monkeyAnimController);
+	player3->setShader(sdrCtl.getShader("basic_model"));
+	player3->setShadowTex(shadow_map_id);
+	player3->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player3->setShininess(30);
+	player3->setFog(fog);
+	player_list.push_back(player3);
 
 	Mesh* tower0 = new Mesh();
 	tower0->LoadMesh("Model/2Tower_6_bone.dae",false);
