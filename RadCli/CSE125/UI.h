@@ -315,7 +315,7 @@ public:
 		//glDepthMask(GL_FALSE);
 
 		life_frame->draw();
-
+		
 		glDisable(GL_BLEND);
 		//glDepthMask(GL_TRUE);
 
@@ -807,6 +807,10 @@ public:
 		frame->setTex(true);
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
+		deaths[4] = { 0 };
+		kills[4] = { 0 };
+
+
 	}
 	~GameMenu(){
 
@@ -842,6 +846,44 @@ public:
 		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
+
+	int killDraw(){
+		char buf[100];
+		
+
+		glDisable(GL_DEPTH_TEST);
+
+		//Player 1
+		k = to_string(kills[0]);
+		d = to_string(deaths[0]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 1 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5* Window::height / 8, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 2
+		k = to_string(kills[1]);
+		d = to_string(deaths[1]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 2 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160,5* Window::height / 8 - 48, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 3
+		k = to_string(kills[2]);
+		d = to_string(deaths[2]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 3 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 96, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 4
+		k = to_string(kills[3]);
+		d = to_string(deaths[3]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 4 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+	
+		glEnable(GL_DEPTH_TEST);
+
+		return 0;
+	}
+
+	void setDeath(int i){ deaths[i]++;}
+	void setKills(int i, int k){ kills[i] = k;}
 
 	int checkHighlight(float x, float y){
 
@@ -911,6 +953,10 @@ private:
 	UI_Panel * selected_quit;
 	UI_Panel * frame;
 
+	int deaths[4];
+	int kills[4];
+	string k;
+	string d;
 	bool drawStartHighlight;
 	bool drawEndHighlight;
 };
@@ -1014,7 +1060,7 @@ public:
 				RenderString(Window::width / 2 - 24, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, ready, vec3(1.0f, 1.0f, 1.0f));
 				break;
 			}
-		
+
 		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
