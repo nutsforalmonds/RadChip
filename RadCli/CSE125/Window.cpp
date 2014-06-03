@@ -275,6 +275,8 @@ int but_up = 1;
 int m_pos = 0;
 int text_flag = 0;
 
+bool kill_count = false;
+
 bool connected;
 std::string out;
 gameState gs;
@@ -1115,6 +1117,11 @@ void Window::displayCallback(void)
 		else if (myClientState->getState() == 5){
 			endScreen->draw(1);
 		}
+
+		else if (kill_count){
+			myGameMenu->killDraw();
+		}
+
 		break;
 	case 4:
 		settings->draw();
@@ -1315,6 +1322,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER0);
 			sound_3d_death->setPosition(player0_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(0);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
@@ -1323,6 +1331,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER1);
 			sound_3d_death->setPosition(player1_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(1);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
@@ -1331,6 +1340,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER2);
 			sound_3d_death->setPosition(player2_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(2);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
@@ -1339,13 +1349,17 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER3);
 			sound_3d_death->setPosition(player3_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(3);
 		}
 
 		// TODO link up health to UI
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 		// TODO display kills somewhere
-		parseOpts->getPKills(recvVec, 0);
+		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, 0));
+		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, 1));
+		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, 2));
+		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, 3));
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
@@ -1903,6 +1917,11 @@ void keyUp (unsigned char key, int x, int y) {
 		}
 		if (key == 'l'){
 			alive = !alive;
+		}
+
+		if (key == 9)
+		{
+			kill_count = !kill_count;
 		}
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
