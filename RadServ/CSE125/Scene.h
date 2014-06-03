@@ -82,6 +82,18 @@ public:
 		return pPtr->getKills();
 	}
 
+	bool * getPlayerPowerUp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getPowerUp();
+	}
+
+	bool getPlayerOnTramp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getTramp();
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -365,6 +377,11 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
+			obj1->setTramp(true);
+		}
+		else
+		{
+			obj1->setTramp(false);
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -1129,6 +1146,7 @@ protected:
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
+	vector<bool> playerOnTramp;
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

@@ -113,7 +113,7 @@ public:
 
 		for (j = PHEALTH_BEGIN; j < PHEALTH_END; j++)
 		{
-			health += (*vec)[i].first.c_str()[PHEALTH_BEGIN + j];
+			health += (*vec)[pid].first.c_str()[PHEALTH_BEGIN + j];
 		}
 
 
@@ -131,11 +131,17 @@ public:
 
 		for (j = PKILLS_BEGIN; j < PKILLS_END; j++)
 		{
-			kills += (*vec)[i].first.c_str()[PKILLS_BEGIN + j];
+			kills += (*vec)[pid].first.c_str()[PKILLS_BEGIN + j];
 		}
 
-
 		return atoi(kills.c_str());
+	}
+
+	int getPPowerUp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+			pUp = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
+
+		return atoi(pUp.c_str());
 	}
 
 	// Parameters are the pointer to the recvVec vector and the desired player ID
@@ -173,6 +179,6 @@ public:
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	std::string health, kills, speed;
+	std::string health, kills, speed, pUp;
 	int i, j;
 };

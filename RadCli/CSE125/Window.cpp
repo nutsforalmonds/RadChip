@@ -1345,7 +1345,11 @@ void server_update(int value){
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 		// TODO display kills somewhere
-		parseOpts->getPKills(recvVec, 0);
+		parseOpts->getPKills(recvVec, PLAYER0);
+
+		// TODO do something with power up status
+		// check consts.h for int that corresponds to powerup
+		parseOpts->getPPowerUp(recvVec, PLAYER0);
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
