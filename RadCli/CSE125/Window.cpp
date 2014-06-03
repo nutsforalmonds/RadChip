@@ -1715,7 +1715,7 @@ int main(int argc, char *argv[])
   glutSetCursor(GLUT_CURSOR_WAIT);
 
   BuildPopupMenu();
-  glutAttachMenu(GLUT_MIDDLE_BUTTON);
+  //glutAttachMenu(GLUT_MIDDLE_BUTTON);
 
   initialize(argc, argv);  
 
@@ -1959,17 +1959,14 @@ void keyboard(unsigned char key, int, int){
 
 		//This plays sound at <0,0,0>
 		if (key == 'i'){
-			cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
+		//	cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
-			posTestSound->Play3D(View);
-			cout << "Playing Sound!" << endl;
+		//	posTestSound->Play3D(View);
+		//	cout << "Playing Sound!" << endl;
 		}
-
-		//This creates looping music at <0,0,0>
+		
 		if (key == 'o'){
-			sound_3d_death->Play3D(View);
-
-			cout << "Playing Death Sound!" << endl;
+			//testSound[10]->Play();
 		}
 		
 		if (key == 27){
@@ -1990,7 +1987,7 @@ void keyboard(unsigned char key, int, int){
 
 		//Added for sound debugging
 		if (key == 'f'){
-			testSound[2]->Play();
+			//testSound[2]->Play();
 			myDeathScreen->setDeathClock(clock());
 			myClientState->setState(3);
 		}
@@ -2633,6 +2630,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
+	myDeathScreen->setupSound(testSound[10]);
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
@@ -3558,6 +3556,9 @@ int loadAudio(){
 		else if (i == 0 || i == 1){
 			testSound[i]->setVolume(0.25);
 		}
+		else if (i == 10){
+			testSound[i]->setVolume(0.15);
+		}
 		else{
 			testSound[i]->setVolume(0.5);
 		}
@@ -3656,5 +3657,6 @@ void printLoadingString(string s){
 
 	glutSwapBuffers();
 }
+
 
 

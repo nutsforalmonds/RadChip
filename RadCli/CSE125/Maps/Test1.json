@@ -63,7 +63,7 @@
             "frag": "Shaders/pe_system_anim.frag"
         }
     ],
-    "num_audio": 10,
+    "num_audio": 11,
     "audio": [
         {
             "name": "Jump Wav",
@@ -104,6 +104,10 @@
         {
             "name": "slap",
             "path": "Sound/slap.mp3"
+        },
+        {
+            "name": "count",
+            "path": "Sound/Countdown.mp3"
         }
     ],
     "num_texture": 6,

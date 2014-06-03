@@ -1051,6 +1051,8 @@ public:
 				break;
 			case 4:
 				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, five, vec3(1.0f, 1.0f, 1.0f));
+				//DAN TODO - Add Sound
+				myCountSound->Play();
 				break;
 			case 3:
 				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, six, vec3(1.0f, 1.0f, 1.0f));
@@ -1071,6 +1073,10 @@ public:
 
 		glEnable(GL_DEPTH_TEST);
 		return 0;
+	}
+
+	void setupSound(Sound* s){
+		myCountSound = s;
 	}
 
 	int checkHighlight(float x, float y){
@@ -1125,6 +1131,7 @@ private:
 	float since_death;
 	bool drawRespawnHighlight = false;
 	
+	Sound* myCountSound;
 };
 
 class Logo
