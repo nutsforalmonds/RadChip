@@ -1254,7 +1254,9 @@ void server_update(int value){
 		for (int i = 0; i < platformDead.size(); i++)
 		{
 			if (platformDead[i].second)
+			{
 				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+			}
 			else
 				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getAliveModelM());
 		}

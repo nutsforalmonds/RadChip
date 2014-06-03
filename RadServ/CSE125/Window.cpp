@@ -609,10 +609,10 @@ int main(int argc, char *argv[])
 		{	
 			if ((*stationaries)[i]->getIsPlatformDamage())
 				platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
-			if (platformDamaged[i])
-				cout << platform_status << endl;
+			//if (platformDamaged[i])
+				//cout << platform_status << endl;
 			scene->setPlatformDamaged(i, false);
-			scene->setPlatformDead(i, false);
+			//scene->setPlatformDead(i, false);
 		}
 		
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);

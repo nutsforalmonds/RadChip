@@ -16,7 +16,7 @@
 using namespace std;
 
 
-#define RESPAWN_COUNTER 100
+#define RESPAWN_COUNTER 1000
 
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
@@ -572,6 +572,7 @@ public:
 					{
 						holder->putHealth(7);
 						holder->setModelM(holder->getAliveModelM());
+						platformDead[i] = false;
 					}
 				}
 			}

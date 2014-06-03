@@ -196,7 +196,7 @@ public:
 		//every platform status set is made up of p0dk, so this should iterate through every set
 		for (int i = 0; i < s.length(); i += 4)
 		{
-			if (s.substr(i + PLATFORM_DAMAGE, 1).c_str() == "d")
+			if (s.c_str()[i + PLATFORM_DAMAGE] == 'd')
 				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
 			else
 				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
@@ -210,20 +210,14 @@ public:
 		std::vector<std::pair<int, bool>> result;
 		std::string s = (*vec)[PLATFORM_STATUS].first;
 
-		std::cout << "Test" << std::endl;
 		//every platform status set is made up of p0dk, so this should iterate through every set
 		for (int i = 0; i < s.length(); i += 4)
 		{
-			if (s.substr(i + PLATFORM_DEAD, 1).c_str() == "k")
+			if (s.c_str()[i + PLATFORM_DEAD] == 'k')
 				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
 			else
 				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
 		}
-		for (int i = 0; i < result.size(); i++)
-		{
-			std::cout << result[i].first << " " << result[i].second;
-		}
-		std::cout << std::endl;
 		 
 		return result;
 	}
