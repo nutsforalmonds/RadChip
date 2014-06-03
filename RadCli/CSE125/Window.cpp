@@ -1788,6 +1788,43 @@ void keyboard(unsigned char key, int, int){
 		if (key == 't'){
 			SelectFromMenu(MENU_TEXTURING);
 		}
+
+		if (key == '1'){
+			light->diffuse += vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
+		if (key == '2'){
+			light->diffuse -= vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
+		if (key == '3'){
+			light->ambient += vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
+		if (key == '4'){
+			light->ambient -= vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
+		if (key == '5'){
+			light->specular += vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
+		if (key == '6'){
+			light->specular -= vec3(0.1, 0.1, 0.1);
+			cout << "diffuse: " << light->diffuse[0] << endl;
+			cout << "ambient: " << light->ambient[0] << endl;
+			cout << "specular: " << light->specular[0] << endl;
+		}
 		break;
 	case 2:
 		if (key == 27){
@@ -2312,9 +2349,9 @@ void initialize(int argc, char *argv[])
 	
 	light[0].type=1;
 	light[0].pos = vec4(0,200,0,1);
-	light[0].specular = vec3(0.1,0.1,0.1);
-	light[0].diffuse = vec3(0.9, 0.9, 0.9);
-	light[0].ambient = vec3(0.35, 0.35, 0.35);
+	light[0].specular = vec3(0.1,0.1,0.1);//0.1,0.1,0.1
+	light[0].diffuse = vec3(0.9, 0.9, 0.9);//0.9, 0.9, 0.9
+	light[0].ambient = vec3(0.35, 0.35, 0.35);//0.35, 0.35, 0.35
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
 	LightView = glm::lookAt(vec3(light[0].pos), vec3(0, 0, 0), vec3(1, 0, 0));
