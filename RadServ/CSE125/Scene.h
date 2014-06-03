@@ -707,7 +707,8 @@ public:
 		cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
-		cubeT->setStartY(hold.max[2]);
+		cubeT->setStartY(hold.max[1]);
+		cubeT->setStartZ(hold.max[2]);
 		cubeT->setPlayerID(playerID);
 		cubeT->setTeamID(player[playerID]->getTeamID());
 
@@ -732,8 +733,9 @@ public:
 		{
 			float startX = projectile[i]->getStartX();
 			float startY = projectile[i]->getStartY();
+			float startZ = projectile[i]->getStartZ();
 			AABB curr = projectile[i]->getAABB();
-			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2) + pow(curr.max[2] - startZ, 2));//Pythagorean Theorem
 
 
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;

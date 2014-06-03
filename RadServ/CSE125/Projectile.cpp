@@ -11,11 +11,16 @@ Projectile::Projectile(int numPlayers)
 
 void Projectile::setStartX(float x){ startX = x; }
 void Projectile::setStartY(float y){ startY = y; }
+void Projectile::setStartZ(float z){ startZ = z; }
 float Projectile::getStartX(){
 	return startX;
 }
 float Projectile::getStartY(){
 	return startY;
+}
+
+float Projectile::getStartZ(){
+	return startZ;
 }
 
 int Projectile::checkHit(int i)
