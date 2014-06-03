@@ -110,6 +110,9 @@ Sound* sound_3d_Throw;
 Sound* sound_3d_hit;
 Sound* sound_3d_light;
 Sound* sound_3d_death;
+Sound* sound_3d_death2;
+Sound* sound_3d_tramp;
+Sound* sound_3d_tele;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
@@ -1368,37 +1371,45 @@ void server_update(int value){
 		//KILLS
 		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
-			cout << "Killed 0" << endl;
+			//cout << "Killed 0" << endl;
 			spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
 			sound_3d_death->setPosition(player0_sound_vec_lasterest);
 			sound_3d_death->Play3D(View);
+			sound_3d_death2->setPosition(player0_sound_vec_lasterest);
+			sound_3d_death2->Play3D(View);
 			myGameMenu->setDeath(0);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
-			cout << "Killed 1" << endl;
+			//cout << "Killed 1" << endl;
 			spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
 			sound_3d_death->setPosition(player1_sound_vec_lasterest);
 			sound_3d_death->Play3D(View);
+			sound_3d_death2->setPosition(player1_sound_vec_lasterest);
+			sound_3d_death2->Play3D(View);
 			myGameMenu->setDeath(1);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
-			cout << "Killed 2" << endl;
+			//cout << "Killed 2" << endl;
 			spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
 			sound_3d_death->setPosition(player2_sound_vec_lasterest);
 			sound_3d_death->Play3D(View);
+			sound_3d_death2->setPosition(player2_sound_vec_lasterest);
+			sound_3d_death2->Play3D(View);
 			myGameMenu->setDeath(2);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
-			cout << "Killed 3" << endl;
+			// << "Killed 3" << endl;
 			spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
 			sound_3d_death->setPosition(player3_sound_vec_lasterest);
 			sound_3d_death->Play3D(View);
+			sound_3d_death2->setPosition(player3_sound_vec_lasterest);
+			sound_3d_death2->Play3D(View);
 			myGameMenu->setDeath(3);
 		}
 
@@ -1413,10 +1424,40 @@ void server_update(int value){
 
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup
-		parseOpts->getPPowerUp(recvVec, PLAYER0);
+		if (parseOpts->getPPowerUp(recvVec, PLAYER0)){
+			sound_3d_tele->setPosition(player0_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getPPowerUp(recvVec, PLAYER1)){
+			sound_3d_tele->setPosition(player1_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getPPowerUp(recvVec, PLAYER2)){
+			sound_3d_tele->setPosition(player2_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getPPowerUp(recvVec, PLAYER3)){
+			sound_3d_tele->setPosition(player3_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
 
 		// TODO bounces arrive
-		parseOpts->getTramp(recvVec, PLAYER0);
+		if (parseOpts->getTramp(recvVec, PLAYER0)){
+			sound_3d_tramp->setPosition(player0_sound_vec_lasterest);
+			sound_3d_tramp->Play3D(View);
+		}
+		if (parseOpts->getTramp(recvVec, PLAYER1)){
+			sound_3d_tramp->setPosition(player1_sound_vec_lasterest);
+			sound_3d_tramp->Play3D(View);
+		}
+		if (parseOpts->getTramp(recvVec, PLAYER2)){
+			sound_3d_tramp->setPosition(player2_sound_vec_lasterest);
+			sound_3d_tramp->Play3D(View);
+		}
+		if (parseOpts->getTramp(recvVec, PLAYER3)){
+			sound_3d_tramp->setPosition(player3_sound_vec_lasterest);
+			sound_3d_tramp->Play3D(View);
+		}
 
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
@@ -1625,6 +1666,27 @@ int main(int argc, char *argv[])
   sound_3d_death->setVelocity(vt);
   sound_3d_death->setMinDistance(10.0f);
   sound_3d_death->setMaxDistance(10000.0f);
+
+  sound_3d_death2 = new Sound(mySoundSystem, "Sound/blast2.mp3", true);
+  sound_3d_death2->setVolume(0.5);
+  sound_3d_death2->setPosition(pt);
+  sound_3d_death2->setVelocity(vt);
+  sound_3d_death2->setMinDistance(5.0f);
+  sound_3d_death2->setMaxDistance(10000.0f);
+
+  sound_3d_tramp = new Sound(mySoundSystem, "Sound/tramp.mp3", true);
+  sound_3d_tramp->setVolume(0.75);
+  sound_3d_tramp->setPosition(pt);
+  sound_3d_tramp->setVelocity(vt);
+  sound_3d_tramp->setMinDistance(10.0f);
+  sound_3d_tramp->setMaxDistance(10000.0f);
+
+  sound_3d_tele = new Sound(mySoundSystem, "Sound/fire.mp3", true);
+  sound_3d_tele->setVolume(0.75);
+  sound_3d_tele->setPosition(pt);
+  sound_3d_tele->setVelocity(vt);
+  sound_3d_tele->setMinDistance(10.0f);
+  sound_3d_tele->setMaxDistance(10000.0f);
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
   posTestMusic->setLoopCount(-1);
