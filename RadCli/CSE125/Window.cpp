@@ -338,6 +338,29 @@ void spawnDamageParticle(int id)
 	explosion_list.push_back(damagePart);
 }
 
+void spawnDeathParticle(int id)
+{
+	ParticleSystem2* deathPart = new ParticleSystem2();
+	deathPart->setShader(sdrCtl.getShader("pe_system"));
+	deathPart->setType("Particle_System");
+	deathPart->setName("Particle_Test");
+	deathPart->setLoopInf(false);
+	deathPart->setLoopCount(1);
+	deathPart->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	deathPart->setTime_Step(0.5);
+	deathPart->setTime_Max(375.0);
+	deathPart->setTime_Min(0.0);
+	deathPart->setBlastRadius(20.0);
+	deathPart->setExplosionVelocity(0.7);
+	deathPart->setExplosionDecay(2.0);
+	deathPart->setFragStartColor(vec3(1.0, 0.2, 0.2));
+	deathPart->setFragEndColor(vec3(0.6, 0, 0));
+	deathPart->setFog(fog);
+	deathPart->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
+	deathPart->setModelM(player_list[id]->getModelM());
+	explosion_list.push_back(deathPart);
+}
+
 void PlayThunderSound(float diff){
 	if (myClientState->getState() > 0){
 		currThunderTimeSec += diff;
@@ -1320,7 +1343,7 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
 			//cout << "Killed 0" << endl;
-			spawnDamageParticle(PLAYER0);
+			spawnDeathParticle(PLAYER0);
 			sound_3d_death->setPosition(player0_sound_vec);
 			sound_3d_hit->Play3D(View);
 			myGameMenu->setDeath(0);
@@ -1329,7 +1352,7 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
-			spawnDamageParticle(PLAYER1);
+			spawnDeathParticle(PLAYER1);
 			sound_3d_death->setPosition(player1_sound_vec);
 			sound_3d_hit->Play3D(View);
 			myGameMenu->setDeath(1);
@@ -1338,7 +1361,7 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
-			spawnDamageParticle(PLAYER2);
+			spawnDeathParticle(PLAYER2);
 			sound_3d_death->setPosition(player2_sound_vec);
 			sound_3d_hit->Play3D(View);
 			myGameMenu->setDeath(2);
@@ -1347,7 +1370,7 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
 			//cout << "Killed 3" << endl;
-			spawnDamageParticle(PLAYER3);
+			spawnDeathParticle(PLAYER3);
 			sound_3d_death->setPosition(player3_sound_vec);
 			sound_3d_hit->Play3D(View);
 			myGameMenu->setDeath(3);
@@ -3254,24 +3277,34 @@ void initialize(int argc, char *argv[])
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	particle8->setFog(emptyFog);
 
-	testSystem = new ParticleSystem2(0.5, 0.1,0.1,8,0.25, 0.0, 360.0, 0.0, 180.0, 10.0);
-	testSystem->setShader(sdrCtl.getShader("pe_system_anim"));
+	testSystem = new ParticleSystem2();
+	testSystem->setShader(sdrCtl.getShader("pe_system"));
 	testSystem->setType("Particle_System");
 	testSystem->setName("Particle_Test");
 	testSystem->setLoopInf(true);
-	testSystem->setTexture(GL_TEXTURE_2D, "img/sprite_sheets/explosion.png", "PNG");
-	testSystem->setTime_Step(0.001);
-	testSystem->setTime_Max(100.0);
+	testSystem->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	/*
+	testSystem->setTime_Step(0.5);
+	testSystem->setTime_Max(350.0);
 	testSystem->setTime_Min(0.0);
-	testSystem->setTexRow(0);
-	testSystem->setTexCol(0);
-	testSystem->setTexNumCol(5);
-	testSystem->setTexNumRow(4);
-	testSystem->setupSprite();
-	testSystem->setBlastRadius(10.0);
-	testSystem->setExplosionVelocity(0.2);
+	testSystem->setBlastRadius(20.0);
+	testSystem->setExplosionVelocity(0.7);
+	testSystem->setExplosionDecay(2.0);
+	testSystem->setFragStartColor(vec3(1.0, 0.2, 0.2));
+	testSystem->setFragEndColor(vec3(0.6, 0, 0));
+	*/
 	testSystem->setFog(fog);
 	testSystem->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
+
+	/*
+	damagePart->setShader(sdrCtl.getShader("pe_system"));
+	damagePart->setType("Particle_System");
+	damagePart->setName("Particle_Test");
+	damagePart->setLoopInf(false);
+	damagePart->setLoopCount(1);
+	damagePart->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	damagePart->setFog(fog);
+	*/
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
