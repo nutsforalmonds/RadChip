@@ -82,6 +82,18 @@ public:
 		return pPtr->getKills();
 	}
 
+	bool * getPlayerPowerUp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getPowerUp();
+	}
+
+	bool getPlayerOnTramp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getTramp();
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -318,6 +330,7 @@ public:
 		float Rewind[3];
 		float minRewind = 999;
 		int minID = 0;
+		obj1->setTramp(false);
 		vec3 v1 = vec3(obj1->getModelM()*vec4(obj1->getVelocity(), 0.0));
 		vec3 v2 = vec3(obj2->getModelM()*vec4(obj2->getVelocity(), 0.0));
 		vec3 vDiff = v1 - v2;
@@ -365,6 +378,13 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
+			obj1->setTramp(true);
+			std::cout << "trampoline bounce" << std::endl;
+		}
+		else
+		{
+			std::cout << "no bounce" << std::endl;
+			obj1->setTramp(false);
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -1129,6 +1149,7 @@ protected:
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
+	vector<bool> playerOnTramp;
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

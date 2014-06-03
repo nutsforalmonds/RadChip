@@ -1356,10 +1356,21 @@ void server_update(int value){
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 		// TODO display kills somewhere
+
 		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, 0));
 		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, 1));
 		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, 2));
 		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, 3));
+
+		//parseOpts->getPKills(recvVec, PLAYER0);
+
+		// TODO do something with power up status
+		// check consts.h for int that corresponds to powerup
+		parseOpts->getPPowerUp(recvVec, PLAYER0);
+
+		if (parseOpts->getTramp(recvVec, PLAYER0))
+			std::cout << "Player bounced" << std::endl;
+
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 

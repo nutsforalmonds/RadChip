@@ -67,6 +67,7 @@ int p3Shots = 0;
 
 
 bool hasShot[4] = { false };
+int powerUpStatus[4] = { 0 };
 
 #define PLAYER_PROJECTILE_COUNT 1000;
 int p1ShotID = 0;
@@ -469,6 +470,116 @@ int main(int argc, char *argv[])
 		p1 += int_to_string(scene->getPlayerKills(PLAYER1), 3);
 		p2 += int_to_string(scene->getPlayerKills(PLAYER2), 3);
 		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
+
+		// Powerup data encoding
+		// P0
+		if (scene->getPlayerPowerUp(PLAYER0)[0])
+		{
+			powerUpStatus[PLAYER0] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[1])
+		{
+			powerUpStatus[PLAYER0] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[2])
+		{
+			powerUpStatus[PLAYER0] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[3])
+		{
+			powerUpStatus[PLAYER0] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[4])
+		{
+			powerUpStatus[PLAYER0] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER0] = NOPOWER;
+		}
+		// P1
+		if (scene->getPlayerPowerUp(PLAYER1)[0])
+		{
+			powerUpStatus[PLAYER1] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[1])
+		{
+			powerUpStatus[PLAYER1] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[2])
+		{
+			powerUpStatus[PLAYER1] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[3])
+		{
+			powerUpStatus[PLAYER1] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[4])
+		{
+			powerUpStatus[PLAYER1] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER1] = NOPOWER;
+		}
+		// P2
+		if (scene->getPlayerPowerUp(PLAYER2)[0])
+		{
+			powerUpStatus[PLAYER2] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[1])
+		{
+			powerUpStatus[PLAYER2] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[2])
+		{
+			powerUpStatus[PLAYER2] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[3])
+		{
+			powerUpStatus[PLAYER2] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[4])
+		{
+			powerUpStatus[PLAYER2] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER2] = NOPOWER;
+		}
+		// P3
+		if (scene->getPlayerPowerUp(PLAYER3)[0])
+		{
+			powerUpStatus[PLAYER3] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[1])
+		{
+			powerUpStatus[PLAYER3] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[2])
+		{
+			powerUpStatus[PLAYER3] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[3])
+		{
+			powerUpStatus[PLAYER3] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[4])
+		{
+			powerUpStatus[PLAYER3] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER3] = NOPOWER;
+		}
+
+		p0 += int_to_string(powerUpStatus[PLAYER0], 1);
+		p1 += int_to_string(powerUpStatus[PLAYER1], 1);
+		p2 += int_to_string(powerUpStatus[PLAYER2], 1);
+		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
+
+		//Trampoline status
+		
 
 
 

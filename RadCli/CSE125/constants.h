@@ -8,8 +8,11 @@
 #define CAM_MAT_BEGIN		8
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
+//#define PLAT_MAT_BEGIN	12
+//#define PLAT_MAT_END		15
+//#define PPDL_MAT			16
 
-//player bit info
+// string indexes
 #define SHOOTBIT			1
 #define DAMAGEDBIT			2
 #define KILLEDBIT			3
@@ -19,6 +22,15 @@
 #define PHEALTH_END			9
 #define PKILLS_BEGIN		10
 #define PKILLS_END			12
+#define POWER_UP_STATUS		13
+#define TRAMP_STATUS		14
+
+#define NOPOWER				0
+#define SPEEDUP				1
+#define DOUBLEDAMAGE		2
+#define HEALTHBOOST			3
+#define FASTERSHOOT			4
+#define FARTHERSHOOT		5
 
 #define PLAYER0				0
 #define PLAYER1				1
