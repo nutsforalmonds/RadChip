@@ -1356,11 +1356,10 @@ void server_update(int value){
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 		// TODO display kills somewhere
-
-		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, 0));
-		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, 1));
-		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, 2));
-		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, 3));
+		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, PLAYER0));
+		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, PLAYER1));
+		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, PLAYER2));
+		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, PLAYER3));
 
 		//parseOpts->getPKills(recvVec, PLAYER0);
 
