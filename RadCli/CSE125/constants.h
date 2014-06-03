@@ -38,10 +38,10 @@
 #define PLAYER3				3
 
 //tower 
-#define SHOOTBIT			0
+#define TOWERSHOOTBIT			0
 #define TOWER_ID			1
-#define SHOOT_ID_BEGIN		2
-#define SHOOT_ID_END		5
+#define TOWER_SHOOT_ID_BEGIN		2
+#define TOWER_SHOOT_ID_END		5
 #define DIR_0_BEGIN			6
 #define DIR_0_END			11
 #define DIR_1_BEGIN			12
