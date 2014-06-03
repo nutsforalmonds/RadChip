@@ -23,6 +23,7 @@
 #define PKILLS_BEGIN		10
 #define PKILLS_END			12
 #define POWER_UP_STATUS		13
+#define TRAMP_STATUS		14
 
 #define NOPOWER				0
 #define SPEEDUP				1

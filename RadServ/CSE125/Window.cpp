@@ -349,286 +349,278 @@ int main(int argc, char *argv[])
 		}
 
 		scene->simulate(diff, (float)(1.0 / 100));
+		boost::array<mat4, 4> mp = scene->getPlayerMats();
+		boost::array<mat4, 4> mt = scene->getTowerMats();
+		boost::array<mat4, 4> ca = scene->getPlayerCams();
 
+		// Print out matrix contents
+		/*
+		cout << (m[0])[0][0] << (m[0])[0][1] << (m[0])[0][2] << (m[0])[0][3] << endl;
+		cout << (m[0])[1][0] << (m[0])[1][1] << (m[0])[1][2] << (m[0])[1][3] << endl;
+		cout << (m[0])[2][0] << (m[0])[2][1] << (m[0])[2][2] << (m[0])[2][3] << endl;
+		cout << (m[0])[3][0] << (m[0])[3][1] << (m[0])[3][2] << (m[0])[3][3] << endl;
+		*/
 
+		if (player1shoot == true){
+			p0Shots += 2;
+		}
+		if (player2shoot == true){
+			p1Shots += 2;
+		}
+		if (player3shoot == true){
+			p2Shots += 2;
+		}
+		if (player4shoot == true){
+			p3Shots += 2;
+		}
+
+		if (p0Shots > 0){
+			p0 = "0s";
+			p0Shots--;
+		}else{
+			p0 = "0S";
+		}
+
+		if (p1Shots > 0){
+			p1 = "1s";
+			p1Shots--;
+		}else{
+			p1 = "1S";
+		}
+
+		if (p2Shots > 0){
+			p2 = "2s";
+			p2Shots--;
+		}else{
+			p2 = "2S";
+		}
+
+		if (p3Shots > 0){
+			p3 = "3s";
+			p3Shots--;
+		}else{
+			p3 = "3S";
+		}
+
+		//SEND SHIT HERE by adding to the p0-p3 strings//
+
+		//sending if a player was damaged
+		if (scene->getPlayerDamaged(PLAYER0))
+			p0 += "d";
+		else
+			p0 += "D";
+		if (scene->getPlayerDamaged(PLAYER1))
+			p1 += "d";
+		else
+			p1 += "D";
+		if (scene->getPlayerDamaged(PLAYER2))
+			p2 += "d";
+		else
+			p2 += "D";
+		if (scene->getPlayerDamaged(PLAYER3))
+			p3 += "d";
+		else
+			p3 += "D";
+		//reset the playerDamaged flags
+		if (sendddddddddddedededed)
+		{
+			scene->setPlayerDamaged(PLAYER0, false);
+			scene->setPlayerDamaged(PLAYER1, false);
+			scene->setPlayerDamaged(PLAYER2, false);
+			scene->setPlayerDamaged(PLAYER3, false);
+		}
+
+		//sending if a player was killed
+		if (scene->getPlayerDead(PLAYER0))
+			p0 += "k";
+		else
+			p0 += "K";
+		if (scene->getPlayerDead(PLAYER1))
+			p1 += "k";
+		else
+			p1 += "K";
+		if (scene->getPlayerDead(PLAYER2))
+			p2 += "k";
+		else
+			p2 += "K";
+		if (scene->getPlayerDead(PLAYER3))
+			p3 += "k";
+		else
+			p3 += "K";
+
+		p0 += int_to_string(p1ShotID, 3);
+		p1 += int_to_string(p2ShotID, 3);
+		p2 += int_to_string(p3ShotID, 3);
+		p3 += int_to_string(p4ShotID, 3);
 
 		if (sendddddddddddedededed)
 		{
-			boost::array<mat4, 4> mp = scene->getPlayerMats();
-			boost::array<mat4, 4> mt = scene->getTowerMats();
-			boost::array<mat4, 4> ca = scene->getPlayerCams();
+			scene->setPlayerDead(0, false);
+			scene->setPlayerDead(1, false);
+			scene->setPlayerDead(2, false);
+			scene->setPlayerDead(3, false);
+		}
 
-			// Print out matrix contents
-			/*
-			cout << (m[0])[0][0] << (m[0])[0][1] << (m[0])[0][2] << (m[0])[0][3] << endl;
-			cout << (m[0])[1][0] << (m[0])[1][1] << (m[0])[1][2] << (m[0])[1][3] << endl;
-			cout << (m[0])[2][0] << (m[0])[2][1] << (m[0])[2][2] << (m[0])[2][3] << endl;
-			cout << (m[0])[3][0] << (m[0])[3][1] << (m[0])[3][2] << (m[0])[3][3] << endl;
-			*/
+		p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerHealth(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerHealth(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerHealth(PLAYER3), 3);
 
-			if (player1shoot == true){
-				//p0Shots += 2;
-			}
-			if (player2shoot == true){
-				//p1Shots += 2;
-			}
-			if (player3shoot == true){
-				//p2Shots += 2;
-			}
-			if (player4shoot == true){
-				//p3Shots += 2;
-			}
+		p0 += int_to_string(scene->getPlayerKills(PLAYER0), 3);
+		p1 += int_to_string(scene->getPlayerKills(PLAYER1), 3);
+		p2 += int_to_string(scene->getPlayerKills(PLAYER2), 3);
+		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
 
-			if (p0Shots > 0){
-				p0 = "0s";
-				//p0Shots--;
-			}
-			else{
-				p0 = "0S";
-			}
+		// Powerup data encoding
+		// P0
+		if (scene->getPlayerPowerUp(PLAYER0)[0])
+		{
+			powerUpStatus[PLAYER0] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[1])
+		{
+			powerUpStatus[PLAYER0] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[2])
+		{
+			powerUpStatus[PLAYER0] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[3])
+		{
+			powerUpStatus[PLAYER0] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER0)[4])
+		{
+			powerUpStatus[PLAYER0] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER0] = NOPOWER;
+		}
+		// P1
+		if (scene->getPlayerPowerUp(PLAYER1)[0])
+		{
+			powerUpStatus[PLAYER1] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[1])
+		{
+			powerUpStatus[PLAYER1] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[2])
+		{
+			powerUpStatus[PLAYER1] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[3])
+		{
+			powerUpStatus[PLAYER1] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER1)[4])
+		{
+			powerUpStatus[PLAYER1] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER1] = NOPOWER;
+		}
+		// P2
+		if (scene->getPlayerPowerUp(PLAYER2)[0])
+		{
+			powerUpStatus[PLAYER2] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[1])
+		{
+			powerUpStatus[PLAYER2] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[2])
+		{
+			powerUpStatus[PLAYER2] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[3])
+		{
+			powerUpStatus[PLAYER2] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER2)[4])
+		{
+			powerUpStatus[PLAYER2] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER2] = NOPOWER;
+		}
+		// P3
+		if (scene->getPlayerPowerUp(PLAYER3)[0])
+		{
+			powerUpStatus[PLAYER3] = SPEEDUP;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[1])
+		{
+			powerUpStatus[PLAYER3] = DOUBLEDAMAGE;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[2])
+		{
+			powerUpStatus[PLAYER3] = HEALTHBOOST;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[3])
+		{
+			powerUpStatus[PLAYER3] = FASTERSHOOT;
+		}
+		else if (scene->getPlayerPowerUp(PLAYER3)[4])
+		{
+			powerUpStatus[PLAYER3] = FARTHERSHOOT;
+		}
+		else
+		{
+			powerUpStatus[PLAYER3] = NOPOWER;
+		}
 
-			if (p1Shots > 0){
-				p1 = "1s";
-				//p1Shots--;
-			}
-			else{
-				p1 = "1S";
-			}
+		p0 += int_to_string(powerUpStatus[PLAYER0], 1);
+		p1 += int_to_string(powerUpStatus[PLAYER1], 1);
+		p2 += int_to_string(powerUpStatus[PLAYER2], 1);
+		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
 
-			if (p2Shots > 0){
-				p2 = "2s";
-				//p2Shots--;
-			}
-			else{
-				p2 = "2S";
-			}
-
-			if (p3Shots > 0){
-				p3 = "3s";
-				//p3Shots--;
-			}
-			else{
-				p3 = "3S";
-			}
-
-			//SEND SHIT HERE by adding to the p0-p3 strings//
-
-			//sending if a player was damaged
-			if (scene->getPlayerDamaged(PLAYER0))
-				p0 += "d";
-			else
-				p0 += "D";
-			if (scene->getPlayerDamaged(PLAYER1))
-				p1 += "d";
-			else
-				p1 += "D";
-			if (scene->getPlayerDamaged(PLAYER2))
-				p2 += "d";
-			else
-				p2 += "D";
-			if (scene->getPlayerDamaged(PLAYER3))
-				p3 += "d";
-			else
-				p3 += "D";
-			//reset the playerDamaged flags
-			if (sendddddddddddedededed)
-			{
-				scene->setPlayerDamaged(PLAYER0, false);
-				scene->setPlayerDamaged(PLAYER1, false);
-				scene->setPlayerDamaged(PLAYER2, false);
-				scene->setPlayerDamaged(PLAYER3, false);
-			}
-
-			//sending if a player was killed
-			if (scene->getPlayerDead(PLAYER0))
-				p0 += "k";
-			else
-				p0 += "K";
-			if (scene->getPlayerDead(PLAYER1))
-				p1 += "k";
-			else
-				p1 += "K";
-			if (scene->getPlayerDead(PLAYER2))
-				p2 += "k";
-			else
-				p2 += "K";
-			if (scene->getPlayerDead(PLAYER3))
-				p3 += "k";
-			else
-				p3 += "K";
-
-			p0 += int_to_string(p1ShotID, 3);
-			p1 += int_to_string(p2ShotID, 3);
-			p2 += int_to_string(p3ShotID, 3);
-			p3 += int_to_string(p4ShotID, 3);
-
-			if (sendddddddddddedededed)
-			{
-				scene->setPlayerDead(0, false);
-				scene->setPlayerDead(1, false);
-				scene->setPlayerDead(2, false);
-				scene->setPlayerDead(3, false);
-			}
-
-			p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);
-			p1 += int_to_string(scene->getPlayerHealth(PLAYER1), 3);
-			p2 += int_to_string(scene->getPlayerHealth(PLAYER2), 3);
-			p3 += int_to_string(scene->getPlayerHealth(PLAYER3), 3);
-
-			p0 += int_to_string(scene->getPlayerKills(PLAYER0), 3);
-			p1 += int_to_string(scene->getPlayerKills(PLAYER1), 3);
-			p2 += int_to_string(scene->getPlayerKills(PLAYER2), 3);
-			p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
-
-			// Powerup data encoding
-			// P0
-			if (scene->getPlayerPowerUp(PLAYER0)[0])
-			{
-				powerUpStatus[PLAYER0] = SPEEDUP;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER0)[1])
-			{
-				powerUpStatus[PLAYER0] = DOUBLEDAMAGE;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER0)[2])
-			{
-				powerUpStatus[PLAYER0] = HEALTHBOOST;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER0)[3])
-			{
-				powerUpStatus[PLAYER0] = FASTERSHOOT;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER0)[4])
-			{
-				powerUpStatus[PLAYER0] = FARTHERSHOOT;
-			}
-			else
-			{
-				powerUpStatus[PLAYER0] = NOPOWER;
-			}
-			// P1
-			if (scene->getPlayerPowerUp(PLAYER1)[0])
-			{
-				powerUpStatus[PLAYER1] = SPEEDUP;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER1)[1])
-			{
-				powerUpStatus[PLAYER1] = DOUBLEDAMAGE;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER1)[2])
-			{
-				powerUpStatus[PLAYER1] = HEALTHBOOST;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER1)[3])
-			{
-				powerUpStatus[PLAYER1] = FASTERSHOOT;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER1)[4])
-			{
-				powerUpStatus[PLAYER1] = FARTHERSHOOT;
-			}
-			else
-			{
-				powerUpStatus[PLAYER1] = NOPOWER;
-			}
-			// P2
-			if (scene->getPlayerPowerUp(PLAYER2)[0])
-			{
-				powerUpStatus[PLAYER2] = SPEEDUP;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER2)[1])
-			{
-				powerUpStatus[PLAYER2] = DOUBLEDAMAGE;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER2)[2])
-			{
-				powerUpStatus[PLAYER2] = HEALTHBOOST;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER2)[3])
-			{
-				powerUpStatus[PLAYER2] = FASTERSHOOT;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER2)[4])
-			{
-				powerUpStatus[PLAYER2] = FARTHERSHOOT;
-			}
-			else
-			{
-				powerUpStatus[PLAYER2] = NOPOWER;
-			}
-			// P3
-			if (scene->getPlayerPowerUp(PLAYER3)[0])
-			{
-				powerUpStatus[PLAYER3] = SPEEDUP;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER3)[1])
-			{
-				powerUpStatus[PLAYER3] = DOUBLEDAMAGE;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER3)[2])
-			{
-				powerUpStatus[PLAYER3] = HEALTHBOOST;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER3)[3])
-			{
-				powerUpStatus[PLAYER3] = FASTERSHOOT;
-			}
-			else if (scene->getPlayerPowerUp(PLAYER3)[4])
-			{
-				powerUpStatus[PLAYER3] = FARTHERSHOOT;
-			}
-			else
-			{
-				powerUpStatus[PLAYER3] = NOPOWER;
-			}
-
-			p0 += int_to_string(powerUpStatus[PLAYER0], 1);
-			p1 += int_to_string(powerUpStatus[PLAYER1], 1);
-			p2 += int_to_string(powerUpStatus[PLAYER2], 1);
-			p3 += int_to_string(powerUpStatus[PLAYER3], 1);
-
-			//Trampoline status
+		//Trampoline status
+		
 
 
 
-
-
-			//despawn player projectile list
-			string ppdl_str;
+		//despawn player projectile list
+		string ppdl_str;
+		if (sendddddddddddedededed){
 			vector<int> ppdl = scene->getPlayerProjectileDespawnList();
 			scene->clearPlayerProjectileDespawnList();
 			ppdl_str = "";
 			for (uint i = 0; i < ppdl.size(); i++){
 				ppdl_str += int_to_string(ppdl[i], 3);
 			}
+		}
 
 
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER1] = std::make_pair(p1.c_str(), mp[PLAYER1]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER2] = std::make_pair(p2.c_str(), mp[PLAYER2]);
+		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER3] = std::make_pair(p3.c_str(), mp[PLAYER3]);
 
-			(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);
-			(*sendVec)[PLAYER_MAT_BEGIN + PLAYER1] = std::make_pair(p1.c_str(), mp[PLAYER1]);
-			(*sendVec)[PLAYER_MAT_BEGIN + PLAYER2] = std::make_pair(p2.c_str(), mp[PLAYER2]);
-			(*sendVec)[PLAYER_MAT_BEGIN + PLAYER3] = std::make_pair(p3.c_str(), mp[PLAYER3]);
+		(*sendVec)[TOWER_MAT_BEGIN + 0] = std::make_pair("t0", mt[0]);
+		(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair("t1", mt[1]);
+		(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair("t2", mt[2]);
+		(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair("t3", mt[3]);
 
-			(*sendVec)[TOWER_MAT_BEGIN + 0] = std::make_pair("t0", mt[0]);
-			(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair("t1", mt[1]);
-			(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair("t2", mt[2]);
-			(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair("t3", mt[3]);
+		(*sendVec)[PPDL_MAT] = std::make_pair(ppdl_str, mat4(1.0));
 
-			(*sendVec)[PPDL_MAT] = std::make_pair(ppdl_str, mat4(1.0));
+		
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER0] = std::make_pair("c0", ca[PLAYER0]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER1] = std::make_pair("c1", ca[PLAYER1]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
+		(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
+		
+		//std::cout << gs.getPosString(sendVec) << std::endl;
+		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
+		//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
+		//std::cout << "pair 2: " << ((*sendVec)[2].first.c_str()) << std::endl;
+		//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
+		//server->send(*sendVec);
 
-
-			(*sendVec)[CAM_MAT_BEGIN + PLAYER0] = std::make_pair("c0", ca[PLAYER0]);
-			(*sendVec)[CAM_MAT_BEGIN + PLAYER1] = std::make_pair("c1", ca[PLAYER1]);
-			(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
-			(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
-
-			//std::cout << gs.getPosString(sendVec) << std::endl;
-			//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
-			//std::cout << "pair 1: " << ((*sendVec)[1].first.c_str()) << std::endl;
-			//std::cout << "pair 2: " << ((*sendVec)[2].first.c_str()) << std::endl;
-			//std::cout << "pair 3: " << ((*sendVec)[3].first.c_str()) << std::endl;
-			//server->send(*sendVec);
-
+		if (sendddddddddddedededed){
 			str = gs.getPosString(sendVec);
 
 			server->send(str + '\n');

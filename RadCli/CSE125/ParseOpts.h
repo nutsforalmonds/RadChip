@@ -144,6 +144,18 @@ public:
 		return atoi(pUp.c_str());
 	}
 
+	bool getTramp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		if ((*vec)[pid].first.c_str()[TRAMP_STATUS] == 't')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	// Parameters are the pointer to the recvVec vector and the desired player ID
 	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{

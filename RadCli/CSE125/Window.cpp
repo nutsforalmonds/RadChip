@@ -1351,6 +1351,9 @@ void server_update(int value){
 		// check consts.h for int that corresponds to powerup
 		parseOpts->getPPowerUp(recvVec, PLAYER0);
 
+		if (parseOpts->getTramp(recvVec, PLAYER0))
+			std::cout << "Player bounced" << std::endl;
+
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
 		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);

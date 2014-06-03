@@ -330,6 +330,7 @@ public:
 		float Rewind[3];
 		float minRewind = 999;
 		int minID = 0;
+		obj1->setTramp(false);
 		vec3 v1 = vec3(obj1->getModelM()*vec4(obj1->getVelocity(), 0.0));
 		vec3 v2 = vec3(obj2->getModelM()*vec4(obj2->getVelocity(), 0.0));
 		vec3 vDiff = v1 - v2;
@@ -378,9 +379,11 @@ public:
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
 			obj1->setTramp(true);
+			std::cout << "trampoline bounce" << std::endl;
 		}
 		else
 		{
+			std::cout << "no bounce" << std::endl;
 			obj1->setTramp(false);
 		}
 	}
