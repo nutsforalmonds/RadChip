@@ -338,12 +338,12 @@ public:
 						{
 							if (!(player[i]->getPowerUp())[0])
 							{
-								player[i]->getBoots()->setMoveSpeed(6);
+								player[i]->getBoots()->setMoveSpeed(4);
 								player[i]->setPowerUp(j, 1);
 							}
 							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
 						}
-						//MS boost , uses index 1
+						//DMG boost , uses index 1
 						else if ( j == 1)
 						{
 							if (!(player[i]->getPowerUp())[1])
