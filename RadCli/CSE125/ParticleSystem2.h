@@ -199,6 +199,7 @@ public:
 		if (current_loop < loop_count || loopInf){
 
 			updateTime();
+			updateSprite();
 
 			shader->setUniform(uniformLoc[0], View);
 			shader->setUniform(uniformLoc[1], Projection);
@@ -241,6 +242,7 @@ public:
 		if (current_loop < loop_count || loopInf){
 
 			updateTime();
+			updateSprite();
 
 			shader->setUniform(uniformLoc[0], view);
 			shader->setUniform(uniformLoc[1], projection);
@@ -390,6 +392,37 @@ public:
 	void setTexNumRow(int rn){ num_row = rn; }
 	int getTexNumRow(){ return num_row; }
 
+	void setupSprite(){
+		num_Sprites = num_col*num_row;
+	}
+
+	void updateSprite(){
+		float total_time = time_Max - time_Min;
+		float sprite_Time = total_time / num_Sprites;
+		float temp = sprite_Time;
+		int index = 0;
+
+		for (;awesome_time > temp;){
+			temp += sprite_Time;
+			index++;
+			
+			if (col < num_col){
+				col++;
+			}
+			else{
+				col = 0;
+
+				if (row < num_row){
+					row++;
+				}
+				else{
+					row = 0;
+				}
+			}
+		}
+		
+	}
+
 private:
 	void generate(){
 
@@ -444,4 +477,7 @@ private:
 	vec2 gravity;
 	float life;
 	//float time;
+
+	int num_Sprites;
+
 };

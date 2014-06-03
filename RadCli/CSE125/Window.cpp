@@ -3202,16 +3202,22 @@ void initialize(int argc, char *argv[])
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	particle8->setFog(emptyFog);
 
-	testSystem = new ParticleSystem2();
+	testSystem = new ParticleSystem2(0.5, 0.1,0.1,8,0.25, 0.0, 360.0, 0.0, 180.0, 10.0);
 	testSystem->setShader(sdrCtl.getShader("pe_system_anim"));
 	testSystem->setType("Particle_System");
 	testSystem->setName("Particle_Test");
 	testSystem->setLoopInf(true);
 	testSystem->setTexture(GL_TEXTURE_2D, "img/sprite_sheets/explosion.png", "PNG");
+	testSystem->setTime_Step(0.001);
+	testSystem->setTime_Max(100.0);
+	testSystem->setTime_Min(0.0);
+	testSystem->setTexRow(0);
+	testSystem->setTexCol(0);
 	testSystem->setTexNumCol(5);
 	testSystem->setTexNumRow(4);
-	testSystem->setTexRow(2);
-	testSystem->setTexCol(2);
+	testSystem->setupSprite();
+	testSystem->setBlastRadius(10.0);
+	testSystem->setExplosionVelocity(0.2);
 	testSystem->setFog(fog);
 	testSystem->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
 
