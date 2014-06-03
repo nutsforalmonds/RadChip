@@ -247,6 +247,10 @@ int main(int argc, char *argv[])
 	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+
 	
 	//Player Cam Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -355,6 +359,7 @@ int main(int argc, char *argv[])
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
 		boost::array<mat4, 4> ca = scene->getPlayerCams();
+		boost::array<mat4, 4> ep = scene->getElevatorMats();
 
 		// Print out matrix contents
 		/*
@@ -635,6 +640,10 @@ int main(int argc, char *argv[])
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER1] = std::make_pair("c1", ca[PLAYER1]);
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
+
+		(*sendVec)[PLATFORM_BEGIN] = std::make_pair("e0", ep[0]);
+		(*sendVec)[PLATFORM_BEGIN + 1] = std::make_pair("e1", ep[1]);
+
 		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;

@@ -13,6 +13,8 @@
 #include "billboard_list.h"
 #include "Trampoline.h"
 #include "Tower.h"
+#include "Elevator.h"
+#include "Teleporter.h"
 using namespace std;
 
 
@@ -130,6 +132,7 @@ public:
 			rechargeJump();
 			respawnPlayer();
 			removePowerUp();
+			moveElevators();
 		}
 		resolvePlayerTransition(t);
 		resolveProjectileTransition(t);
@@ -144,6 +147,41 @@ public:
 		rechargeJump();
 		respawnPlayer();
 		removePowerUp();
+		moveElevators();
+	}
+
+	void moveElevators(){
+		if (counter == 1000){
+			counter3 = -counter3;
+			counter = 0;
+		}
+		for (int i = 0; i < elevator.size(); ++i){
+			if (elevator[i]->getDirection() == 0){
+				elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+				vector<Object*> elplayers = elevator[i]->getPlayers();
+				for (int j = 0; j < elplayers.size(); ++j)
+					elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+			}
+			else {
+				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
+				vector<Object*> elplayers = elevator[i]->getPlayers();
+				for (int j = 0; j < elplayers.size(); ++j)
+					elplayers[j]->preTrans(glm::translate(vec3(0, counter3, 0)));
+				/*
+				ofstream ofile;
+				ofile.open("debug.txt", ios::app);
+
+				for (int i = 0; i < 4; ++i)
+				for (int j = 0; j < 4; ++j)
+				ofile << elevator[1]->getModelM()[i][j] << " ";
+
+				ofile << endl;
+				ofile.close();*/
+
+			}
+			elevator[i]->removeAll();
+		}
+		counter++;
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -399,6 +437,13 @@ public:
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
 			playerOnTramp[obj1->getPlayerID()] = true;
 		}
+		if (!strcmp(obj2->getType().c_str(), "Teleporter") && onGround1){
+			obj1->preTrans(((Teleporter*)obj2)->getEndpoint());
+		}
+		if (!strcmp(obj2->getType().c_str(), "Elevator") && onGround1){
+			((Elevator*)obj2)->addPlayer(obj1);
+			obj1->setOnElevator(true);
+		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
 	void addTower(Tower* t){ tower.push_back(t); }
@@ -452,7 +497,14 @@ public:
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
-	void jump(int playerID){ getPlayerObj(playerID)->jump(); }
+	void jump(int playerID){
+		if (getPlayerObj(playerID)->getOnElevator()){
+			getPlayerObj(playerID)->preTrans(glm::translate(vec3(0, counter3, 0)));
+			getPlayerObj(playerID)->setOnElevator(false);
+		}
+		else
+			getPlayerObj(playerID)->jump();
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
@@ -952,6 +1004,14 @@ public:
 		return c;
 	}
 
+	boost::array<mat4, 4> getElevatorMats(){
+		boost::array<mat4, 4> c;
+		for (uint i = 0; i < elevator.size(); i++){
+			c[i] = elevator[i]->getModelM();
+		}
+		return c;
+	}
+
 	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
@@ -1198,6 +1258,40 @@ public:
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
+		//teleporter
+		Teleporter* tele_01 = new Teleporter();
+		//platform_01->setSpeed(5);
+		tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tele_01->setEndpoint(glm::translate(vec3(0, 50.0, 0)));
+		tele_01->setType("Teleporter");
+		tele_01->setName("Test Teleporter");
+		addStationary(tele_01);
+
+		//elevator
+		Elevator* ele_01 = new Elevator();
+		//platform_01->setSpeed(5);
+		ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+		ele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_01->setType("Elevator");
+		ele_01->setName("Test Elevator");
+		ele_01->setDirection(0);
+		addStationary(ele_01);
+		elevator.push_back(ele_01);
+
+		//elevator
+		Elevator* ele_02 = new Elevator();
+		//platform_01->setSpeed(5);
+		ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
+		ele_02->setAABB(AABB(vec3(-20.0, -0.5, -20.0), vec3(20.0, .5, 20.0)));
+		ele_02->setDirection(1);
+		ele_02->setType("Elevator");
+		ele_02->setName("Test Elevator");
+		addStationary(ele_02);
+		elevator.push_back(ele_02);
+
+		counter2 = 0;
+		counter3 = 0.1;
 
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
@@ -1251,7 +1345,10 @@ public:
 	}
 
 protected:
+	int counter2;
+	float counter3;
 	vector<Object*> stationary;
+	vector<Elevator*> elevator;
 	vector<Object*> player;
 	vector<Object*> respawn;
 	vector<Tower*> tower;

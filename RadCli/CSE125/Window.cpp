@@ -113,6 +113,7 @@ Sound* sound_3d_death;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
+std::vector<Object*> elevator_list;
 std::vector<Object*> player_list;
 std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
@@ -1375,6 +1376,9 @@ void server_update(int value){
 		tower_list[1]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 1].second);
 		tower_list[2]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 2].second);
 		tower_list[3]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 3].second);
+
+		elevator_list[0]->setModelM((*recvVec)[PLAT_MAT_BEGIN].second);
+		elevator_list[1]->setModelM((*recvVec)[PLAT_MAT_END].second);
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
@@ -3028,7 +3032,55 @@ void initialize(int argc, char *argv[])
 	tramp_01->setName("Test Trampoline");
 	stationary_list.push_back(tramp_01);
 
+	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tele_01->setKd(vec3(1.0, 1.0, 1.0));
+	tele_01->setKa(vec3(1.0, 1.0, 1.0));
+	tele_01->setKs(vec3(1.0, 1.0, 1.0));
+	tele_01->setShininess(100);
+	tele_01->setFog(fog);
+	tele_01->setReflectFactor(vec2(0.2, 0.5));
+	tele_01->setEta(0.5);
+	tele_01->setCubeMapUnit(3);
+	tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tele_01->setShadowTex(shadow_map_id);
+	tele_01->setType("Teleporter");
+	tele_01->setName("Test Teleporter");
+	stationary_list.push_back(tele_01);
 
+	Cube* ele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	ele_01->setKd(vec3(1.0, 1.0, 1.0));
+	ele_01->setKa(vec3(1.0, 1.0, 1.0));
+	ele_01->setKs(vec3(1.0, 1.0, 1.0));
+	ele_01->setShininess(100);
+	ele_01->setFog(fog);
+	ele_01->setReflectFactor(vec2(0.2, 0.5));
+	ele_01->setEta(0.5);
+	ele_01->setCubeMapUnit(3);
+	ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+	ele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	ele_01->setShadowTex(shadow_map_id);
+	ele_01->setType("Elevator");
+	ele_01->setName("Test Elevator");
+	stationary_list.push_back(ele_01);
+	elevator_list.push_back(ele_01);
+
+	Cube* ele_02 = new Cube(-20.0, 20.0, -0.5, 0.5, -20.0, 20.0);
+	ele_02->setKd(vec3(1.0, 1.0, 1.0));
+	ele_02->setKa(vec3(1.0, 1.0, 1.0));
+	ele_02->setKs(vec3(1.0, 1.0, 1.0));
+	ele_02->setShininess(100);
+	ele_02->setFog(fog);
+	ele_02->setReflectFactor(vec2(0.2, 0.5));
+	ele_02->setEta(0.5);
+	ele_02->setCubeMapUnit(3);
+	ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
+	ele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	ele_02->setShadowTex(shadow_map_id);
+	ele_02->setType("Elevator");
+	ele_02->setName("Test Elevator");
+	stationary_list.push_back(ele_02);
+	elevator_list.push_back(ele_02);
 	/*
 	float temp_x = randomFloatBetween(0.0, 1.0);
 	float temp_y = randomFloatBetween(0.0, 1.0);

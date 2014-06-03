@@ -180,6 +180,12 @@
     <ClInclude Include="Tower.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Elevator.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Teleporter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

@@ -90,6 +90,7 @@
     <ClInclude Include="ConfigSettings.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="Elevator.h" />
     <ClInclude Include="gameState.h" />
     <ClInclude Include="glslprogram.h" />
     <ClInclude Include="glutils.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Structures.h" />
+    <ClInclude Include="Teleporter.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureScreen.h" />
     <ClInclude Include="Tower.h" />

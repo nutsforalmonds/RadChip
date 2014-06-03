@@ -18,6 +18,7 @@ class Object
 {
 public:
 	Object(void){
+		onElevator = false;
 		velocity = vec3(0.0);
 		modelM = mat4(1.0);
 		Rotation = mat4(1.0);
@@ -36,6 +37,7 @@ public:
 		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
 	}
 	Object(string n, string t){
+		onElevator = false;
 		name = n;
 		type = t;
 		velocity = vec3(0.0);
@@ -193,8 +195,15 @@ public:
 
 	int * getPowerUpDuration() { return powerUpDuration; }
 	void setPowerUpDuration(int i, int val) { powerUpDuration[i] = val; }
+	bool getOnElevator(){
+		return onElevator;
+	}
+	void setOnElevator(bool b){
+		onElevator = b;
+	}
 
 protected:
+	bool onElevator;
 	mat4 modelM;
 	mat4 Rotation;
 	string type;
