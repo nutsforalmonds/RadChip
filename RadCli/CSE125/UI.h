@@ -307,9 +307,9 @@ public:
 	int draw(){
 
 		//Status Bars
-		life_back->draw();
+		life_back->draw();	
 		life_front->draw();
-
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glDepthMask(GL_FALSE);
@@ -368,23 +368,31 @@ public:
 
 	int healthBar(float damage){
 
-		life_front->UI_Panel::~UI_Panel();
-
-		x2_life = x2_life - health_bar_size*damage;
-
-		if (x2_life <= x1_life)
+		if (x2_life != health_bar_size*damage + x1_life)
 		{
-			//x2_life = x1_life;
-			x2_life = 0.275f;
+
+			life_front->UI_Panel::~UI_Panel();
+
+			x2_life = health_bar_size*damage + x1_life;
+
+			if (x2_life <= x1_life)
+			{
+				//x2_life = x1_life;
+				x2_life = 0.275f;
+			}
+
+			life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
+			life_front->setColor(vec3(0.0, 1.0, 0.0));
+			life_front->setShader(sdrCtl.getShader("basic_2D"));
+			//life_front->loadColorTex("img/UI_TEST.png", "PNG");
+			life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
+
+			return 1;
 		}
-
-		life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-		life_front->setColor(vec3(0.0, 1.0, 0.0));
-		life_front->setShader(sdrCtl.getShader("basic_2D"));
-		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
-
-		return 0;
+		else
+		{
+			return 0;
+		}
 
 	}
 
@@ -482,7 +490,7 @@ public:
 
 
 	float getLess_Life(){ return less_life; }
-	void setLess_Life(float l){ less_life = l; }
+	void setLess_Life(float l){less_life = l;}
 
 	float getShots(){ return shots; }
 	void setShots(float s){ shots = s; }
@@ -545,7 +553,7 @@ private:
 	float less_life = 0;
 	float overheat = 0;
 	float shots = 0;
-	float damage_taken = (float)0.1; //set to default 1/7 of the life bar
+	float damage_taken;
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
 

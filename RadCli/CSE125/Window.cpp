@@ -254,6 +254,7 @@ int stateID = -1;
 int keyState = 0;
 int mouseState = 0;
 int projectile_counter = 0;
+float max_health = 7.0;
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
@@ -1377,7 +1378,7 @@ void server_update(int value){
 		}
 
 		// TODO link up health to UI
-		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
+		myUI->healthBar((float)parseOpts->getPHealth(recvVec, playerID)/max_health);
 
 		// TODO display kills somewhere
 		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, PLAYER0));
