@@ -599,7 +599,7 @@ int main(int argc, char *argv[])
 			scene->clearPlayerProjectileDespawnList();
 			ppdl_str = "";
 			for (uint i = 0; i < ppdl.size(); i++){
-				ppdl_str += int_to_string(ppdl[i], 3);
+				ppdl_str += int_to_string(ppdl[i], 4);
 			}
 
 

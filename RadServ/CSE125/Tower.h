@@ -27,8 +27,16 @@ public:
 		}
 		return false;
 	}
-
+	void setShootRange(float r){ shoot_range = r; }
+	float getShootRange(){ return shoot_range; }
+	void setShootSpeed(float s){ shoot_speed = s; }
+	float getShootSpeed(){ return shoot_speed; }
+	void setDamage(int d){ damage = d; }
+	int getDamage(){ return damage; }
 private:
 	LARGE_INTEGER last_shoot,freq;
 	float interval;
+	float shoot_range;
+	float shoot_speed;
+	int damage;
 };

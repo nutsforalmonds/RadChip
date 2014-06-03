@@ -17,12 +17,12 @@
 #define DAMAGEDBIT			2
 #define KILLEDBIT			3
 #define SHOOT_ID_BEGIN		4
-#define SHOOT_ID_END		6
-#define PHEALTH_BEGIN		7
-#define PHEALTH_END			9
-#define PKILLS_BEGIN		10
-#define PKILLS_END			12
-#define POWER_UP_STATUS		13
+#define SHOOT_ID_END		7
+#define PHEALTH_BEGIN		8
+#define PHEALTH_END			10
+#define PKILLS_BEGIN		11
+#define PKILLS_END			13
+#define POWER_UP_STATUS		14
 
 #define NOPOWER				0
 #define SPEEDUP				1
