@@ -10,7 +10,12 @@ struct FogInfo{
 };
 uniform FogInfo fog;
 
-uniform sampler2D texUnit;                                                        
+uniform sampler2D texUnit;            
+uniform float transparency;
+uniform int sample_x;
+uniform int sample_y;
+uniform float x_dist;
+uniform float y_dist;                                            
                                                                                     
 in vec2 TexCoord;
 in vec3 world_pos;
@@ -21,10 +26,17 @@ void main()
 {                                                                                   
     FragColor = texture2D(texUnit, TexCoord);                                     
     
+    //glow
+    for(int i=-sample_x;i<sample_x+1;i++){
+    	for(int j=-sample_y;j<sample_y+1;j++){
+    		FragColor += texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist))/((2*sample_x+1)*(2*sample_y+1));
+    	}
+    }
+
     //apply fog
 	float dist = distance(world_pos,world_cam);
 	float fog_factor = (dist-fog.minDist)/(fog.maxDist-fog.minDist);
 	fog_factor = pow(clamp(fog_factor,0.0,1.0),2.0)*fog.visibility;
 
-	FragColor = vec4(mix(FragColor.xyz,fog.color ,fog_factor),FragColor[3]);                                                              
+	FragColor = vec4(mix(FragColor.xyz,fog.color ,fog_factor),FragColor[3]*transparency);                                                              
 }

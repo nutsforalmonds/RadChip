@@ -64,6 +64,11 @@ public:
 		freq = other.freq;
 		type = other.type;
 		fog = other.fog;
+		transparency=other.transparency;
+		sample_x = other.sample_x;
+		sample_y = other.sample_y;
+		x_dist = other.x_dist;
+		y_dist = other.y_dist;
 		return *this;
 	}
 
@@ -94,6 +99,11 @@ public:
 		shader->setUniform(uniformLoc[14], fog->visibility);
 		shader->setUniform(uniformLoc[15], fog->maxHeight);
 		shader->setUniform(uniformLoc[16], fog->minHeight);
+		shader->setUniform(uniformLoc[17], transparency);
+		shader->setUniform(uniformLoc[18], sample_x);
+		shader->setUniform(uniformLoc[19], sample_y);
+		shader->setUniform(uniformLoc[20], x_dist);
+		shader->setUniform(uniformLoc[21], y_dist);
 		shader->use();
 		m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
@@ -121,6 +131,11 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("transparency"));
+		uniformLoc.push_back(shader->getUniformLoc("sample_x"));
+		uniformLoc.push_back(shader->getUniformLoc("sample_y"));
+		uniformLoc.push_back(shader->getUniformLoc("x_dist"));
+		uniformLoc.push_back(shader->getUniformLoc("y_dist"));
 	}
 
 	void Bind(){
@@ -171,6 +186,9 @@ public:
 	int getType(){ return type; }
 
 	void setFog(Fog& f){ fog = &f; }
+	void setTransparency(float t){ transparency = t; }
+	void setSampleCount(int x, int y){ sample_x = x; sample_y = y; }
+	void setSampleDist(float x, float y){ x_dist = x; y_dist = y; }
 
 private:
 	GLuint m_VB;
@@ -188,6 +206,10 @@ private:
 	LARGE_INTEGER current, freq;
 	int type;//0: one time 1: continuous
 	Fog* fog;
+	float transparency=1.0;
+	//glow
+	int sample_x=0, sample_y=0;
+	float x_dist = 0, y_dist = 0;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */

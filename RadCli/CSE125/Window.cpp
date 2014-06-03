@@ -530,11 +530,14 @@ void Window::idleCallback(void)
 			for (uint i = 0; i < lightning_pos.size(); i++){
 				//lightning
 				ParticleAnimated* new_lightning = new ParticleAnimated(*MOM.mother_of_lightning);
-				new_lightning->setModelM(glm::translate(vec3(lightning_pos[i][0], 70, lightning_pos[i][1])));
+				new_lightning->setModelM(glm::translate(vec3(lightning_pos[i][0], ground->getDispY(lightning_pos[i][0], lightning_pos[i][1]) + 84, lightning_pos[i][1])));
 				new_lightning->setType(0);
 				new_lightning->setWidth(10);
 				new_lightning->setHeight(200);
 				new_lightning->setDuration(0.5);
+				new_lightning->setTransparency(0.8);
+				new_lightning->setSampleCount(3, 3);
+				new_lightning->setSampleDist(0.001, 0.005);
 				LARGE_INTEGER time_lightning;
 				QueryPerformanceCounter(&time_lightning);
 				new_lightning->setStartTime(time_lightning);
@@ -544,8 +547,10 @@ void Window::idleCallback(void)
 				p_anim->setModelM(glm::translate(vec3(lightning_pos[i][0], ground->getDispY(lightning_pos[i][0], lightning_pos[i][1])+0.3, lightning_pos[i][1])));
 				p_anim->setType(0);
 				p_anim->setDuration(0.7);
-				p_anim->setWidth(3);
-				p_anim->setHeight(3);
+				p_anim->setWidth(10);
+				p_anim->setHeight(10);
+				p_anim->setSampleCount(3, 3);
+				p_anim->setSampleDist(0.005, 0.005);
 				LARGE_INTEGER time_p_anim;
 				QueryPerformanceCounter(&time_p_anim);
 				p_anim->setStartTime(time_p_anim);
@@ -2341,7 +2346,7 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_p_anim->setNumColumn(5);
 	MOM.mother_of_p_anim->setNumRow(4);
 	MOM.mother_of_p_anim->setDuration(1);
-	MOM.mother_of_p_anim->setFog(emptyFog);
+	MOM.mother_of_p_anim->setFog(fog);
 	MOM.mother_of_p_anim->Bind();
 
 	MOM.mother_of_lightning = new ParticleAnimated();
@@ -2357,13 +2362,13 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_lightning->setFog(fog);
 	MOM.mother_of_lightning->Bind();
 
-	ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
-	p_anim->setType(1);
-	LARGE_INTEGER time_p_anim;
-	QueryPerformanceCounter(&time_p_anim);
-	p_anim->setStartTime(time_p_anim);
-	panim_list.push_back(p_anim);
+	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
+	//p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	//p_anim->setType(1);
+	//LARGE_INTEGER time_p_anim;
+	//QueryPerformanceCounter(&time_p_anim);
+	//p_anim->setStartTime(time_p_anim);
+	//panim_list.push_back(p_anim);
 
 	AnimController monkeyAnimController;
 	monkeyAnimController.add(20 / 24.0, 5 / 24.0);//stand

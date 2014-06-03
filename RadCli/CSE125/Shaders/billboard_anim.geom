@@ -32,7 +32,7 @@ void main()
     vec3 toCamera = normalize(gCameraPos - Pos);                                    
     vec3 up = vec3(0.0, 1.0, 0.0);                                                  
     //vec3 right = cross(toCamera, up);            
-	vec3 right = cross(toCamera, up) * width;    	
+	vec3 right = normalize(cross(toCamera, up)) * width;    	
                                                                                     
     //Pos -= (right * 0.5);    
 	Pos -= right/2.0;   
