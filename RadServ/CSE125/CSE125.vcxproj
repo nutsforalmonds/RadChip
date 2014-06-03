@@ -118,6 +118,7 @@
     <ClInclude Include="Structures.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureScreen.h" />
+    <ClInclude Include="Tower.h" />
     <ClInclude Include="Trampoline.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="Weapon.h" />
