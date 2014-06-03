@@ -1253,7 +1253,6 @@ void server_update(int value){
 		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
 		for (int i = 0; i < platformDead.size(); i++)
 		{
-			cout << platformDead[i].second << endl;
 			if (platformDead[i].second)
 				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
 			else
