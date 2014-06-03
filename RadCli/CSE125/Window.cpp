@@ -113,6 +113,7 @@ Sound* sound_3d_death;
 Sound* sound_3d_death2;
 Sound* sound_3d_tramp;
 Sound* sound_3d_tele;
+Sound* sound_3d_pick;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
@@ -314,6 +315,14 @@ int Vibrate_Frame_Num = 0;
 
 float nextThunderTimeSec = 90.0;
 float currThunderTimeSec = 90.0;
+
+float nextPickupSound = 10.0;
+float currPickupSound = 0.0;
+
+int Player0_Powerup = 0;
+int Player1_Powerup = 0;
+int Player2_Powerup = 0;
+int Player3_Powerup = 0;
 
 FMOD_VECTOR player0_sound_vec_curr = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player1_sound_vec_curr = { 0.0, 0.0, 0.0 };
@@ -1425,20 +1434,32 @@ void server_update(int value){
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup
 		if (parseOpts->getPPowerUp(recvVec, PLAYER0)){
-			sound_3d_tele->setPosition(player0_sound_vec_lasterest);
-			sound_3d_tele->Play3D(View);
+			if (Player0_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER0)){
+				sound_3d_pick->setPosition(player0_sound_vec_lasterest);
+				sound_3d_pick->Play3D(View);
+				Player0_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER0);
+			}
 		}
 		if (parseOpts->getPPowerUp(recvVec, PLAYER1)){
-			sound_3d_tele->setPosition(player1_sound_vec_lasterest);
-			sound_3d_tele->Play3D(View);
+			if (Player1_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER1)){
+				sound_3d_pick->setPosition(player1_sound_vec_lasterest);
+				sound_3d_pick->Play3D(View);
+				Player1_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER1);
+			}
 		}
 		if (parseOpts->getPPowerUp(recvVec, PLAYER2)){
-			sound_3d_tele->setPosition(player2_sound_vec_lasterest);
-			sound_3d_tele->Play3D(View);
+			if (Player2_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER2)){
+				sound_3d_pick->setPosition(player2_sound_vec_lasterest);
+				sound_3d_pick->Play3D(View);
+				Player2_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER2);
+			}
 		}
 		if (parseOpts->getPPowerUp(recvVec, PLAYER3)){
-			sound_3d_tele->setPosition(player3_sound_vec_lasterest);
-			sound_3d_tele->Play3D(View);
+			if (Player3_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER3)){
+				sound_3d_pick->setPosition(player3_sound_vec_lasterest);
+				sound_3d_pick->Play3D(View);
+				Player3_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER3);
+			}
 		}
 
 		// TODO bounces arrive
@@ -1687,6 +1708,13 @@ int main(int argc, char *argv[])
   sound_3d_tele->setVelocity(vt);
   sound_3d_tele->setMinDistance(10.0f);
   sound_3d_tele->setMaxDistance(10000.0f);
+  
+  sound_3d_pick = new Sound(mySoundSystem, "Sound/pickup.mp3", true);
+  sound_3d_pick->setVolume(0.75);
+  sound_3d_pick->setPosition(pt);
+  sound_3d_pick->setVelocity(vt);
+  sound_3d_pick->setMinDistance(10.0f);
+  sound_3d_pick->setMaxDistance(10000.0f);
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
   posTestMusic->setLoopCount(-1);
