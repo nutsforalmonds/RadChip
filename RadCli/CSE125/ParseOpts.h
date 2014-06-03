@@ -9,13 +9,11 @@
 #include <glm/gtx/vector_angle.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
+#include "constants.h"
 
-#define SHOOTBIT 1
-#define DAMAGEDBIT 2
-#define KILLEDBIT 3
 
-#define PSPEEDINDEX 2
-#define PSPEEDLEN 3
+
+//#define PSPEEDINDEX 2
 
 using glm::mat4;
 
@@ -30,7 +28,7 @@ public:
 
 	}
 
-	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid, int& shootID)
 	{
 		for (i = 0; i < 3; i++)
 		{
@@ -40,31 +38,33 @@ public:
 
 		if ((*vec)[i].first.c_str()[SHOOTBIT] == 's')
 		{
+			std::string shoot_id = (*vec)[i].first.substr(SHOOT_ID_BEGIN,SHOOT_ID_END+1-SHOOT_ID_BEGIN);
+			shootID = atoi(shoot_id.c_str());
 			return true;
 		}
 		else
 		{
-			return false;
+			return false;                 
 		}
 	}
 
-	int getPSpeed(std::vector <std::pair<std::string, mat4>>* vec, int pid)
-	{
-		speed = "";
-		for (i = 0; i < 3; i++)
-		{
-			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
-				break;
-		}
+	//int getPSpeed(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	//{
+	//	speed = "";
+	//	for (i = 0; i < 3; i++)
+	//	{
+	//		if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+	//			break;
+	//	}
 
-		for (j = 0; j < PSPEEDLEN; j++)
-		{
-			speed += (*vec)[i].first.c_str()[PSPEEDINDEX + j];
-		}
+	//	for (j = 0; j < PSPEEDLEN; j++)
+	//	{
+	//		speed += (*vec)[i].first.c_str()[PSPEEDINDEX + j];
+	//	}
 
 
-		return atoi(speed.c_str());
-	}
+	//	return atoi(speed.c_str());
+	//}
 
 	bool getDamaged(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
@@ -102,6 +102,48 @@ public:
 		}
 	}
 
+	int getPHealth(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		health = "";
+		/*for (i = 0; i < 3; i++)
+		{
+			if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+				break;
+		}*/
+
+		for (j = PHEALTH_BEGIN; j < PHEALTH_END; j++)
+		{
+			health += (*vec)[pid].first.c_str()[PHEALTH_BEGIN + j];
+		}
+
+
+		return atoi(health.c_str());
+	}
+
+	int getPKills(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		kills = "";
+		/*for (i = 0; i < 3; i++)
+		{
+		if (atoi(&((*vec)[i].first.c_str())[0]) == pid)
+		break;
+		}*/
+
+		for (j = PKILLS_BEGIN; j < PKILLS_END; j++)
+		{
+			kills += (*vec)[pid].first.c_str()[PKILLS_BEGIN + j];
+		}
+
+		return atoi(kills.c_str());
+	}
+
+	int getPPowerUp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+			pUp = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
+
+		return atoi(pUp.c_str());
+	}
+
 	// Parameters are the pointer to the recvVec vector and the desired player ID
 	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
@@ -124,10 +166,19 @@ public:
 	}
 	}*/
 
+	std::vector<int> getPPDL(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::vector<int> result;
+		std::string s = (*vec)[PPDL_MAT].first;
+		for (int um = 0; um < s.length(); um += 3){
+			result.push_back(atoi(s.substr(um,3).c_str()));
+		}
+		return result;
+	}
+
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	int health;
+	std::string health, kills, speed, pUp;
 	int i, j;
-	std::string speed;
 };

@@ -90,6 +90,7 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConfigSettings.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CXBOXController.h" />
     <ClInclude Include="gameState.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="JSON_Parse.h" />
+    <ClInclude Include="LightningGenerator.h" />
     <ClInclude Include="MD5Animation.h" />
     <ClInclude Include="MD5Model.h" />
     <ClInclude Include="MD5ModelLoaderPCH.h" />
@@ -143,8 +145,6 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.frag" />
-    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.vert" />
     <None Include="Config.ini" />
     <None Include="ConfigTemplate.ini" />
     <None Include="Maps\Test1.json" />
@@ -169,6 +169,9 @@
     <None Include="Shaders\billboard.frag" />
     <None Include="Shaders\billboard.geom" />
     <None Include="Shaders\billboard.vert" />
+    <None Include="Shaders\billboard_anim.frag" />
+    <None Include="Shaders\billboard_anim.geom" />
+    <None Include="Shaders\billboard_anim.vert" />
     <None Include="Shaders\emitter.frag" />
     <None Include="Shaders\emitter.vert" />
     <None Include="Shaders\grid_ground.frag" />
@@ -177,8 +180,12 @@
     <None Include="Shaders\ground_tess.eval" />
     <None Include="Shaders\ground_tess.frag" />
     <None Include="Shaders\ground_tess.vert" />
+    <None Include="Shaders\halo.frag" />
+    <None Include="Shaders\halo.vert" />
     <None Include="Shaders\pe_system.frag" />
     <None Include="Shaders\pe_system.vert" />
+    <None Include="Shaders\pe_system_anim.frag" />
+    <None Include="Shaders\pe_system_anim.vert" />
     <None Include="Shaders\pe_torus.frag" />
     <None Include="Shaders\pe_torus.vert" />
     <None Include="Shaders\ps_update.frag" />

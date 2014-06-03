@@ -12,6 +12,7 @@
 #include "Ground.h"
 #include "billboard_list.h"
 #include "Trampoline.h"
+#include "Tower.h"
 using namespace std;
 
 
@@ -69,6 +70,30 @@ public:
 		return NULL;
 	}
 
+	int getPlayerHealth(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getHealth();
+	}
+
+	int getPlayerKills(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getKills();
+	}
+
+	bool * getPlayerPowerUp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getPowerUp();
+	}
+
+	bool getPlayerOnTramp(int playerID)
+	{
+		pPtr = getPlayerObj(playerID);
+		return pPtr->getTramp();
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -77,6 +102,7 @@ public:
 			resolveProjectileTransition(sub);
 			resolveTowerTransition(sub);
 		//	//octree here
+			towerProjectileAttack(sub);
 			collisionDetection();
 			collisionDetectionPlayer();
 			collisionDetectionProjectile();
@@ -90,6 +116,7 @@ public:
 		resolveProjectileTransition(t);
 		resolveTowerTransition(t);
 		////octree here
+		towerProjectileAttack(t);
 		collisionDetection();
 		collisionDetectionPlayer();
 		collisionDetectionProjectile();
@@ -350,10 +377,15 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
+			obj1->setTramp(true);
+		}
+		else
+		{
+			obj1->setTramp(false);
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
-	void addTower(Object* t){ tower.push_back(t); }
+	void addTower(Tower* t){ tower.push_back(t); }
 	void addStationary(Object* s){ stationary.push_back(s); }
 	void addProjectile(Projectile* p){ projectile.push_back(p); }
 	void setGravity(vec3& g){ gravity = g; }
@@ -522,6 +554,7 @@ public:
 					pv[1] = 1;
 					player[j]->preTrans(glm::translate(pv));
 					damagePlayer(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
 					i--;
@@ -552,6 +585,7 @@ public:
 					//pv[1] = 1;
 					//tower[j]->preTrans(glm::translate(pv));
 					damageTower(tower[j]->getPlayerID(), projectile[i]->getPlayerID());
+					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
 					i--;
@@ -684,7 +718,7 @@ public:
 	    }
 	  
 	}
-	void projectileAttack(int playerID, mat4 * cam)
+	void projectileAttack(int playerID, mat4 * cam, int shootID)
 	{
 		mat4 test = *cam; //cam->getCamM();
 		vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
@@ -724,8 +758,20 @@ public:
 		cubeT->setSpeed(50);
 		//cubeT->setHMove((holder[0] / 4));
 		cubeT->setVelocity(vec3(player1*vec4(vec3(holder)*((RangeWeapon *)playerHold->getWeapon())->getSpeed(),0.0)));// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+		cubeT->setShootID(shootID);
 		//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 		//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
+	}
+	void towerProjectileAttack(float t){
+		LARGE_INTEGER ct;
+		QueryPerformanceCounter(&ct);
+		for (uint i = 0; i < tower.size(); i++){
+			if (tower[i]->checkShoot(ct)){
+				//TODO: shoot
+
+				tower[i]->setLastShoot(ct);
+			}
+		}
 	}
 	void despawnProjectile()
 	{
@@ -827,40 +873,13 @@ public:
 		}
 		return m;
 	}
+	vector<int> getPlayerProjectileDespawnList(){
+		return despon_player_projectile_list;
+	}
+	void clearPlayerProjectileDespawnList(){
+		despon_player_projectile_list.clear();
+	}
 	void initialize(){
-
-
-		/*Cube* cube0 = new Cube();
-		cube0->setSpeed(5);
-		cube0->postTrans(glm::translate(vec3(0, 0.5, 7)));
-		cube0->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-		cube0->setType("Cube");
-		cube0->setName("Test cube0");
-		addPlayer(cube0);
-
-		Cube* cube1 = new Cube();
-		cube1->setSpeed(5);
-		cube1->postTrans(glm::translate(vec3(0, 0.5, 7)));
-		cube1->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-		cube1->setType("Cube");
-		cube1->setName("Test cube1");
-		addPlayer(cube1);
-
-		Cube* cube2 = new Cube();
-		cube2->setSpeed(5);
-		cube2->postTrans(glm::translate(vec3(0, 0.5, 7)));
-		cube2->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-		cube2->setType("Cube");
-		cube2->setName("Test cube2");
-		addPlayer(cube2);
-
-		Cube* cube3 = new Cube();
-		cube3->setSpeed(5);
-		cube3->postTrans(glm::translate(vec3(0, 0.5, 7)));
-		cube3->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
-		cube3->setType("Cube");
-		cube3->setName("Test cube3");
-		addPlayer(cube3);*/
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(PLAYER_SPEED);
@@ -911,9 +930,10 @@ public:
 		}
 
 		//triplet tower
-		MD5Model* tw0 = new MD5Model();
+		Tower* tw0 = new Tower();
 		tw0->postTrans(glm::translate(vec3(-30.0, 0.0, -30.0)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
+		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
 		tw0->setTeamID(1);
@@ -921,9 +941,10 @@ public:
 		addTower(tw0);
 
 		//triplet tower
-		MD5Model* tw1 = new MD5Model();
+		Tower* tw1 = new Tower();
 		tw1->postTrans(glm::translate(vec3(30.0, 0.0, -30.0)));
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
+		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
 		tw1->setTeamID(1);
@@ -931,9 +952,10 @@ public:
 		addTower(tw1);
 
 		//pctopus tower
-		MD5Model* tw2 = new MD5Model();
+		Tower* tw2 = new Tower();
 		tw2->postTrans(glm::translate(vec3(30.0, 0, 30.0)));
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
 		tw2->setTeamID(0);
@@ -941,9 +963,10 @@ public:
 		addTower(tw2);
 
 		//pctopus tower
-		MD5Model* tw3 = new MD5Model();
+		Tower* tw3 = new Tower();
 		tw3->postTrans(glm::translate(vec3(-30.0, 0, 30.0)));
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
 		tw3->setTeamID(0);
@@ -1114,7 +1137,7 @@ protected:
 	vector<Object*> stationary;
 	vector<Object*> player;
 	vector<Object*> respawn;
-	vector<Object*> tower;
+	vector<Tower*> tower;
 	vector<Object*> skillShot;
 	vector<Object*> virtualTower;
 	vector<Projectile*> projectile;
@@ -1125,7 +1148,11 @@ protected:
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
+	vector<bool> playerOnTramp;
 	int counter;
 	int projectile_counter;
+	vector<int> despon_player_projectile_list;
+
+	Object * pPtr;
 };
 

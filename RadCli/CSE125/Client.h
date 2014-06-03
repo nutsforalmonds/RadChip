@@ -60,7 +60,6 @@ public:
 		{
 			ret_str = strqueue.front();
 			strqueue.pop_front();
-			//std::cout << "pop" << std::endl;
 			return ret_str;
 		}
 		else
@@ -69,11 +68,7 @@ public:
 
 	void receive()
 	{
-		boost::asio::async_read_until(socket_,
-			b, "\n",
-			boost::bind(&tcp_client::handle_read, this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
+		
 	}
 
 	int pID()
@@ -98,6 +93,7 @@ private:
 	size_t bytes_;
 	std::string data;
 	std::deque<std::string> strqueue;
+	int i = 0;
 
 	void handle_connect(const boost::system::error_code& error)
 	{
@@ -139,15 +135,17 @@ private:
 	void handle_read(const boost::system::error_code& error,
 					 size_t bytes)
 	{
-		std::cout << "size of queue: " << strqueue.size() << std::endl;
+		//std::cout << "size of queue: " << strqueue.size() << std::endl;
 		if (!error)
 		{
 			std::istream response_strm(&b);
-			//response_strm >> data;
 			std::getline(response_strm, data);
 			strqueue.push_back(data);
-			//b.consume(bytes);
-			receive();
+			boost::asio::async_read_until(socket_,
+				b, "\n",
+				boost::bind(&tcp_client::handle_read, this,
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
 		}
 		else
 		{

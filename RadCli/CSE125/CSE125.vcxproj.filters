@@ -168,6 +168,12 @@
     <ClInclude Include="ParticleAnimated.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="LightningGenerator.h">
+    	<Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -304,16 +310,31 @@
     <None Include="Shaders\pe_system.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Dan%27s Desktop\Documents\GitHub\RadChip\RadCli\CSE125\Shaders\halo.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\pe_torus.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\pe_torus.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\billboard_anim.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\billboard_anim.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\billboard_anim.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\halo.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\pe_system_anim.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\pe_system_anim.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\halo.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

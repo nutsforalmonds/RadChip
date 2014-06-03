@@ -215,7 +215,7 @@ public:
 		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
 		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
-		life_frame = new UI_Panel(-0.3f, 0.3, -0.2f, 0.2f);
+		life_frame = new UI_Panel(-0.3f, 0.3f, -0.2f, 0.2f);
 		life_frame->setColor(vec3(1.0, 0.0, 0.0));
 		life_frame->setShader(sdrCtl.getShader("basic_2D"));
 		life_frame->loadColorTex("img/UI_elements/healthBAR_2", "PNG");
@@ -307,12 +307,6 @@ public:
 	int draw(){
 
 		//Status Bars
-		if (less_life)
-		{
-			healthBar(damage_taken);
-			less_life = 0;
-		}
-
 		life_back->draw();
 		life_front->draw();
 
@@ -415,9 +409,9 @@ public:
 
 				y2_heat = y2_heat + ((heat_bar_size) / 7.0); //# of shots
 
-				if (y2_heat >= 0.2)
+				if (y2_heat >= 0.2f)
 				{
-					y2_heat = 0.2;
+					y2_heat = 0.2f;
 					overheat = 1;
 				}
 
@@ -930,21 +924,14 @@ public:
 		respawn->setShader(sdrCtl.getShader("basic_2D"));
 		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
 		respawn->setTex(true);
-		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
+		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
 
 		selected_respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_respawn->setColor(vec3(1.0, 0.0, 0.0));
 		selected_respawn->setShader(sdrCtl.getShader("basic_2D"));
 		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
 		selected_respawn->setTex(true);
-		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
-
-		countdown = new UI_Panel(-0.15f, 0.15f, -0.15f, 0.15f);
-		countdown->setColor(vec3(1.0, 0.0, 0.0));
-		countdown->setShader(sdrCtl.getShader("basic_2D"));
-		countdown->loadColorTex("img/UI_elements/ten.png", "PNG");
-		countdown->setTex(true);
-		countdown->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1, -1.0f)));
+		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1, -1.0f)));
 
 		frame = new UI_Panel(-0.5f, 0.5f, -0.5, 0.5);
 		frame->setColor(vec3(1.0, 0.0, 0.0));
@@ -957,11 +944,23 @@ public:
 	~DeathScreen(){
 		respawn->           ~UI_Panel();
 		selected_respawn->  ~UI_Panel();
-		countdown->         ~UI_Panel();
 		frame->             ~UI_Panel();
 	}
 
 	int draw(){
+
+
+		unsigned char one[] = "1";
+		unsigned char two[] = "2";
+		unsigned char three[] = "3";
+		unsigned char four[] = "4";
+		unsigned char five[] = "5";
+		unsigned char six[] = "6";
+		unsigned char seven[] = "7";
+		unsigned char eight[] = "8";
+		unsigned char nine[] = "9";
+		unsigned char ready[] = "NOW";
+		unsigned char s[] = "RESPAWN READY IN:";
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -977,8 +976,45 @@ public:
 			selected_respawn->draw();
 		}
 
-		countdown->draw();
+		i = (clock() - since_death) / (float)CLOCKS_PER_SEC;
 
+		RenderString((Window::width / 2) - 124, 5* Window::height / 8, GLUT_BITMAP_TIMES_ROMAN_24, s, vec3(1.0f, 1.0f, 1.0f));
+			switch (i){
+			case 9:
+				RenderString((Window::width / 2) - 24, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, ready, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 8:
+				RenderString(Window::width / 2, 9*Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, one, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 7:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, two, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 6:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, three, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 5:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, four, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 4:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, five, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 3:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, six, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 2:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, seven, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 1:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, eight, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			case 0:
+				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, nine, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			default:
+				RenderString(Window::width / 2 - 24, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, ready, vec3(1.0f, 1.0f, 1.0f));
+				break;
+			}
+		
 		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
@@ -988,7 +1024,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.53) && (y < 0.64) && i > 8){
 				drawRespawnHighlight = true;
 				return 1;
 			}
@@ -1010,7 +1046,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.53) && (y < 0.64) && i > 8){
 				return 1;
 			}
 			else{
@@ -1024,12 +1060,17 @@ public:
 	
 	}
 
+	void setDeathClock(float time){ since_death = time;}
+
 private:
 	UI_Panel * frame;
 	UI_Panel * respawn;
 	UI_Panel * selected_respawn;
-	UI_Panel * countdown;
+
+	int i;
+	float since_death;
 	bool drawRespawnHighlight = false;
+	
 };
 
 class Logo

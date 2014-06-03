@@ -24,6 +24,7 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, 72*sizeof(float), &vertex_positions, GL_STATIC_DRAW, 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.addAttrib(GL_ARRAY_BUFFER, 72*sizeof(float), &vertex_normals, GL_STATIC_DRAW, 1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.setDrawMode(GL_TRIANGLES, 36, GL_UNSIGNED_INT, &triangle_indices);
+		transparency = 1.0;
 	}
 	Cube(float negx,float posx,float negy,float posy,float negz,float posz){
 		generate(negx,posx,negy,posy,negz,posz);
@@ -33,6 +34,7 @@ public:
 		vao.addAttrib(GL_ARRAY_BUFFER, 72*sizeof(float), &vertex_positions, GL_STATIC_DRAW, 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.addAttrib(GL_ARRAY_BUFFER, 72*sizeof(float), &vertex_normals, GL_STATIC_DRAW, 1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 		vao.setDrawMode(GL_TRIANGLES, 36, GL_UNSIGNED_INT, &triangle_indices);
+		transparency = 1.0;
 	}
 	~Cube(void){}
 	void draw(){
@@ -58,6 +60,7 @@ public:
 		shader->setUniform(uniformLoc[19], fog->visibility);
 		shader->setUniform(uniformLoc[20], fog->maxHeight);
 		shader->setUniform(uniformLoc[21], fog->minHeight);
+		shader->setUniform(uniformLoc[22], transparency);
 		shader->use();
 		vao.draw();
 		glUseProgram(0);
@@ -85,6 +88,7 @@ public:
 		shader->setUniform(uniformLoc[19], fog->visibility);
 		shader->setUniform(uniformLoc[20], fog->maxHeight);
 		shader->setUniform(uniformLoc[21], fog->minHeight);
+		shader->setUniform(uniformLoc[22], transparency);
 		shader->use();
 		vao.draw();
 		glUseProgram(0);
@@ -113,6 +117,7 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("fog.visibility"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.maxHeight"));
 		uniformLoc.push_back(shader->getUniformLoc("fog.minHeight"));
+		uniformLoc.push_back(shader->getUniformLoc("transparency"));
 	}
 	void setKd(vec3 v){ material.Kd = v; }
 	vec3 getKd(){ return material.Kd; }
@@ -129,6 +134,7 @@ public:
 	void setCubeMapUnit(int u){ CubeMapUnit = u; }
 	int getCubeMapUnit(){ return CubeMapUnit; }
 	void setColor(vec3 c){ color = c; }
+	void setTransparency(float t){ transparency = t; }
 
 	void physicsSimulation(float time, float substep){
 		if ((modelM*vec4(0, -0.5, 0, 1))[1] == 0.0 && jumpVelocity==0)
@@ -200,5 +206,6 @@ private:
 	int shadowTex;
 	vector<int> uniformLoc;
 	Fog* fog;
+	float transparency;
 };
 

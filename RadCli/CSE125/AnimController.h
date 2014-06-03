@@ -2,16 +2,19 @@
 #include "Structures.h"
 
 struct AnimSeg{
-	AnimSeg(double s, double d){
+	AnimSeg(double s, double d, float speedUp=1){
 		start = s;
 		duration = d;
+		this->speedUp = speedUp;
 	}
 	AnimSeg(const AnimSeg& other){
 		start = other.start;
 		duration = other.duration;
+		speedUp = other.speedUp;
 	}
 	double start;
 	double duration;
+	float speedUp;
 };
 
 class AnimController{
@@ -38,8 +41,8 @@ public:
 		AnimOnceOn = other.AnimOnceOn;
 		return *this;
 	}
-	void add(double start, double duration){
-		segList.push_back(AnimSeg(start, duration));
+	void add(double start, double duration, float speedUp = 1){
+		segList.push_back(AnimSeg(start, duration, speedUp));
 	}
 	AnimSeg& operator [] (int index){
 		return segList[index];
@@ -74,13 +77,13 @@ public:
 	}
 	double getAnimation(double time){
 		if (AnimOnceOn){
-			if (time - startTimeOnce <= segList[currentOnce].duration){
-				return time - startTimeOnce + segList[currentOnce].start;
+			if ((time - startTimeOnce)*segList[currentOnce].speedUp <= segList[currentOnce].duration){
+				return (time - startTimeOnce)*segList[currentOnce].speedUp + segList[currentOnce].start;
 			}
 			AnimOnceOn = false;
 		}
 
-		return fmod(time - startTimeLoop, segList[currentLoop].duration) + segList[currentLoop].start;
+		return fmod(time*segList[currentLoop].speedUp - startTimeLoop, segList[currentLoop].duration) + segList[currentLoop].start;
 	}
 
 private:

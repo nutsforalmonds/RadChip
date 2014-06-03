@@ -132,16 +132,18 @@ public:
 
 	void playSound(FMOD::Sound *s, double v){
 		FMOD::Channel *temp;
-		system->playSound(FMOD_CHANNEL_FREE, s, false, &temp);
+		system->playSound(FMOD_CHANNEL_FREE, s, true, &temp);
 		temp->setVolume(v);
+		temp->setPaused(false);
 	}
 
 	void play3DSound(FMOD::Sound *s, double v, FMOD_VECTOR pos, FMOD_VECTOR vel, float minD, float maxD){
 		FMOD::Channel *temp;
-		system->playSound(FMOD_CHANNEL_FREE, s, false, &temp);
+		system->playSound(FMOD_CHANNEL_FREE, s, true, &temp);
 		temp->set3DAttributes(&pos, &vel);
 		temp->set3DMinMaxDistance(minD, maxD);
 		temp->setVolume(v);
+		temp->setPaused(false);
 	}
 
 	FMOD::Sound* createMusic(string path){

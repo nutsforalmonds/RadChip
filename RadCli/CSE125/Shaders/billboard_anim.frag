@@ -1,21 +1,42 @@
 #version 400                                                                       
+                                  
+struct FogInfo{
+	float maxDist;
+	float minDist;
+	vec3 color;
+	float visibility;
+	float maxHeight;
+	float minHeight;
+};
+uniform FogInfo fog;
+
+uniform sampler2D texUnit;            
+uniform float transparency;
+uniform int sample_x;
+uniform int sample_y;
+uniform float x_dist;
+uniform float y_dist;                                            
                                                                                     
-uniform sampler2D texUnit;                                                        
-                                                                                    
-in vec2 TexCoord;                                                                   
+in vec2 TexCoord;
+in vec3 world_pos;
+flat in vec3 world_cam;                                                                        
 out vec4 FragColor;                                                                 
                                                                                     
 void main()                                                                         
 {                                                                                   
     FragColor = texture2D(texUnit, TexCoord);                                     
     
-    /*                                                                                
-    if (FragColor.r <= 0.1 && FragColor.g <= 0.1 && FragColor.b <= 0.1) {
-        discard;                                                                    
-    }   
-    */        
+    //glow
+    for(int i=-sample_x;i<sample_x+1;i++){
+    	for(int j=-sample_y;j<sample_y+1;j++){
+    		FragColor += texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist))/((2*sample_x+1)*(2*sample_y+1));
+    	}
+    }
 
-    // if(FragColor.a<0.1){
-    // 	discard;
-    // }                                                                    
+    //apply fog
+	float dist = distance(world_pos,world_cam);
+	float fog_factor = (dist-fog.minDist)/(fog.maxDist-fog.minDist);
+	fog_factor = pow(clamp(fog_factor,0.0,1.0),2.0)*fog.visibility;
+
+	FragColor = vec4(mix(FragColor.xyz,fog.color ,fog_factor),FragColor[3]*transparency);                                                              
 }

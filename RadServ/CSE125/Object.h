@@ -22,6 +22,7 @@ public:
 		modelM = mat4(1.0);
 		Rotation = mat4(1.0);
 		onGround = true;
+		onTramp = false;
 		health = 7;
 		maxHealth = 7;
 		numJumps = 5;
@@ -41,6 +42,7 @@ public:
 		velocity = vec3(0.0);
 		modelM = mat4(1.0);
 		onGround = true;
+		onTramp = false;
 		health = 7;
 		maxHealth = 7;
 		numJumps = 5;
@@ -194,6 +196,9 @@ public:
 	int * getPowerUpDuration() { return powerUpDuration; }
 	void setPowerUpDuration(int i, int val) { powerUpDuration[i] = val; }
 
+	bool getTramp() { return onTramp; }
+	void setTramp(bool b) { onTramp = b; }
+
 protected:
 	mat4 modelM;
 	mat4 Rotation;
@@ -207,6 +212,7 @@ protected:
 	float pendingRot;
 	float jumpVelocity;
 	bool onGround;
+	bool onTramp;
 	int health;
 	int maxHealth;
 	int numJumps;
