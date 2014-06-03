@@ -151,6 +151,7 @@ public:
 	void setPosition(vec3& p){
 		Position = p;
 	}
+	vec3 getPosition(){ return Position; }
 	void setWidth(float f){
 		width = f;
 	}

@@ -100,11 +100,16 @@ using namespace std;
 SoundSystem *mySoundSystem;
 Music *menuMusic;
 Music *gameMusic;
-Sound* testSound[10];
+Music *gameThunder;
+Sound* testSound[20];
+Sound* gameThunder2;
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
 Sound* posTestSound;
-Sound* posTestSound2;
+Sound* sound_3d_Throw;
+Sound* sound_3d_hit;
+Sound* sound_3d_light;
+Sound* sound_3d_death;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
@@ -300,6 +305,9 @@ bool FLS = false;
 bool USE_JOYSTICK = false;
 int Vibrate_Frame_Num = 0;
 
+float nextThunderTimeSec = 90.0;
+float currThunderTimeSec = 90.0;
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
 {
@@ -325,6 +333,16 @@ void spawnDamageParticle(int id)
 	damagePart->setFog(fog);
 	damagePart->setModelM(player_list[id]->getModelM());
 	explosion_list.push_back(damagePart);
+}
+
+void PlayThunderSound(float diff){
+	if (myClientState->getState() > 0){
+		currThunderTimeSec += diff;
+		if (nextThunderTimeSec <= currThunderTimeSec){
+			currThunderTimeSec = 0;
+			gameThunder2->Play();
+		}
+	}
 }
 
 int gettimeofday(struct timeval2 *tv/*in*/, struct timezone2 *tz/*in*/)
@@ -1005,7 +1023,14 @@ void Window::displayCallback(void)
 		}
 		for (uint i = 0; i < lightning_list.size(); i++){
 			lightning_list[i]->draw();
+		
+			//WAY TOO LAGGY! 16fps
+			//vec3 temp = lightning_list[i]->getPosition();
+			//FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
+			//sound_3d_light->setPosition(pt);
+			//sound_3d_light->Play3D(View);
 		}
+		
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 
@@ -1222,11 +1247,37 @@ void server_update(int value){
 			}
 		}
 
+		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
+		mats[PLAYER1] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER1].second;
+		mats[PLAYER2] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER2].second;
+		mats[PLAYER3] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER3].second;
+
+		player_list[PLAYER0]->setModelM(mats[PLAYER0]);
+		player_list[PLAYER1]->setModelM(mats[PLAYER1]);
+		player_list[PLAYER2]->setModelM(mats[PLAYER2]);
+		player_list[PLAYER3]->setModelM(mats[PLAYER3]);
+
+		//Finding each players pos vec for 3D sound
+		vec4 temp0(0.0, 0.0, 0.0, 1.0);
+		vec4 temp1(0.0, 0.0, 0.0, 1.0);
+		vec4 temp2(0.0, 0.0, 0.0, 1.0);
+		vec4 temp3(0.0, 0.0, 0.0, 1.0);
+		temp0 = player_list[PLAYER0]->getModelM() *temp0;
+		temp1 = player_list[PLAYER1]->getModelM() *temp1;
+		temp2 = player_list[PLAYER2]->getModelM() *temp2;
+		temp3 = player_list[PLAYER3]->getModelM() *temp3;
+		FMOD_VECTOR player0_sound_vec = { temp0.x, temp0.y, temp0.z };
+		FMOD_VECTOR player1_sound_vec = { temp1.x, temp1.y, temp1.z };
+		FMOD_VECTOR player2_sound_vec = { temp2.x, temp2.y, temp2.z };
+		FMOD_VECTOR player3_sound_vec = { temp3.x, temp3.y, temp3.z };
+
 		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
 		if (parseOpts->getDamaged(recvVec, PLAYER0))
 		{
 			//cout << "damaged 0" << endl;
 			spawnDamageParticle(PLAYER0);
+			sound_3d_hit->setPosition(player0_sound_vec);
+			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
 
@@ -1234,6 +1285,8 @@ void server_update(int value){
 		{
 			//cout << "damaged 1" << endl;
 			spawnDamageParticle(PLAYER1);
+			sound_3d_hit->setPosition(player1_sound_vec);
+			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
 
@@ -1241,6 +1294,8 @@ void server_update(int value){
 		{
 			//cout << "damaged 2" << endl;
 			spawnDamageParticle(PLAYER2);
+			sound_3d_hit->setPosition(player2_sound_vec);
+			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
 
@@ -1248,6 +1303,8 @@ void server_update(int value){
 		{
 			//cout << "damaged 3" << endl;
 			spawnDamageParticle(PLAYER3);
+			sound_3d_hit->setPosition(player3_sound_vec);
+			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
 
@@ -1255,24 +1312,32 @@ void server_update(int value){
 		{
 			//cout << "Killed 0" << endl;
 			spawnDamageParticle(PLAYER0);
+			sound_3d_death->setPosition(player0_sound_vec);
+			sound_3d_hit->Play3D(View);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
 			spawnDamageParticle(PLAYER1);
+			sound_3d_death->setPosition(player1_sound_vec);
+			sound_3d_hit->Play3D(View);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
 			spawnDamageParticle(PLAYER2);
+			sound_3d_death->setPosition(player2_sound_vec);
+			sound_3d_hit->Play3D(View);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
 			//cout << "Killed 3" << endl;
 			spawnDamageParticle(PLAYER3);
+			sound_3d_death->setPosition(player3_sound_vec);
+			sound_3d_hit->Play3D(View);
 		}
 
 		// TODO link up health to UI
@@ -1281,20 +1346,7 @@ void server_update(int value){
 		// TODO display kills somewhere
 		parseOpts->getPKills(recvVec, 0);
 
-
-		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
-		mats[PLAYER1] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER1].second;
-		mats[PLAYER2] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER2].second;
-		mats[PLAYER3] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER3].second;
-		
-		player_list[PLAYER0]->setModelM(mats[PLAYER0]);
-		player_list[PLAYER1]->setModelM(mats[PLAYER1]);
-		player_list[PLAYER2]->setModelM(mats[PLAYER2]);
-		player_list[PLAYER3]->setModelM(mats[PLAYER3]);
-
-
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
-
 
 		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
 		tower_list[1]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 1].second);
@@ -1308,30 +1360,21 @@ void server_update(int value){
 		
 		i++;
 
-		vec4 temp(0.0, 0.0, 0.0, 1.0);
 		if (p0f && (playerID != PLAYER0)){
-			temp = player_list[PLAYER0]->getModelM() *temp;
-			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
-			posTestSound2->setPosition(pt);
-			posTestSound2->Play3D(View);
+			sound_3d_Throw->setPosition(player0_sound_vec);
+			sound_3d_Throw->Play3D(View);
 		}
 		if (p1f && (playerID != PLAYER1)){
-			temp = player_list[PLAYER1]->getModelM() * temp;
-			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
-			posTestSound2->setPosition(pt);
-			posTestSound2->Play3D(View);
+			sound_3d_Throw->setPosition(player1_sound_vec);
+			sound_3d_Throw->Play3D(View);
 		}
 		if (p2f && (playerID != PLAYER2)){
-			temp = player_list[PLAYER2]->getModelM() * temp;
-			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
-			posTestSound2->setPosition(pt);
-			posTestSound2->Play3D(View);
+			sound_3d_Throw->setPosition(player2_sound_vec);
+			sound_3d_Throw->Play3D(View);
 		}
 		if (p3f && (playerID != PLAYER3)){
-			temp = player_list[PLAYER3]->getModelM() * temp;
-			FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
-			posTestSound2->setPosition(pt);
-			posTestSound2->Play3D(View);
+			sound_3d_Throw->setPosition(player3_sound_vec);
+			sound_3d_Throw->Play3D(View);
 		}
 	}
 
@@ -1476,15 +1519,36 @@ int main(int argc, char *argv[])
   posTestSound->setVolume(0.5);
   posTestSound->setPosition(pt);
   posTestSound->setVelocity(vt);
-  posTestSound->setMinDistance(5.0f);
+  posTestSound->setMinDistance(10.0f);
   posTestSound->setMaxDistance(10000.0f);
 
-  posTestSound2 = new Sound(mySoundSystem, "Sound/disc_fire.ogg", true);
-  posTestSound2->setVolume(0.5);
-  posTestSound2->setPosition(pt);
-  posTestSound2->setVelocity(vt);
-  posTestSound2->setMinDistance(5.0f);
-  posTestSound2->setMaxDistance(10000.0f);  
+  sound_3d_Throw = new Sound(mySoundSystem, "Sound/throw.mp3", true);
+  sound_3d_Throw->setVolume(0.75);
+  sound_3d_Throw->setPosition(pt);
+  sound_3d_Throw->setVelocity(vt);
+  sound_3d_Throw->setMinDistance(10.0f);
+  sound_3d_Throw->setMaxDistance(10000.0f);  
+
+  sound_3d_hit = new Sound(mySoundSystem, "Sound/blast.mp3", true);
+  sound_3d_hit->setVolume(0.5);
+  sound_3d_hit->setPosition(pt);
+  sound_3d_hit->setVelocity(vt);
+  sound_3d_hit->setMinDistance(5.0f);
+  sound_3d_hit->setMaxDistance(10000.0f);
+
+  sound_3d_light = new Sound(mySoundSystem, "Sound/blast3.mp3", true);
+  sound_3d_light->setVolume(0.75);
+  sound_3d_light->setPosition(pt);
+  sound_3d_light->setVelocity(vt);
+  sound_3d_light->setMinDistance(10.0f);
+  sound_3d_light->setMaxDistance(10000.0f);
+
+  sound_3d_death = new Sound(mySoundSystem, "Sound/death.mp3", true);
+  sound_3d_death->setVolume(0.5);
+  sound_3d_death->setPosition(pt);
+  sound_3d_death->setVelocity(vt);
+  sound_3d_death->setMinDistance(5.0f);
+  sound_3d_death->setMaxDistance(10000.0f);
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
   posTestMusic->setLoopCount(-1);
@@ -1507,6 +1571,8 @@ int main(int argc, char *argv[])
 	  QueryPerformanceCounter(&current);
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	  last = current;
+
+	  PlayThunderSound(diff);
 
 	  glutMainLoopEvent();
 	  
@@ -1656,11 +1722,11 @@ void keyboard(unsigned char key, int, int){
 
 		//This creates looping music at <0,0,0>
 		if (key == 'o'){
-			posTestMusic->Play3D();
+			sound_3d_death->Play3D(View);
 
-			cout << "Playing Music!" << endl;
+			cout << "Playing Death Sound!" << endl;
 		}
-
+		
 		if (key == 27){
 			//running = false;
 			//exit(0);
@@ -1896,6 +1962,7 @@ void mouseFunc(int button, int state, int x, int y)
 				menuMusic->Stop();
 			//	gameMusic->setFade(0.75, 0.005);
 				gameMusic->Play();
+				//gameThunder->Play();
 				server_update(0);
 			}
 			else if (click == 2){
@@ -1922,7 +1989,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[4]->Play();
+					testSound[9]->Play();
 					///scene->basicAttack(playerID);
 
 					player_list[playerID]->setAnimOnce(3, time);
@@ -1937,7 +2004,7 @@ void mouseFunc(int button, int state, int x, int y)
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
 
-					testSound[3]->Play();
+					testSound[8]->Play();
 
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
@@ -1952,7 +2019,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-					testSound[5]->Play();
+				//	testSound[5]->Play();
 				}
 				else
 				{
@@ -1989,7 +2056,8 @@ void mouseFunc(int button, int state, int x, int y)
 				testSound[7]->Play();
 				myClientState->setState(0);
 				gameMusic->Stop();
-				menuMusic->setFade(0.75, 0.005);
+				//gameThunder->Stop();
+				menuMusic->setFade(0.5, 0.005);
 				menuMusic->Play();
 			}
 		}
@@ -3075,12 +3143,20 @@ int loadAudio(){
 	//mySoundSystem->createMusic();
 	menuMusic = new Music(mySoundSystem, "Music/backgroundMenu.wav", false);
 	menuMusic->setLoopCount(-1);
-	menuMusic->setVolume(0.75);
+	menuMusic->setVolume(0.5);
 	menuMusic->Play();
 
 	gameMusic = new Music(mySoundSystem, "Music/background_music.mp3", false);
 	gameMusic->setLoopCount(-1);
 	gameMusic->setVolume(0.9);
+
+	gameThunder = new Music(mySoundSystem, "Sound/thunder.wav", false);
+	gameThunder->setLoopCount(-1);
+	gameThunder->setVolume(0.2);
+
+	gameThunder2 = new Sound(mySoundSystem, "Sound/thunder.wav", false);
+	//gameThunder2->setLoopCount(-1);
+	gameThunder2->setVolume(0.2);
 	//gameMusic->Play();
 
 	int NumberOfAudio = map_info->GetAudioCount();
@@ -3098,7 +3174,16 @@ int loadAudio(){
 		glutSwapBuffers();
 
 		testSound[i] = new Sound(mySoundSystem, path.c_str(), false);
-		testSound[i]->setVolume(0.5);
+		if (i == 8 || i == 9){
+			testSound[i]->setVolume(0.75);
+			testSound[i]->setVolume(0.75);
+		}
+		else if (i == 0 || i == 1){
+			testSound[i]->setVolume(0.25);
+		}
+		else{
+			testSound[i]->setVolume(0.5);
+		}
 		sound_list.push_back(testSound[0]);
 		printf("done!\n");
 
