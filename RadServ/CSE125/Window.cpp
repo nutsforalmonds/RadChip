@@ -110,6 +110,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[0] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 1)
@@ -122,6 +123,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[1] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 2)
@@ -134,6 +136,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[2] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 3)
@@ -146,11 +149,11 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[3] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
-
-		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second, shootID);
+		
 	}
 	else if (!(mouseState & 1 << 1))
 	{
@@ -579,8 +582,28 @@ int main(int argc, char *argv[])
 		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
 
 		//Trampoline status
-		
+		if (scene->getPlayerOnTramp(PLAYER0))
+			p0 += "t";
+		else
+			p0 += "T";
+		if (scene->getPlayerOnTramp(PLAYER1))
+			p1 += "t";
+		else
+			p1 += "T";
+		if (scene->getPlayerOnTramp(PLAYER2))
+			p2 += "t";
+		else
+			p2 += "T";
+		if (scene->getPlayerOnTramp(PLAYER3))
+			p3 += "t";
+		else
+			p3 += "T";
 
+		// Clear onTramp after status grabbed
+		if (sendddddddddddedededed)
+		{
+			scene->clearPlayerOnTramp();
+		}
 
 
 		//despawn player projectile list

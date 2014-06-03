@@ -111,9 +111,9 @@ public:
 				break;
 		}*/
 
-		for (j = PHEALTH_BEGIN; j < PHEALTH_END; j++)
+		for (j = PHEALTH_BEGIN; j <= PHEALTH_END; j++)
 		{
-			health += (*vec)[pid].first.c_str()[PHEALTH_BEGIN + j];
+			health += (*vec)[pid].first.c_str()[j];
 		}
 
 
@@ -129,9 +129,9 @@ public:
 		break;
 		}*/
 
-		for (j = PKILLS_BEGIN; j < PKILLS_END; j++)
+		for (j = PKILLS_BEGIN; j <= PKILLS_END; j++)
 		{
-			kills += (*vec)[pid].first.c_str()[PKILLS_BEGIN + j];
+			kills += (*vec)[pid].first.c_str()[j];
 		}
 
 		return atoi(kills.c_str());
