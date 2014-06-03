@@ -312,6 +312,21 @@ int Vibrate_Frame_Num = 0;
 float nextThunderTimeSec = 90.0;
 float currThunderTimeSec = 90.0;
 
+FMOD_VECTOR player0_sound_vec_curr = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player1_sound_vec_curr = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player2_sound_vec_curr = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player3_sound_vec_curr = { 0.0, 0.0, 0.0 };
+
+FMOD_VECTOR player0_sound_vec_last = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player1_sound_vec_last = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player2_sound_vec_last = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player3_sound_vec_last = { 0.0, 0.0, 0.0 };
+
+FMOD_VECTOR player0_sound_vec_last_m = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player1_sound_vec_last_m = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player2_sound_vec_last_m = { 0.0, 0.0, 0.0 };
+FMOD_VECTOR player3_sound_vec_last_m = { 0.0, 0.0, 0.0 };
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
 {
@@ -339,7 +354,7 @@ void spawnDamageParticle(int id)
 	explosion_list.push_back(damagePart);
 }
 
-void spawnDeathParticle(int id)
+void spawnDeathParticle(float x, float y, float z)
 {
 	ParticleSystem2* deathPart = new ParticleSystem2();
 	deathPart->setShader(sdrCtl.getShader("pe_system"));
@@ -351,14 +366,14 @@ void spawnDeathParticle(int id)
 	deathPart->setTime_Step(0.5);
 	deathPart->setTime_Max(375.0);
 	deathPart->setTime_Min(0.0);
+	deathPart->setTime(0.0);
 	deathPart->setBlastRadius(20.0);
 	deathPart->setExplosionVelocity(0.7);
 	deathPart->setExplosionDecay(2.0);
 	deathPart->setFragStartColor(vec3(1.0, 0.2, 0.2));
 	deathPart->setFragEndColor(vec3(0.6, 0, 0));
 	deathPart->setFog(fog);
-	deathPart->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
-	deathPart->setModelM(player_list[id]->getModelM());
+	deathPart->setModelM(glm::translate(vec3(x, y, z)));
 	explosion_list.push_back(deathPart);
 }
 
@@ -1291,6 +1306,15 @@ void server_update(int value){
 		player_list[PLAYER3]->setModelM(mats[PLAYER3]);
 
 		//Finding each players pos vec for 3D sound
+		player0_sound_vec_last_m = player0_sound_vec_last;
+		player1_sound_vec_last_m = player1_sound_vec_last;
+		player2_sound_vec_last_m = player2_sound_vec_last;
+		player3_sound_vec_last_m = player3_sound_vec_last;
+
+		player0_sound_vec_last = player0_sound_vec_curr;
+		player1_sound_vec_last = player1_sound_vec_curr;
+		player2_sound_vec_last = player2_sound_vec_curr;
+		player3_sound_vec_last = player3_sound_vec_curr;
 		vec4 temp0(0.0, 0.0, 0.0, 1.0);
 		vec4 temp1(0.0, 0.0, 0.0, 1.0);
 		vec4 temp2(0.0, 0.0, 0.0, 1.0);
@@ -1299,17 +1323,17 @@ void server_update(int value){
 		temp1 = player_list[PLAYER1]->getModelM() *temp1;
 		temp2 = player_list[PLAYER2]->getModelM() *temp2;
 		temp3 = player_list[PLAYER3]->getModelM() *temp3;
-		FMOD_VECTOR player0_sound_vec = { temp0.x, temp0.y, temp0.z };
-		FMOD_VECTOR player1_sound_vec = { temp1.x, temp1.y, temp1.z };
-		FMOD_VECTOR player2_sound_vec = { temp2.x, temp2.y, temp2.z };
-		FMOD_VECTOR player3_sound_vec = { temp3.x, temp3.y, temp3.z };
+		player0_sound_vec_curr = { temp0.x, temp0.y, temp0.z };
+		player1_sound_vec_curr = { temp1.x, temp1.y, temp1.z };
+		player2_sound_vec_curr = { temp2.x, temp2.y, temp2.z };
+		player3_sound_vec_curr = { temp3.x, temp3.y, temp3.z };
 
 		/////////////////////////////////////////////////////////displaying particle effect///////////////////////////////////////////////////////
 		if (parseOpts->getDamaged(recvVec, PLAYER0))
 		{
 			//cout << "damaged 0" << endl;
 			spawnDamageParticle(PLAYER0);
-			sound_3d_hit->setPosition(player0_sound_vec);
+			sound_3d_hit->setPosition(player0_sound_vec_curr);
 			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
@@ -1318,7 +1342,7 @@ void server_update(int value){
 		{
 			//cout << "damaged 1" << endl;
 			spawnDamageParticle(PLAYER1);
-			sound_3d_hit->setPosition(player1_sound_vec);
+			sound_3d_hit->setPosition(player0_sound_vec_curr);
 			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
@@ -1327,7 +1351,7 @@ void server_update(int value){
 		{
 			//cout << "damaged 2" << endl;
 			spawnDamageParticle(PLAYER2);
-			sound_3d_hit->setPosition(player2_sound_vec);
+			sound_3d_hit->setPosition(player0_sound_vec_curr);
 			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
@@ -1336,44 +1360,45 @@ void server_update(int value){
 		{
 			//cout << "damaged 3" << endl;
 			spawnDamageParticle(PLAYER3);
-			sound_3d_hit->setPosition(player3_sound_vec);
+			sound_3d_hit->setPosition(player0_sound_vec_curr);
 			sound_3d_hit->Play3D(View);
 			myUI->setLess_Life(1);
 		}
 
+		//KILLS
 		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
-			//cout << "Killed 0" << endl;
-			spawnDeathParticle(PLAYER0);
-			sound_3d_death->setPosition(player0_sound_vec);
-			sound_3d_hit->Play3D(View);
+			cout << "Killed 0" << endl;
+			spawnDeathParticle(player0_sound_vec_last_m.x, player0_sound_vec_last_m.y, player0_sound_vec_last_m.z);
+			sound_3d_death->setPosition(player0_sound_vec_last_m);
+			sound_3d_death->Play3D(View);
 			myGameMenu->setDeath(0);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
-			//cout << "Killed 1" << endl;
-			spawnDeathParticle(PLAYER1);
-			sound_3d_death->setPosition(player1_sound_vec);
-			sound_3d_hit->Play3D(View);
+			cout << "Killed 1" << endl;
+			spawnDeathParticle(player1_sound_vec_last_m.x, player1_sound_vec_last_m.y, player1_sound_vec_last_m.z);
+			sound_3d_death->setPosition(player1_sound_vec_last_m);
+			sound_3d_death->Play3D(View);
 			myGameMenu->setDeath(1);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
-			//cout << "Killed 2" << endl;
-			spawnDeathParticle(PLAYER2);
-			sound_3d_death->setPosition(player2_sound_vec);
-			sound_3d_hit->Play3D(View);
+			cout << "Killed 2" << endl;
+			spawnDeathParticle(player2_sound_vec_last_m.x, player2_sound_vec_last_m.y, player2_sound_vec_last_m.z);
+			sound_3d_death->setPosition(player2_sound_vec_last_m);
+			sound_3d_death->Play3D(View);
 			myGameMenu->setDeath(2);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
-			//cout << "Killed 3" << endl;
-			spawnDeathParticle(PLAYER3);
-			sound_3d_death->setPosition(player3_sound_vec);
-			sound_3d_hit->Play3D(View);
+			cout << "Killed 3" << endl;
+			spawnDeathParticle(player3_sound_vec_last_m.x, player3_sound_vec_last_m.y, player3_sound_vec_last_m.z);
+			sound_3d_death->setPosition(player3_sound_vec_last_m);
+			sound_3d_death->Play3D(View);
 			myGameMenu->setDeath(3);
 		}
 
@@ -1412,19 +1437,19 @@ void server_update(int value){
 		i++;
 
 		if (p0f && (playerID != PLAYER0)){
-			sound_3d_Throw->setPosition(player0_sound_vec);
+			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
 		if (p1f && (playerID != PLAYER1)){
-			sound_3d_Throw->setPosition(player1_sound_vec);
+			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
 		if (p2f && (playerID != PLAYER2)){
-			sound_3d_Throw->setPosition(player2_sound_vec);
+			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
 		if (p3f && (playerID != PLAYER3)){
-			sound_3d_Throw->setPosition(player3_sound_vec);
+			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
 	}
@@ -1595,10 +1620,10 @@ int main(int argc, char *argv[])
   sound_3d_light->setMaxDistance(10000.0f);
 
   sound_3d_death = new Sound(mySoundSystem, "Sound/death.mp3", true);
-  sound_3d_death->setVolume(0.5);
+  sound_3d_death->setVolume(0.75);
   sound_3d_death->setPosition(pt);
   sound_3d_death->setVelocity(vt);
-  sound_3d_death->setMinDistance(5.0f);
+  sound_3d_death->setMinDistance(10.0f);
   sound_3d_death->setMaxDistance(10000.0f);
 
   posTestMusic = new Music(mySoundSystem, "Sound/prepunch1.ogg", true);
@@ -1758,6 +1783,7 @@ void keyboard(unsigned char key, int, int){
 			particle8->StartLoop();
 			Vibrate(65535, 65535, 500);
 		}
+
 		//This creates random explosion
 		if (key == 'n'){
 			createExplosion();
