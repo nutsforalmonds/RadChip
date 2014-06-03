@@ -147,6 +147,9 @@ public:
 	void setAnimOnce(int index, double start_time){ ac.setAnimOnce(index, start_time); }
 	double getAnimation(double time){ return ac.getAnimation(time); }
 
+	mat4 getAliveModelM(){ return aliveModelM; }
+	void setAliveModelM(mat4 m){ aliveModelM = m; }
+
 protected:
 	mat4 modelM;
 	mat4 Rotation;
@@ -166,4 +169,5 @@ protected:
 	int kills;
 	int playerID;
 	AnimController ac;
+	mat4 aliveModelM;
 };

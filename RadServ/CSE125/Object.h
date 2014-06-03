@@ -35,6 +35,7 @@ public:
 		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
 		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
 		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		isPlatformDamage = false;
 	}
 	Object(string n, string t){
 		name = n;
@@ -55,6 +56,7 @@ public:
 		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
 		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
 		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		isPlatformDamage = false;
 	}
 	~Object()
 	{
@@ -199,6 +201,9 @@ public:
 	bool getTramp() { return onTramp; }
 	void setTramp(bool b) { onTramp = b; }
 
+	bool getIsPlatformDamage() { return isPlatformDamage; }
+	void setIsPlatformDamage(bool b) { isPlatformDamage = b; }
+
 protected:
 	mat4 modelM;
 	mat4 Rotation;
@@ -225,4 +230,5 @@ protected:
 	mat4 aliveModelM;
 	bool * powerUp;
 	int * powerUpDuration;
+	bool isPlatformDamage;
 };

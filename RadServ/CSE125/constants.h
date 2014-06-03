@@ -7,6 +7,7 @@
 #define CAM_MAT_BEGIN		8
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
+#define PLATFORM_STATUS		13
 
 //player bit info
 #define SHOOTBIT			1

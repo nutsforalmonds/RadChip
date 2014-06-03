@@ -1,6 +1,6 @@
 
 // matrix indexes
-#define NUMOFVECS			13
+#define NUMOFVECS			14
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
@@ -8,6 +8,7 @@
 #define CAM_MAT_BEGIN		8
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
+#define PLATFORM_STATUS		13
 //#define PLAT_MAT_BEGIN	12
 //#define PLAT_MAT_END		15
 //#define PPDL_MAT			16
@@ -36,3 +37,8 @@
 #define PLAYER1				1
 #define PLAYER2				2
 #define PLAYER3				3
+
+//indicies for platform status
+#define PLATFORM_INDEX		1
+#define PLATFORM_DAMAGE		2
+#define PLATFORM_DEAD		3

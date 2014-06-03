@@ -188,6 +188,40 @@ public:
 		return result;
 	}
 
+	std::vector<std::pair<int, bool>> getPlatformDamage(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::vector<std::pair<int, bool>> result;
+		std::string s = (*vec)[PLATFORM_STATUS].first;
+		int printIndex = 0;
+		//every platform status set is made up of p0dk, so this should iterate through every set
+		for (int i = 0; i < s.length(); i += 4)
+		{
+			if (s.substr(i + PLATFORM_DAMAGE, 1).c_str() == "d")
+				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
+			else
+				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
+			printIndex++;
+		}
+		return result;
+	}
+
+	std::vector<std::pair<int, bool>> getPlatformDead(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::vector<std::pair<int, bool>> result;
+		std::string s = (*vec)[PLATFORM_STATUS].first;
+		int printIndex = 0;
+		//every platform status set is made up of p0dk, so this should iterate through every set
+		for (int i = 0; i < s.length(); i += 4)
+		{
+			if (s.substr(i + PLATFORM_DEAD, 1).c_str() == "k")
+				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
+			else
+				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
+			printIndex++;
+		}
+		return result;
+	}
+
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;

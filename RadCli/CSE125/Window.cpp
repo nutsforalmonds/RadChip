@@ -1196,7 +1196,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 0!" << endl;
+			//cout << "FIRE 0!" << endl;
 			p0f = true;
 		}
 
@@ -1208,7 +1208,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 1!" << endl;
+			//cout << "FIRE 1!" << endl;
 			p1f = true;
 		}
 
@@ -1220,7 +1220,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 2!" << endl;
+			//cout << "FIRE 2!" << endl;
 			p2f = true;
 		}
 
@@ -1232,7 +1232,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 3!" << endl;
+			//cout << "FIRE 3!" << endl;
 			p3f = true;
 		}
 
@@ -1246,6 +1246,18 @@ void server_update(int value){
 					break;
 				}
 			}
+		}
+
+		std::vector<std::pair<int, bool>> platformDamage = parseOpts->getPlatformDamage(recvVec);
+		std::vector<std::pair<int, bool>> platformDead = parseOpts->getPlatformDead(recvVec);
+		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
+		for (int i = 0; i < platformDead.size(); i++)
+		{
+			cout << platformDead[i].second << endl;
+			if (platformDead[i].second)
+				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+			else
+				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getAliveModelM());
 		}
 
 		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
@@ -1340,6 +1352,7 @@ void server_update(int value){
 			sound_3d_death->setPosition(player3_sound_vec);
 			sound_3d_hit->Play3D(View);
 		}
+
 
 		// TODO link up health to UI
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
@@ -2828,6 +2841,7 @@ void initialize(int argc, char *argv[])
 	platform_01->setShadowTex(shadow_map_id);
 	platform_01->setType("Cube");
 	platform_01->setName("Test Platform");
+	platform_01->setAliveModelM(platform_01->getModelM());
 	//platform_01->setTransparency(0.5);
 	stationary_list.push_back(platform_01);
 
@@ -2849,6 +2863,7 @@ void initialize(int argc, char *argv[])
 	platform_02->setShadowTex(shadow_map_id);
 	platform_02->setType("Cube");
 	platform_02->setName("Test Platform");
+	platform_02->setAliveModelM(platform_02->getModelM());
 	stationary_list.push_back(platform_02);
 
 	//2nd Bottom Side Step Platform
@@ -2869,6 +2884,7 @@ void initialize(int argc, char *argv[])
 	platform_03->setShadowTex(shadow_map_id);
 	platform_03->setType("Cube");
 	platform_03->setName("Test Platform");
+	platform_03->setAliveModelM(platform_03->getModelM());
 	stationary_list.push_back(platform_03);
 
 	//Platform Steps 1-1
@@ -2889,6 +2905,7 @@ void initialize(int argc, char *argv[])
 	platform_04->setShadowTex(shadow_map_id);
 	platform_04->setType("Cube");
 	platform_04->setName("Test Platform");
+	platform_04->setAliveModelM(platform_04->getModelM());
 	stationary_list.push_back(platform_04);
 
 	//Platform Steps 1-2
@@ -2909,6 +2926,7 @@ void initialize(int argc, char *argv[])
 	platform_05->setShadowTex(shadow_map_id);
 	platform_05->setType("Cube");
 	platform_05->setName("Test Platform");
+	platform_05->setAliveModelM(platform_05->getModelM());
 	stationary_list.push_back(platform_05);
 
 	//Platform Steps 1-3
@@ -2929,6 +2947,7 @@ void initialize(int argc, char *argv[])
 	platform_06->setShadowTex(shadow_map_id);
 	platform_06->setType("Cube");
 	platform_06->setName("Test Platform");
+	platform_06->setAliveModelM(platform_06->getModelM());
 	stationary_list.push_back(platform_06);
 
 	//Platform Steps 2-1
@@ -2949,6 +2968,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setShadowTex(shadow_map_id);
 	platform_07->setType("Cube");
 	platform_07->setName("Test Platform");
+	platform_07->setAliveModelM(platform_07->getModelM());
 	stationary_list.push_back(platform_07);
 
 	//Platform Steps 2-2
@@ -2969,6 +2989,7 @@ void initialize(int argc, char *argv[])
 	platform_08->setShadowTex(shadow_map_id);
 	platform_08->setType("Cube");
 	platform_08->setName("Test Platform");
+	platform_08->setAliveModelM(platform_08->getModelM());
 	stationary_list.push_back(platform_08);
 
 	//Platform Steps 2-3
@@ -2989,6 +3010,7 @@ void initialize(int argc, char *argv[])
 	platform_09->setShadowTex(shadow_map_id);
 	platform_09->setType("Cube");
 	platform_09->setName("Test Platform");
+	platform_09->setAliveModelM(platform_09->getModelM());
 	stationary_list.push_back(platform_09);
 
 	//Trampoline

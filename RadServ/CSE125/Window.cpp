@@ -110,6 +110,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[0] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 1)
@@ -122,6 +123,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[1] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 2)
@@ -134,6 +136,7 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[2] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		else if (pid == 3)
@@ -146,11 +149,11 @@ void handle_mouse_state(int pid, int mouseState){
 				p_shoot_counter++;
 				p_shoot_counter %= PLAYER_PROJECTILE_COUNT;
 				hasShot[3] = true;
+				scene->projectileAttack(pid, &(*recvVec)[playerID * VECSPERPLAYER + 2].second, shootID);
 			}
 		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
 
-		scene->projectileAttack(pid, &(*recvVec)[playerID * 4 + 2].second, shootID);
 	}
 	else if (!(mouseState & 1 << 1))
 	{
@@ -249,6 +252,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	//platform states
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -594,7 +600,21 @@ int main(int argc, char *argv[])
 			}
 		}
 
-
+		//adding platform status
+		string platform_status = "";
+		vector<bool> platformDamaged = scene->getPlatformDamaged();
+		vector<bool> platformDead = scene->getPlatformDead();
+		vector<Object *> * stationaries = scene->getStationary();
+		for (int i = 0; i < platformDamaged.size(); i++)
+		{	
+			if ((*stationaries)[i]->getIsPlatformDamage())
+				platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+			if (platformDamaged[i])
+				cout << platform_status << endl;
+			scene->setPlatformDamaged(i, false);
+			scene->setPlatformDead(i, false);
+		}
+		
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER1] = std::make_pair(p1.c_str(), mp[PLAYER1]);
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER2] = std::make_pair(p2.c_str(), mp[PLAYER2]);
@@ -612,6 +632,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER1] = std::make_pair("c1", ca[PLAYER1]);
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
+
+		(*sendVec)[PLATFORM_STATUS] = std::make_pair(platform_status, mat4(0.0));
 		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;
