@@ -174,8 +174,9 @@ public:
 	bool update(){
 		QueryPerformanceCounter(&current);
 		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart;
-		if (anim_time > duration)
+		if (anim_time > duration){
 			return false;
+		}
 
 		double seg_time = duration / (num_column*num_row);
 		int block_ID = (int)floor(anim_time/seg_time);
@@ -200,11 +201,10 @@ private:
 	float width;
 	float height;
 	vec3 Position=vec3(0,0,0);
-	LARGE_INTEGER start_time;
 	int num_column, num_row;
 	int column=0, row=0;
 	double duration;
-	LARGE_INTEGER current, freq;
+	LARGE_INTEGER current, freq, start_time;
 	int type;//0: one time 1: continuous
 	Fog* fog;
 	float transparency=1.0;

@@ -102,8 +102,15 @@ public:
 
 	bool getPlayerOnTramp(int playerID)
 	{
-		pPtr = getPlayerObj(playerID);
-		return pPtr->getTramp();
+		return playerOnTramp[playerID];
+	}
+
+	void clearPlayerOnTramp()
+	{
+		playerOnTramp[0] = false;
+		playerOnTramp[1] = false;
+		playerOnTramp[2] = false;
+		playerOnTramp[3] = false;
 	}
 
 	void simulate(float t, float sub){
@@ -172,6 +179,7 @@ public:
 					if (collide){
 						fixCollision(player[i], stationary[j], pBox, sBox, touchGround1, touchGround2);
 					}
+					
 					stationary[j]->touchGround(touchGround2);
 				}
 			}
@@ -389,11 +397,7 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
-			obj1->setTramp(true);
-		}
-		else
-		{
-			obj1->setTramp(false);
+			playerOnTramp[obj1->getPlayerID()] = true;
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -1262,7 +1266,7 @@ protected:
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
-	vector<bool> playerOnTramp;
+	bool playerOnTramp[4];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

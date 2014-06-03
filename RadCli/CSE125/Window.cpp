@@ -275,6 +275,8 @@ int but_up = 1;
 int m_pos = 0;
 int text_flag = 0;
 
+bool kill_count = false;
+
 bool connected;
 std::string out;
 gameState gs;
@@ -1115,6 +1117,11 @@ void Window::displayCallback(void)
 		else if (myClientState->getState() == 5){
 			endScreen->draw(1);
 		}
+
+		else if (kill_count){
+			myGameMenu->killDraw();
+		}
+
 		break;
 	case 4:
 		settings->draw();
@@ -1315,6 +1322,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER0);
 			sound_3d_death->setPosition(player0_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(0);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
@@ -1323,6 +1331,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER1);
 			sound_3d_death->setPosition(player1_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(1);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
@@ -1331,6 +1340,7 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER2);
 			sound_3d_death->setPosition(player2_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(2);
 		}
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
@@ -1339,17 +1349,25 @@ void server_update(int value){
 			spawnDamageParticle(PLAYER3);
 			sound_3d_death->setPosition(player3_sound_vec);
 			sound_3d_hit->Play3D(View);
+			myGameMenu->setDeath(3);
 		}
 
 		// TODO link up health to UI
 		myUI->healthBar(parseOpts->getPHealth(recvVec, (float)playerID / 100));
 
 		// TODO display kills somewhere
-		parseOpts->getPKills(recvVec, PLAYER0);
+		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, PLAYER0));
+		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, PLAYER1));
+		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, PLAYER2));
+		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, PLAYER3));
 
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup
 		parseOpts->getPPowerUp(recvVec, PLAYER0);
+
+		// TODO bounces arrive
+		parseOpts->getTramp(recvVec, PLAYER0);
+
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
@@ -1907,6 +1925,11 @@ void keyUp (unsigned char key, int x, int y) {
 		}
 		if (key == 'l'){
 			alive = !alive;
+		}
+
+		if (key == 9)
+		{
+			kill_count = !kill_count;
 		}
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
@@ -3179,16 +3202,22 @@ void initialize(int argc, char *argv[])
 	particle8->setTexture(GL_TEXTURE_2D, "img/UI_elements/minusSign.png", "PNG");
 	particle8->setFog(emptyFog);
 
-	testSystem = new ParticleSystem2();
+	testSystem = new ParticleSystem2(0.5, 0.1,0.1,8,0.25, 0.0, 360.0, 0.0, 180.0, 10.0);
 	testSystem->setShader(sdrCtl.getShader("pe_system_anim"));
 	testSystem->setType("Particle_System");
 	testSystem->setName("Particle_Test");
 	testSystem->setLoopInf(true);
 	testSystem->setTexture(GL_TEXTURE_2D, "img/sprite_sheets/explosion.png", "PNG");
+	testSystem->setTime_Step(0.001);
+	testSystem->setTime_Max(100.0);
+	testSystem->setTime_Min(0.0);
+	testSystem->setTexRow(0);
+	testSystem->setTexCol(0);
 	testSystem->setTexNumCol(5);
 	testSystem->setTexNumRow(4);
-	testSystem->setTexRow(2);
-	testSystem->setTexCol(2);
+	testSystem->setupSprite();
+	testSystem->setBlastRadius(10.0);
+	testSystem->setExplosionVelocity(0.2);
 	testSystem->setFog(fog);
 	testSystem->setModelM(glm::translate(vec3(0.0f, 9.0f, 0.0f)));
 
