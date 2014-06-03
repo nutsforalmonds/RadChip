@@ -456,10 +456,10 @@ int main(int argc, char *argv[])
 		else
 			p3 += "K";
 
-		p0 += int_to_string(p1ShotID, 3);
-		p1 += int_to_string(p2ShotID, 3);
-		p2 += int_to_string(p3ShotID, 3);
-		p3 += int_to_string(p4ShotID, 3);
+		p0 += int_to_string(p1ShotID, 4);
+		p1 += int_to_string(p2ShotID, 4);
+		p2 += int_to_string(p3ShotID, 4);
+		p3 += int_to_string(p4ShotID, 4);
 
 		if (sendddddddddddedededed)
 		{
