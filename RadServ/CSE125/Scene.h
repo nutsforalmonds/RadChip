@@ -921,8 +921,9 @@ public:
 				if (min_dist != 10000){
 					Projectile* cubeT = new Projectile(player.size() + respawn.size());
 					cubeT->setSpeed(5);
-					cubeT->setModelM(player[pid]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-					cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
+					mat4 pjt_model = tower[i]->getModelM()*glm::translate(vec3(0, 4, 0));
+					cubeT->setModelM(pjt_model);//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
 					cubeT->setStartY(hold.max[2]);
@@ -935,7 +936,7 @@ public:
 					cubeT->setDistance(tower[i]->getShootRange());
 					tower_projectile.push_back(cubeT);
 					cubeT->setSpeed(50);
-					vec3 dir = glm::normalize(vec3(player[pid]->getModelM()*vec4(0, 0, 0, 1)) - vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)));
+					vec3 dir = glm::normalize(vec3(player[pid]->getModelM()*vec4(0, 0, 0, 1)) - vec3(pjt_model*vec4(0, 0, 0, 1)));
 					cubeT->setVelocity(dir*tower[i]->getShootSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 					int shootID = tower_shoot_counter;
 					tower_shoot_counter++;
@@ -1140,7 +1141,7 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(20);
-		tw0->setShootSpeed(50);
+		tw0->setShootSpeed(20);
 		tw0->setDamage(-1);
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
@@ -1154,7 +1155,7 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(20);
-		tw1->setShootSpeed(50);
+		tw1->setShootSpeed(20);
 		tw1->setDamage(-1);
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
@@ -1168,7 +1169,7 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(20);
-		tw2->setShootSpeed(50);
+		tw2->setShootSpeed(20);
 		tw2->setDamage(-1);
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
@@ -1182,7 +1183,7 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(20);
-		tw3->setShootSpeed(50);
+		tw3->setShootSpeed(20);
 		tw3->setDamage(-1);
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");

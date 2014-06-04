@@ -532,7 +532,7 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	pjt->setFog(fog);
 
 	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 4, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 	pjt->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
@@ -547,9 +547,9 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	//Add Cube to the draw list
 	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
 	tower_projectile_list.push_back(pjt);
-	pjt->setSpeed(50);
+	pjt->setSpeed(20);
 	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(glm::normalize(direction)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
