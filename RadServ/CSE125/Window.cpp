@@ -80,8 +80,9 @@ string int_to_string(int num, int length){
 	string t = "";
 	if (num < 0)
 	{
-		std::cout << "Exception: less than zero int to string conversion" << std::endl;
-		system("pause");
+		//std::cout << "Exception: less than zero int to string conversion -> set to 0" << std::endl;
+		//system("pause");
+		num = 0;
 	}
 
 	int num_zero;
