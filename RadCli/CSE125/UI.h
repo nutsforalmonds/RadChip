@@ -406,7 +406,7 @@ public:
 
 			x2_life = health_bar_size*damage + x1_life;
 
-			if (x2_life <= x1_life)
+			if (x2_life <= x1_life || damage > 1)
 			{
 				//x2_life = x1_life;
 				x2_life = 0.275f;
@@ -435,7 +435,7 @@ public:
 
 			x2_target = enemy_health_bar*damage + x1_target;
 
-			if (x2_target <= x1_target)
+			if (x2_target <= x1_target || damage >= 1)
 			{
 				x2_target = 0.1375f;
 			}
