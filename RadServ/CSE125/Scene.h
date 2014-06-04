@@ -174,11 +174,19 @@ public:
 			counter = 0;
 		}
 		for (int i = 0; i < elevator.size(); ++i){
-			if (elevator[i]->getDirection() == 0){
-				elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
-				vector<Object*> elplayers = elevator[i]->getPlayers();
-				for (int j = 0; j < elplayers.size(); ++j)
-					elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+			if (elevator[i]->getDirection() != 1){
+				if (elevator[i]->getDirection() == -1){
+					elevator[i]->preTrans(glm::translate(vec3(-counter3, 0, 0)));
+					vector<Object*> elplayers = elevator[i]->getPlayers();
+					for (int j = 0; j < elplayers.size(); ++j)
+						elplayers[j]->preTrans(glm::translate(vec3(-counter3, 0, 0)));
+				}
+				else {
+					elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+					vector<Object*> elplayers = elevator[i]->getPlayers();
+					for (int j = 0; j < elplayers.size(); ++j)
+						elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+				}
 			}
 			else {
 				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
@@ -1045,8 +1053,8 @@ public:
 		return c;
 	}
 
-	boost::array<mat4, 4> getElevatorMats(){
-		boost::array<mat4, 4> c;
+	boost::array<mat4, 5> getElevatorMats(){
+		boost::array<mat4, 5> c;
 		for (uint i = 0; i < elevator.size(); i++){
 			c[i] = elevator[i]->getModelM();
 		}
@@ -1207,81 +1215,83 @@ public:
 		ground->setName("Ground");
 		addStationary(ground);
 
-		//Bottom Mid Platform
-		Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
-		//platform_01->setSpeed(5);
-		platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
+		//elevator 
+		Elevator* platform_01 = new Elevator();
+		//platform_01->setSpeed(5); 
+		platform_01->postTrans(glm::translate(vec3(0, 5.0, 0)));
 		platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
-		platform_01->setType("Cube");
+		platform_01->setType("Elevator");
+		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
 		addStationary(platform_01);
+		elevator.push_back(platform_01);
 
-		//1st Bottom Side Step Platform
-		Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
-		platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
-		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		//island 
+		Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+		//platform_01->setSpeed(5); 
+		platform_02->postTrans(glm::translate(vec3(74.0, 18.0, 0)));
+		platform_02->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
 		addStationary(platform_02);
 
-		//2nd Bottom Side Step Platform
-		Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
-		platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
-		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		//island 
+		Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+		//platform_01->setSpeed(5); 
+		platform_03->postTrans(glm::translate(vec3(-74.0, 18.0, 0)));
+		platform_03->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
 		addStationary(platform_03);
 
-		//Platform Steps 1-1
-		Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//walkway 
+		Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 80);
+		//platform_01->setSpeed(5); 
 		platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
-		platform_04->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_04->setAABB(AABB(vec3(-10.0, -0.5, -10), vec3(10.0, 0.5, 80)));
 		platform_04->setType("Cube");
 		platform_04->setName("Test Platform");
 		addStationary(platform_04);
 
-		//Platform Steps 1-2
-		Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
+		//barricade on walkway 
+		Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
+		//platform_01->setSpeed(5); 
 		platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
-		platform_05->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_05->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, .5)));
 		platform_05->setType("Cube");
 		platform_05->setName("Test Platform");
 		addStationary(platform_05);
 
-		//Platform Steps 1-3
+		//Platform Steps 1-3 
 		Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
 		platform_06->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_06->setType("Cube");
 		platform_06->setName("Test Platform");
 		addStationary(platform_06);
 
-		//Platform Steps 2-1
-		Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//walkway 
+		Cube* platform_07 = new Cube(-10.0, 10.0, -0.5, 0.5, -80, 10);
+		//platform_01->setSpeed(5); 
 		platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
-		platform_07->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_07->setAABB(AABB(vec3(-10.0, -0.5, -80), vec3(10.0, 0.5, 10)));
 		platform_07->setType("Cube");
 		platform_07->setName("Test Platform");
 		addStationary(platform_07);
 
-		//Platform Steps 2-2
-		Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
+		//barricade on walkway 
+		Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
+		//platform_01->setSpeed(5); 
 		platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
-		platform_08->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_08->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, 0.5)));
 		platform_08->setType("Cube");
 		platform_08->setName("Test Platform");
 		addStationary(platform_08);
 
-		//Platform Steps 2-3
+		//Platform Steps 2-3 
 		Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
 		platform_09->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_09->setType("Cube");
@@ -1289,9 +1299,9 @@ public:
 		addStationary(platform_09);
 
 
-		//Trampoline
+		//Trampoline 
 		Trampoline* tramp_01 = new Trampoline();
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
 		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_01->setBoost(vec3(0, 60, 0));
@@ -1299,9 +1309,9 @@ public:
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
-		//teleporter
+		//teleporter 
 		Teleporter* tele_01 = new Teleporter();
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
 		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tele_01->setEndpoint(glm::translate(vec3(0, 50.0, 0)));
@@ -1309,10 +1319,10 @@ public:
 		tele_01->setName("Test Teleporter");
 		addStationary(tele_01);
 
-		//elevator
+
 		Elevator* ele_01 = new Elevator();
-		//platform_01->setSpeed(5);
-		ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+		//platform_01->setSpeed(5); 
+		ele_01->postTrans(glm::translate(vec3(12, 18.0, 38)));
 		ele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		ele_01->setType("Elevator");
 		ele_01->setName("Test Elevator");
@@ -1320,20 +1330,38 @@ public:
 		addStationary(ele_01);
 		elevator.push_back(ele_01);
 
-		//elevator
 		Elevator* ele_02 = new Elevator();
-		//platform_01->setSpeed(5);
-		ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
-		ele_02->setAABB(AABB(vec3(-20.0, -0.5, -20.0), vec3(20.0, .5, 20.0)));
-		ele_02->setDirection(1);
+		//platform_01->setSpeed(5); 
+		ele_02->postTrans(glm::translate(vec3(12, 18.0, -38)));
+		ele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		ele_02->setType("Elevator");
 		ele_02->setName("Test Elevator");
+		ele_02->setDirection(0);
 		addStationary(ele_02);
 		elevator.push_back(ele_02);
 
-		counter2 = 0;
-		counter3 = 0.1;
+		Elevator* ele_03 = new Elevator();
+		//platform_01->setSpeed(5); 
+		ele_03->postTrans(glm::translate(vec3(-12, 18.0, 38)));
+		ele_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_03->setType("Elevator");
+		ele_03->setName("Test Elevator");
+		ele_03->setDirection(-1);
+		addStationary(ele_03);
+		elevator.push_back(ele_03);
 
+		Elevator* ele_04 = new Elevator();
+		//platform_01->setSpeed(5); 
+		ele_04->postTrans(glm::translate(vec3(-12, 18.0, -38)));
+		ele_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_04->setType("Elevator");
+		ele_04->setName("Test Elevator");
+		ele_04->setDirection(-1);
+		addStationary(ele_04);
+		elevator.push_back(ele_04);
+
+		counter2 = 0;
+		counter3 = 0.05;
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 		//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));

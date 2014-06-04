@@ -1,6 +1,6 @@
 
 // matrix indexes
-#define NUMOFVECS			15
+#define NUMOFVECS			18
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
