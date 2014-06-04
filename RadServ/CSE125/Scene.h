@@ -120,6 +120,19 @@ public:
 		playerOnTramp[3] = false;
 	}
 
+	bool getPlayerOnTele(int playerID)
+	{
+		return playerOnTele[playerID];
+	}
+
+	void clearPlayerOnTele()
+	{
+		playerOnTele[0] = false;
+		playerOnTele[1] = false;
+		playerOnTele[2] = false;
+		playerOnTele[3] = false;
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -444,6 +457,7 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Teleporter") && onGround1){
 			obj1->preTrans(((Teleporter*)obj2)->getEndpoint());
+			playerOnTele[obj1->getPlayerID()] = true;
 		}
 		if (!strcmp(obj2->getType().c_str(), "Elevator") && onGround1){
 			((Elevator*)obj2)->addPlayer(obj1);
@@ -1395,6 +1409,7 @@ protected:
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
 	bool playerOnTramp[4];
+	bool playerOnTele[4];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

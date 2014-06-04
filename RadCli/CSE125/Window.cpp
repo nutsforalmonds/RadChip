@@ -1557,6 +1557,28 @@ void server_update(int value){
 			sound_3d_tramp->setPosition(player3_sound_vec_lasterest);
 			sound_3d_tramp->Play3D(View);
 		}
+		// Teleporter sounds
+		if (parseOpts->getTele(recvVec, PLAYER0))
+		{
+			sound_3d_tele->setPosition(player0_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER1))
+		{
+			sound_3d_tele->setPosition(player1_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER2))
+		{
+			sound_3d_tele->setPosition(player2_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER3))
+		{
+			sound_3d_tele->setPosition(player3_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+
 
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;

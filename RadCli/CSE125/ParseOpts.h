@@ -173,6 +173,18 @@ public:
 		}
 	}
 
+	bool getTele(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		if ((*vec)[pid].first.c_str()[TELE_STATUS] == 'p')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	// Parameters are the pointer to the recvVec vector and the desired player ID
 	/*bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{

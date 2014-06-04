@@ -614,6 +614,31 @@ int main(int argc, char *argv[])
 			scene->clearPlayerOnTramp();
 		}
 
+		//Teleport status
+		if (scene->getPlayerOnTele(PLAYER0))
+			p0 += "p";
+		else
+			p0 += "P";
+		if (scene->getPlayerOnTele(PLAYER1))
+			p1 += "p";
+		else
+			p1 += "P";
+		if (scene->getPlayerOnTele(PLAYER2))
+			p2 += "p";
+		else
+			p2 += "P";
+		if (scene->getPlayerOnTele(PLAYER3))
+			p3 += "p";
+		else
+			p3 += "P";
+
+		// Clear onTramp after status grabbed
+		if (sendddddddddddedededed)
+		{
+			scene->clearPlayerOnTele();
+		}
+
+
 
 		//despawn player projectile list
 		string ppdl_str;

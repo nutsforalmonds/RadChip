@@ -24,6 +24,7 @@
 #define PKILLS_END			13
 #define POWER_UP_STATUS		14
 #define TRAMP_STATUS		15
+#define TELE_STATUS			16
 
 #define NOPOWER				0
 #define SPEEDUP				1
