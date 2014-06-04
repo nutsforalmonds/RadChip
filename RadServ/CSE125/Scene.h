@@ -13,6 +13,8 @@
 #include "billboard_list.h"
 #include "Trampoline.h"
 #include "Tower.h"
+#include "Elevator.h"
+#include "Teleporter.h"
 using namespace std;
 
 
@@ -28,11 +30,28 @@ using namespace std;
 #define GRAVITY_SCALE 2.5
 #define PLAYER_SPEED 10
 
+#define NUM_TOWERS 4
+
+struct TowerShootInfo{
+	TowerShootInfo(int td, int pd, vec3 dir){
+		towerID = td;
+		projectileID = pd;
+		direction = dir;
+	}
+	int towerID;
+	int projectileID;
+	vec3 direction;
+};
+
 
 class Scene
 {
 public:
 	Scene(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
+		tower_shoot_counter = 0;
 		camM.push_back(mat4(1.0));
 		camM.push_back(mat4(1.0));
 		camM.push_back(mat4(1.0));
@@ -90,8 +109,15 @@ public:
 
 	bool getPlayerOnTramp(int playerID)
 	{
-		pPtr = getPlayerObj(playerID);
-		return pPtr->getTramp();
+		return playerOnTramp[playerID];
+	}
+
+	void clearPlayerOnTramp()
+	{
+		playerOnTramp[0] = false;
+		playerOnTramp[1] = false;
+		playerOnTramp[2] = false;
+		playerOnTramp[3] = false;
 	}
 
 	void simulate(float t, float sub){
@@ -111,6 +137,7 @@ public:
 			rechargeJump();
 			respawnObjs();
 			removePowerUp();
+			moveElevators();
 		}
 		resolvePlayerTransition(t);
 		resolveProjectileTransition(t);
@@ -125,6 +152,41 @@ public:
 		rechargeJump();
 		respawnObjs();
 		removePowerUp();
+		moveElevators();
+	}
+
+	void moveElevators(){
+		if (counter == 1000){
+			counter3 = -counter3;
+			counter = 0;
+		}
+		for (int i = 0; i < elevator.size(); ++i){
+			if (elevator[i]->getDirection() == 0){
+				elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+				vector<Object*> elplayers = elevator[i]->getPlayers();
+				for (int j = 0; j < elplayers.size(); ++j)
+					elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+			}
+			else {
+				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
+				vector<Object*> elplayers = elevator[i]->getPlayers();
+				for (int j = 0; j < elplayers.size(); ++j)
+					elplayers[j]->preTrans(glm::translate(vec3(0, counter3, 0)));
+				/*
+				ofstream ofile;
+				ofile.open("debug.txt", ios::app);
+
+				for (int i = 0; i < 4; ++i)
+				for (int j = 0; j < 4; ++j)
+				ofile << elevator[1]->getModelM()[i][j] << " ";
+
+				ofile << endl;
+				ofile.close();*/
+
+			}
+			elevator[i]->removeAll();
+		}
+		counter++;
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -160,6 +222,7 @@ public:
 					if (collide){
 						fixCollision(player[i], stationary[j], pBox, sBox, touchGround1, touchGround2);
 					}
+					
 					stationary[j]->touchGround(touchGround2);
 				}
 			}
@@ -330,7 +393,6 @@ public:
 		float Rewind[3];
 		float minRewind = 999;
 		int minID = 0;
-		obj1->setTramp(false);
 		vec3 v1 = vec3(obj1->getModelM()*vec4(obj1->getVelocity(), 0.0));
 		vec3 v2 = vec3(obj2->getModelM()*vec4(obj2->getVelocity(), 0.0));
 		vec3 vDiff = v1 - v2;
@@ -378,13 +440,14 @@ public:
 		}
 		if (!strcmp(obj2->getType().c_str(), "Trampoline")&&onGround1){
 			obj1->addVelocity(((Trampoline*)obj2)->getBoost());
-			obj1->setTramp(true);
-			//std::cout << "trampoline bounce" << std::endl;
+			playerOnTramp[obj1->getPlayerID()] = true;
 		}
-		else
-		{
-			//std::cout << "no bounce" << std::endl;
-			obj1->setTramp(false);
+		if (!strcmp(obj2->getType().c_str(), "Teleporter") && onGround1){
+			obj1->preTrans(((Teleporter*)obj2)->getEndpoint());
+		}
+		if (!strcmp(obj2->getType().c_str(), "Elevator") && onGround1){
+			((Elevator*)obj2)->addPlayer(obj1);
+			obj1->setOnElevator(true);
 		}
 	}
 	void addPlayer(Object* p){ player.push_back(p); }
@@ -427,6 +490,9 @@ public:
 			projectile[i]->addVelocity(gravity*t);
 			projectile[i]->preTrans(glm::translate(projectile[i]->getVelocity()*t));
 		}
+		for (uint i = 0; i < tower_projectile.size(); i++){
+			tower_projectile[i]->preTrans(glm::translate(tower_projectile[i]->getVelocity()*t));
+		}
 	}
 
 	void setHMove(int playerID, int m){ player[playerID]->setHMove(m); }
@@ -436,7 +502,14 @@ public:
 
 	void setPendingRot(int playerID, float f){ getPlayerObj(playerID)->setPendingRot(f); }
 	void pushRot(int playerID, float f){ getPlayerObj(playerID)->pushRot(f); }
-	void jump(int playerID){ getPlayerObj(playerID)->jump(); }
+	void jump(int playerID){
+		if (getPlayerObj(playerID)->getOnElevator()){
+			getPlayerObj(playerID)->preTrans(glm::translate(vec3(0, counter3, 0)));
+			getPlayerObj(playerID)->setOnElevator(false);
+		}
+		else
+			getPlayerObj(playerID)->jump();
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,8 +715,37 @@ public:
 				}
 			}
 		}
+		//player-tower projectile detecion
+		for (uint i = 0; i < tower_projectile.size(); i++){
+			for (uint j = 0; j < player.size(); j++){
+				if (tower_projectile[i]->getTeamID() == player[j]->getTeamID())
+					continue;
+				AABB pBox = tower_projectile[i]->getAABB();
+				AABB sBox = player[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					vec3 pv = tower_projectile[i]->getVelocity();
+					pv[1] = 0;
+					pv = glm::normalize(pv);
+					pv[1] = 1;
+					player[j]->preTrans(glm::translate(pv));
+					damagePlayerT(player[j]->getPlayerID(), tower_projectile[i]->getPlayerID());
+					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
+					delete tower_projectile[i];
+					tower_projectile.erase(tower_projectile.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
 
-		//tower-projectile detection
+		//player-projectile detection
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			for (uint j = 0; j < stationary.size(); j++)
@@ -659,7 +761,7 @@ public:
 				}
 				if (collide){
 					if (stationary[j]->getIsPlatformDamage())
-						damageStationary(j, projectile[i]->getPlayerID());
+						damageStationary(player[j]->getPlayerID(), projectile[i]->getPlayerID());
 					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
@@ -668,6 +770,7 @@ public:
 				}
 			}
 		}
+
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
@@ -710,6 +813,26 @@ public:
 			playerHolder->setKills(1);
 			//RangeWeapon * newItem = new RangeWeapon(((RangeWeapon *)player[0]->getItem())->getDistance() * 3
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
+		}
+	}
+	void damagePlayerT(int targetId, int towerID)
+	{
+		Tower* tw = tower[towerID];
+		Object * targetHolder = getPlayerObj(targetId);
+		targetHolder->setHealth(tw->getDamage());
+		playerDamaged[targetId] = true;
+		if (targetHolder->getHealth() < 1)
+		{
+			playerDead[targetId] = true;
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			for (uint i = 0; i < player.size(); i++)
+			{
+				if (player[i]->getPlayerID() == targetId)
+				{
+					player[i]->setAliveModelM(player[i]->getModelM());
+					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+				}
+			}
 		}
 	}
 	void damageTower(int targetId, int playerId)
@@ -860,11 +983,51 @@ public:
 		QueryPerformanceCounter(&ct);
 		for (uint i = 0; i < tower.size(); i++){
 			if (tower[i]->checkShoot(ct)){
-				//TODO: shoot
+				int pid;
+				float min_dist=10000;
+				for (uint k = 0; k < player.size(); k++){
+					if (tower[i]->getTeamID() != player[k]->getTeamID()){
+						float dist = glm::distance(vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)), vec3(player[k]->getModelM()*vec4(0, 0, 0, 1)));
+						if (dist < tower[i]->getShootRange() && dist<min_dist){
+							pid = k;
+							min_dist = dist;
+						}
+					}
+				}
+				if (min_dist != 10000){
+					Projectile* cubeT = new Projectile(player.size() + respawn.size());
+					cubeT->setSpeed(5);
+					cubeT->setModelM(player[pid]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+					cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
+					AABB hold = cubeT->getAABB();
+					cubeT->setStartX(hold.max[0]);
+					cubeT->setStartY(hold.max[2]);
+					cubeT->setTeamID(tower[i]->getTeamID());
+					cubeT->setPlayerID(tower[i]->getPlayerID());
 
-				tower[i]->setLastShoot(ct);
+					//Name and type
+					cubeT->setType("Cube");
+					cubeT->setName("Test Cube" + std::to_string(projectile_counter));
+					cubeT->setDistance(tower[i]->getShootRange());
+					tower_projectile.push_back(cubeT);
+					cubeT->setSpeed(50);
+					vec3 dir = glm::normalize(vec3(player[pid]->getModelM()*vec4(0, 0, 0, 1)) - vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)));
+					cubeT->setVelocity(dir*tower[i]->getShootSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+					int shootID = tower_shoot_counter;
+					tower_shoot_counter++;
+					tower_shoot_counter %= 1000;
+					cubeT->setShootID(shootID);
+					tower[i]->setLastShoot(ct);
+					tower[i]->setLastShootDir(dir);
+
+					tower_shoot.push_back(TowerShootInfo(i, shootID, dir));
+					tower_shoot_check[i] = true;
+				}
 			}
 		}
+	}
+	void clearTowerShoot(){
+		tower_shoot.clear();
 	}
 	void despawnProjectile()
 	{
@@ -883,6 +1046,22 @@ public:
 				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
 				delete projectile[i];
 				projectile.erase(projectile.begin() + i);
+			}
+		}
+		for (uint i = 0; i < tower_projectile.size(); i++)
+		{
+			float startX = tower_projectile[i]->getStartX();
+			float startY = tower_projectile[i]->getStartY();
+			AABB curr = tower_projectile[i]->getAABB();
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+
+
+			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
+			if (distance >= (*tower_projectile[i]).getDistance())
+			{
+				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
+				delete tower_projectile[i];
+				tower_projectile.erase(tower_projectile.begin() + i);
 			}
 		}
 	}
@@ -942,6 +1121,14 @@ public:
 		return c;
 	}
 
+	boost::array<mat4, 4> getElevatorMats(){
+		boost::array<mat4, 4> c;
+		for (uint i = 0; i < elevator.size(); i++){
+			c[i] = elevator[i]->getModelM();
+		}
+		return c;
+	}
+
 	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
@@ -972,6 +1159,8 @@ public:
 	void clearPlayerProjectileDespawnList(){
 		despon_player_projectile_list.clear();
 	}
+	vector<int> getTowerProjectileDespawnList(){ return despon_tower_projectile_list; }
+	void clearTowerProjectileDespawnList(){ despon_tower_projectile_list.clear(); }
 	void initialize(){
 
 		MD5Model* md50 = new MD5Model();
@@ -1027,6 +1216,9 @@ public:
 		tw0->postTrans(glm::translate(vec3(-30.0, 0.0, -30.0)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
+		tw0->setShootRange(20);
+		tw0->setShootSpeed(50);
+		tw0->setDamage(-1);
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
 		tw0->setTeamID(1);
@@ -1038,6 +1230,9 @@ public:
 		tw1->postTrans(glm::translate(vec3(30.0, 0.0, -30.0)));
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
+		tw1->setShootRange(20);
+		tw1->setShootSpeed(50);
+		tw1->setDamage(-1);
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
 		tw1->setTeamID(1);
@@ -1049,6 +1244,9 @@ public:
 		tw2->postTrans(glm::translate(vec3(30.0, 0, 30.0)));
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
+		tw2->setShootRange(20);
+		tw2->setShootSpeed(50);
+		tw2->setDamage(-1);
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
 		tw2->setTeamID(0);
@@ -1060,6 +1258,9 @@ public:
 		tw3->postTrans(glm::translate(vec3(-30.0, 0, 30.0)));
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
+		tw3->setShootRange(20);
+		tw3->setShootSpeed(50);
+		tw3->setDamage(-1);
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
 		tw3->setTeamID(0);
@@ -1175,6 +1376,40 @@ public:
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
+		//teleporter
+		Teleporter* tele_01 = new Teleporter();
+		//platform_01->setSpeed(5);
+		tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tele_01->setEndpoint(glm::translate(vec3(0, 50.0, 0)));
+		tele_01->setType("Teleporter");
+		tele_01->setName("Test Teleporter");
+		addStationary(tele_01);
+
+		//elevator
+		Elevator* ele_01 = new Elevator();
+		//platform_01->setSpeed(5);
+		ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+		ele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_01->setType("Elevator");
+		ele_01->setName("Test Elevator");
+		ele_01->setDirection(0);
+		addStationary(ele_01);
+		elevator.push_back(ele_01);
+
+		//elevator
+		Elevator* ele_02 = new Elevator();
+		//platform_01->setSpeed(5);
+		ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
+		ele_02->setAABB(AABB(vec3(-20.0, -0.5, -20.0), vec3(20.0, .5, 20.0)));
+		ele_02->setDirection(1);
+		ele_02->setType("Elevator");
+		ele_02->setName("Test Elevator");
+		addStationary(ele_02);
+		elevator.push_back(ele_02);
+
+		counter2 = 0;
+		counter3 = 0.1;
 
 		for (int i = 0; i < stationary.size(); i++)
 		{
@@ -1232,15 +1467,27 @@ public:
 		counter = 0;
 		projectile_counter = 0;
 	}
+	bool* getTowerShootCheck(){ return tower_shoot_check; }
+	void clearTowerShootCheck(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
+	}
+	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
+	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
 
 protected:
+	int counter2;
+	float counter3;
 	vector<Object*> stationary;
+	vector<Elevator*> elevator;
 	vector<Object*> player;
 	vector<Object*> respawn;
 	vector<Tower*> tower;
 	vector<Object*> skillShot;
 	vector<Object*> virtualTower;
 	vector<Projectile*> projectile;
+	vector<Projectile*> tower_projectile;
 	vector<BillboardList *> powerUps;
 	vector<Item *> items;
 	vector<mat4> camM;
@@ -1248,12 +1495,16 @@ protected:
 	vector<vector<int>> prevAttacked;//first element is playerID, second is axis
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
-	vector<bool> playerOnTramp;
+	bool playerOnTramp[4];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;
 	vector<bool> platformDamaged;
 	vector<bool> platformDead;
+	vector<int> despon_tower_projectile_list;
+	vector<TowerShootInfo> tower_shoot;
+	int tower_shoot_counter;
+	bool tower_shoot_check[NUM_TOWERS];
 
 	Object * pPtr;
 };

@@ -13,7 +13,7 @@ extern mat4 LightView;
 extern mat4 LightProjection;
 extern mat4 ScaleBias;
 
-#define NUM_PARTICLES 3600
+#define NUM_PARTICLES 1000
 
 typedef struct Particle
 {

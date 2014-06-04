@@ -153,7 +153,6 @@ void handle_mouse_state(int pid, int mouseState){
 			}
 		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
-
 	}
 	else if (!(mouseState & 1 << 1))
 	{
@@ -247,6 +246,10 @@ int main(int argc, char *argv[])
 	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+
 	
 	//Player Cam Mats
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -313,7 +316,7 @@ int main(int argc, char *argv[])
 		player4shoot = false;
 		if (strcmp((*recvVec)[RECVINDEXP0].first.c_str(), ""))
 		{
-			playerID = atoi((*recvVec)[0].first.c_str()); 
+			playerID = atoi((*recvVec)[0].first.c_str());
 			handle_key_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER].second[0][0]);
 			if (newData[0]){
 				handle_mouse_state(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 1].second[0][0]);
@@ -331,7 +334,7 @@ int main(int argc, char *argv[])
 				handle_cam_mat(playerID, (*recvVec)[playerID * VECSPERPLAYER + 2].second);
 				handle_cam_rot(playerID, (int)(*recvVec)[playerID * VECSPERPLAYER + 3].second[0][0]);
 			}
-			
+
 		}
 		if (strcmp((*recvVec)[RECVINDEXP2].first.c_str(), ""))
 		{
@@ -358,6 +361,7 @@ int main(int argc, char *argv[])
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
 		boost::array<mat4, 4> ca = scene->getPlayerCams();
+		boost::array<mat4, 4> ep = scene->getElevatorMats();
 
 		// Print out matrix contents
 		/*
@@ -383,28 +387,32 @@ int main(int argc, char *argv[])
 		if (p0Shots > 0){
 			p0 = "0s";
 			p0Shots--;
-		}else{
+		}
+		else{
 			p0 = "0S";
 		}
 
 		if (p1Shots > 0){
 			p1 = "1s";
 			p1Shots--;
-		}else{
+		}
+		else{
 			p1 = "1S";
 		}
 
 		if (p2Shots > 0){
 			p2 = "2s";
 			p2Shots--;
-		}else{
+		}
+		else{
 			p2 = "2S";
 		}
 
 		if (p3Shots > 0){
 			p3 = "3s";
 			p3Shots--;
-		}else{
+		}
+		else{
 			p3 = "3S";
 		}
 
@@ -454,10 +462,10 @@ int main(int argc, char *argv[])
 		else
 			p3 += "K";
 
-		p0 += int_to_string(p1ShotID, 3);
-		p1 += int_to_string(p2ShotID, 3);
-		p2 += int_to_string(p3ShotID, 3);
-		p3 += int_to_string(p4ShotID, 3);
+		p0 += int_to_string(p1ShotID, 4);
+		p1 += int_to_string(p2ShotID, 4);
+		p2 += int_to_string(p3ShotID, 4);
+		p3 += int_to_string(p4ShotID, 4);
 
 		if (sendddddddddddedededed)
 		{
@@ -585,8 +593,28 @@ int main(int argc, char *argv[])
 		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
 
 		//Trampoline status
-		
+		if (scene->getPlayerOnTramp(PLAYER0))
+			p0 += "t";
+		else
+			p0 += "T";
+		if (scene->getPlayerOnTramp(PLAYER1))
+			p1 += "t";
+		else
+			p1 += "T";
+		if (scene->getPlayerOnTramp(PLAYER2))
+			p2 += "t";
+		else
+			p2 += "T";
+		if (scene->getPlayerOnTramp(PLAYER3))
+			p3 += "t";
+		else
+			p3 += "T";
 
+		// Clear onTramp after status grabbed
+		if (sendddddddddddedededed)
+		{
+			scene->clearPlayerOnTramp();
+		}
 
 
 		//despawn player projectile list
@@ -596,7 +624,7 @@ int main(int argc, char *argv[])
 			scene->clearPlayerProjectileDespawnList();
 			ppdl_str = "";
 			for (uint i = 0; i < ppdl.size(); i++){
-				ppdl_str += int_to_string(ppdl[i], 3);
+				ppdl_str += int_to_string(ppdl[i], 4);
 			}
 		}
 
@@ -610,20 +638,54 @@ int main(int argc, char *argv[])
 			if ((*stationaries)[i]->getIsPlatformDamage())
 				platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
 			//if (platformDamaged[i])
-				//cout << platform_status << endl;
+			//	cout << platform_status << endl;
 			scene->setPlatformDamaged(i, false);
 			//scene->setPlatformDead(i, false);
 		}
 		
+		string ts[4] = { "" };
+		if (sendddddddddddedededed){
+			bool* shoot_check = scene->getTowerShootCheck();
+			for (uint i = 0; i < 4; i++){
+				if (shoot_check[i]){//tower shot during last simulation
+					ts[i] += "T";
+					ts[i] += to_string(i);
+					assert(ts[i].length() == 2);
+					ts[i] += int_to_string(scene->getLastTowerShootID(i), 4);
+					vec3 dir = scene->getLastTowerShootDir(i);
+					ts[i] += int_to_string((int)(100000 * (1 + dir[0])), 6);
+					//cout << int_to_string((int)(100000 * (1 + dir[0])), 6) << endl;
+					ts[i] += int_to_string((int)(100000 * (1 + dir[1])), 6);
+					//cout << int_to_string((int)(100000 * (1 + dir[1])), 6) << endl;
+					ts[i] += int_to_string((int)(100000 * (1 + dir[2])), 6);
+					//cout << int_to_string((int)(100000 * (1 + dir[2])), 6) << endl;
+					assert(ts[i].length() == 24);
+				}
+				else{
+					ts[i] += "t";
+					ts[i] += to_string(i);
+					assert(ts[i].length() == 2);
+					ts[i] += "0000";
+					ts[i] += "000000";
+					ts[i] += "000000";
+					ts[i] += "000000";
+					assert(ts[i].length() == 24);
+				}
+			}
+			scene->clearTowerShoot();
+			scene->clearTowerShootCheck();
+		}
+
+
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER0] = std::make_pair(p0.c_str(), mp[PLAYER0]);
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER1] = std::make_pair(p1.c_str(), mp[PLAYER1]);
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER2] = std::make_pair(p2.c_str(), mp[PLAYER2]);
 		(*sendVec)[PLAYER_MAT_BEGIN + PLAYER3] = std::make_pair(p3.c_str(), mp[PLAYER3]);
 
-		(*sendVec)[TOWER_MAT_BEGIN + 0] = std::make_pair("t0", mt[0]);
-		(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair("t1", mt[1]);
-		(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair("t2", mt[2]);
-		(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair("t3", mt[3]);
+		(*sendVec)[TOWER_MAT_BEGIN + 0] = std::make_pair(ts[0], mt[0]);
+		(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair(ts[1], mt[1]);
+		(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair(ts[2], mt[2]);
+		(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair(ts[3], mt[3]);
 
 		(*sendVec)[PPDL_MAT] = std::make_pair(ppdl_str, mat4(1.0));
 
@@ -633,7 +695,11 @@ int main(int argc, char *argv[])
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER2] = std::make_pair("c2", ca[PLAYER2]);
 		(*sendVec)[CAM_MAT_BEGIN + PLAYER3] = std::make_pair("c3", ca[PLAYER3]);
 
+		(*sendVec)[PLATFORM_BEGIN] = std::make_pair("e0", ep[0]);
+		(*sendVec)[PLATFORM_BEGIN + 1] = std::make_pair("e1", ep[1]);
+
 		(*sendVec)[PLATFORM_STATUS] = std::make_pair(platform_status, mat4(0.0));
+
 		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
 		//std::cout << "pair 0: " << ((*sendVec)[0].first.c_str()) << std::endl;

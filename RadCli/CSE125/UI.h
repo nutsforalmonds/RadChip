@@ -307,15 +307,15 @@ public:
 	int draw(){
 
 		//Status Bars
-		life_back->draw();
+		life_back->draw();	
 		life_front->draw();
-
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glDepthMask(GL_FALSE);
 
 		life_frame->draw();
-
+		
 		glDisable(GL_BLEND);
 		//glDepthMask(GL_TRUE);
 
@@ -368,23 +368,31 @@ public:
 
 	int healthBar(float damage){
 
-		life_front->UI_Panel::~UI_Panel();
-
-		x2_life = x2_life - health_bar_size*damage;
-
-		if (x2_life <= x1_life)
+		if (x2_life != health_bar_size*damage + x1_life)
 		{
-			//x2_life = x1_life;
-			x2_life = 0.275f;
+
+			life_front->UI_Panel::~UI_Panel();
+
+			x2_life = health_bar_size*damage + x1_life;
+
+			if (x2_life <= x1_life)
+			{
+				//x2_life = x1_life;
+				x2_life = 0.275f;
+			}
+
+			life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
+			life_front->setColor(vec3(0.0, 1.0, 0.0));
+			life_front->setShader(sdrCtl.getShader("basic_2D"));
+			//life_front->loadColorTex("img/UI_TEST.png", "PNG");
+			life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
+
+			return 1;
 		}
-
-		life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
-		life_front->setColor(vec3(0.0, 1.0, 0.0));
-		life_front->setShader(sdrCtl.getShader("basic_2D"));
-		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
-		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
-
-		return 0;
+		else
+		{
+			return 0;
+		}
 
 	}
 
@@ -482,7 +490,7 @@ public:
 
 
 	float getLess_Life(){ return less_life; }
-	void setLess_Life(float l){ less_life = l; }
+	void setLess_Life(float l){less_life = l;}
 
 	float getShots(){ return shots; }
 	void setShots(float s){ shots = s; }
@@ -545,7 +553,7 @@ private:
 	float less_life = 0;
 	float overheat = 0;
 	float shots = 0;
-	float damage_taken = (float)0.1; //set to default 1/7 of the life bar
+	float damage_taken;
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
 
@@ -807,6 +815,10 @@ public:
 		frame->setTex(true);
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
+		deaths[4] = { 0 };
+		kills[4] = { 0 };
+
+
 	}
 	~GameMenu(){
 
@@ -842,6 +854,44 @@ public:
 		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
+
+	int killDraw(){
+		char buf[100];
+		
+
+		glDisable(GL_DEPTH_TEST);
+
+		//Player 1
+		k = to_string(kills[0]);
+		d = to_string(deaths[0]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 1 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5* Window::height / 8, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 2
+		k = to_string(kills[1]);
+		d = to_string(deaths[1]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 2 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160,5* Window::height / 8 - 48, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 3
+		k = to_string(kills[2]);
+		d = to_string(deaths[2]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 3 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 96, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+
+		//Player 4
+		k = to_string(kills[3]);
+		d = to_string(deaths[3]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 4 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+	
+		glEnable(GL_DEPTH_TEST);
+
+		return 0;
+	}
+
+	void setDeath(int i){ deaths[i]++;}
+	void setKills(int i, int k){ kills[i] = k;}
 
 	int checkHighlight(float x, float y){
 
@@ -911,6 +961,10 @@ private:
 	UI_Panel * selected_quit;
 	UI_Panel * frame;
 
+	int deaths[4];
+	int kills[4];
+	string k;
+	string d;
 	bool drawStartHighlight;
 	bool drawEndHighlight;
 };
@@ -997,6 +1051,8 @@ public:
 				break;
 			case 4:
 				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, five, vec3(1.0f, 1.0f, 1.0f));
+				//DAN TODO - Add Sound
+				myCountSound->Play();
 				break;
 			case 3:
 				RenderString(Window::width / 2, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, six, vec3(1.0f, 1.0f, 1.0f));
@@ -1014,9 +1070,13 @@ public:
 				RenderString(Window::width / 2 - 24, 9 * Window::height / 16, GLUT_BITMAP_TIMES_ROMAN_24, ready, vec3(1.0f, 1.0f, 1.0f));
 				break;
 			}
-		
+
 		glEnable(GL_DEPTH_TEST);
 		return 0;
+	}
+
+	void setupSound(Sound* s){
+		myCountSound = s;
 	}
 
 	int checkHighlight(float x, float y){
@@ -1071,6 +1131,7 @@ private:
 	float since_death;
 	bool drawRespawnHighlight = false;
 	
+	Sound* myCountSound;
 };
 
 class Logo

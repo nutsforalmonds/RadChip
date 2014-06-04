@@ -1,6 +1,6 @@
 
 // matrix indexes
-#define NUMOFVECS			14
+#define NUMOFVECS			16
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
@@ -8,9 +8,11 @@
 #define CAM_MAT_BEGIN		8
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
-#define PLATFORM_STATUS		13
 //#define PLAT_MAT_BEGIN	12
 //#define PLAT_MAT_END		15
+#define PLAT_MAT_BEGIN	    13
+#define PLAT_MAT_END		14
+#define PLATFORM_STATUS		15
 //#define PPDL_MAT			16
 
 // string indexes
@@ -18,13 +20,13 @@
 #define DAMAGEDBIT			2
 #define KILLEDBIT			3
 #define SHOOT_ID_BEGIN		4
-#define SHOOT_ID_END		6
-#define PHEALTH_BEGIN		7
-#define PHEALTH_END			9
-#define PKILLS_BEGIN		10
-#define PKILLS_END			12
-#define POWER_UP_STATUS		13
-#define TRAMP_STATUS		14
+#define SHOOT_ID_END		7
+#define PHEALTH_BEGIN		8
+#define PHEALTH_END			10
+#define PKILLS_BEGIN		11
+#define PKILLS_END			13
+#define POWER_UP_STATUS		14
+#define TRAMP_STATUS		15
 
 #define NOPOWER				0
 #define SPEEDUP				1
@@ -38,7 +40,20 @@
 #define PLAYER2				2
 #define PLAYER3				3
 
+
 //indicies for platform status
 #define PLATFORM_INDEX		1
 #define PLATFORM_DAMAGE		2
 #define PLATFORM_DEAD		3
+
+//tower 
+#define TOWERSHOOTBIT			0
+#define TOWER_ID			1
+#define TOWER_SHOOT_ID_BEGIN		2
+#define TOWER_SHOOT_ID_END		5
+#define DIR_0_BEGIN			6
+#define DIR_0_END			11
+#define DIR_1_BEGIN			12
+#define DIR_1_END			17
+#define DIR_2_BEGIN			18
+#define DIR_2_END			23
