@@ -31,10 +31,8 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(2, 10, 2);
-		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
-		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
-		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
-		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		powerUp = 0;
+		powerUpDuration = 0;
 	}
 	Object(string n, string t){
 		onElevator = false;
@@ -51,10 +49,8 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(2, 10, 2);
-		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
-		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
-		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
-		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		powerUp = 0;
+		powerUpDuration = 0;
 	}
 	~Object()
 	{
@@ -190,11 +186,11 @@ public:
 	int getTeamID(){ return teamID; }
 	void setTeamID(int i){ teamID = i; }
 
-	bool * getPowerUp() { return powerUp; }
-	void setPowerUp(int i, bool val) { powerUp[i] = val; }
+	int getPowerUp() { return powerUp; }
+	void setPowerUp(int val) { powerUp = val; }
 
-	int * getPowerUpDuration() { return powerUpDuration; }
-	void setPowerUpDuration(int i, int val) { powerUpDuration[i] = val; }
+	int getPowerUpDuration() { return powerUpDuration; }
+	void setPowerUpDuration(int val) { powerUpDuration = val; }
 	bool getOnElevator(){
 		return onElevator;
 	}
@@ -226,6 +222,6 @@ protected:
 	RangeWeapon * weapon;
 	Boots * boots;
 	mat4 aliveModelM;
-	bool * powerUp;
-	int * powerUpDuration;
+	int powerUp;
+	int powerUpDuration;
 };

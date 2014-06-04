@@ -8,6 +8,8 @@
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
 #define PLATFORM_BEGIN      13     
+#define PLATFORM_END		14
+#define GLOBAL				15
 
 //player bit info
 #define SHOOTBIT			1
@@ -16,7 +18,7 @@
 #define SHOOT_ID_BEGIN		4
 #define SHOOT_ID_END		6
 
-#define NOPOWER			0
+#define NOPOWER				0
 #define SPEEDUP				1
 #define DOUBLEDAMAGE		2
 #define HEALTHBOOST			3

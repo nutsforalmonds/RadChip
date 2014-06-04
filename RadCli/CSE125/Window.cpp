@@ -1587,12 +1587,6 @@ void server_update(int value){
 			}
 		}
 
-		std::fill_n(bVis, 5, true);
-		bVis[parseOpts->getPPowerUp(recvVec, PLAYER0)] = false;
-		bVis[parseOpts->getPPowerUp(recvVec, PLAYER1)] = false;
-		bVis[parseOpts->getPPowerUp(recvVec, PLAYER2)] = false;
-		bVis[parseOpts->getPPowerUp(recvVec, PLAYER3)] = false;
-
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){
@@ -1668,7 +1662,23 @@ void server_update(int value){
 			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
+
+		std::fill_n(bVis, 5, true);
+		int pUpState = parseOpts->getPUpState(recvVec);
+		std::cout << pUpState << std::endl;
+		if (pUpState & 1)
+			bVis[SPEEDUP] = false;
+		if (pUpState & 1 << 1)
+			bVis[DOUBLEDAMAGE] = false;
+		if (pUpState & 1 << 2)
+			bVis[HEALTHBOOST] = false;
+		if (pUpState & 1 << 3)
+			bVis[FASTERSHOOT] = false;
+		if (pUpState & 1 << 3)
+			bVis[FARTHERSHOOT] = false;
+
 	}
+
 
 	//Particles are instantly despawning
 	//despawnProjectile();

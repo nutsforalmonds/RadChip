@@ -15,6 +15,7 @@
 #include "Tower.h"
 #include "Elevator.h"
 #include "Teleporter.h"
+#include "constants.h"
 using namespace std;
 
 
@@ -101,7 +102,7 @@ public:
 		return pPtr->getKills();
 	}
 
-	bool * getPlayerPowerUp(int playerID)
+	int getPlayerPowerUp(int playerID)
 	{
 		pPtr = getPlayerObj(playerID);
 		return pPtr->getPowerUp();
@@ -131,6 +132,24 @@ public:
 		playerOnTele[1] = false;
 		playerOnTele[2] = false;
 		playerOnTele[3] = false;
+	}
+
+	int getPUpState()
+	{
+		int ret = 0;
+
+		if (pUpCooldown[SPEEDUP] > 0)
+			ret = ret | 1;
+		if (pUpCooldown[DOUBLEDAMAGE] > 0)
+			ret = ret | 1 << 1;
+		if (pUpCooldown[HEALTHBOOST] > 0)
+			ret = ret | 1 << 2;
+		if (pUpCooldown[FASTERSHOOT] > 0)
+			ret = ret | 1 << 3;
+		if (pUpCooldown[FARTHERSHOOT] > 0)
+			ret = ret | 1 << 4;
+
+		return ret;
 	}
 
 	void simulate(float t, float sub){
@@ -346,55 +365,149 @@ public:
 
 					if (inX && inY && inZ)
 					{
+						// TODO needs to despawn powerup on server side
+						// check all players, if anyone has the powerup, it can't be applied
+						// to a new player
 						//MS boost , uses index 0
-						if (j == 0)
+						if (j == 0 && pUpCooldown[SPEEDUP] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[0])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getBoots()->setMoveSpeed(4);
-								player[i]->setPowerUp(j, 1);
+ 								player[i]->setPowerUp(SPEEDUP);
+								std::cout << "speed boost if" << std::endl;
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									break;
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								
+								player[i]->getBoots()->setMoveSpeed(4);
+								player[i]->setPowerUp(SPEEDUP);
+								std::cout << "speed boost else" << std::endl;
+							}
+							pUpCooldown[SPEEDUP] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//DMG boost , uses index 1
-						else if ( j == 1)
+						else if (j == 1 && pUpCooldown[DOUBLEDAMAGE] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[1])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setDamage(-4);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(DOUBLEDAMAGE);
+								std::cout << "dmg if" << std::endl;
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									break;
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->getWeapon()->setDamage(-4);
+								player[i]->setPowerUp(DOUBLEDAMAGE);
+								std::cout << "dmg else" << std::endl;
+								std::cout << player[i]->getPowerUp() << std::endl;
+							}
+							pUpCooldown[DOUBLEDAMAGE] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Health boost , uses index 2
-						else if (j == 2)
+						else if (j == 2 && pUpCooldown[HEALTHBOOST] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[2])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->setHealth(4);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(HEALTHBOOST);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									break;
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->setHealth(4);
+								player[i]->setPowerUp(HEALTHBOOST);
+							}
+							pUpCooldown[HEALTHBOOST] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Shot Spd boost , uses index 3
-						else if (j == 3)
+						else if (j == 3 && pUpCooldown[FASTERSHOOT] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[3])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setSpeed(70);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(FASTERSHOOT);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									break;
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->getWeapon()->setSpeed(70);
+								player[i]->setPowerUp(FASTERSHOOT);
+							}
+							pUpCooldown[FASTERSHOOT] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Shot Range boost , uses index 4
-						else if (j == 4)
+						else if (j == 4 && pUpCooldown[FARTHERSHOOT] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[4])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setDistance(70);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(FARTHERSHOOT);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									break;
+								
+								player[i]->getWeapon()->setDistance(70);
+								player[i]->setPowerUp(FARTHERSHOOT);
+							}
+							pUpCooldown[FARTHERSHOOT] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 					}
 				}
@@ -530,54 +643,37 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void removePowerUp()
 	{
-		bool * playerPowerUp;
-		int * powerUpDuration;
+		if (pUpCooldown[SPEEDUP] > 0)
+			pUpCooldown[SPEEDUP] -= 1;
+		if (pUpCooldown[DOUBLEDAMAGE] > 0)
+			pUpCooldown[DOUBLEDAMAGE] -= 1;
+		if (pUpCooldown[HEALTHBOOST] > 0)
+			pUpCooldown[HEALTHBOOST] -= 1;
+		if (pUpCooldown[FASTERSHOOT] > 0)
+			pUpCooldown[FASTERSHOOT] -= 1;
+		if (pUpCooldown[FARTHERSHOOT] > 0)
+			pUpCooldown[FARTHERSHOOT] -= 1;
+
 		for (int i = 0; i < player.size(); i++)
 		{
-			playerPowerUp = player[i]->getPowerUp();
-			powerUpDuration = player[i]->getPowerUpDuration();
-
-			for (int j = 0; j < NUM_POWERUPS; j++)
+			if (player[i]->getPowerUp() != 0)
 			{
-				if (playerPowerUp[j])
+				//std::cout << player[i]->getPowerUp() << std::endl;
+				player[i]->setPowerUpDuration(player[i]->getPowerUpDuration() - 1);
+				if (player[i]->getPowerUpDuration() <= 0)
 				{
-					powerUpDuration[j]--;
-					//if (j == 0)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
-					//if (j == 1)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
-					//if (j == 2)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
-					//if (j == 3)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
-					//if (j == 4)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
+					if (player[i]->getPowerUp() == SPEEDUP)
+						player[i]->getBoots()->setMoveSpeed(2);
+					else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+						player[i]->getWeapon()->setDamage(-1);
+					else if (player[i]->getPowerUp() == HEALTHBOOST)
+						player[i]->setHealth(-4);
+					else if (player[i]->getPowerUp() == FASTERSHOOT)
+						player[i]->getWeapon()->setSpeed(50);
+					else if (player[i]->getPowerUp() == FARTHERSHOOT)
+						player[i]->getWeapon()->setDistance(40);
 
-					if (powerUpDuration[j] <= 0)
-					{
-						player[i]->setPowerUp(j, 0);
-
-						if (j == 0)
-						{
-							player[i]->getBoots()->setMoveSpeed(2);
-						}
-						else if (j == 1)
-						{
-							player[i]->getWeapon()->setDamage(-1);
-						}
-						else if (j == 2)
-						{
-							player[i]->setHealth(-4);
-						}
-						else if (j == 3)
-						{
-							player[i]->getWeapon()->setSpeed(50);
-						}
-						else if (j == 4)
-						{
-							player[i]->getWeapon()->setDistance(40);
-						}
-					}
+					player[i]->setPowerUp(NOPOWER);
 				}
 			}
 		}
@@ -1414,6 +1510,7 @@ protected:
 	vector<bool> playerDead;
 	bool playerOnTramp[4];
 	bool playerOnTele[4];
+	int pUpCooldown[5];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

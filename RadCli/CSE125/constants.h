@@ -1,6 +1,6 @@
 
 // matrix indexes
-#define NUMOFVECS			15
+#define NUMOFVECS			16
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
@@ -10,7 +10,7 @@
 #define PPDL_MAT			12
 #define PLAT_MAT_BEGIN	    13
 #define PLAT_MAT_END		14
-//#define PPDL_MAT			16
+#define GLOBAL				15
 
 // string indexes
 #define SHOOTBIT			1
