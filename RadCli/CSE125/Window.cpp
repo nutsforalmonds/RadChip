@@ -2090,6 +2090,11 @@ void keyboard(unsigned char key, int, int){
 			//scene->addPlayer(cube6);
 
 		}
+
+		if (key == 9)
+		{
+			kill_count = true;
+		}
 		if (key == 0x30)
 		{
 			draw_list.clear();
@@ -2224,8 +2229,9 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 9)
 		{
-			kill_count = !kill_count;
+			kill_count = false;
 		}
+
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
 			if (sprint_up < 10){
