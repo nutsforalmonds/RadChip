@@ -266,6 +266,10 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -368,7 +372,7 @@ int main(int argc, char *argv[])
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
 		boost::array<mat4, 4> ca = scene->getPlayerCams();
-		boost::array<mat4, 4> ep = scene->getElevatorMats();
+		boost::array<mat4, 5> ep = scene->getElevatorMats();
 
 		// Print out matrix contents
 		/*
@@ -615,6 +619,9 @@ int main(int argc, char *argv[])
 
 		(*sendVec)[PLATFORM_BEGIN] = std::make_pair("e0", ep[0]);
 		(*sendVec)[PLATFORM_BEGIN + 1] = std::make_pair("e1", ep[1]);
+		(*sendVec)[PLATFORM_BEGIN +2] = std::make_pair("e2", ep[2]);
+		(*sendVec)[PLATFORM_BEGIN + 3] = std::make_pair("e3", ep[3]);
+		(*sendVec)[PLATFORM_BEGIN +4] = std::make_pair("e4", ep[4]);
 
 		(*sendVec)[GLOBAL] = std::make_pair(pG.c_str(), mat4(1.0));
 

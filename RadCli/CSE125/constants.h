@@ -1,6 +1,6 @@
 
 // matrix indexes
-#define NUMOFVECS			16
+#define NUMOFVECS			19
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
@@ -9,8 +9,8 @@
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
 #define PLAT_MAT_BEGIN	    13
-#define PLAT_MAT_END		14
-#define GLOBAL				15
+#define PLAT_MAT_END		17
+#define GLOBAL				18
 
 // string indexes
 #define SHOOTBIT			1
@@ -39,10 +39,10 @@
 #define PLAYER3				3
 
 //tower 
-#define TOWERSHOOTBIT			0
+#define TOWERSHOOTBIT		0
 #define TOWER_ID			1
-#define TOWER_SHOOT_ID_BEGIN		2
-#define TOWER_SHOOT_ID_END		5
+#define TOWER_SHOOT_ID_BEGIN	2
+#define TOWER_SHOOT_ID_END	5
 #define DIR_0_BEGIN			6
 #define DIR_0_END			11
 #define DIR_1_BEGIN			12
