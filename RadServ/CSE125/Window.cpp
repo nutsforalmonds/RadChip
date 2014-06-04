@@ -78,6 +78,12 @@ int p_shoot_counter;
 
 string int_to_string(int num, int length){
 	string t = "";
+	if (num < 0)
+	{
+		std::cout << "Exception: less than zero int to string conversion" << std::endl;
+		system("pause");
+	}
+
 	int num_zero;
 	if (num > 1){
 		num_zero = length - (int)floor(log10(num*10));
@@ -467,10 +473,10 @@ int main(int argc, char *argv[])
 
 		if (sendddddddddddedededed)
 		{
-			scene->setPlayerDead(0, false);
-			scene->setPlayerDead(1, false);
-			scene->setPlayerDead(2, false);
-			scene->setPlayerDead(3, false);
+			//scene->setPlayerDead(0, false);
+			//scene->setPlayerDead(1, false);
+			//scene->setPlayerDead(2, false);
+			//scene->setPlayerDead(3, false);
 		}
 
 		p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);

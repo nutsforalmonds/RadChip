@@ -18,7 +18,7 @@
 using namespace std;
 
 
-#define RESPAWN_COUNTER 100
+#define RESPAWN_COUNTER 1500
 
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
@@ -591,9 +591,8 @@ public:
 		{
 			if (player[i]->getHealth() < 1)
 			{
-
 				holder = player[i];
-				holder->setRespawn(holder->getRespawn() - 1);
+				holder->setModelM(holder->getModelM()*glm::translate(vec3(0, -20, 0)));
 				
 				if (holder->getRespawn() < 1)
 				{
@@ -601,7 +600,9 @@ public:
 					//Window::addPlayerList(holder);
 					//Window::respawnPlayer(holder->getName());
 					holder->putHealth(7);
-					holder->setModelM(holder->getAliveModelM());
+					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
+					holder->setVelocity(vec3(0, 20, 0));
+					setPlayerDead(holder->getPlayerID(), false);
 					//cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << " " << player[i]->getHealth() << endl;
 
 					//id = holder->getPlayerID();
@@ -616,6 +617,8 @@ public:
 
 					//cout << "" << endl;
 				}
+				else
+					holder->setRespawn(holder->getRespawn() - 1);
 			}
 		}
 	}
@@ -744,7 +747,7 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+					////////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
 			//cout << playerId << " " << dmg << endl;
@@ -772,7 +775,7 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+					///////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
 		}

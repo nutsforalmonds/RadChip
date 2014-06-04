@@ -623,7 +623,7 @@ void Window::idleCallback(void)
 			cam[playerID]->setCamMode(0);
 		}
 		else if(first_change){
-			cam[playerID]->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam[playerID]->setCamM(glm::translate(vec3(0,60,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
 			cam[playerID]->setCamMode(1);
 			first_change = false;
 		}
@@ -1498,6 +1498,17 @@ void server_update(int value){
 			sound_3d_death2->setPosition(player3_sound_vec_lasterest);
 			sound_3d_death2->Play3D(View);
 			myGameMenu->setDeath(3);
+		}
+
+		if (parseOpts->getKilled(recvVec, playerID))
+		{
+			//myDeathScreen->setDeathClock(clock());
+			//myClientState->setState(3);
+			alive = false;
+		}
+		if (!alive && !parseOpts->getKilled(recvVec, playerID))
+		{
+			alive = true;
 		}
 
 		// TODO link up health to UI
