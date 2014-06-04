@@ -132,6 +132,8 @@ LightningGenerator lightning_generator;
 
 Mesh_Static* tryThis;
 
+
+bool bVis[5];
 BillboardList m_billboardList;
 BillboardList m_billboardList2;
 BillboardList m_billboardList3;
@@ -260,6 +262,7 @@ int keyState = 0;
 int mouseState = 0;
 int projectile_counter = 0;
 float max_health = 7.0;
+bool dead[4];
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
@@ -623,7 +626,7 @@ void Window::idleCallback(void)
 			cam[playerID]->setCamMode(0);
 		}
 		else if(first_change){
-			cam[playerID]->setCamM(glm::translate(vec3(0,60,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam[playerID]->setCamM(glm::translate(vec3(0,120,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
 			cam[playerID]->setCamMode(1);
 			first_change = false;
 		}
@@ -1168,11 +1171,17 @@ void Window::displayCallback(void)
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 
-		m_billboardList.Render(Projection, View, 1.0f);
-		m_billboardList2.Render(Projection, View, 1.0f);
-		m_billboardList3.Render(Projection, View, 1.0f);
-		m_billboardList4.Render(Projection, View, 1.0f);
-		m_billboardList5.Render(Projection, View, 1.0f);
+		if (bVis[SPEEDUP])
+			m_billboardList.Render(Projection, View, 1.0f);
+		if (bVis[DOUBLEDAMAGE])
+			m_billboardList2.Render(Projection, View, 1.0f);
+		if (bVis[HEALTHBOOST])
+			m_billboardList3.Render(Projection, View, 1.0f);
+		if (bVis[FASTERSHOOT])
+			m_billboardList4.Render(Projection, View, 1.0f);
+		if (bVis[FARTHERSHOOT])
+			m_billboardList5.Render(Projection, View, 1.0f);
+
 		//m_billboardList6.Render(Projection, View, 1.0f);
 
 		glEnable(GL_POINT_SPRITE);
@@ -1459,46 +1468,70 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
 			//cout << "Killed 0" << endl;
-			spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player0_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player0_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(0);
+			if (!dead[PLAYER0])
+			{
+				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player0_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(0);
+				dead[PLAYER0] = true;
+			}
 		}
+		else
+			dead[PLAYER0] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
-			spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player1_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player1_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(1);
+			if (!dead[PLAYER1])
+			{
+				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player1_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player1_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(0);
+				dead[PLAYER1] = true;
+			}
 		}
+		else
+			dead[PLAYER1] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
-			spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player2_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player2_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(2);
+			if (!dead[PLAYER2])
+			{
+				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player2_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player2_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(2);
+				dead[PLAYER2] = true;
+			}
 		}
+		else
+			dead[PLAYER2] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
-			// << "Killed 3" << endl;
-			spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player3_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player3_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(3);
+			//cout << "Killed 3" << endl;
+			if (!dead[PLAYER3])
+			{
+				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player3_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player3_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(3);
+				dead[PLAYER3] = true;
+			}
 		}
+		else
+			dead[PLAYER3] = false;
 
 		if (parseOpts->getKilled(recvVec, playerID))
 		{
@@ -1529,6 +1562,7 @@ void server_update(int value){
 				Player0_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER0);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER1)){
 			if (Player1_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER1)){
 				sound_3d_pick->setPosition(player1_sound_vec_lasterest);
@@ -1536,6 +1570,7 @@ void server_update(int value){
 				Player1_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER1);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER2)){
 			if (Player2_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER2)){
 				sound_3d_pick->setPosition(player2_sound_vec_lasterest);
@@ -1543,6 +1578,7 @@ void server_update(int value){
 				Player2_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER2);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER3)){
 			if (Player3_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER3)){
 				sound_3d_pick->setPosition(player3_sound_vec_lasterest);
@@ -1550,6 +1586,13 @@ void server_update(int value){
 				Player3_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER3);
 			}
 		}
+
+		std::fill_n(bVis, 5, true);
+		bVis[parseOpts->getPPowerUp(recvVec, PLAYER0)] = false;
+		bVis[parseOpts->getPPowerUp(recvVec, PLAYER1)] = false;
+		bVis[parseOpts->getPPowerUp(recvVec, PLAYER2)] = false;
+		bVis[parseOpts->getPPowerUp(recvVec, PLAYER3)] = false;
+
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){
@@ -2050,6 +2093,11 @@ void keyboard(unsigned char key, int, int){
 			//scene->addPlayer(cube6);
 
 		}
+
+		if (key == 9)
+		{
+			kill_count = true;
+		}
 		if (key == 0x30)
 		{
 			draw_list.clear();
@@ -2184,8 +2232,9 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 9)
 		{
-			kill_count = !kill_count;
+			kill_count = false;
 		}
+
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
 			if (sprint_up < 10){
