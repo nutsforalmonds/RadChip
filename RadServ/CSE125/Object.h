@@ -31,6 +31,11 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(2, 10, 2);
+//		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+//		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+//		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+//		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		isPlatformDamage = false;
 		powerUp = 0;
 		powerUpDuration = 0;
 	}
@@ -49,6 +54,11 @@ public:
 		playerID = -1;
 		weapon = new RangeWeapon();
 		boots = new Boots(2, 10, 2);
+//		powerUp = (bool *)malloc(NUM_POWERUPS * sizeof(bool));
+//		memset(powerUp, 0, NUM_POWERUPS * sizeof(bool));
+//		powerUpDuration = (int *)malloc(NUM_POWERUPS * sizeof(int));
+//		memset(powerUpDuration, 0, NUM_POWERUPS * sizeof(int));
+		isPlatformDamage = false;
 		powerUp = 0;
 		powerUpDuration = 0;
 	}
@@ -198,6 +208,9 @@ public:
 		onElevator = b;
 	}
 
+	bool getIsPlatformDamage() { return isPlatformDamage; }
+	void setIsPlatformDamage(bool b) { isPlatformDamage = b; }
+
 protected:
 	bool onElevator;
 	mat4 modelM;
@@ -222,6 +235,9 @@ protected:
 	RangeWeapon * weapon;
 	Boots * boots;
 	mat4 aliveModelM;
+//	bool * powerUp;
+//	int * powerUpDuration;
+	bool isPlatformDamage;
 	int powerUp;
 	int powerUpDuration;
 };

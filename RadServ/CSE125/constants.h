@@ -10,6 +10,7 @@
 #define PLATFORM_BEGIN      13     
 #define PLATFORM_END		17
 #define GLOBAL				18
+#define PLATFORM_STATUS		19
 
 //player bit info
 #define SHOOTBIT			1

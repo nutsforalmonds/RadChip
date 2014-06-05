@@ -169,7 +169,7 @@ public:
 			collisionDetectionPowerUp();
 			despawnProjectile();
 			rechargeJump();
-			respawnPlayer();
+			respawnObjs();
 			respawnTower();
 			removePowerUp();
 			moveElevators();
@@ -185,7 +185,7 @@ public:
 		collisionDetectionPowerUp();
 		despawnProjectile();
 		rechargeJump();
-		respawnPlayer();
+		respawnObjs();
 		respawnTower();
 		removePowerUp();
 		moveElevators();
@@ -371,9 +371,9 @@ public:
 				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
-					inX = (playerAABB.min[0] <= powerUpPos[0]) && (powerUpPos[0] <= playerAABB.max[0]);
-					inY = (playerAABB.min[1] <= powerUpPos[1]) && (powerUpPos[1] <= playerAABB.max[1]);
-					inZ = (playerAABB.min[2] <= powerUpPos[2]) && (powerUpPos[2] <= playerAABB.max[2]);
+					inX = (playerAABB.min[0] <= powerUpPos[0] + 3) && (powerUpPos[0] - 3 <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1] + 3) && (powerUpPos[1] - 3 <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2] + 3) && (powerUpPos[2] - 3 <= playerAABB.max[2]);
 
 					if (inX && inY && inZ)
 					{
@@ -655,6 +655,32 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	vector<Object *> * getStationary()
+	{
+		return &stationary;
+	}
+
+	vector<bool> getPlatformDamaged()
+	{
+		return platformDamaged;
+	}
+
+	void setPlatformDamaged(int i, bool b)
+	{
+		platformDamaged[i] = b;
+	}
+
+	vector<bool> getPlatformDead()
+	{
+		return platformDead;
+	}
+
+	void setPlatformDead(int i, bool b)
+	{
+		platformDead[i] = b;
+	}
+
 	void removePowerUp()
 	{
 		if (pUpCooldown[SPEEDUP] > 0)
@@ -693,7 +719,7 @@ public:
 		}
 	}
 
-	void respawnPlayer()
+	void respawnObjs()
 	{
 		Object * holder;
 		//int id;
@@ -729,6 +755,26 @@ public:
 				}
 				else
 					holder->setRespawn(holder->getRespawn() - 1);
+			}
+		}
+
+		for (int i = 0; i < stationary.size(); i++)
+		{
+			if (stationary[i]->getIsPlatformDamage())
+			{
+				if (stationary[i]->getHealth() < 1)
+				{
+
+					holder = stationary[i];
+					holder->setRespawn(holder->getRespawn() - 1);
+
+					if (holder->getRespawn() < 1)
+					{
+						holder->putHealth(7);
+						holder->setModelM(holder->getAliveModelM());
+						platformDead[i] = false;
+					}
+				}
 			}
 		}
 	}
@@ -848,6 +894,34 @@ public:
 			}
 		}
 
+		//stationary-projectile detection
+		for (uint i = 0; i < projectile.size(); i++)
+		{
+			for (uint j = 0; j < stationary.size(); j++)
+			{
+				AABB pBox = projectile[i]->getAABB();
+				AABB sBox = stationary[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					if (stationary[j]->getIsPlatformDamage())
+					{
+						damageStationary(j, projectile[i]->getPlayerID());
+					}
+					despon_player_projectile_list.push_back(projectile[i]->getShootID());
+					delete projectile[i];
+					projectile.erase(projectile.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
+
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
@@ -942,7 +1016,7 @@ public:
 				if (tower[i]->getPlayerID() == targetId)
 				{
 					tower[i]->setAliveModelM(tower[i]->getModelM());
-					tower[i]->setModelM(tower[i]->getModelM()*glm::translate(vec3(0, 50, 0)));
+					tower[i]->setModelM(tower[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
 				}
 			}
 			//cout << playerId << " " << dmg << endl;
@@ -955,6 +1029,26 @@ public:
 			//										, ((RangeWeapon *)player[0]->getItem())->getSpeed() * 3);
 		}
 	}
+
+	void damageStationary(int targetId, int playerId)
+	{
+		Object * playerHolder = getPlayerObj(playerId);
+		Object * targetHolder = stationary[targetId];
+		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		platformDamaged[targetId] = true;
+		if (targetHolder->getHealth() < 1)
+		{
+			platformDead[targetId] = true;
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			stationary[targetId]->setAliveModelM(stationary[targetId]->getModelM());
+			stationary[targetId]->setModelM(stationary[targetId]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+		}
+	}
+	
+
 	void basicAttack(int playerID)
 	{
 	  for (uint j = 0; j < player.size(); j++)
@@ -1016,7 +1110,8 @@ public:
 		cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
-		cubeT->setStartY(hold.max[2]);
+		cubeT->setStartY(hold.max[1]);
+		cubeT->setStartZ(hold.max[2]);
 		cubeT->setPlayerID(playerID);
 		cubeT->setTeamID(player[playerID]->getTeamID());
 
@@ -1094,8 +1189,9 @@ public:
 		{
 			float startX = projectile[i]->getStartX();
 			float startY = projectile[i]->getStartY();
+			float startZ = projectile[i]->getStartZ();
 			AABB curr = projectile[i]->getAABB();
-			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2) + pow(curr.max[2] - startZ, 2));//Pythagorean Theorem
 
 
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
@@ -1369,6 +1465,7 @@ public:
 		platform_01->setType("Elevator");
 		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
+		platform_01->setIsPlatformDamage(true);
 		addStationary(platform_01);
 		elevator.push_back(platform_01);
 
@@ -1379,6 +1476,7 @@ public:
 		platform_02->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
+		platform_02->setIsPlatformDamage(true);
 		addStationary(platform_02);
 
 		//island 
@@ -1388,6 +1486,7 @@ public:
 		platform_03->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
+		platform_03->setIsPlatformDamage(true);
 		addStationary(platform_03);
 
 		//walkway 
@@ -1534,6 +1633,12 @@ public:
 		addStationary(ele_04);
 		elevator.push_back(ele_04);
 
+		for (int i = 0; i < stationary.size(); i++)
+		{
+			platformDamaged.push_back(false);
+			platformDead.push_back(false);
+		}
+
 		counter2 = 0;
 		counter3 = 0.05;
 		//m_pMesh2 = new Mesh();
@@ -1612,6 +1717,8 @@ protected:
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;
+	vector<bool> platformDamaged;
+	vector<bool> platformDead;
 	vector<int> despon_tower_projectile_list;
 	vector<TowerShootInfo> tower_shoot;
 	int tower_shoot_counter;

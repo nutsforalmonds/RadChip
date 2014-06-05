@@ -159,7 +159,6 @@ void handle_mouse_state(int pid, int mouseState){
 			}
 		}
 		//std::cout << player1shoot << player2shoot << player3shoot << player4shoot << std::endl;
-		
 	}
 	else if (!(mouseState & 1 << 1))
 	{
@@ -265,6 +264,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	//platform states
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -566,6 +568,27 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		//adding platform status
+		string platform_status = "";
+		vector<bool> platformDamaged = scene->getPlatformDamaged();
+		vector<bool> platformDead = scene->getPlatformDead();
+		vector<Object *> * stationaries = scene->getStationary();
+		for (int i = 0; i < platformDamaged.size(); i++)
+		{	
+			if ((*stationaries)[i]->getIsPlatformDamage())
+			{
+				if (std::to_string(i).size() == 1)
+					platform_status += "p0" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+				else
+					platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+				platform_status += "00" + std::to_string((*stationaries)[i]->getHealth());
+			}
+			//if (platformDamaged[i])
+			//	cout << platform_status << endl;
+			scene->setPlatformDamaged(i, false);
+			//scene->setPlatformDead(i, false);
+		}
+		
 		//tower infos
 		string ts[NUM_TOWERS] = { "" };
 		if (sendddddddddddedededed){
@@ -638,6 +661,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[PLATFORM_BEGIN +4] = std::make_pair("e4", ep[4]);
 
 		(*sendVec)[GLOBAL] = std::make_pair(pG.c_str(), mat4(1.0));
+
+		(*sendVec)[PLATFORM_STATUS] = std::make_pair(platform_status, mat4(0.0));
 
 		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
