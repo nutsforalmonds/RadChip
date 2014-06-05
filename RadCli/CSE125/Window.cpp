@@ -1127,6 +1127,10 @@ void Window::displayCallback(void)
 		}
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		for (uint i = 0; i < stationary_list.size(); ++i)
+		{
+			stationary_list[i]->draw();
+		}
 		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < tower_projectile_list.size(); ++i)
 		{
@@ -1145,13 +1149,6 @@ void Window::displayCallback(void)
 			//sound_3d_light->Play3D(View);
 		}
 		glDepthMask(GL_TRUE);
-		glDisable(GL_BLEND);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		for (uint i = 0; i < stationary_list.size(); ++i)
-		{
-			stationary_list[i]->draw();
-		}
 		glDisable(GL_BLEND);
 
 		//	md5->draw();
