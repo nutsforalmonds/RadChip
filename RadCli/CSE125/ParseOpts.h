@@ -156,9 +156,9 @@ public:
 
 	int getPPowerUp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
-			pUp = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
+			pUpPlayers = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
 
-		return atoi(pUp.c_str());
+		return atoi(pUpPlayers.c_str());
 	}
 
 	bool getTramp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
@@ -183,6 +183,16 @@ public:
 		{
 			return false;
 		}
+	}
+
+	int getPUpState(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		pUpState = "";
+		for (j = 0; j <= 1; j++)
+		{
+			pUpState += (*vec)[GLOBAL].first.c_str()[j];
+		}
+		return atoi(pUpState.c_str());
 	}
 
 	// Parameters are the pointer to the recvVec vector and the desired player ID
@@ -220,6 +230,6 @@ public:
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	std::string health, kills, speed, pUp;
+	std::string health, kills, speed, pUpPlayers, pUpState;
 	int i, j;
 };

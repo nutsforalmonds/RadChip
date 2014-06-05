@@ -67,7 +67,6 @@ int p3Shots = 0;
 
 
 bool hasShot[4] = { false };
-int powerUpStatus[4] = { 0 };
 
 #define PLAYER_PROJECTILE_COUNT 1000;
 int p1ShotID = 0;
@@ -257,6 +256,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	// global
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
 
 	
 	//Player Cam Mats
@@ -308,7 +310,7 @@ int main(int argc, char *argv[])
 	double diff;
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&last);
-	string p0, p1, p2, p3;
+	string p0, p1, p2, p3, pG;
 
 	bool newData[4] = { false };
 	while (true){
@@ -495,111 +497,12 @@ int main(int argc, char *argv[])
 		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
 
 		// Powerup data encoding
-		// P0
-		if (scene->getPlayerPowerUp(PLAYER0)[0])
-		{
-			powerUpStatus[PLAYER0] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[1])
-		{
-			powerUpStatus[PLAYER0] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[2])
-		{
-			powerUpStatus[PLAYER0] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[3])
-		{
-			powerUpStatus[PLAYER0] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[4])
-		{
-			powerUpStatus[PLAYER0] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER0] = NOPOWER;
-		}
-		// P1
-		if (scene->getPlayerPowerUp(PLAYER1)[0])
-		{
-			powerUpStatus[PLAYER1] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[1])
-		{
-			powerUpStatus[PLAYER1] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[2])
-		{
-			powerUpStatus[PLAYER1] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[3])
-		{
-			powerUpStatus[PLAYER1] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[4])
-		{
-			powerUpStatus[PLAYER1] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER1] = NOPOWER;
-		}
-		// P2
-		if (scene->getPlayerPowerUp(PLAYER2)[0])
-		{
-			powerUpStatus[PLAYER2] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[1])
-		{
-			powerUpStatus[PLAYER2] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[2])
-		{
-			powerUpStatus[PLAYER2] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[3])
-		{
-			powerUpStatus[PLAYER2] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[4])
-		{
-			powerUpStatus[PLAYER2] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER2] = NOPOWER;
-		}
-		// P3
-		if (scene->getPlayerPowerUp(PLAYER3)[0])
-		{
-			powerUpStatus[PLAYER3] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[1])
-		{
-			powerUpStatus[PLAYER3] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[2])
-		{
-			powerUpStatus[PLAYER3] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[3])
-		{
-			powerUpStatus[PLAYER3] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[4])
-		{
-			powerUpStatus[PLAYER3] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER3] = NOPOWER;
-		}
+		p0 += int_to_string(scene->getPlayerPowerUp(PLAYER0), 1);
+		p1 += int_to_string(scene->getPlayerPowerUp(PLAYER1), 1);
+		p2 += int_to_string(scene->getPlayerPowerUp(PLAYER2), 1);
+		p3 += int_to_string(scene->getPlayerPowerUp(PLAYER3), 1);
 
-		p0 += int_to_string(powerUpStatus[PLAYER0], 1);
-		p1 += int_to_string(powerUpStatus[PLAYER1], 1);
-		p2 += int_to_string(powerUpStatus[PLAYER2], 1);
-		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
+		pG = int_to_string(scene->getPUpState(), 2);
 
 		//Trampoline status
 		if (scene->getPlayerOnTramp(PLAYER0))
@@ -719,6 +622,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[PLATFORM_BEGIN +2] = std::make_pair("e2", ep[2]);
 		(*sendVec)[PLATFORM_BEGIN + 3] = std::make_pair("e3", ep[3]);
 		(*sendVec)[PLATFORM_BEGIN +4] = std::make_pair("e4", ep[4]);
+
+		(*sendVec)[GLOBAL] = std::make_pair(pG.c_str(), mat4(1.0));
 
 		
 		//std::cout << gs.getPosString(sendVec) << std::endl;
