@@ -1392,7 +1392,7 @@ public:
 		tw0->setDamage(-1);
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
-		tw0->setTeamID(1);
+		tw0->setTeamID(0);
 		tw0->setPlayerID(0);
 		addTower(tw0);
 
@@ -1407,7 +1407,7 @@ public:
 		tw1->setDamage(-1);
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
-		tw1->setTeamID(1);
+		tw1->setTeamID(0);
 		tw1->setPlayerID(1);
 		addTower(tw1);
 
@@ -1422,7 +1422,7 @@ public:
 		tw2->setDamage(-1);
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
-		tw2->setTeamID(0);
+		tw2->setTeamID(1);
 		tw2->setPlayerID(2);
 		addTower(tw2);
 
@@ -1437,7 +1437,7 @@ public:
 		tw3->setDamage(-1);
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
-		tw3->setTeamID(0);
+		tw3->setTeamID(1);
 		tw3->setPlayerID(3);
 		addTower(tw3);
 
