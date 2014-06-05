@@ -102,7 +102,7 @@ SoundSystem *mySoundSystem;
 Music *menuMusic;
 Music *gameMusic;
 Music *gameThunder;
-Sound* testSound[20];
+Sound* testSound[NumberOfSounds];
 Sound* gameThunder2;
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
@@ -2060,7 +2060,7 @@ void keyboard(unsigned char key, int, int){
 	case 0:
 		if (key == ' '){
 			if (space_up){
-				testSound[2]->Play();
+				//testSound[SoundVegeta]->Play();
 				//myClientState->setState(1);
 			}
 		}
@@ -2167,13 +2167,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				testSound[1]->Play();
+				testSound[SoundJumpOgg]->Play();
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			//testSound[2]->Play();
+			//testSound[SoundVegeta]->Play();
 			myDeathScreen->setDeathClock(clock());
 			myClientState->setState(3);
 		}
@@ -2317,7 +2317,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//	testSound[SoundJumpOgg]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -2393,7 +2393,7 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				if (!connected){
 					
 					//Player mats
@@ -2453,7 +2453,7 @@ void mouseFunc(int button, int state, int x, int y)
 				server_update(0);
 			}
 			else if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				Sleep(1250);
 				running = false;
 				exit(0);
@@ -2476,7 +2476,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[9]->Play();
+					testSound[SoundSlap]->Play();
 					///scene->basicAttack(playerID);
 
 					player_list[playerID]->setAnimOnce(3, time);
@@ -2491,7 +2491,7 @@ void mouseFunc(int button, int state, int x, int y)
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
 
-					testSound[8]->Play();
+					testSound[SoundThrow]->Play();
 
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
@@ -2506,7 +2506,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-				//	testSound[5]->Play();
+				//	testSound[SoundPrePunch]->Play();
 				}
 				else
 				{
@@ -2536,11 +2536,11 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = myGameMenu->checkClick(newX, newY);
 			if (click == 1){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(1);
 			}
 			if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(0);
 				gameMusic->Stop();
 				//gameThunder->Stop();
@@ -2609,7 +2609,7 @@ void passiveMotionFunc(int x, int y){
 		sound = myMainMenu->checkHighlight(newX, newY);
 		if (sound){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2639,7 +2639,7 @@ void passiveMotionFunc(int x, int y){
 		sound2 = myGameMenu->checkHighlight(newX, newY);
 		if (sound2){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2656,7 +2656,7 @@ void passiveMotionFunc(int x, int y){
 		sound3 = myDeathScreen->checkHighlight(newX, newY);
 		if (sound3){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2674,7 +2674,7 @@ void passiveMotionFunc(int x, int y){
 		sound5 = endScreen->checkHighlight(newX, newY);
 		if (sound5){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2694,7 +2694,7 @@ void specialKeyboardFunc(int key, int x, int y){
 	case 1:
 		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 			if (sprint_up >= 10){
-			//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//	testSound[SoundJumpOgg1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				//scene->jump(playerID);
 			}
 			if (sprint_up > 0){
@@ -2860,7 +2860,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
-	myDeathScreen->setupSound(testSound[10]);
+	myDeathScreen->setupSound(testSound[SoundCount]);
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
@@ -4167,20 +4167,20 @@ int loadAudio(){
 		glutSwapBuffers();
 
 		testSound[i] = new Sound(mySoundSystem, path.c_str(), false);
-		if (i == 8 || i == 9){
+		if (i == SoundThrow || i == SoundSlap){
 			testSound[i]->setVolume(0.75);
 			testSound[i]->setVolume(0.75);
 		}
-		else if (i == 0 || i == 1){
+		else if (i == SoundJumpWav || i == SoundJumpOgg){
 			testSound[i]->setVolume(0.25);
 		}
-		else if (i == 10){
+		else if (i == SoundCount){
 			testSound[i]->setVolume(0.15);
 		}
 		else{
 			testSound[i]->setVolume(0.5);
 		}
-		sound_list.push_back(testSound[0]);
+		sound_list.push_back(testSound[i]);
 		printf("done!\n");
 
 		//Print to game window
