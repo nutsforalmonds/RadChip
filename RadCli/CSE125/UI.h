@@ -1328,7 +1328,7 @@ public:
 		selected_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON", "PNG");
+		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON", "PNG");
 		selected_button->setTex(true);
 		selected_button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
 
@@ -1372,7 +1372,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.74) && (y < 0.84)){
 				drawButtonHighlight = true;
 				return 1;
 			}
@@ -1394,7 +1394,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.74) && (y < 0.84)){
 				return 1;
 			}
 			else{

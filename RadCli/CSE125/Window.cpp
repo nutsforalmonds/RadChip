@@ -1292,7 +1292,7 @@ void Window::displayCallback(void)
 		}
 
 		else if (myClientState->getState() == 5){
-			endScreen->draw(1);
+			endScreen->draw(0);
 		}
 
 		else if (kill_count){
@@ -2181,6 +2181,11 @@ void keyboard(unsigned char key, int, int){
 		{
 			kill_count = true;
 		}
+
+		if (key == 'p') //test for end screen
+		{
+			myClientState->setState(5);
+		}
 		if (key == 0x30)
 		{
 			draw_list.clear();
@@ -2243,9 +2248,9 @@ void keyboard(unsigned char key, int, int){
 		break;
 	case 3:
 		if (key == 27){
-			//running = false;
-			//exit(0);
-			//myClientState->setState(1);
+			running = false;
+			exit(0);
+			myClientState->setState(1);
 		}
 		break;
 	case 4:
@@ -2253,6 +2258,10 @@ void keyboard(unsigned char key, int, int){
 			myClientState->setState(0);
 		}
 		break;
+	case 5:
+		if (key == 27){
+			myClientState->setState(1);
+		}
 	default:
 		break;
 	}
@@ -2333,6 +2342,8 @@ void keyUp (unsigned char key, int x, int y) {
 	case 3:
 		break;
 	case 4:
+		break;
+	case 5:
 		break;
 	default:
 		break;
@@ -2527,6 +2538,17 @@ void mouseFunc(int button, int state, int x, int y)
 		break;
 	case 4:
 		break;
+	case 5:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			int click = endScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -2619,6 +2641,22 @@ void passiveMotionFunc(int x, int y){
 		}
 		break;
 	case 4:
+		break;
+	case 5:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		endScreen->checkHighlight(newX, newY);
+		int sound5;
+		sound5 = endScreen->checkHighlight(newX, newY);
+		if (sound5){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	default:
 		break;
