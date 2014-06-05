@@ -15,10 +15,11 @@
 #include "Tower.h"
 #include "Elevator.h"
 #include "Teleporter.h"
+#include "constants.h"
 using namespace std;
 
 
-#define RESPAWN_COUNTER 1000
+#define RESPAWN_COUNTER 1500
 
 #define MAX_SPEED 100
 #define MAX_DISTANCE 100
@@ -50,6 +51,8 @@ public:
 	Scene(){
 		for (int i = 0; i < NUM_TOWERS; i++){
 			tower_shoot_check[i] = false;
+			tower_damaged[i] = false;
+			tower_kill[i] = false;
 		}
 		tower_shoot_counter = 0;
 		camM.push_back(mat4(1.0));
@@ -101,7 +104,7 @@ public:
 		return pPtr->getKills();
 	}
 
-	bool * getPlayerPowerUp(int playerID)
+	int getPlayerPowerUp(int playerID)
 	{
 		pPtr = getPlayerObj(playerID);
 		return pPtr->getPowerUp();
@@ -120,6 +123,37 @@ public:
 		playerOnTramp[3] = false;
 	}
 
+	bool getPlayerOnTele(int playerID)
+	{
+		return playerOnTele[playerID];
+	}
+
+	void clearPlayerOnTele()
+	{
+		playerOnTele[0] = false;
+		playerOnTele[1] = false;
+		playerOnTele[2] = false;
+		playerOnTele[3] = false;
+	}
+
+	int getPUpState()
+	{
+		int ret = 0;
+
+		if (pUpCooldown[SPEEDUP] > 0)
+			ret = ret | 1;
+		if (pUpCooldown[DOUBLEDAMAGE] > 0)
+			ret = ret | 1 << 1;
+		if (pUpCooldown[HEALTHBOOST] > 0)
+			ret = ret | 1 << 2;
+		if (pUpCooldown[FASTERSHOOT] > 0)
+			ret = ret | 1 << 3;
+		if (pUpCooldown[FARTHERSHOOT] > 0)
+			ret = ret | 1 << 4;
+
+		return ret;
+	}
+
 	void simulate(float t, float sub){
 		resolvePlayerRotation();
 		while (t > sub){
@@ -136,6 +170,7 @@ public:
 			despawnProjectile();
 			rechargeJump();
 			respawnObjs();
+			respawnTower();
 			removePowerUp();
 			moveElevators();
 		}
@@ -151,21 +186,30 @@ public:
 		despawnProjectile();
 		rechargeJump();
 		respawnObjs();
+		respawnTower();
 		removePowerUp();
 		moveElevators();
 	}
 
 	void moveElevators(){
-		if (counter == 1000){
+		if (counter2 == 1000){
 			counter3 = -counter3;
-			counter = 0;
+			counter2 = 0;
 		}
 		for (int i = 0; i < elevator.size(); ++i){
-			if (elevator[i]->getDirection() == 0){
-				elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
-				vector<Object*> elplayers = elevator[i]->getPlayers();
-				for (int j = 0; j < elplayers.size(); ++j)
-					elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+			if (elevator[i]->getDirection() != 1){
+				if (elevator[i]->getDirection() == -1){
+					elevator[i]->preTrans(glm::translate(vec3(-counter3, 0, 0)));
+					vector<Object*> elplayers = elevator[i]->getPlayers();
+					for (int j = 0; j < elplayers.size(); ++j)
+						elplayers[j]->preTrans(glm::translate(vec3(-counter3, 0, 0)));
+				}
+				else {
+					elevator[i]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+					vector<Object*> elplayers = elevator[i]->getPlayers();
+					for (int j = 0; j < elplayers.size(); ++j)
+						elplayers[j]->preTrans(glm::translate(vec3(counter3, 0, 0)));
+				}
 			}
 			else {
 				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
@@ -186,7 +230,7 @@ public:
 			}
 			elevator[i]->removeAll();
 		}
-		counter++;
+		counter2++;
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
@@ -327,61 +371,155 @@ public:
 				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
-					inX = (playerAABB.min[0] <= powerUpPos[0]) && (powerUpPos[0] <= playerAABB.max[0]);
-					inY = (playerAABB.min[1] <= powerUpPos[1]) && (powerUpPos[1] <= playerAABB.max[1]);
-					inZ = (playerAABB.min[2] <= powerUpPos[2]) && (powerUpPos[2] <= playerAABB.max[2]);
+					inX = (playerAABB.min[0] <= powerUpPos[0] + 3) && (powerUpPos[0] - 3 <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1] + 3) && (powerUpPos[1] - 3 <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2] + 3) && (powerUpPos[2] - 3 <= playerAABB.max[2]);
 
 					if (inX && inY && inZ)
 					{
+						// TODO needs to despawn powerup on server side
+						// check all players, if anyone has the powerup, it can't be applied
+						// to a new player
 						//MS boost , uses index 0
-						if (j == 0)
+						if (j == 0 && pUpCooldown[SPEEDUP] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[0])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
-								player[i]->getBoots()->setMoveSpeed(6);
-								player[i]->setPowerUp(j, 1);
+								player[i]->getBoots()->setMoveSpeed(4);
+ 								player[i]->setPowerUp(SPEEDUP);
+								//std::cout << "speed boost if" << std::endl;
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									break;
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								
+								player[i]->getBoots()->setMoveSpeed(4);
+								player[i]->setPowerUp(SPEEDUP);
+								//std::cout << "speed boost else" << std::endl;
+							}
+							pUpCooldown[SPEEDUP] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
-						//MS boost , uses index 1
-						else if ( j == 1)
+						//DMG boost , uses index 1
+						else if (j == 1 && pUpCooldown[DOUBLEDAMAGE] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[1])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setDamage(-4);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(DOUBLEDAMAGE);
+								//std::cout << "dmg if" << std::endl;
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									break;
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->getWeapon()->setDamage(-4);
+								player[i]->setPowerUp(DOUBLEDAMAGE);
+								//std::cout << "dmg else" << std::endl;
+								//std::cout << player[i]->getPowerUp() << std::endl;
+							}
+							pUpCooldown[DOUBLEDAMAGE] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Health boost , uses index 2
-						else if (j == 2)
+						else if (j == 2 && pUpCooldown[HEALTHBOOST] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[2])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->setHealth(4);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(HEALTHBOOST);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									break;
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->setHealth(4);
+								player[i]->setPowerUp(HEALTHBOOST);
+							}
+							pUpCooldown[HEALTHBOOST] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Shot Spd boost , uses index 3
-						else if (j == 3)
+						else if (j == 3 && pUpCooldown[FASTERSHOOT] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[3])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setSpeed(70);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(FASTERSHOOT);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									break;
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									player[i]->getWeapon()->setDistance(40);
+
+								player[i]->getWeapon()->setSpeed(70);
+								player[i]->setPowerUp(FASTERSHOOT);
+							}
+							pUpCooldown[FASTERSHOOT] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 						//Shot Range boost , uses index 4
-						else if (j == 4)
+						else if (j == 4 && pUpCooldown[FARTHERSHOOT] <= 0)
 						{
-							if (!(player[i]->getPowerUp())[4])
+							if (player[i]->getPowerUp() == NOPOWER)
 							{
 								player[i]->getWeapon()->setDistance(70);
-								player[i]->setPowerUp(j, 1);
+								player[i]->setPowerUp(FARTHERSHOOT);
 							}
-							player[i]->setPowerUpDuration(j, POWERUP_DURATION);
+							else
+							{
+								if (player[i]->getPowerUp() == SPEEDUP)
+									player[i]->getBoots()->setMoveSpeed(2);
+								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+									player[i]->getWeapon()->setDamage(-1);
+								else if (player[i]->getPowerUp() == HEALTHBOOST)
+									player[i]->setHealth(-4);
+								else if (player[i]->getPowerUp() == FASTERSHOOT)
+									player[i]->getWeapon()->setSpeed(50);
+								else if (player[i]->getPowerUp() == FARTHERSHOOT)
+									break;
+								
+								player[i]->getWeapon()->setDistance(70);
+								player[i]->setPowerUp(FARTHERSHOOT);
+							}
+							pUpCooldown[FARTHERSHOOT] = POWERUP_DURATION;
+							player[i]->setPowerUpDuration(POWERUP_DURATION);
 						}
 					}
 				}
@@ -443,7 +581,8 @@ public:
 			playerOnTramp[obj1->getPlayerID()] = true;
 		}
 		if (!strcmp(obj2->getType().c_str(), "Teleporter") && onGround1){
-			obj1->preTrans(((Teleporter*)obj2)->getEndpoint());
+			obj1->setModelM(((Teleporter*)obj2)->getEndpoint());
+			playerOnTele[obj1->getPlayerID()] = true;
 		}
 		if (!strcmp(obj2->getType().c_str(), "Elevator") && onGround1){
 			((Elevator*)obj2)->addPlayer(obj1);
@@ -480,6 +619,8 @@ public:
 	void resolveTowerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < tower.size(); i++){
+			if (tower[i]->getHealth() < 1)
+				continue;
 			tower[i]->addVelocity(gravity*extra_speed);
 			tower[i]->postTrans(glm::translate(tower[i]->getVelocity()*t));
 		}
@@ -542,54 +683,37 @@ public:
 
 	void removePowerUp()
 	{
-		bool * playerPowerUp;
-		int * powerUpDuration;
+		if (pUpCooldown[SPEEDUP] > 0)
+			pUpCooldown[SPEEDUP] -= 1;
+		if (pUpCooldown[DOUBLEDAMAGE] > 0)
+			pUpCooldown[DOUBLEDAMAGE] -= 1;
+		if (pUpCooldown[HEALTHBOOST] > 0)
+			pUpCooldown[HEALTHBOOST] -= 1;
+		if (pUpCooldown[FASTERSHOOT] > 0)
+			pUpCooldown[FASTERSHOOT] -= 1;
+		if (pUpCooldown[FARTHERSHOOT] > 0)
+			pUpCooldown[FARTHERSHOOT] -= 1;
+
 		for (int i = 0; i < player.size(); i++)
 		{
-			playerPowerUp = player[i]->getPowerUp();
-			powerUpDuration = player[i]->getPowerUpDuration();
-
-			for (int j = 0; j < NUM_POWERUPS; j++)
+			if (player[i]->getPowerUp() != 0)
 			{
-				if (playerPowerUp[j])
+				//std::cout << player[i]->getPowerUp() << std::endl;
+				player[i]->setPowerUpDuration(player[i]->getPowerUpDuration() - 1);
+				if (player[i]->getPowerUpDuration() <= 0)
 				{
-					powerUpDuration[j]--;
-					//if (j == 0)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getBoots()->getMoveSpeed() << endl;
-					//if (j == 1)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDamage() << endl;
-					//if (j == 2)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getHealth() << endl;
-					//if (j == 3)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getSpeed() << endl;
-					//if (j == 4)
-					//	cout << j << " " << playerPowerUp[j] << " " << powerUpDuration[j] << " " << player[i]->getWeapon()->getDistance() << endl;
+					if (player[i]->getPowerUp() == SPEEDUP)
+						player[i]->getBoots()->setMoveSpeed(2);
+					else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
+						player[i]->getWeapon()->setDamage(-1);
+					else if (player[i]->getPowerUp() == HEALTHBOOST)
+						player[i]->setHealth(-4);
+					else if (player[i]->getPowerUp() == FASTERSHOOT)
+						player[i]->getWeapon()->setSpeed(50);
+					else if (player[i]->getPowerUp() == FARTHERSHOOT)
+						player[i]->getWeapon()->setDistance(40);
 
-					if (powerUpDuration[j] <= 0)
-					{
-						player[i]->setPowerUp(j, 0);
-
-						if (j == 0)
-						{
-							player[i]->getBoots()->setMoveSpeed(2);
-						}
-						else if (j == 1)
-						{
-							player[i]->getWeapon()->setDamage(-1);
-						}
-						else if (j == 2)
-						{
-							player[i]->setHealth(-4);
-						}
-						else if (j == 3)
-						{
-							player[i]->getWeapon()->setSpeed(50);
-						}
-						else if (j == 4)
-						{
-							player[i]->getWeapon()->setDistance(40);
-						}
-					}
+					player[i]->setPowerUp(NOPOWER);
 				}
 			}
 		}
@@ -603,9 +727,8 @@ public:
 		{
 			if (player[i]->getHealth() < 1)
 			{
-
 				holder = player[i];
-				holder->setRespawn(holder->getRespawn() - 1);
+				holder->setModelM(holder->getModelM()*glm::translate(vec3(0, -20, 0)));
 				
 				if (holder->getRespawn() < 1)
 				{
@@ -613,7 +736,9 @@ public:
 					//Window::addPlayerList(holder);
 					//Window::respawnPlayer(holder->getName());
 					holder->putHealth(7);
-					holder->setModelM(holder->getAliveModelM());
+					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
+					holder->setVelocity(vec3(0, 20, 0));
+					setPlayerDead(holder->getPlayerID(), false);
 					//cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << " " << player[i]->getHealth() << endl;
 
 					//id = holder->getPlayerID();
@@ -628,6 +753,8 @@ public:
 
 					//cout << "" << endl;
 				}
+				else
+					holder->setRespawn(holder->getRespawn() - 1);
 			}
 		}
 
@@ -648,6 +775,28 @@ public:
 						platformDead[i] = false;
 					}
 				}
+			}
+		}
+	}
+	void respawnTower()
+	{
+		Tower * holder;
+		//int id;
+		for (uint i = 0; i < tower.size(); i++)
+		{
+			if (tower[i]->getHealth() < 1)
+			{
+				holder = tower[i];
+				holder->setModelM(holder->getModelM()*glm::translate(vec3(0, -20, 0)));
+
+				if (holder->getRespawn() < 1)
+				{
+					holder->putHealth(20);
+					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
+					holder->setVelocity(vec3(0, 20, 0));
+				}
+				else
+					holder->setRespawn(holder->getRespawn() - 1);
 			}
 		}
 	}
@@ -689,7 +838,7 @@ public:
 		{
 			for (uint j = 0; j < tower.size(); j++)
 			{
-				if (projectile[i]->getTeamID() == tower[j]->getTeamID())
+				if (tower[j]->getHealth()<1 || projectile[i]->getTeamID() == tower[j]->getTeamID())
 					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = tower[j]->getAABB();
@@ -804,7 +953,7 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+					////////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
 			//cout << playerId << " " << dmg << endl;
@@ -832,18 +981,20 @@ public:
 				if (player[i]->getPlayerID() == targetId)
 				{
 					player[i]->setAliveModelM(player[i]->getModelM());
-					player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+					///////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
 		}
 	}
 	void damageTower(int targetId, int playerId)
 	{
+		tower_damaged[targetId] = true;
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getTowerObj(targetId);
 		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		if (targetHolder->getHealth() < 1)
 		{
+			tower_kill[targetId] = true;
 			int dist, spd, dmg;
 			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
 			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
@@ -984,7 +1135,7 @@ public:
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
 		for (uint i = 0; i < tower.size(); i++){
-			if (tower[i]->checkShoot(ct)){
+			if (tower[i]->getHealth()>0 && tower[i]->checkShoot(ct)){
 				int pid;
 				float min_dist=10000;
 				for (uint k = 0; k < player.size(); k++){
@@ -999,8 +1150,9 @@ public:
 				if (min_dist != 10000){
 					Projectile* cubeT = new Projectile(player.size() + respawn.size());
 					cubeT->setSpeed(5);
-					cubeT->setModelM(player[pid]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
-					cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
+					mat4 pjt_model = tower[i]->getModelM()*glm::translate(vec3(0, 5, 0));
+					cubeT->setModelM(pjt_model);//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
 					cubeT->setStartY(hold.max[2]);
@@ -1013,7 +1165,7 @@ public:
 					cubeT->setDistance(tower[i]->getShootRange());
 					tower_projectile.push_back(cubeT);
 					cubeT->setSpeed(50);
-					vec3 dir = glm::normalize(vec3(player[pid]->getModelM()*vec4(0, 0, 0, 1)) - vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)));
+					vec3 dir = glm::normalize(vec3(player[pid]->getModelM()*vec4(0, 0, 0, 1)) - vec3(pjt_model*vec4(0, 0, 0, 1)));
 					cubeT->setVelocity(dir*tower[i]->getShootSpeed());// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 					int shootID = tower_shoot_counter;
 					tower_shoot_counter++;
@@ -1098,17 +1250,14 @@ public:
 	{
 		return playerDamaged[i];
 	}
-
 	void setPlayerDamaged(int i, bool b)
 	{
 		playerDamaged[i] = b;
 	}
-
 	bool getPlayerDead(int i)
 	{
 		return playerDead[i];
 	}
-
 	void setPlayerDead(int i, bool b)
 	{
 		playerDead[i] = b;
@@ -1122,15 +1271,13 @@ public:
 		}
 		return c;
 	}
-
-	boost::array<mat4, 4> getElevatorMats(){
-		boost::array<mat4, 4> c;
+	boost::array<mat4, 5> getElevatorMats(){
+		boost::array<mat4, 5> c;
 		for (uint i = 0; i < elevator.size(); i++){
 			c[i] = elevator[i]->getModelM();
 		}
 		return c;
 	}
-
 	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
@@ -1163,6 +1310,27 @@ public:
 	}
 	vector<int> getTowerProjectileDespawnList(){ return despon_tower_projectile_list; }
 	void clearTowerProjectileDespawnList(){ despon_tower_projectile_list.clear(); }
+	bool* getTowerShootCheck(){ return tower_shoot_check; }
+	void clearTowerShootCheck(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
+	}
+	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
+	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
+	bool* getTowerDamaged(){ return tower_damaged; }
+	void clearTowerDamaged(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_damaged[i] = false;
+		}
+	}
+	bool* getTowerKill(){ return tower_kill; }
+	void clearTowerKill(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_kill[i] = false;
+		}
+	}
+	int getTowerHealth(int towerID){ return tower[towerID]->getHealth(); }
 	void initialize(){
 
 		MD5Model* md50 = new MD5Model();
@@ -1219,7 +1387,8 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(20);
-		tw0->setShootSpeed(50);
+		tw0->setShootSpeed(20);
+		tw0->setHealth(20);
 		tw0->setDamage(-1);
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
@@ -1233,7 +1402,8 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(20);
-		tw1->setShootSpeed(50);
+		tw1->setShootSpeed(20);
+		tw1->setHealth(20);
 		tw1->setDamage(-1);
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
@@ -1247,7 +1417,8 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(20);
-		tw2->setShootSpeed(50);
+		tw2->setShootSpeed(20);
+		tw2->setHealth(20);
 		tw2->setDamage(-1);
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
@@ -1261,7 +1432,8 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(20);
-		tw3->setShootSpeed(50);
+		tw3->setShootSpeed(20);
+		tw3->setHealth(20);
 		tw3->setDamage(-1);
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
@@ -1285,94 +1457,114 @@ public:
 		ground->setName("Ground");
 		addStationary(ground);
 
-		//Bottom Mid Platform
-		Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
-		//platform_01->setSpeed(5);
-		platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
+		//elevator 
+		Elevator* platform_01 = new Elevator();
+		//platform_01->setSpeed(5); 
+		platform_01->postTrans(glm::translate(vec3(0, 5.0, 0)));
 		platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
-		platform_01->setType("Cube");
+		platform_01->setType("Elevator");
+		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
 		platform_01->setIsPlatformDamage(true);
 		addStationary(platform_01);
+		elevator.push_back(platform_01);
 
-		//1st Bottom Side Step Platform
-		Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
-		platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
-		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		//island 
+		Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+		//platform_01->setSpeed(5); 
+		platform_02->postTrans(glm::translate(vec3(74.0, 18.0, 0)));
+		platform_02->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
 		platform_02->setIsPlatformDamage(true);
 		addStationary(platform_02);
 
-		//2nd Bottom Side Step Platform
-		Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
-		platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
-		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+		//island 
+		Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+		//platform_01->setSpeed(5); 
+		platform_03->postTrans(glm::translate(vec3(-74.0, 18.0, 0)));
+		platform_03->setAABB(AABB(vec3(-10, -0.5, -40.0), vec3(10, 0.5, 40.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
 		platform_03->setIsPlatformDamage(true);
 		addStationary(platform_03);
 
-		//Platform Steps 1-1
-		Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//walkway 
+		Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 80);
+		//platform_01->setSpeed(5); 
 		platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
-		platform_04->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_04->setAABB(AABB(vec3(-10.0, -0.5, -10), vec3(10.0, 0.5, 80)));
 		platform_04->setType("Cube");
 		platform_04->setName("Test Platform");
 		addStationary(platform_04);
 
-		//Platform Steps 1-2
-		Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
+		//barricade on walkway 
+		Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
+		//platform_01->setSpeed(5); 
 		platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
-		platform_05->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_05->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, .5)));
 		platform_05->setType("Cube");
 		platform_05->setName("Test Platform");
 		addStationary(platform_05);
 
-		//Platform Steps 1-3
+		//Platform Steps 1-3 
 		Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
 		platform_06->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_06->setType("Cube");
 		platform_06->setName("Test Platform");
 		addStationary(platform_06);
 
-		//Platform Steps 2-1
-		Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//walkway 
+		Cube* platform_07 = new Cube(-10.0, 10.0, -0.5, 0.5, -80, 10);
+		//platform_01->setSpeed(5); 
 		platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
-		platform_07->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
+		platform_07->setAABB(AABB(vec3(-10.0, -0.5, -80), vec3(10.0, 0.5, 10)));
 		platform_07->setType("Cube");
 		platform_07->setName("Test Platform");
 		addStationary(platform_07);
 
-		//Platform Steps 2-2
-		Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-		//platform_01->setSpeed(5);
+		//barricade on walkway 
+		Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
+		//platform_01->setSpeed(5); 
 		platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
-		platform_08->setAABB(AABB(vec3(-5.0, -0.5, -5.0), vec3(5.0, 0.5, 5.0)));
+		platform_08->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, 0.5)));
 		platform_08->setType("Cube");
 		platform_08->setName("Test Platform");
 		addStationary(platform_08);
 
-		//Platform Steps 2-3
+		//Platform Steps 2-3 
 		Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
 		platform_09->setAABB(AABB(vec3(-5.0, -0.5, -1.5), vec3(5.0, 0.5, 1.5)));
 		platform_09->setType("Cube");
 		platform_09->setName("Test Platform");
 		addStationary(platform_09);
 
+		//island to teleporter 
+		Cube* platform_10 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+		//platform_01->setSpeed(5); 
+		platform_10->postTrans(glm::translate(vec3(100.0, 18.0, 0.0)));
+		platform_10->setAABB(AABB(vec3(-5.0, -0.5, -5), vec3(5.0, 0.5, 5)));
+		platform_10->setType("Cube");
+		platform_10->setName("Test Platform");
+		addStationary(platform_10);
 
-		//Trampoline
+		//island to teleporter 
+		Cube* platform_11 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+		//platform_01->setSpeed(5); 
+		platform_11->postTrans(glm::translate(vec3(-100.0, 18.0, 0.0)));
+		platform_11->setAABB(AABB(vec3(-5.0, -0.5, -5), vec3(5.0, 0.5, 5)));
+		platform_11->setType("Cube");
+		platform_11->setName("Test Platform");
+		addStationary(platform_11);
+
+
+		//Trampoline 
 		Trampoline* tramp_01 = new Trampoline();
-		//platform_01->setSpeed(5);
+		//platform_01->setSpeed(5); 
 		tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
 		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_01->setBoost(vec3(0, 60, 0));
@@ -1380,20 +1572,30 @@ public:
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
-		//teleporter
+		//teleporter 
 		Teleporter* tele_01 = new Teleporter();
-		//platform_01->setSpeed(5);
-		tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+		//platform_01->setSpeed(5); 
+		tele_01->postTrans(glm::translate(vec3(114, 18.0, 0)));
 		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_01->setEndpoint(glm::translate(vec3(0, 50.0, 0)));
+		tele_01->setEndpoint(glm::translate(vec3(-74, 20.0, 0)));
 		tele_01->setType("Teleporter");
 		tele_01->setName("Test Teleporter");
 		addStationary(tele_01);
 
-		//elevator
+		//teleporter 
+		Teleporter* tele_02 = new Teleporter();
+		//platform_01->setSpeed(5); 
+		tele_02->postTrans(glm::translate(vec3(-114, 18.0, 0)));
+		tele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tele_02->setEndpoint(glm::translate(vec3(74, 20.0, 0)));
+		tele_02->setType("Teleporter");
+		tele_02->setName("Test Teleporter");
+		addStationary(tele_02);
+
+
 		Elevator* ele_01 = new Elevator();
-		//platform_01->setSpeed(5);
-		ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+		//platform_01->setSpeed(5); 
+		ele_01->postTrans(glm::translate(vec3(12, 18.0, 38)));
 		ele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		ele_01->setType("Elevator");
 		ele_01->setName("Test Elevator");
@@ -1401,19 +1603,35 @@ public:
 		addStationary(ele_01);
 		elevator.push_back(ele_01);
 
-		//elevator
 		Elevator* ele_02 = new Elevator();
-		//platform_01->setSpeed(5);
-		ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
-		ele_02->setAABB(AABB(vec3(-20.0, -0.5, -20.0), vec3(20.0, .5, 20.0)));
-		ele_02->setDirection(1);
+		//platform_01->setSpeed(5); 
+		ele_02->postTrans(glm::translate(vec3(12, 18.0, -38)));
+		ele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		ele_02->setType("Elevator");
 		ele_02->setName("Test Elevator");
+		ele_02->setDirection(0);
 		addStationary(ele_02);
 		elevator.push_back(ele_02);
 
-		counter2 = 0;
-		counter3 = 0.1;
+		Elevator* ele_03 = new Elevator();
+		//platform_01->setSpeed(5); 
+		ele_03->postTrans(glm::translate(vec3(-12, 18.0, 38)));
+		ele_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_03->setType("Elevator");
+		ele_03->setName("Test Elevator");
+		ele_03->setDirection(-1);
+		addStationary(ele_03);
+		elevator.push_back(ele_03);
+
+		Elevator* ele_04 = new Elevator();
+		//platform_01->setSpeed(5); 
+		ele_04->postTrans(glm::translate(vec3(-12, 18.0, -38)));
+		ele_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		ele_04->setType("Elevator");
+		ele_04->setName("Test Elevator");
+		ele_04->setDirection(-1);
+		addStationary(ele_04);
+		elevator.push_back(ele_04);
 
 		for (int i = 0; i < stationary.size(); i++)
 		{
@@ -1421,6 +1639,8 @@ public:
 			platformDead.push_back(false);
 		}
 
+		counter2 = 0;
+		counter3 = 0.05;
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 		//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
@@ -1471,14 +1691,6 @@ public:
 		counter = 0;
 		projectile_counter = 0;
 	}
-	bool* getTowerShootCheck(){ return tower_shoot_check; }
-	void clearTowerShootCheck(){
-		for (int i = 0; i < NUM_TOWERS; i++){
-			tower_shoot_check[i] = false;
-		}
-	}
-	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
-	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
 
 protected:
 	int counter2;
@@ -1500,6 +1712,8 @@ protected:
 	vector<bool> playerDamaged;
 	vector<bool> playerDead;
 	bool playerOnTramp[4];
+	bool playerOnTele[4];
+	int pUpCooldown[6];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;
@@ -1509,6 +1723,8 @@ protected:
 	vector<TowerShootInfo> tower_shoot;
 	int tower_shoot_counter;
 	bool tower_shoot_check[NUM_TOWERS];
+	bool tower_damaged[NUM_TOWERS];//only last valid simulation
+	bool tower_kill[NUM_TOWERS];//only last valid simulation
 
 	Object * pPtr;
 };

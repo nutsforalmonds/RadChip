@@ -39,10 +39,23 @@ public:
 				direction[0] = atoi((*vec)[i].first.substr(DIR_0_BEGIN, DIR_0_END + 1 - DIR_0_BEGIN).c_str()) / 100000.0-1;
 				direction[1] = atoi((*vec)[i].first.substr(DIR_1_BEGIN, DIR_1_END + 1 - DIR_1_BEGIN).c_str()) / 100000.0-1;
 				direction[2] = atoi((*vec)[i].first.substr(DIR_2_BEGIN, DIR_2_END + 1 - DIR_2_BEGIN).c_str()) / 100000.0-1;
-				//cout << "dirrrrr: " << direction[0] << " " << direction[1] << " " << direction[2] << endl;
 				tsi.push_back(TowerShootInfoClient(towerID,projectileID,direction));
 			}
 		}
+	}
+
+	bool getTowerDamaged(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		if ((*vec)[TOWER_MAT_BEGIN + towerID].first.c_str()[TOWER_DAMAGED] == 'D')
+			return true;
+		return false;
+	}
+	bool getTowerKill(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		if ((*vec)[TOWER_MAT_BEGIN + towerID].first.c_str()[TOWER_KILL] == 'K')
+			return true;
+		return false;
+	}
+	int getTowerHealth(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		return atoi((*vec)[TOWER_MAT_BEGIN + towerID].first.substr(TOWER_HEALTH_BEGIN,TOWER_HEALTH_END+1-TOWER_HEALTH_BEGIN).c_str());
 	}
 
 	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid, int& shootID)
@@ -156,9 +169,9 @@ public:
 
 	int getPPowerUp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
 	{
-			pUp = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
+			pUpPlayers = (*vec)[pid].first.c_str()[POWER_UP_STATUS];
 
-		return atoi(pUp.c_str());
+		return atoi(pUpPlayers.c_str());
 	}
 
 	bool getTramp(std::vector <std::pair<std::string, mat4>>* vec, int pid)
@@ -171,6 +184,28 @@ public:
 		{
 			return false;
 		}
+	}
+
+	bool getTele(std::vector <std::pair<std::string, mat4>>* vec, int pid)
+	{
+		if ((*vec)[pid].first.c_str()[TELE_STATUS] == 'p')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	int getPUpState(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		pUpState = "";
+		for (j = 0; j <= 1; j++)
+		{
+			pUpState += (*vec)[GLOBAL].first.c_str()[j];
+		}
+		return atoi(pUpState.c_str());
 	}
 
 	// Parameters are the pointer to the recvVec vector and the desired player ID
@@ -199,8 +234,8 @@ public:
 	{
 		std::vector<int> result;
 		std::string s = (*vec)[PPDL_MAT].first;
-		for (int um = 0; um < s.length(); um += 3){
-			result.push_back(atoi(s.substr(um,3).c_str()));
+		for (int um = 0; um < s.length(); um += PPDL_INT_LENGTH){
+			result.push_back(atoi(s.substr(um, PPDL_INT_LENGTH).c_str()));
 		}
 		return result;
 	}
@@ -283,6 +318,6 @@ public:
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
-	std::string health, kills, speed, pUp;
+	std::string health, kills, speed, pUpPlayers, pUpState;
 	int i, j;
 };

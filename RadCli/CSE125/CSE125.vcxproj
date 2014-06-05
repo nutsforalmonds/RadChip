@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimController.h" />
+    <ClInclude Include="BillboardProjectile.h" />
     <ClInclude Include="billboard_list.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Client.h" />

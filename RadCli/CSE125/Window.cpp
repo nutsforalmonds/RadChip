@@ -37,6 +37,7 @@
 #include "AnimController.h"
 #include "ParticleAnimated.h"
 #include "LightningGenerator.h"
+#include "BillboardProjectile.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -114,6 +115,8 @@ Sound* sound_3d_death2;
 Sound* sound_3d_tramp;
 Sound* sound_3d_tele;
 Sound* sound_3d_pick;
+Sound* sound_3d_tower_shoot;
+Sound* sound_3d_tower_explosion;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
@@ -122,7 +125,7 @@ std::vector<Object*> player_list;
 std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
-std::vector<Projectile*> tower_projectile_list;
+std::vector<BillboardProjectile*> tower_projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 std::vector<ParticleAnimated*> panim_list;
@@ -132,6 +135,8 @@ LightningGenerator lightning_generator;
 
 Mesh_Static* tryThis;
 
+
+bool bVis[6];
 BillboardList m_billboardList;
 BillboardList m_billboardList2;
 BillboardList m_billboardList3;
@@ -184,8 +189,12 @@ struct Mother{
 	Mesh* mother_of_wrench;
 	Mesh* mother_of_banana;
 	Mesh* mother_of_nut;
-	ParticleAnimated* mother_of_p_anim;
+	ParticleAnimated* mother_of_p_anim;//blue fire
 	ParticleAnimated* mother_of_lightning;
+	ParticleAnimated* mother_of_tower_shoot_1;
+	ParticleAnimated* mother_of_tower_damage_1;
+	ParticleAnimated* mother_of_tower_explosion_1;
+	ParticleAnimated* mother_of_health_potion;
 }MOM;
 
 int texScreenWidth = 512;
@@ -216,6 +225,8 @@ int space_up = 1;
 int sprint_up = 10;
 
 //bool keyState[4];//up,down,left,right
+
+void initializeMOM();
 
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
@@ -260,6 +271,7 @@ int keyState = 0;
 int mouseState = 0;
 int projectile_counter = 0;
 float max_health = 7.0;
+bool dead[4];
 
 std::vector <pair<string, mat4>>* sendVec = new vector<pair<string, mat4>>;
 std::vector <pair<string, mat4>>* recvVec = new vector<pair<string, mat4>>;
@@ -351,7 +363,6 @@ struct timeval2 {
 	__int32    tv_sec;         /* seconds */
 	__int32    tv_usec;        /* microseconds */
 };
-
 
 void spawnDamageParticle(int id)
 {
@@ -514,45 +525,29 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 }
 void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 
-	Projectile* pjt = new Projectile(player_list.size());
-	//if (playerID % 2){//monkey throws
-		pjt->setVAO(MOM.mother_of_banana->getVAO());
-		pjt->setEntries(MOM.mother_of_banana->getEntries());
-		pjt->setTextures(MOM.mother_of_banana->getTextures());
-		pjt->setAdjustM(MOM.mother_of_banana->getAdjustM());
-	//}
-	//else{//chipmonk throws
-	//	pjt->setVAO(MOM.mother_of_nut->getVAO());
-	//	pjt->setEntries(MOM.mother_of_nut->getEntries());
-	//	pjt->setTextures(MOM.mother_of_nut->getTextures());
-	//	pjt->setAdjustM(MOM.mother_of_nut->getAdjustM());
-	//}
-	pjt->setShader(sdrCtl.getShader("basic_model"));
-	pjt->setShininess(30);
-	pjt->setFog(fog);
-
-	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	BillboardProjectile* pjt = new BillboardProjectile(*(MOM.mother_of_tower_shoot_1));
+	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 5, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 	pjt->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
 	pjt->setDistance(20);
-	pjt->setShadowTex(shadow_map_id);
-
 	//Name and type
-	pjt->setType("Cube");
-	pjt->setName("Test Cube" + std::to_string(projectile_counter));
-	//projectile_counter++;
-	//Add Cube to the draw list
-	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
-	tower_projectile_list.push_back(pjt);
-	pjt->setSpeed(50);
-	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(glm::normalize(direction)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setName("Tower Projectile");
+	pjt->setSpeed(20);
+	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	pjt->setStartTime(ct);
+	tower_projectile_list.push_back(pjt);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_tower_shoot->setPosition(tpos);
+	sound_3d_tower_shoot->Play3D(View);
 }
 void despawnProjectile()
 {
@@ -596,8 +591,51 @@ void simulateProjectile(float t)
 	}
 	for (uint i = 0; i < tower_projectile_list.size(); i++){
 		tower_projectile_list[i]->preTrans(glm::translate(tower_projectile_list[i]->getVelocity()*t));
-		tower_projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*tower_projectile_list[i]->getAdjustM());
 	}
+}
+void towerDamage(int towerID){
+	ParticleAnimated* tower_dmg = new ParticleAnimated(*(MOM.mother_of_tower_damage_1));
+	tower_dmg->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0,0,0,1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tower_dmg->setStartTime(ct);
+	panim_list.push_back(tower_dmg);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_hit->setPosition(tpos);
+	sound_3d_hit->Play3D(View);
+}
+void towerKill(int towerID){
+	ParticleAnimated* tower_exp = new ParticleAnimated(*(MOM.mother_of_tower_explosion_1));
+	tower_exp->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tower_exp->setStartTime(ct);
+	panim_list.push_back(tower_exp);
+
+	ParticleAnimated* tower_exp_2 = new ParticleAnimated(*(MOM.mother_of_tower_damage_1));
+	tower_exp_2->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	tower_exp_2->setValidFrame(0, 19);
+	tower_exp_2->setStartTime(ct);
+	tower_exp_2->setDelay(0.5);
+	tower_exp_2->setDuration(0.3);
+	tower_exp_2->setWidth(20.0);
+	tower_exp_2->setHeight(10.0);
+	panim_list.push_back(tower_exp_2);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_tower_explosion->setPosition(tpos);
+	sound_3d_tower_explosion->Play3D(View);
+}
+void powerUpAnimation(int playerID){
+	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
+	power_up->setModelM(player_list[playerID]->getModelM()*glm::translate(vec3(0,0.7,0) + 0.5f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - player_list[playerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	power_up->setStartTime(ct);
+	panim_list.push_back(power_up);
 }
 
 void Window::idleCallback(void)
@@ -623,7 +661,7 @@ void Window::idleCallback(void)
 			cam[playerID]->setCamMode(0);
 		}
 		else if(first_change){
-			cam[playerID]->setCamM(glm::translate(vec3(0,100,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
+			cam[playerID]->setCamM(glm::translate(vec3(0,120,0))*glm::rotate(mat4(1.0),-90.0f,vec3(1,0,0)));
 			cam[playerID]->setCamMode(1);
 			first_change = false;
 		}
@@ -636,6 +674,7 @@ void Window::idleCallback(void)
 		anim_time += delta;
 		*/
 
+		//player animation
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
 		dt = ((double)ct.QuadPart - (double)idleCallbackTime.QuadPart) / (double)freq.QuadPart;
@@ -656,6 +695,20 @@ void Window::idleCallback(void)
 				else{//continuous
 					panim_list[i]->setStartTime(ct);
 					panim_list[i]->update();
+				}
+			}
+		}
+		//tower projectile animatioin
+		for (uint i = 0; i < tower_projectile_list.size(); i++){
+			if (!tower_projectile_list[i]->update()){
+				if (tower_projectile_list[i]->getType() == 0){//one time
+					delete tower_projectile_list[i];
+					tower_projectile_list.erase(tower_projectile_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					tower_projectile_list[i]->setStartTime(ct);
+					tower_projectile_list[i]->update();
 				}
 			}
 		}
@@ -1102,10 +1155,10 @@ void Window::displayCallback(void)
 		{
 			projectile_list[i]->draw(LightProjection, LightView);
 		}	
-		for (uint i = 0; i < tower_projectile_list.size(); ++i)
-		{
-			tower_projectile_list[i]->draw(LightProjection, LightView);
-		}
+		//for (uint i = 0; i < tower_projectile_list.size(); ++i)
+		//{
+		//	tower_projectile_list[i]->draw(LightProjection, LightView);
+		//}
 		
 		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1125,24 +1178,21 @@ void Window::displayCallback(void)
 		{
 			tower_list[i]->draw();
 		}
+		for (uint i = 0; i < projectile_list.size(); ++i)
+		{
+			projectile_list[i]->draw();
+		}
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (uint i = 0; i < stationary_list.size(); ++i)
 		{
 			stationary_list[i]->draw();
 		}
-		glDisable(GL_BLEND);
-		for (uint i = 0; i < projectile_list.size(); ++i)
-		{
-			projectile_list[i]->draw();
-		}
+		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < tower_projectile_list.size(); ++i)
 		{
 			tower_projectile_list[i]->draw();
 		}
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
 		}
@@ -1155,7 +1205,6 @@ void Window::displayCallback(void)
 			//sound_3d_light->setPosition(pt);
 			//sound_3d_light->Play3D(View);
 		}
-		
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 
@@ -1168,11 +1217,17 @@ void Window::displayCallback(void)
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 
-		m_billboardList.Render(Projection, View, 1.0f);
-		m_billboardList2.Render(Projection, View, 1.0f);
-		m_billboardList3.Render(Projection, View, 1.0f);
-		m_billboardList4.Render(Projection, View, 1.0f);
-		m_billboardList5.Render(Projection, View, 1.0f);
+		if (bVis[SPEEDUP])
+			m_billboardList.Render(Projection, View, 1.0f);
+		if (bVis[DOUBLEDAMAGE])
+			m_billboardList2.Render(Projection, View, 1.0f);
+		if (bVis[HEALTHBOOST])
+			m_billboardList3.Render(Projection, View, 1.0f);
+		if (bVis[FASTERSHOOT])
+			m_billboardList4.Render(Projection, View, 1.0f);
+		if (bVis[FARTHERSHOOT])
+			m_billboardList5.Render(Projection, View, 1.0f);
+
 		//m_billboardList6.Render(Projection, View, 1.0f);
 
 		glEnable(GL_POINT_SPRITE);
@@ -1237,7 +1292,7 @@ void Window::displayCallback(void)
 		}
 
 		else if (myClientState->getState() == 5){
-			endScreen->draw(1);
+			endScreen->draw(0);
 		}
 
 		else if (kill_count){
@@ -1370,12 +1425,21 @@ void server_update(int value){
 		parseOpts->getTowerShoot(recvVec, tsi);
 		for (uint i = 0; i < tsi.size(); i++){
 			towerProjectileAttack(tsi[i].towerID, tsi[i].projectileID, tsi[i].direction);
-			//cout << "'dijiejfowjowefj: " << tsi[i].direction[0] << " " << tsi[i].direction[1] << " " << tsi[i].direction[2] << endl;
+		}
+		for (int i = 0; i < NUM_TOWERS; i++){
+			if (parseOpts->getTowerDamaged(recvVec, i)){
+				towerDamage(i);
+			}
+			if (parseOpts->getTowerKill(recvVec, i)){
+				towerKill(i);
+			}
+			int tower_health = parseOpts->getTowerHealth(recvVec, i);
 		}
 
 		//despawn projectiles from hit
 		vector<int> ppdl = parseOpts->getPPDL(recvVec);
 		for (uint i = 0; i < ppdl.size(); i++){
+			//cout << "despawn: " << ppdl[i] << endl;
 			for (uint k = 0; k < projectile_list.size(); k++){
 				if (projectile_list[k]->getShootID() == ppdl[i]){
 					delete projectile_list[k];
@@ -1482,45 +1546,80 @@ void server_update(int value){
 		if (parseOpts->getKilled(recvVec, PLAYER0))
 		{
 			//cout << "Killed 0" << endl;
-			spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player0_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player0_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(0);
+			if (!dead[PLAYER0])
+			{
+				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player0_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(0);
+				dead[PLAYER0] = true;
+			}
 		}
+		else
+			dead[PLAYER0] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER1))
 		{
 			//cout << "Killed 1" << endl;
-			spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player1_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player1_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(1);
+			if (!dead[PLAYER1])
+			{
+				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player1_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player1_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(0);
+				dead[PLAYER1] = true;
+			}
 		}
+		else
+			dead[PLAYER1] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER2))
 		{
 			//cout << "Killed 2" << endl;
-			spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player2_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player2_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(2);
+			if (!dead[PLAYER2])
+			{
+				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player2_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player2_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(2);
+				dead[PLAYER2] = true;
+			}
 		}
+		else
+			dead[PLAYER2] = false;
 
 		if (parseOpts->getKilled(recvVec, PLAYER3))
 		{
-			// << "Killed 3" << endl;
-			spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
-			sound_3d_death->setPosition(player3_sound_vec_lasterest);
-			sound_3d_death->Play3D(View);
-			sound_3d_death2->setPosition(player3_sound_vec_lasterest);
-			sound_3d_death2->Play3D(View);
-			myGameMenu->setDeath(3);
+			//cout << "Killed 3" << endl;
+			if (!dead[PLAYER3])
+			{
+				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
+				sound_3d_death->setPosition(player3_sound_vec_lasterest);
+				sound_3d_death->Play3D(View);
+				sound_3d_death2->setPosition(player3_sound_vec_lasterest);
+				sound_3d_death2->Play3D(View);
+				myGameMenu->setDeath(3);
+				dead[PLAYER3] = true;
+			}
+		}
+		else
+			dead[PLAYER3] = false;
+
+		if (parseOpts->getKilled(recvVec, playerID))
+		{
+			//myDeathScreen->setDeathClock(clock());
+			//myClientState->setState(3);
+			alive = false;
+		}
+		if (!alive && !parseOpts->getKilled(recvVec, playerID))
+		{
+			alive = true;
 		}
 
 
@@ -1540,29 +1639,37 @@ void server_update(int value){
 				sound_3d_pick->setPosition(player0_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player0_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER0);
+				powerUpAnimation(0);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER1)){
 			if (Player1_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER1)){
 				sound_3d_pick->setPosition(player1_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player1_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER1);
+				powerUpAnimation(1);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER2)){
 			if (Player2_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER2)){
 				sound_3d_pick->setPosition(player2_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player2_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER2);
+				powerUpAnimation(2);
 			}
 		}
+
 		if (parseOpts->getPPowerUp(recvVec, PLAYER3)){
 			if (Player3_Powerup != parseOpts->getPPowerUp(recvVec, PLAYER3)){
 				sound_3d_pick->setPosition(player3_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player3_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER3);
+				powerUpAnimation(3);
 			}
 		}
+
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){
@@ -1581,6 +1688,28 @@ void server_update(int value){
 			sound_3d_tramp->setPosition(player3_sound_vec_lasterest);
 			sound_3d_tramp->Play3D(View);
 		}
+		// Teleporter sounds
+		if (parseOpts->getTele(recvVec, PLAYER0))
+		{
+			sound_3d_tele->setPosition(player0_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER1))
+		{
+			sound_3d_tele->setPosition(player1_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER2))
+		{
+			sound_3d_tele->setPosition(player2_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+		if (parseOpts->getTele(recvVec, PLAYER3))
+		{
+			sound_3d_tele->setPosition(player3_sound_vec_lasterest);
+			sound_3d_tele->Play3D(View);
+		}
+
 
 
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
@@ -1591,7 +1720,10 @@ void server_update(int value){
 		tower_list[3]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 3].second);
 
 		elevator_list[0]->setModelM((*recvVec)[PLAT_MAT_BEGIN].second);
-		elevator_list[1]->setModelM((*recvVec)[PLAT_MAT_END].second);
+		elevator_list[1]->setModelM((*recvVec)[PLAT_MAT_BEGIN+1].second);
+		elevator_list[2]->setModelM((*recvVec)[PLAT_MAT_BEGIN+2].second);
+		elevator_list[3]->setModelM((*recvVec)[PLAT_MAT_BEGIN+3].second);
+		elevator_list[4]->setModelM((*recvVec)[PLAT_MAT_BEGIN+4].second);
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
@@ -1616,7 +1748,23 @@ void server_update(int value){
 			sound_3d_Throw->setPosition(player0_sound_vec_curr);
 			sound_3d_Throw->Play3D(View);
 		}
+
+		std::fill_n(bVis, 5, true);
+		int pUpState = parseOpts->getPUpState(recvVec);
+		//std::cout << pUpState << std::endl;
+		if (pUpState & 1)
+			bVis[SPEEDUP] = false;
+		if (pUpState & 1 << 1)
+			bVis[DOUBLEDAMAGE] = false;
+		if (pUpState & 1 << 2)
+			bVis[HEALTHBOOST] = false;
+		if (pUpState & 1 << 3)
+			bVis[FASTERSHOOT] = false;
+		if (pUpState & 1 << 3)
+			bVis[FARTHERSHOOT] = false;
+
 	}
+
 
 	//Particles are instantly despawning
 	//despawnProjectile();
@@ -1825,6 +1973,20 @@ int main(int argc, char *argv[])
   posTestMusic->setVelocity(vt);
   posTestMusic->setMinDistance(5.0f);
   posTestMusic->setMaxDistance(10000.0f);
+
+  sound_3d_tower_shoot = new Sound(mySoundSystem, "Sound/tower_shoot.mp3", true);
+  sound_3d_tower_shoot->setVolume(0.5);
+  sound_3d_tower_shoot->setPosition(pt);
+  sound_3d_tower_shoot->setVelocity(vt);
+  sound_3d_tower_shoot->setMinDistance(5.0f);
+  sound_3d_tower_shoot->setMaxDistance(10000.0f);
+
+  sound_3d_tower_explosion = new Sound(mySoundSystem, "Sound/tower_explosion.wav", true);
+  sound_3d_tower_explosion->setVolume(0.75);
+  sound_3d_tower_explosion->setPosition(pt);
+  sound_3d_tower_explosion->setVelocity(vt);
+  sound_3d_tower_explosion->setMinDistance(5.0f);
+  sound_3d_tower_explosion->setMaxDistance(10000.0f);
 
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
@@ -2038,6 +2200,16 @@ void keyboard(unsigned char key, int, int){
 			//scene->addPlayer(cube6);
 
 		}
+
+		if (key == 9)
+		{
+			kill_count = true;
+		}
+
+		if (key == 'p') //test for end screen
+		{
+			myClientState->setState(5);
+		}
 		if (key == 0x30)
 		{
 			draw_list.clear();
@@ -2100,9 +2272,9 @@ void keyboard(unsigned char key, int, int){
 		break;
 	case 3:
 		if (key == 27){
-			//running = false;
-			//exit(0);
-			//myClientState->setState(1);
+			running = false;
+			exit(0);
+			myClientState->setState(1);
 		}
 		break;
 	case 4:
@@ -2110,6 +2282,10 @@ void keyboard(unsigned char key, int, int){
 			myClientState->setState(0);
 		}
 		break;
+	case 5:
+		if (key == 27){
+			myClientState->setState(1);
+		}
 	default:
 		break;
 	}
@@ -2172,8 +2348,9 @@ void keyUp (unsigned char key, int x, int y) {
 
 		if (key == 9)
 		{
-			kill_count = !kill_count;
+			kill_count = false;
 		}
+
 		// This goes into server
 		if (!(glutGetModifiers() & GLUT_ACTIVE_SHIFT)){
 			if (sprint_up < 10){
@@ -2189,6 +2366,8 @@ void keyUp (unsigned char key, int x, int y) {
 	case 3:
 		break;
 	case 4:
+		break;
+	case 5:
 		break;
 	default:
 		break;
@@ -2383,6 +2562,17 @@ void mouseFunc(int button, int state, int x, int y)
 		break;
 	case 4:
 		break;
+	case 5:
+		if (state == GLUT_DOWN){
+			newX = (float)x / Window::width;
+			newY = (float)y / Window::height;
+			cout << "CLICK!" << newX << "," << newY << endl;
+			int click = endScreen->checkClick(newX, newY);
+			if (click == 1){
+				myClientState->setState(1);
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -2475,6 +2665,22 @@ void passiveMotionFunc(int x, int y){
 		}
 		break;
 	case 4:
+		break;
+	case 5:
+		newX = (float)x / Window::width;
+		newY = (float)y / Window::height;
+		endScreen->checkHighlight(newX, newY);
+		int sound5;
+		sound5 = endScreen->checkHighlight(newX, newY);
+		if (sound5){
+			if (!inMenuBox){
+				testSound[6]->Play();
+			}
+			inMenuBox = true;
+		}
+		else{
+			inMenuBox = false;
+		}
 		break;
 	default:
 		break;
@@ -2619,9 +2825,9 @@ void initialize(int argc, char *argv[])
 	
 	light[0].type=1;
 	light[0].pos = vec4(0,200,0,1);
-	light[0].specular = vec3(0.1,0.1,0.1);//0.1,0.1,0.1
-	light[0].diffuse = vec3(0.9, 0.9, 0.9);//0.9, 0.9, 0.9
-	light[0].ambient = vec3(0.35, 0.35, 0.35);//0.35, 0.35, 0.35
+	light[0].specular = vec3(0.2,0.2,0.2);//0.1,0.1,0.1
+	light[0].diffuse = vec3(1.1, 1.1, 1.1);//0.9, 0.9, 0.9
+	light[0].ambient = vec3(0.45, 0.45, 0.45);//0.35, 0.35, 0.35
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
 	LightView = glm::lookAt(vec3(light[0].pos), vec3(0, 0, 0), vec3(1, 0, 0));
@@ -2689,59 +2895,27 @@ void initialize(int argc, char *argv[])
 	lightning_generator.setDt(0.1);//lightning generation per 0.1 seconds
 	lightning_generator.setSize(400);//size of the map
 
-	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
-	MOM.mother_of_wrench = new Mesh();
-	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
-	MOM.mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_wrench->setShadowTex(shadow_map_id);
-	MOM.mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-	MOM.mother_of_wrench->setShininess(30);
-	MOM.mother_of_wrench->setFog(fog);
-
-	MOM.mother_of_banana = new Mesh();
-	MOM.mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
-	MOM.mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_banana->setShadowTex(shadow_map_id);
-	MOM.mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
-	MOM.mother_of_banana->setShininess(30);
-	MOM.mother_of_banana->setFog(fog);
-
-	MOM.mother_of_nut = new Mesh();
-	MOM.mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
-	MOM.mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_nut->setShadowTex(shadow_map_id);
-	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
-	MOM.mother_of_nut->setShininess(30);
-	MOM.mother_of_nut->setFog(fog);
-
-	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(2.0f);
-	MOM.mother_of_p_anim->setHeight(2.0f);
-	MOM.mother_of_p_anim->setNumColumn(5);
-	MOM.mother_of_p_anim->setNumRow(4);
-	MOM.mother_of_p_anim->setDuration(1);
-	MOM.mother_of_p_anim->setFog(fog);
-	MOM.mother_of_p_anim->Bind();
-
-	MOM.mother_of_lightning = new ParticleAnimated();
-	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
-	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_lightning->setWidth(2.0f);
-	MOM.mother_of_lightning->setHeight(2.0f);
-	MOM.mother_of_lightning->setNumColumn(10);
-	MOM.mother_of_lightning->setNumRow(1);
-	MOM.mother_of_lightning->setDuration(1);
-	MOM.mother_of_lightning->setType(0);
-	MOM.mother_of_lightning->setFog(fog);
-	MOM.mother_of_lightning->Bind();
+	initializeMOM();
 
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	//p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
+	//p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	//p_anim->setModelM(glm::translate(vec3(0, 7, 0)));
+	//p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	//p_anim->setNumColumn(5);
+	//p_anim->setNumRow(6);
+	//p_anim->setValidFrame(0, 9);
+	////p_anim->setReverse(true);
+	//p_anim->setDuration(1);
+	//p_anim->setFog(fog);
+	//p_anim->Bind();
 	//p_anim->setType(1);
+	//p_anim->setWidth(2);
+	//p_anim->setHeight(2);
+	//p_anim->setDuration(1.0);
+	//p_anim->setTransparency(1.0);
+	////p_anim->setSampleCount(3, 3);
+	////p_anim->setSampleDist(0.001, 0.005);
 	//LARGE_INTEGER time_p_anim;
 	//QueryPerformanceCounter(&time_p_anim);
 	//p_anim->setStartTime(time_p_anim);
@@ -3074,9 +3248,9 @@ void initialize(int argc, char *argv[])
 	t3_ps_03->setLoopInf(true);
 	t3_ps_03->setModelM(glm::translate(vec3(-30.0f, 7.3f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
-	//Bottom Mid Platform
+	//elevator 
 	Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
-	//platform_01->setSpeed(5);
+	//platform_01->setSpeed(5); 
 	platform_01->setKd(vec3(0.8, 0.0, 0.0));
 	platform_01->setKa(vec3(0.3, 0.0, 0.0));
 	platform_01->setKs(vec3(0.4, 0.0, 0.0));
@@ -3086,19 +3260,19 @@ void initialize(int argc, char *argv[])
 	platform_01->setEta(0.5);
 	platform_01->setCubeMapUnit(3);
 	platform_01->setSpeed(5);
-	platform_01->postTrans(glm::translate(vec3(0, 13.0, 0)));
-	//platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0)));
+	platform_01->postTrans(glm::translate(vec3(0, 5.0, 0)));
+	//platform_01->setAABB(AABB(vec3(-10.0, -0.5, -10.0), vec3(10.0, 0.5, 10.0))); 
 	platform_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_01->setShadowTex(shadow_map_id);
 	platform_01->setType("Cube");
 	platform_01->setName("Test Platform");
 	platform_01->setAliveModelM(platform_01->getModelM());
-	//platform_01->setTransparency(0.5);
 	stationary_list.push_back(platform_01);
+	elevator_list.push_back(platform_01);
 
-	//1st Bottom Side Step Platform
-	Cube* platform_02 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-	//platform_01->setSpeed(5);
+	//island 
+	Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+	//platform_01->setSpeed(5); 
 	platform_02->setKd(vec3(0.15, 0.15, 0.92));
 	platform_02->setKa(vec3(0.0, 0.0, 0.3));
 	platform_02->setKs(vec3(0.0, 0.0, 0.4));
@@ -3108,8 +3282,8 @@ void initialize(int argc, char *argv[])
 	platform_02->setEta(0.5);
 	platform_02->setCubeMapUnit(3);
 	platform_02->setSpeed(5);
-	platform_02->postTrans(glm::translate(vec3(20.0, 8.0, 0)));
-	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_02->postTrans(glm::translate(vec3(74.0, 18.0, 0)));
+	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_02->setShadowTex(shadow_map_id);
 	platform_02->setType("Cube");
@@ -3117,9 +3291,9 @@ void initialize(int argc, char *argv[])
 	platform_02->setAliveModelM(platform_02->getModelM());
 	stationary_list.push_back(platform_02);
 
-	//2nd Bottom Side Step Platform
-	Cube* platform_03 = new Cube(-1.5, 1.5, -0.5, 0.5, -5.0, 5.0);
-	//platform_01->setSpeed(5);
+	//island 
+	Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+	//platform_01->setSpeed(5); 
 	platform_03->setKd(vec3(0.11, 0.67, 0.09));
 	platform_03->setKa(vec3(0.0, 0.2, 0.0));
 	platform_03->setKs(vec3(0.0, 0.3, 0.0));
@@ -3129,8 +3303,8 @@ void initialize(int argc, char *argv[])
 	platform_03->setEta(0.5);
 	platform_03->setCubeMapUnit(3);
 	platform_03->setSpeed(5);
-	platform_03->postTrans(glm::translate(vec3(-20.0, 8.0, 0)));
-	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	platform_03->postTrans(glm::translate(vec3(-74.0, 18.0, 0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_03->setShadowTex(shadow_map_id);
 	platform_03->setType("Cube");
@@ -3138,9 +3312,9 @@ void initialize(int argc, char *argv[])
 	platform_03->setAliveModelM(platform_03->getModelM());
 	stationary_list.push_back(platform_03);
 
-	//Platform Steps 1-1
-	Cube* platform_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-	//platform_01->setSpeed(5);
+	//walkway 
+	Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 80);
+	//platform_01->setSpeed(5); 
 	platform_04->setKd(vec3(0.8, 0.8, 0.0));
 	platform_04->setKa(vec3(0.3, 0.3, 0.0));
 	platform_04->setKs(vec3(0.4, 0.4, 0.0));
@@ -3151,8 +3325,6 @@ void initialize(int argc, char *argv[])
 	platform_04->setCubeMapUnit(3);
 	platform_04->setSpeed(5);
 	platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
-
-	//platform_04->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_04->setShadowTex(shadow_map_id);
 	platform_04->setType("Cube");
@@ -3160,9 +3332,9 @@ void initialize(int argc, char *argv[])
 	platform_04->setAliveModelM(platform_04->getModelM());
 	stationary_list.push_back(platform_04);
 
-	//Platform Steps 1-2
-	Cube* platform_05 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-	//platform_05->setSpeed(5);
+	//barricade on walkway 
+	Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
+	//platform_05->setSpeed(5); 
 	platform_05->setKd(vec3(0.0, 0.8, 0.8));
 	platform_05->setKa(vec3(0.0, 0.3, 0.3));
 	platform_05->setKs(vec3(0.0, 0.4, 0.4));
@@ -3173,7 +3345,7 @@ void initialize(int argc, char *argv[])
 	platform_05->setCubeMapUnit(3);
 	platform_05->setSpeed(5);
 	platform_05->postTrans(glm::translate(vec3(0.0, 23.0, 40.0)));
-	//platform_05->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	//platform_05->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_05->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_05->setShadowTex(shadow_map_id);
 	platform_05->setType("Cube");
@@ -3181,9 +3353,9 @@ void initialize(int argc, char *argv[])
 	platform_05->setAliveModelM(platform_05->getModelM());
 	stationary_list.push_back(platform_05);
 
-	//Platform Steps 1-3
+	//Platform Steps 1-3 
 	Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-	//platform_06->setSpeed(5);
+	//platform_06->setSpeed(5); 
 	platform_06->setKd(vec3(0.8, 0.0, 0.8));
 	platform_06->setKa(vec3(0.3, 0.0, 0.3));
 	platform_06->setKs(vec3(0.4, 0.0, 0.4));
@@ -3194,7 +3366,7 @@ void initialize(int argc, char *argv[])
 	platform_06->setCubeMapUnit(3);
 	platform_06->setSpeed(5);
 	platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
-	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_06->setShadowTex(shadow_map_id);
 	platform_06->setType("Cube");
@@ -3202,9 +3374,9 @@ void initialize(int argc, char *argv[])
 	platform_06->setAliveModelM(platform_06->getModelM());
 	stationary_list.push_back(platform_06);
 
-	//Platform Steps 2-1
-	Cube* platform_07 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-	//platform_07->setSpeed(5);
+	//walkway 
+	Cube* platform_07 = new Cube(-10.0, 10.0, -0.5, 0.5, -80, 10);
+	//platform_07->setSpeed(5); 
 	platform_07->setKd(vec3(0.8, 0.0, 0.8));
 	platform_07->setKa(vec3(0.3, 0.0, 0.3));
 	platform_07->setKs(vec3(0.4, 0.0, 0.4));
@@ -3215,7 +3387,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setCubeMapUnit(3);
 	platform_07->setSpeed(5);
 	platform_07->postTrans(glm::translate(vec3(0.0, 18.0, -20.0)));
-	//platform_07->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	//platform_07->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_07->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_07->setShadowTex(shadow_map_id);
 	platform_07->setType("Cube");
@@ -3223,9 +3395,9 @@ void initialize(int argc, char *argv[])
 	platform_07->setAliveModelM(platform_07->getModelM());
 	stationary_list.push_back(platform_07);
 
-	//Platform Steps 2-2
-	Cube* platform_08 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
-	//platform_08->setSpeed(5);
+	//barricade on walkway 
+	Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
+	//platform_08->setSpeed(5); 
 	platform_08->setKd(vec3(0.0, 0.8, 0.8));
 	platform_08->setKa(vec3(0.0, 0.3, 0.3));
 	platform_08->setKs(vec3(0.0, 0.4, 0.4));
@@ -3236,7 +3408,7 @@ void initialize(int argc, char *argv[])
 	platform_08->setCubeMapUnit(3);
 	platform_08->setSpeed(5);
 	platform_08->postTrans(glm::translate(vec3(0.0, 23.0, -40.0)));
-	//platform_08->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	//platform_08->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_08->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_08->setShadowTex(shadow_map_id);
 	platform_08->setType("Cube");
@@ -3244,9 +3416,9 @@ void initialize(int argc, char *argv[])
 	platform_08->setAliveModelM(platform_08->getModelM());
 	stationary_list.push_back(platform_08);
 
-	//Platform Steps 2-3
+	//Platform Steps 2-3 
 	Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
-	//platform_09->setSpeed(5);
+	//platform_09->setSpeed(5); 
 	platform_09->setKd(vec3(0.8, 0.8, 0.0));
 	platform_09->setKa(vec3(0.3, 0.3, 0.0));
 	platform_09->setKs(vec3(0.4, 0.4, 0.0));
@@ -3257,7 +3429,7 @@ void initialize(int argc, char *argv[])
 	platform_09->setCubeMapUnit(3);
 	platform_09->setSpeed(5);
 	platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
-	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_09->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_09->setShadowTex(shadow_map_id);
 	platform_09->setType("Cube");
@@ -3265,8 +3437,48 @@ void initialize(int argc, char *argv[])
 	platform_09->setAliveModelM(platform_09->getModelM());
 	stationary_list.push_back(platform_09);
 
-	//Trampoline
-	Cube* tramp_01 = new Cube(-2.0,2.0,-0.5,0.5,-2.0,2.0);
+	//island to teleporter
+	Cube* platform_10 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+	//platform_09->setSpeed(5); 
+	platform_10->setKd(vec3(0.8, 0.8, 0.0));
+	platform_10->setKa(vec3(0.3, 0.3, 0.0));
+	platform_10->setKs(vec3(0.4, 0.4, 0.0));
+	platform_10->setShininess(100);
+	platform_10->setFog(fog);
+	platform_10->setReflectFactor(vec2(0.2, 0.5));
+	platform_10->setEta(0.5);
+	platform_10->setCubeMapUnit(3);
+	platform_10->setSpeed(5);
+	platform_10->postTrans(glm::translate(vec3(100.0, 18.0, 0.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_10->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_10->setShadowTex(shadow_map_id);
+	platform_10->setType("Cube");
+	platform_10->setName("Test Platform");
+	stationary_list.push_back(platform_10);
+
+	//island to teleporter
+	Cube* platform_11 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+	//platform_09->setSpeed(5); 
+	platform_11->setKd(vec3(0.8, 0.8, 0.0));
+	platform_11->setKa(vec3(0.3, 0.3, 0.0));
+	platform_11->setKs(vec3(0.4, 0.4, 0.0));
+	platform_11->setShininess(100);
+	platform_11->setFog(fog);
+	platform_11->setReflectFactor(vec2(0.2, 0.5));
+	platform_11->setEta(0.5);
+	platform_11->setCubeMapUnit(3);
+	platform_11->setSpeed(5);
+	platform_11->postTrans(glm::translate(vec3(-100.0, 18.0, 0.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_11->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_11->setShadowTex(shadow_map_id);
+	platform_11->setType("Cube");
+	platform_11->setName("Test Platform");
+	stationary_list.push_back(platform_11);
+
+	//Trampoline 
+	Cube* tramp_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_01->setKd(vec3(0.0, 0.0, 0.0));
 	tramp_01->setKa(vec3(0.0, 0.0, 0.0));
 	tramp_01->setKs(vec3(0.0, 0.0, 0.0));
@@ -3291,12 +3503,28 @@ void initialize(int argc, char *argv[])
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
 	tele_01->setEta(0.5);
 	tele_01->setCubeMapUnit(3);
-	tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+	tele_01->postTrans(glm::translate(vec3(114, 18.0, 0)));
 	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_01->setShadowTex(shadow_map_id);
 	tele_01->setType("Teleporter");
 	tele_01->setName("Test Teleporter");
 	stationary_list.push_back(tele_01);
+
+	Cube* tele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tele_02->setKd(vec3(1.0, 1.0, 1.0));
+	tele_02->setKa(vec3(1.0, 1.0, 1.0));
+	tele_02->setKs(vec3(1.0, 1.0, 1.0));
+	tele_02->setShininess(100);
+	tele_02->setFog(fog);
+	tele_02->setReflectFactor(vec2(0.2, 0.5));
+	tele_02->setEta(0.5);
+	tele_02->setCubeMapUnit(3);
+	tele_02->postTrans(glm::translate(vec3(-114, 18.0, 0)));
+	tele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tele_02->setShadowTex(shadow_map_id);
+	tele_02->setType("Teleporter");
+	tele_02->setName("Test Teleporter");
+	stationary_list.push_back(tele_02);
 
 	Cube* ele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	ele_01->setKd(vec3(1.0, 1.0, 1.0));
@@ -3307,7 +3535,7 @@ void initialize(int argc, char *argv[])
 	ele_01->setReflectFactor(vec2(0.2, 0.5));
 	ele_01->setEta(0.5);
 	ele_01->setCubeMapUnit(3);
-	ele_01->postTrans(glm::translate(vec3(0, 20.0, 20)));
+	ele_01->postTrans(glm::translate(vec3(12, 18.0, 38)));
 	ele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_01->setShadowTex(shadow_map_id);
 	ele_01->setType("Elevator");
@@ -3315,7 +3543,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(ele_01);
 	elevator_list.push_back(ele_01);
 
-	Cube* ele_02 = new Cube(-20.0, 20.0, -0.5, 0.5, -20.0, 20.0);
+	Cube* ele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	ele_02->setKd(vec3(1.0, 1.0, 1.0));
 	ele_02->setKa(vec3(1.0, 1.0, 1.0));
 	ele_02->setKs(vec3(1.0, 1.0, 1.0));
@@ -3324,13 +3552,47 @@ void initialize(int argc, char *argv[])
 	ele_02->setReflectFactor(vec2(0.2, 0.5));
 	ele_02->setEta(0.5);
 	ele_02->setCubeMapUnit(3);
-	ele_02->postTrans(glm::translate(vec3(-10, 10.0, 85)));
+	ele_02->postTrans(glm::translate(vec3(12, 18.0, 38)));
 	ele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_02->setShadowTex(shadow_map_id);
 	ele_02->setType("Elevator");
 	ele_02->setName("Test Elevator");
 	stationary_list.push_back(ele_02);
 	elevator_list.push_back(ele_02);
+
+	Cube* ele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	ele_03->setKd(vec3(1.0, 1.0, 1.0));
+	ele_03->setKa(vec3(1.0, 1.0, 1.0));
+	ele_03->setKs(vec3(1.0, 1.0, 1.0));
+	ele_03->setShininess(100);
+	ele_03->setFog(fog);
+	ele_03->setReflectFactor(vec2(0.2, 0.5));
+	ele_03->setEta(0.5);
+	ele_03->setCubeMapUnit(3);
+	ele_03->postTrans(glm::translate(vec3(12, 18.0, 38)));
+	ele_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	ele_03->setShadowTex(shadow_map_id);
+	ele_03->setType("Elevator");
+	ele_03->setName("Test Elevator");
+	stationary_list.push_back(ele_03);
+	elevator_list.push_back(ele_03);
+
+	Cube* ele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	ele_04->setKd(vec3(1.0, 1.0, 1.0));
+	ele_04->setKa(vec3(1.0, 1.0, 1.0));
+	ele_04->setKs(vec3(1.0, 1.0, 1.0));
+	ele_04->setShininess(100);
+	ele_04->setFog(fog);
+	ele_04->setReflectFactor(vec2(0.2, 0.5));
+	ele_04->setEta(0.5);
+	ele_04->setCubeMapUnit(3);
+	ele_04->postTrans(glm::translate(vec3(12, 18.0, 38)));
+	ele_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	ele_04->setShadowTex(shadow_map_id);
+	ele_04->setType("Elevator");
+	ele_04->setName("Test Elevator");
+	stationary_list.push_back(ele_04);
+	elevator_list.push_back(ele_04);
 	/*
 	float temp_x = randomFloatBetween(0.0, 1.0);
 	float temp_y = randomFloatBetween(0.0, 1.0);
@@ -3533,6 +3795,328 @@ void initialize(int argc, char *argv[])
 	damagePart->setFog(fog);
 	*/
 
+	//Floor
+	Cube* platform_20 = new Cube(-20, 20, -0.5, 0.5, -20.0, 20.0);
+	//platform_01->setSpeed(5); 
+	platform_20->setKd(vec3(0.15, 0.15, 0.92));
+	platform_20->setKa(vec3(0.0, 0.0, 0.3));
+	platform_20->setKs(vec3(0.0, 0.0, 0.4));
+	platform_20->setShininess(100);
+	platform_20->setFog(fog);
+	platform_20->setReflectFactor(vec2(0.1, 0.1));
+	platform_20->setEta(0.5);
+	platform_20->setCubeMapUnit(3);
+	platform_20->setSpeed(5);
+	platform_20->postTrans(glm::translate(vec3(	ORIGINX,
+												ORIGINY,
+												ORIGINZ)));
+	//platform_20->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_20->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_20->setShadowTex(shadow_map_id);
+	platform_20->setType("Cube");
+	platform_20->setName("Test Platform");
+	// don't draw for now so we can peek inside
+	//stationary_list.push_back(platform_20);
+
+	//wall0
+	Cube* platform_21 = new Cube(-0.5, 0.5, -15, 15, -25.0, 25.0);
+	//platform_01->setSpeed(5); 
+	platform_21->setKd(vec3(0.15, 0.15, 0.92));
+	platform_21->setKa(vec3(0.0, 0.0, 0.3));
+	platform_21->setKs(vec3(0.0, 0.0, 0.4));
+	platform_21->setShininess(100);
+	platform_21->setFog(fog);
+	platform_21->setReflectFactor(vec2(0.1, 0.1));
+	platform_21->setEta(0.5);
+	platform_21->setCubeMapUnit(3);
+	platform_21->setSpeed(5);
+	platform_21->postTrans(glm::translate(vec3(	ORIGINX + 25,
+												ORIGINY + PERIMETER_WALL_HEIGHT,
+												ORIGINZ)));
+	//platform_21->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_21->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_21->setShadowTex(shadow_map_id);
+	platform_21->setType("Cube");
+	platform_21->setName("Test Platform");
+	stationary_list.push_back(platform_21);
+
+	//wall1
+	Cube* platform_22 = new Cube(-0.5, 0.5, -15, 15, -25.0, 25.0);
+	//platform_01->setSpeed(5); 
+	platform_22->setKd(vec3(0.15, 0.15, 0.92));
+	platform_22->setKa(vec3(0.0, 0.0, 0.3));
+	platform_22->setKs(vec3(0.0, 0.0, 0.4));
+	platform_22->setShininess(100);
+	platform_22->setFog(fog);
+	platform_22->setReflectFactor(vec2(0.1, 0.1));
+	platform_22->setEta(0.5);
+	platform_22->setCubeMapUnit(3);
+	platform_22->setSpeed(5);
+	platform_22->postTrans(glm::translate(vec3(	ORIGINX - 25, 
+												ORIGINY + PERIMETER_WALL_HEIGHT, 
+												ORIGINZ)));
+	//platform_22->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_22->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_22->setShadowTex(shadow_map_id);
+	platform_22->setType("Cube");
+	platform_22->setName("Test Platform");
+	stationary_list.push_back(platform_22);
+
+	//wall2
+	Cube* platform_23 = new Cube(-25, 25, -15, 15, -0.5, 0.5);
+	//platform_01->setSpeed(5); 
+	platform_23->setKd(vec3(0.15, 0.15, 0.92));
+	platform_23->setKa(vec3(0.0, 0.0, 0.3));
+	platform_23->setKs(vec3(0.0, 0.0, 0.4));
+	platform_23->setShininess(100);
+	platform_23->setFog(fog);
+	platform_23->setReflectFactor(vec2(0.1, 0.1));
+	platform_23->setEta(0.5);
+	platform_23->setCubeMapUnit(3);
+	platform_23->setSpeed(5);
+	platform_23->postTrans(glm::translate(vec3(	ORIGINX,
+												ORIGINY + PERIMETER_WALL_HEIGHT,
+												ORIGINZ + 25)));
+	//platform_23->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_23->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_23->setShadowTex(shadow_map_id);
+	platform_23->setType("Cube");
+	platform_23->setName("Test Platform");
+	stationary_list.push_back(platform_23);
+
+	//wall3
+	Cube* platform_24 = new Cube(-25, 25, -15, 15, -0.5, 0.5);
+	//platform_01->setSpeed(5); 
+	platform_24->setKd(vec3(0.15, 0.15, 0.92));
+	platform_24->setKa(vec3(0.0, 0.0, 0.3));
+	platform_24->setKs(vec3(0.0, 0.0, 0.4));
+	platform_24->setShininess(100);
+	platform_24->setFog(fog);
+	platform_24->setReflectFactor(vec2(0.1, 0.1));
+	platform_24->setEta(0.5);
+	platform_24->setCubeMapUnit(3);
+	platform_24->setSpeed(5);
+	platform_24->postTrans(glm::translate(vec3(	ORIGINX,
+												ORIGINY + PERIMETER_WALL_HEIGHT,
+												ORIGINZ - 25)));
+	//platform_24->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_24->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_24->setShadowTex(shadow_map_id);
+	platform_24->setType("Cube");
+	platform_24->setName("Test Platform");
+	stationary_list.push_back(platform_24);
+
+	// inside middle
+	Cube* platform_25 = new Cube(-2, 2, -0.5, -0.5, -2, 2);
+	//platform_01->setSpeed(5); 
+	platform_25->setKd(vec3(0.15, 0.15, 0.92));
+	platform_25->setKa(vec3(0.0, 0.0, 0.3));
+	platform_25->setKs(vec3(0.0, 0.0, 0.4));
+	platform_25->setShininess(100);
+	platform_25->setFog(fog);
+	platform_25->setReflectFactor(vec2(0.1, 0.1));
+	platform_25->setEta(0.5);
+	platform_25->setCubeMapUnit(3);
+	platform_25->setSpeed(5);
+	platform_25->postTrans(glm::translate(vec3(	ORIGINX,
+												ORIGINY + CENTER_TOWERPLAT_HEIGHT,
+												ORIGINZ)));
+	//platform_25->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_25->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_25->setShadowTex(shadow_map_id);
+	platform_25->setType("Cube");
+	platform_25->setName("Test Platform");
+	stationary_list.push_back(platform_25);
+
+	// tower in the middle
+	Mesh* tower10 = new Mesh();
+	tower10->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
+	tower10->setShader(sdrCtl.getShader("basic_model"));
+	tower10->setShadowTex(shadow_map_id);
+	tower10->setAdjustM(glm::translate(vec3(0.0, 2.9, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
+	tower10->setModelM(glm::translate(vec3(	ORIGINX,
+											ORIGINY + CENTER_TOWERPLAT_HEIGHT,
+											ORIGINZ)));
+	tower10->setShininess(30);
+	tower10->setFog(fog);
+	tower_list.push_back(tower10);
+
+	//diag plat 0
+	Cube* platform_26 = new Cube(-5, 5, -0.5, -0.5, -5, 5);
+	//platform_01->setSpeed(5); 
+	platform_26->setKd(vec3(0.15, 0.15, 0.92));
+	platform_26->setKa(vec3(0.0, 0.0, 0.3));
+	platform_26->setKs(vec3(0.0, 0.0, 0.4));
+	platform_26->setShininess(100);
+	platform_26->setFog(fog);
+	platform_26->setReflectFactor(vec2(0.1, 0.1));
+	platform_26->setEta(0.5);
+	platform_26->setCubeMapUnit(3);
+	platform_26->setSpeed(5);
+	platform_26->postTrans(glm::translate(vec3(	ORIGINX + CENTER_PLAT_SPACING,
+												ORIGINY + CENTER_PLAT_HEIGHT,
+												ORIGINZ + CENTER_PLAT_SPACING)));
+	//platform_26->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_26->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_26->setShadowTex(shadow_map_id);
+	platform_26->setType("Cube");
+	platform_26->setName("Test Platform");
+	stationary_list.push_back(platform_26);
+
+	//diag plat 1
+	Cube* platform_27 = new Cube(-5, 5, -0.5, -0.5, -5, 5);
+	//platform_01->setSpeed(5); 
+	platform_27->setKd(vec3(0.15, 0.15, 0.92));
+	platform_27->setKa(vec3(0.0, 0.0, 0.3));
+	platform_27->setKs(vec3(0.0, 0.0, 0.4));
+	platform_27->setShininess(100);
+	platform_27->setFog(fog);
+	platform_27->setReflectFactor(vec2(0.1, 0.1));
+	platform_27->setEta(0.5);
+	platform_27->setCubeMapUnit(3);
+	platform_27->setSpeed(5);
+	platform_27->postTrans(glm::translate(vec3(	ORIGINX - CENTER_PLAT_SPACING,
+												ORIGINY + CENTER_PLAT_HEIGHT,
+												ORIGINZ - CENTER_PLAT_SPACING)));
+	//platform_27->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_27->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_27->setShadowTex(shadow_map_id);
+	platform_27->setType("Cube");
+	platform_27->setName("Test Platform");
+	stationary_list.push_back(platform_27);
+
+	//diag plat 2
+	Cube* platform_28 = new Cube(-5, 5, -0.5, -0.5, -5, 5);
+	//platform_01->setSpeed(5); 
+	platform_28->setKd(vec3(0.15, 0.15, 0.92));
+	platform_28->setKa(vec3(0.0, 0.0, 0.3));
+	platform_28->setKs(vec3(0.0, 0.0, 0.4));
+	platform_28->setShininess(100);
+	platform_28->setFog(fog);
+	platform_28->setReflectFactor(vec2(0.1, 0.1));
+	platform_28->setEta(0.5);
+	platform_28->setCubeMapUnit(3);
+	platform_28->setSpeed(5);
+	platform_28->postTrans(glm::translate(vec3(	ORIGINX + CENTER_PLAT_SPACING,
+												ORIGINY + CENTER_PLAT_HEIGHT,
+												ORIGINZ - CENTER_PLAT_SPACING)));
+	//platform_28->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_28->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_28->setShadowTex(shadow_map_id);
+	platform_28->setType("Cube");
+	platform_28->setName("Test Platform");
+	stationary_list.push_back(platform_28);
+
+	//diag plat 3
+	Cube* platform_29 = new Cube(-5, 5, -0.5, -0.5, -5, 5);
+	//platform_01->setSpeed(5); 
+	platform_29->setKd(vec3(0.15, 0.15, 0.92));
+	platform_29->setKa(vec3(0.0, 0.0, 0.3));
+	platform_29->setKs(vec3(0.0, 0.0, 0.4));
+	platform_29->setShininess(100);
+	platform_29->setFog(fog);
+	platform_29->setReflectFactor(vec2(0.1, 0.1));
+	platform_29->setEta(0.5);
+	platform_29->setCubeMapUnit(3);
+	platform_29->setSpeed(5);
+	platform_29->postTrans(glm::translate(vec3(	ORIGINX - CENTER_PLAT_SPACING,
+												ORIGINY + CENTER_PLAT_HEIGHT,
+												ORIGINZ + CENTER_PLAT_SPACING)));
+	//platform_29->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_29->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_29->setShadowTex(shadow_map_id);
+	platform_29->setType("Cube");
+	platform_29->setName("Test Platform");
+	stationary_list.push_back(platform_29);
+
+	//rampart0
+	Cube* platform_30 = new Cube(-20, 20, -0.5, -0.5, -3, 3);
+	//platform_01->setSpeed(5); 
+	platform_30->setKd(vec3(0.15, 0.15, 0.92));
+	platform_30->setKa(vec3(0.0, 0.0, 0.3));
+	platform_30->setKs(vec3(0.0, 0.0, 0.4));
+	platform_30->setShininess(100);
+	platform_30->setFog(fog);
+	platform_30->setReflectFactor(vec2(0.1, 0.1));
+	platform_30->setEta(0.5);
+	platform_30->setCubeMapUnit(3);
+	platform_30->setSpeed(5);
+	platform_30->postTrans(glm::translate(vec3(	ORIGINX,
+												ORIGINY + 15,
+												ORIGINZ - 30)));
+	//platform_30->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_30->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_30->setShadowTex(shadow_map_id);
+	platform_30->setType("Cube");
+	platform_30->setName("Test Platform");
+	stationary_list.push_back(platform_30);
+
+	Cube* platform_31 = new Cube(-20, 20, -0.5, -0.5, -3, 3);
+	//platform_01->setSpeed(5); 
+	platform_31->setKd(vec3(0.15, 0.15, 0.92));
+	platform_31->setKa(vec3(0.0, 0.0, 0.3));
+	platform_31->setKs(vec3(0.0, 0.0, 0.4));
+	platform_31->setShininess(100);
+	platform_31->setFog(fog);
+	platform_31->setReflectFactor(vec2(0.1, 0.1));
+	platform_31->setEta(0.5);
+	platform_31->setCubeMapUnit(3);
+	platform_31->setSpeed(5);
+	platform_31->postTrans(glm::translate(vec3(ORIGINX,
+		ORIGINY + 12,
+		ORIGINZ - 40)));
+	//platform_31->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_31->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_31->setShadowTex(shadow_map_id);
+	platform_31->setType("Cube");
+	platform_31->setName("Test Platform");
+	stationary_list.push_back(platform_31);
+
+	Cube* platform_32 = new Cube(-20, 20, -0.5, -0.5, -3, 3);
+	//platform_01->setSpeed(5); 
+	platform_32->setKd(vec3(0.15, 0.15, 0.92));
+	platform_32->setKa(vec3(0.0, 0.0, 0.3));
+	platform_32->setKs(vec3(0.0, 0.0, 0.4));
+	platform_32->setShininess(100);
+	platform_32->setFog(fog);
+	platform_32->setReflectFactor(vec2(0.1, 0.1));
+	platform_32->setEta(0.5);
+	platform_32->setCubeMapUnit(3);
+	platform_32->setSpeed(5);
+	platform_32->postTrans(glm::translate(vec3(ORIGINX,
+		ORIGINY + 9,
+		ORIGINZ - 50)));
+	//platform_32->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_32->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_32->setShadowTex(shadow_map_id);
+	platform_32->setType("Cube");
+	platform_32->setName("Test Platform");
+	stationary_list.push_back(platform_32);
+
+	Cube* platform_33 = new Cube(-20, 20, -0.5, -0.5, -3, 3);
+	//platform_01->setSpeed(5); 
+	platform_33->setKd(vec3(0.15, 0.15, 0.92));
+	platform_33->setKa(vec3(0.0, 0.0, 0.3));
+	platform_33->setKs(vec3(0.0, 0.0, 0.4));
+	platform_33->setShininess(100);
+	platform_33->setFog(fog);
+	platform_33->setReflectFactor(vec2(0.1, 0.1));
+	platform_33->setEta(0.5);
+	platform_33->setCubeMapUnit(3);
+	platform_33->setSpeed(5);
+	platform_33->postTrans(glm::translate(vec3(ORIGINX,
+		ORIGINY + 6,
+		ORIGINZ - 60)));
+	//platform_33->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_33->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_33->setShadowTex(shadow_map_id);
+	platform_33->setType("Cube");
+	platform_33->setName("Test Platform");
+	stationary_list.push_back(platform_33);
+
+
+
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//RenderString((Window::width) / 4, (Window::height) / 2, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(0.0f, 1.0f, 0.0f));
 
@@ -3692,5 +4276,129 @@ void printLoadingString(string s){
 	glutSwapBuffers();
 }
 
+void initializeMOM(){
+	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
+	MOM.mother_of_wrench = new Mesh();
+	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
+	MOM.mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_wrench->setShadowTex(shadow_map_id);
+	MOM.mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	MOM.mother_of_wrench->setShininess(30);
+	MOM.mother_of_wrench->setFog(fog);
 
+	MOM.mother_of_banana = new Mesh();
+	MOM.mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
+	MOM.mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_banana->setShadowTex(shadow_map_id);
+	MOM.mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+	MOM.mother_of_banana->setShininess(30);
+	MOM.mother_of_banana->setFog(fog);
+
+	MOM.mother_of_nut = new Mesh();
+	MOM.mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
+	MOM.mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_nut->setShadowTex(shadow_map_id);
+	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
+	MOM.mother_of_nut->setShininess(30);
+	MOM.mother_of_nut->setFog(fog);
+
+	MOM.mother_of_p_anim = new ParticleAnimated();
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
+	MOM.mother_of_p_anim->setNumColumn(5);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setValidFrame(0, 19);
+	MOM.mother_of_p_anim->setDuration(1);
+	MOM.mother_of_p_anim->setFog(fog);
+	MOM.mother_of_p_anim->Bind();
+
+	MOM.mother_of_lightning = new ParticleAnimated();
+	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
+	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_lightning->setWidth(2.0f);
+	MOM.mother_of_lightning->setHeight(2.0f);
+	MOM.mother_of_lightning->setNumColumn(10);
+	MOM.mother_of_lightning->setNumRow(1);
+	MOM.mother_of_lightning->setValidFrame(0, 9);
+	MOM.mother_of_lightning->setDuration(1);
+	MOM.mother_of_lightning->setType(0);
+	MOM.mother_of_lightning->setFog(fog);
+	MOM.mother_of_lightning->Bind();
+
+	MOM.mother_of_tower_shoot_1 = new ParticleAnimated();
+	MOM.mother_of_tower_shoot_1->Init("img/sprite_sheets/light_003.png", "PNG");
+	MOM.mother_of_tower_shoot_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_shoot_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_shoot_1->setWidth(4.0f);
+	MOM.mother_of_tower_shoot_1->setHeight(4.0f);
+	MOM.mother_of_tower_shoot_1->setNumColumn(5);
+	MOM.mother_of_tower_shoot_1->setNumRow(6);
+	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
+	MOM.mother_of_tower_shoot_1->setDuration(1);
+	MOM.mother_of_tower_shoot_1->setType(1);
+	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setFog(fog);
+	MOM.mother_of_tower_shoot_1->Bind();
+
+	MOM.mother_of_tower_damage_1 = new ParticleAnimated();
+	MOM.mother_of_tower_damage_1->Init("img/sprite_sheets/fire_003.png", "PNG");
+	MOM.mother_of_tower_damage_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_damage_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_damage_1->setWidth(4.0f);
+	MOM.mother_of_tower_damage_1->setHeight(4.0f);
+	MOM.mother_of_tower_damage_1->setNumColumn(5);
+	MOM.mother_of_tower_damage_1->setNumRow(8);
+	MOM.mother_of_tower_damage_1->setValidFrame(20, 39);
+	MOM.mother_of_tower_damage_1->setDuration(1);
+	MOM.mother_of_tower_damage_1->setType(0);
+	//MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
+	//MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_damage_1->setTransparency(0.9);
+	//MOM.mother_of_tower_damage_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_damage_1->setFog(fog);
+	MOM.mother_of_tower_damage_1->Bind();
+
+	MOM.mother_of_tower_explosion_1 = new ParticleAnimated();
+	MOM.mother_of_tower_explosion_1->Init("img/sprite_sheets/light_004.png", "PNG");
+	MOM.mother_of_tower_explosion_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_explosion_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_explosion_1->setWidth(14.0f);
+	MOM.mother_of_tower_explosion_1->setHeight(14.0f);
+	MOM.mother_of_tower_explosion_1->setNumColumn(5);
+	MOM.mother_of_tower_explosion_1->setNumRow(5);
+	MOM.mother_of_tower_explosion_1->setValidFrame(0, 24);
+	MOM.mother_of_tower_explosion_1->setDuration(0.8);
+	MOM.mother_of_tower_explosion_1->setType(0);
+	MOM.mother_of_tower_explosion_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_explosion_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_explosion_1->setTransparency(0.9);
+	MOM.mother_of_tower_explosion_1->setBlurStrength(0.3);
+	MOM.mother_of_tower_explosion_1->setFog(fog);
+	MOM.mother_of_tower_explosion_1->Bind();
+
+	MOM.mother_of_health_potion = new ParticleAnimated();
+	MOM.mother_of_health_potion->Init("img/sprite_sheets/heal_003.png", "PNG");
+	MOM.mother_of_health_potion->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_health_potion->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_health_potion->setWidth(2.0f);
+	MOM.mother_of_health_potion->setHeight(2.0f);
+	MOM.mother_of_health_potion->setNumColumn(5);
+	MOM.mother_of_health_potion->setNumRow(4);
+	MOM.mother_of_health_potion->setValidFrame(0, 19);
+	MOM.mother_of_health_potion->setDuration(0.5);
+	MOM.mother_of_health_potion->setType(0);
+	//MOM.mother_of_health_potion->setSampleCount(3, 3);
+	//MOM.mother_of_health_potion->setSampleDist(0.002, 0.002);
+	MOM.mother_of_health_potion->setTransparency(1.0);
+	//MOM.mother_of_health_potion->setBlurStrength(0.3);
+	MOM.mother_of_health_potion->setFog(fog);
+	MOM.mother_of_health_potion->Bind();
+}
 

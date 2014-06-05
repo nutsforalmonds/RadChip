@@ -67,7 +67,6 @@ int p3Shots = 0;
 
 
 bool hasShot[4] = { false };
-int powerUpStatus[4] = { 0 };
 
 #define PLAYER_PROJECTILE_COUNT 1000;
 int p1ShotID = 0;
@@ -78,6 +77,13 @@ int p_shoot_counter;
 
 string int_to_string(int num, int length){
 	string t = "";
+	if (num < 0)
+	{
+		//std::cout << "Exception: less than zero int to string conversion -> set to 0" << std::endl;
+		//system("pause");
+		num = 0;
+	}
+
 	int num_zero;
 	if (num > 1){
 		num_zero = length - (int)floor(log10(num*10));
@@ -164,31 +170,31 @@ void handle_key_state(int pid, int keyState){
 		return;
 	if (keyState & 1){ //'a'
 		//cout << "move left" << endl;
-		scene->setHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 1){ //'d'
 		//cout << "move right" << endl;
-		scene->setHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 2){ //'w'
 		//cout << "move up" << endl;
-		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 3){ //'s'
 		//cout << "move down" << endl;
-		scene->setVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 4){ //' '
 		//cout << "jump" << endl;
@@ -249,6 +255,9 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
+	// global
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
 
 	
 	//Player Cam Mats
@@ -258,6 +267,10 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
 	//platform states
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	
 	recvVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -299,7 +312,7 @@ int main(int argc, char *argv[])
 	double diff;
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&last);
-	string p0, p1, p2, p3;
+	string p0, p1, p2, p3, pG;
 
 	bool newData[4] = { false };
 	while (true){
@@ -361,7 +374,7 @@ int main(int argc, char *argv[])
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
 		boost::array<mat4, 4> mt = scene->getTowerMats();
 		boost::array<mat4, 4> ca = scene->getPlayerCams();
-		boost::array<mat4, 4> ep = scene->getElevatorMats();
+		boost::array<mat4, 5> ep = scene->getElevatorMats();
 
 		// Print out matrix contents
 		/*
@@ -469,10 +482,10 @@ int main(int argc, char *argv[])
 
 		if (sendddddddddddedededed)
 		{
-			scene->setPlayerDead(0, false);
-			scene->setPlayerDead(1, false);
-			scene->setPlayerDead(2, false);
-			scene->setPlayerDead(3, false);
+			//scene->setPlayerDead(0, false);
+			//scene->setPlayerDead(1, false);
+			//scene->setPlayerDead(2, false);
+			//scene->setPlayerDead(3, false);
 		}
 
 		p0 += int_to_string(scene->getPlayerHealth(PLAYER0), 3);
@@ -486,111 +499,13 @@ int main(int argc, char *argv[])
 		p3 += int_to_string(scene->getPlayerKills(PLAYER3), 3);
 
 		// Powerup data encoding
-		// P0
-		if (scene->getPlayerPowerUp(PLAYER0)[0])
-		{
-			powerUpStatus[PLAYER0] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[1])
-		{
-			powerUpStatus[PLAYER0] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[2])
-		{
-			powerUpStatus[PLAYER0] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[3])
-		{
-			powerUpStatus[PLAYER0] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER0)[4])
-		{
-			powerUpStatus[PLAYER0] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER0] = NOPOWER;
-		}
-		// P1
-		if (scene->getPlayerPowerUp(PLAYER1)[0])
-		{
-			powerUpStatus[PLAYER1] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[1])
-		{
-			powerUpStatus[PLAYER1] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[2])
-		{
-			powerUpStatus[PLAYER1] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[3])
-		{
-			powerUpStatus[PLAYER1] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER1)[4])
-		{
-			powerUpStatus[PLAYER1] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER1] = NOPOWER;
-		}
-		// P2
-		if (scene->getPlayerPowerUp(PLAYER2)[0])
-		{
-			powerUpStatus[PLAYER2] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[1])
-		{
-			powerUpStatus[PLAYER2] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[2])
-		{
-			powerUpStatus[PLAYER2] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[3])
-		{
-			powerUpStatus[PLAYER2] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER2)[4])
-		{
-			powerUpStatus[PLAYER2] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER2] = NOPOWER;
-		}
-		// P3
-		if (scene->getPlayerPowerUp(PLAYER3)[0])
-		{
-			powerUpStatus[PLAYER3] = SPEEDUP;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[1])
-		{
-			powerUpStatus[PLAYER3] = DOUBLEDAMAGE;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[2])
-		{
-			powerUpStatus[PLAYER3] = HEALTHBOOST;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[3])
-		{
-			powerUpStatus[PLAYER3] = FASTERSHOOT;
-		}
-		else if (scene->getPlayerPowerUp(PLAYER3)[4])
-		{
-			powerUpStatus[PLAYER3] = FARTHERSHOOT;
-		}
-		else
-		{
-			powerUpStatus[PLAYER3] = NOPOWER;
-		}
+		p0 += int_to_string(scene->getPlayerPowerUp(PLAYER0), 1);
+		p1 += int_to_string(scene->getPlayerPowerUp(PLAYER1), 1);
+		p2 += int_to_string(scene->getPlayerPowerUp(PLAYER2), 1);
+		p3 += int_to_string(scene->getPlayerPowerUp(PLAYER3), 1);
 
-		p0 += int_to_string(powerUpStatus[PLAYER0], 1);
-		p1 += int_to_string(powerUpStatus[PLAYER1], 1);
-		p2 += int_to_string(powerUpStatus[PLAYER2], 1);
-		p3 += int_to_string(powerUpStatus[PLAYER3], 1);
+		pG = int_to_string(scene->getPUpState(), 2);
+		//std::cout << pG << std::endl;
 
 		//Trampoline status
 		if (scene->getPlayerOnTramp(PLAYER0))
@@ -615,6 +530,31 @@ int main(int argc, char *argv[])
 		{
 			scene->clearPlayerOnTramp();
 		}
+
+		//Teleport status
+		if (scene->getPlayerOnTele(PLAYER0))
+			p0 += "p";
+		else
+			p0 += "P";
+		if (scene->getPlayerOnTele(PLAYER1))
+			p1 += "p";
+		else
+			p1 += "P";
+		if (scene->getPlayerOnTele(PLAYER2))
+			p2 += "p";
+		else
+			p2 += "P";
+		if (scene->getPlayerOnTele(PLAYER3))
+			p3 += "p";
+		else
+			p3 += "P";
+
+		// Clear onTramp after status grabbed
+		if (sendddddddddddedededed)
+		{
+			scene->clearPlayerOnTele();
+		}
+
 
 
 		//despawn player projectile list
@@ -649,10 +589,13 @@ int main(int argc, char *argv[])
 			//scene->setPlatformDead(i, false);
 		}
 		
-		string ts[4] = { "" };
+		//tower infos
+		string ts[NUM_TOWERS] = { "" };
 		if (sendddddddddddedededed){
 			bool* shoot_check = scene->getTowerShootCheck();
-			for (uint i = 0; i < 4; i++){
+			bool* tower_damage_check = scene->getTowerDamaged();
+			bool* tower_kill_check = scene->getTowerKill();
+			for (uint i = 0; i < NUM_TOWERS; i++){
 				if (shoot_check[i]){//tower shot during last simulation
 					ts[i] += "T";
 					ts[i] += to_string(i);
@@ -660,14 +603,10 @@ int main(int argc, char *argv[])
 					ts[i] += int_to_string(scene->getLastTowerShootID(i), 4);
 					vec3 dir = scene->getLastTowerShootDir(i);
 					ts[i] += int_to_string((int)(100000 * (1 + dir[0])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[0])), 6) << endl;
 					ts[i] += int_to_string((int)(100000 * (1 + dir[1])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[1])), 6) << endl;
 					ts[i] += int_to_string((int)(100000 * (1 + dir[2])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[2])), 6) << endl;
 					assert(ts[i].length() == 24);
-				}
-				else{
+				}else{
 					ts[i] += "t";
 					ts[i] += to_string(i);
 					assert(ts[i].length() == 2);
@@ -677,9 +616,23 @@ int main(int argc, char *argv[])
 					ts[i] += "000000";
 					assert(ts[i].length() == 24);
 				}
+				if (tower_damage_check[i]){//check if tower is damaged during last simulation
+					ts[i] += "D";
+				}else{
+					ts[i] += "d";
+				}
+				if (tower_kill_check[i]){//check if tower is killed during last simulation
+					ts[i] += "K";
+				}else{
+					ts[i] += "k";
+				}
+				ts[i] += int_to_string(scene->getTowerHealth(i), 4);
+				assert(ts[i].length() == 30);
 			}
 			scene->clearTowerShoot();
 			scene->clearTowerShootCheck();
+			scene->clearTowerDamaged();
+			scene->clearTowerKill();
 		}
 
 
@@ -703,6 +656,11 @@ int main(int argc, char *argv[])
 
 		(*sendVec)[PLATFORM_BEGIN] = std::make_pair("e0", ep[0]);
 		(*sendVec)[PLATFORM_BEGIN + 1] = std::make_pair("e1", ep[1]);
+		(*sendVec)[PLATFORM_BEGIN +2] = std::make_pair("e2", ep[2]);
+		(*sendVec)[PLATFORM_BEGIN + 3] = std::make_pair("e3", ep[3]);
+		(*sendVec)[PLATFORM_BEGIN +4] = std::make_pair("e4", ep[4]);
+
+		(*sendVec)[GLOBAL] = std::make_pair(pG.c_str(), mat4(1.0));
 
 		(*sendVec)[PLATFORM_STATUS] = std::make_pair(platform_status, mat4(0.0));
 

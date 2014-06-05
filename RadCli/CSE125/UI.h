@@ -242,6 +242,27 @@ public:
 		heat_frame->setTex(true);
 		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.85f, 0.0f, -1.0f)));
 
+		//targets health bar
+
+		target_back = new UI_Panel(x1_target, x2_target, y1_target, y2_target);
+		target_back->setColor(vec3(1.0, 0.0, 0.0));
+		target_back->setShader(sdrCtl.getShader("basic_2D"));
+		//life_back->loadColorTex("img/UI_TEST.png", "PNG");
+		target_back->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
+
+		target_front = new UI_Panel(x1_target, x2_target, y1_target, y2_target);
+		target_front->setColor(vec3(0.0, 1.0, 0.0));
+		target_front->setShader(sdrCtl.getShader("basic_2D"));
+		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
+		target_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
+
+		target_frame = new UI_Panel(-0.15f, 0.15f, -0.1, 0.1f);
+		target_frame->setColor(vec3(1.0, 0.0, 0.0));
+		target_frame->setShader(sdrCtl.getShader("basic_2D"));
+		target_frame->loadColorTex("img/UI_elements/healthBAR_2", "PNG");
+		target_frame->setTex(true);
+		target_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
+
 		//tower indicators in the top right and left coreners of the screen
 
 		m_tower1 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
@@ -296,6 +317,10 @@ public:
 		heat_front->	~UI_Panel();
 		heat_frame->	~UI_Panel();
 
+		target_back->	~UI_Panel();
+		target_front->	~UI_Panel();
+		target_frame->	~UI_Panel();
+
 		m_tower1->		~UI_Panel();
 		m_tower2->	    ~UI_Panel();
 		m_tower3->	    ~UI_Panel();
@@ -318,6 +343,8 @@ public:
 		
 		glDisable(GL_BLEND);
 		//glDepthMask(GL_TRUE);
+
+		drawEnemy();
 
 		overheatBar(shots, overheat, 2);
 
@@ -350,19 +377,24 @@ public:
 			break;
 		}
 
-		
-	
-		/*m_tower3->draw();
-		m_tower2->draw();
-		m_tower1->draw();
-
-		c_tower3->draw();
-		c_tower2->draw();
-		c_tower1->draw(); */
-		
-
 		glDisable(GL_BLEND);
 		
+		return 0;
+	}
+
+	int drawEnemy()
+	{
+
+		target_back->draw();
+		target_front->draw();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		target_frame->draw();
+
+		glDisable(GL_BLEND);
+
 		return 0;
 	}
 
@@ -370,12 +402,11 @@ public:
 
 		if (x2_life != health_bar_size*damage + x1_life)
 		{
-
 			life_front->UI_Panel::~UI_Panel();
 
 			x2_life = health_bar_size*damage + x1_life;
 
-			if (x2_life <= x1_life)
+			if (x2_life <= x1_life || damage > 1)
 			{
 				//x2_life = x1_life;
 				x2_life = 0.275f;
@@ -394,6 +425,33 @@ public:
 			return 0;
 		}
 
+	}
+
+	int enemyHealth(float damage){
+		if (x2_target != enemy_health_bar*damage + x1_target)
+		{
+
+			target_front->UI_Panel::~UI_Panel();
+
+			x2_target = enemy_health_bar*damage + x1_target;
+
+			if (x2_target <= x1_target || damage >= 1)
+			{
+				x2_target = 0.1375f;
+			}
+
+			target_front = new UI_Panel(x1_target, x2_target, y1_target, y2_target);
+			target_front->setColor(vec3(0.0, 1.0, 0.0));
+			target_front->setShader(sdrCtl.getShader("basic_2D"));
+			//target_front->loadColorTex("img/UI_TEST.png", "PNG");
+			target_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
+
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	int overheatBar(int fired, int hot, int style){
@@ -515,7 +573,6 @@ public:
 		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(y, 0.0f, -1.0f)));
 
 		x = -0.85f - y;
-
 	}
 
 private:
@@ -526,6 +583,10 @@ private:
 	UI_Panel* heat_back;
 	UI_Panel* heat_front;
 	UI_Panel* heat_frame;
+
+	UI_Panel* target_back;
+	UI_Panel* target_front;
+	UI_Panel* target_frame;
 
 	UI_Panel* m_tower1;
 	UI_Panel* m_tower2;
@@ -545,6 +606,11 @@ private:
 	float y1_heat = -0.2f;
 	float y2_heat = -0.2f;
 
+	float x1_target = -0.135f; //life
+	float x2_target = 0.1375f;
+	float y1_target = -0.0175f;
+	float y2_target = 0.03f;
+
 	float x = 0;
 	float y = 0;
 
@@ -556,6 +622,7 @@ private:
 	float damage_taken;
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
+	float enemy_health_bar = x2_target - x1_target;
 
 	int c_towers_left = 3;
 	int m_towers_left = 3;
@@ -833,6 +900,7 @@ public:
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 		frame->draw();
 
 		glDisable(GL_BLEND);
@@ -858,33 +926,57 @@ public:
 	int killDraw(){
 		char buf[100];
 		
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		frame->setModelM(glm::scale(vec3(1.2f, 1.3f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+
+		frame->draw();
+
+		glDisable(GL_BLEND);
 
 		glDisable(GL_DEPTH_TEST);
 
-		//Player 1
+		sprintf_s(buf, "%s", "SCOREBOARD");
+		RenderString((Window::width / 2) - 100, 5 * Window::height / 8 + 24, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+		
+		//Chipmunk Team
+		k = to_string(kills[0] + kills[2]);
+		d = to_string(deaths[0] + deaths[2]);
+		sprintf_s(buf, "%s %s %s %s", "CHIPMUNK TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 220, 5 * Window::height / 8 - 24, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+
+		//Player 1 green chipmunk
 		k = to_string(kills[0]);
 		d = to_string(deaths[0]);
 		sprintf_s(buf, "%s %s %s %s", "PLAYER 1 KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 160, 5* Window::height / 8, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width / 2) - 354, 5 * Window::height / 8 - 72, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
 
-		//Player 2
-		k = to_string(kills[1]);
-		d = to_string(deaths[1]);
-		sprintf_s(buf, "%s %s %s %s", "PLAYER 2 KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 160,5* Window::height / 8 - 48, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
-
-		//Player 3
+		//Player 3 red chipmunk
 		k = to_string(kills[2]);
 		d = to_string(deaths[2]);
 		sprintf_s(buf, "%s %s %s %s", "PLAYER 3 KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 96, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width / 2) + 34, 5 * Window::height / 8 - 72, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
 
-		//Player 4
+
+		//Monkey Team
+		k = to_string(kills[1] + kills[3]);
+		d = to_string(deaths[1] + deaths[3]);
+		sprintf_s(buf, "%s %s %s %s", "MONKEY TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 200, 5 * Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+
+		//Player 2 gorilla
+		k = to_string(kills[1]);
+		d = to_string(deaths[1]);
+		sprintf_s(buf, "%s %s %s %s", "PLAYER 2 KILLS:", k.c_str(), "DEATHS:", d.c_str());
+		RenderString((Window::width / 2) - 354,5* Window::height / 8 - 192, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+
+		//Player 4 monkey
 		k = to_string(kills[3]);
 		d = to_string(deaths[3]);
 		sprintf_s(buf, "%s %s %s %s", "PLAYER 4 KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 160, 5*Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 1.0f));
-	
+		RenderString((Window::width / 2) + 34, 5*Window::height / 8 - 192, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+
 		glEnable(GL_DEPTH_TEST);
 
 		return 0;
@@ -1236,7 +1328,7 @@ public:
 		selected_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON", "PNG");
+		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON", "PNG");
 		selected_button->setTex(true);
 		selected_button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
 
@@ -1280,7 +1372,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.74) && (y < 0.84)){
 				drawButtonHighlight = true;
 				return 1;
 			}
@@ -1302,7 +1394,7 @@ public:
 		//Check the x bounds first cause all buttons are the same width
 		if ((x > 0.42) && (x < 0.57)){
 
-			if ((y > 0.71) && (y < 0.81)){
+			if ((y > 0.74) && (y < 0.84)){
 				return 1;
 			}
 			else{

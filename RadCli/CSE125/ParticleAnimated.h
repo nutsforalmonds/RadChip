@@ -69,6 +69,10 @@ public:
 		sample_y = other.sample_y;
 		x_dist = other.x_dist;
 		y_dist = other.y_dist;
+		start_frame = other.start_frame;
+		end_frame = other.end_frame;
+		reverse = other.reverse;
+		delay = other.delay;
 		return *this;
 	}
 
@@ -82,6 +86,8 @@ public:
 	}
 
 	void draw(){
+		if (row < 0)
+			return;
 		shader->setUniform(uniformLoc[0], Projection);
 		shader->setUniform(uniformLoc[1], View);
 		shader->setUniform(uniformLoc[2], vec3((glm::inverse(View)*vec4(0, 0, 0, 1))));
@@ -104,6 +110,7 @@ public:
 		shader->setUniform(uniformLoc[19], sample_y);
 		shader->setUniform(uniformLoc[20], x_dist);
 		shader->setUniform(uniformLoc[21], y_dist);
+		shader->setUniform(uniformLoc[22], blur_strength);
 		shader->use();
 		m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
@@ -136,6 +143,7 @@ public:
 		uniformLoc.push_back(shader->getUniformLoc("sample_y"));
 		uniformLoc.push_back(shader->getUniformLoc("x_dist"));
 		uniformLoc.push_back(shader->getUniformLoc("y_dist"));
+		uniformLoc.push_back(shader->getUniformLoc("blur_strength"));
 	}
 
 	void Bind(){
@@ -148,16 +156,10 @@ public:
 		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), &Position, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
-	void setPosition(vec3& p){
-		Position = p;
-	}
+	void setPosition(vec3& p){ Position = p; }
 	vec3 getPosition(){ return Position; }
-	void setWidth(float f){
-		width = f;
-	}
-	void setHeight(float f){
-		height = f;
-	}
+	void setWidth(float f){ width = f; }
+	void setHeight(float f){ height = f; }
 	void setStartTime(LARGE_INTEGER& t){ start_time = t; }
 	LARGE_INTEGER getStartTime(){ return start_time; }
 	void setDuration(double d){ duration = d; }
@@ -171,15 +173,28 @@ public:
 	void setRow(int r){ row = r; }
 	int getRow(){ return row; }
 
+	void setReverse(bool re){ reverse = re; }
+	void setValidFrame(int start_frame, int end_frame){ this->start_frame = start_frame; this->end_frame = end_frame; }
+
 	bool update(){
 		QueryPerformanceCounter(&current);
-		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart;
+		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart - delay;
 		if (anim_time > duration){
 			return false;
 		}
+		if (anim_time < 0){
+			row = column = -1;
+			return true;
+		}
 
-		double seg_time = duration / (num_column*num_row);
-		int block_ID = (int)floor(anim_time/seg_time);
+		int block_ID;
+		double seg_time = duration / (end_frame-start_frame+1);
+		if (reverse){
+			block_ID = end_frame - (int)floor(anim_time / seg_time);
+		}
+		else{
+			block_ID = (int)floor(anim_time / seg_time) + start_frame;
+		}
 		row = block_ID / num_column;
 		column = block_ID % num_column;
 		return true;
@@ -191,6 +206,8 @@ public:
 	void setTransparency(float t){ transparency = t; }
 	void setSampleCount(int x, int y){ sample_x = x; sample_y = y; }
 	void setSampleDist(float x, float y){ x_dist = x; y_dist = y; }
+	void setBlurStrength(float s){ blur_strength = s; }
+	void setDelay(double delay){ this->delay = delay; }
 
 private:
 	GLuint m_VB;
@@ -211,6 +228,10 @@ private:
 	//glow
 	int sample_x=0, sample_y=0;
 	float x_dist = 0, y_dist = 0;
+	int start_frame, end_frame;
+	bool reverse = false;
+	float blur_strength = 1;
+	double delay=0;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */
