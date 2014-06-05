@@ -628,6 +628,14 @@ void towerKill(int towerID){
 	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
+
+	if (towerID < 2){
+		myUI->setTowers('c');
+	}
+	else if (towerID > 1)
+	{
+		myUI->setTowers('m');
+	}
 }
 void powerUpAnimation(int playerID){
 	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
@@ -2492,7 +2500,6 @@ void mouseFunc(int button, int state, int x, int y)
 					mouseState = mouseState | 1 << 1;
 
 					testSound[8]->Play();
-
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
 				}
