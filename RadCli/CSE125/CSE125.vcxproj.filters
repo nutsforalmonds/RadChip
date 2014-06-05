@@ -169,9 +169,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="LightningGenerator.h">
-    	<Filter>Header</Filter>
+      <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="constants.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardProjectile.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

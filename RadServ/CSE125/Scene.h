@@ -1025,7 +1025,7 @@ public:
 				if (min_dist != 10000){
 					Projectile* cubeT = new Projectile(player.size() + respawn.size());
 					cubeT->setSpeed(5);
-					mat4 pjt_model = tower[i]->getModelM()*glm::translate(vec3(0, 4, 0));
+					mat4 pjt_model = tower[i]->getModelM()*glm::translate(vec3(0, 5, 0));
 					cubeT->setModelM(pjt_model);//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();

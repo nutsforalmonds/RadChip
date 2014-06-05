@@ -37,6 +37,7 @@
 #include "AnimController.h"
 #include "ParticleAnimated.h"
 #include "LightningGenerator.h"
+#include "BillboardProjectile.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -122,7 +123,7 @@ std::vector<Object*> player_list;
 std::vector<Object*> tower_list;
 std::vector<Object*> stationary_list;
 std::vector<Projectile*> projectile_list;
-std::vector<Projectile*> tower_projectile_list;
+std::vector<BillboardProjectile*> tower_projectile_list;
 std::vector<Texture*> texture_list;
 std::vector<Sound*> sound_list;
 std::vector<ParticleAnimated*> panim_list;
@@ -186,8 +187,9 @@ struct Mother{
 	Mesh* mother_of_wrench;
 	Mesh* mother_of_banana;
 	Mesh* mother_of_nut;
-	ParticleAnimated* mother_of_p_anim;
+	ParticleAnimated* mother_of_p_anim;//blue fire
 	ParticleAnimated* mother_of_lightning;
+	ParticleAnimated* mother_of_tower_shoot_1;
 }MOM;
 
 int texScreenWidth = 512;
@@ -517,41 +519,18 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 }
 void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 
-	Projectile* pjt = new Projectile(player_list.size());
-	//if (playerID % 2){//monkey throws
-		pjt->setVAO(MOM.mother_of_banana->getVAO());
-		pjt->setEntries(MOM.mother_of_banana->getEntries());
-		pjt->setTextures(MOM.mother_of_banana->getTextures());
-		pjt->setAdjustM(MOM.mother_of_banana->getAdjustM());
-	//}
-	//else{//chipmonk throws
-	//	pjt->setVAO(MOM.mother_of_nut->getVAO());
-	//	pjt->setEntries(MOM.mother_of_nut->getEntries());
-	//	pjt->setTextures(MOM.mother_of_nut->getTextures());
-	//	pjt->setAdjustM(MOM.mother_of_nut->getAdjustM());
-	//}
-	pjt->setShader(sdrCtl.getShader("basic_model"));
-	pjt->setShininess(30);
-	pjt->setFog(fog);
-
-	//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 4, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+	BillboardProjectile* pjt = new BillboardProjectile(*(MOM.mother_of_tower_shoot_1));
+	pjt->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 5, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 	pjt->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
 	pjt->setDistance(20);
-	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
-	pjt->setType("Cube");
-	pjt->setName("Test Cube" + std::to_string(projectile_counter));
-	//projectile_counter++;
-	//Add Cube to the draw list
-	////////////////////////////////////////////////////////Window::addDrawList(cubeT);
+	pjt->setName("Tower Projectile");
 	tower_projectile_list.push_back(pjt);
 	pjt->setSpeed(20);
-	//cubeT->setHMove((holder[0] / 4));
 	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
@@ -599,7 +578,6 @@ void simulateProjectile(float t)
 	}
 	for (uint i = 0; i < tower_projectile_list.size(); i++){
 		tower_projectile_list[i]->preTrans(glm::translate(tower_projectile_list[i]->getVelocity()*t));
-		tower_projectile_list[i]->setAdjustM(glm::rotate(mat4(1.0), t*360.0f, vec3(-1.0, 0, 0))*tower_projectile_list[i]->getAdjustM());
 	}
 }
 
@@ -639,6 +617,7 @@ void Window::idleCallback(void)
 		anim_time += delta;
 		*/
 
+		//player animation
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
 		dt = ((double)ct.QuadPart - (double)idleCallbackTime.QuadPart) / (double)freq.QuadPart;
@@ -659,6 +638,20 @@ void Window::idleCallback(void)
 				else{//continuous
 					panim_list[i]->setStartTime(ct);
 					panim_list[i]->update();
+				}
+			}
+		}
+		//tower projectile animatioin
+		for (uint i = 0; i < tower_projectile_list.size(); i++){
+			if (!tower_projectile_list[i]->update()){
+				if (tower_projectile_list[i]->getType() == 0){//one time
+					delete tower_projectile_list[i];
+					tower_projectile_list.erase(tower_projectile_list.begin() + i);
+					i--;
+				}
+				else{//continuous
+					tower_projectile_list[i]->setStartTime(ct);
+					tower_projectile_list[i]->update();
 				}
 			}
 		}
@@ -1105,10 +1098,10 @@ void Window::displayCallback(void)
 		{
 			projectile_list[i]->draw(LightProjection, LightView);
 		}	
-		for (uint i = 0; i < tower_projectile_list.size(); ++i)
-		{
-			tower_projectile_list[i]->draw(LightProjection, LightView);
-		}
+		//for (uint i = 0; i < tower_projectile_list.size(); ++i)
+		//{
+		//	tower_projectile_list[i]->draw(LightProjection, LightView);
+		//}
 		
 		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1139,13 +1132,13 @@ void Window::displayCallback(void)
 		{
 			projectile_list[i]->draw();
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < tower_projectile_list.size(); ++i)
 		{
 			tower_projectile_list[i]->draw();
 		}
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDepthMask(GL_FALSE);
 		for (uint i = 0; i < panim_list.size(); i++){
 			panim_list[i]->draw();
 		}
@@ -1158,7 +1151,6 @@ void Window::displayCallback(void)
 			//sound_3d_light->setPosition(pt);
 			//sound_3d_light->Play3D(View);
 		}
-		
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 
@@ -1379,12 +1371,12 @@ void server_update(int value){
 		parseOpts->getTowerShoot(recvVec, tsi);
 		for (uint i = 0; i < tsi.size(); i++){
 			towerProjectileAttack(tsi[i].towerID, tsi[i].projectileID, tsi[i].direction);
-			//cout << "'dijiejfowjowefj: " << tsi[i].direction[0] << " " << tsi[i].direction[1] << " " << tsi[i].direction[2] << endl;
 		}
 
 		//despawn projectiles from hit
 		vector<int> ppdl = parseOpts->getPPDL(recvVec);
 		for (uint i = 0; i < ppdl.size(); i++){
+			//cout << "despawn: " << ppdl[i] << endl;
 			for (uint k = 0; k < projectile_list.size(); k++){
 				if (projectile_list[k]->getShootID() == ppdl[i]){
 					delete projectile_list[k];
@@ -2793,6 +2785,7 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_p_anim->setHeight(2.0f);
 	MOM.mother_of_p_anim->setNumColumn(5);
 	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setValidFrame(0, 19);
 	MOM.mother_of_p_anim->setDuration(1);
 	MOM.mother_of_p_anim->setFog(fog);
 	MOM.mother_of_p_anim->Bind();
@@ -2805,14 +2798,49 @@ void initialize(int argc, char *argv[])
 	MOM.mother_of_lightning->setHeight(2.0f);
 	MOM.mother_of_lightning->setNumColumn(10);
 	MOM.mother_of_lightning->setNumRow(1);
+	MOM.mother_of_lightning->setValidFrame(0, 9);
 	MOM.mother_of_lightning->setDuration(1);
 	MOM.mother_of_lightning->setType(0);
 	MOM.mother_of_lightning->setFog(fog);
 	MOM.mother_of_lightning->Bind();
 
+	MOM.mother_of_tower_shoot_1 = new ParticleAnimated();
+	MOM.mother_of_tower_shoot_1->Init("img/sprite_sheets/light_003.png", "PNG");
+	MOM.mother_of_tower_shoot_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_shoot_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_shoot_1->setWidth(4.0f);
+	MOM.mother_of_tower_shoot_1->setHeight(4.0f);
+	MOM.mother_of_tower_shoot_1->setNumColumn(5);
+	MOM.mother_of_tower_shoot_1->setNumRow(6);
+	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
+	MOM.mother_of_tower_shoot_1->setDuration(1);
+	MOM.mother_of_tower_shoot_1->setType(1);
+	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_shoot_1->setTransparency(0.8);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setFog(fog);
+	MOM.mother_of_tower_shoot_1->Bind();
+
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
-	//p_anim->setModelM(glm::translate(vec3(0, 15, 0)));
+	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
+	//p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	//p_anim->setModelM(glm::translate(vec3(0, 7, 0)));
+	//p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	//p_anim->setNumColumn(5);
+	//p_anim->setNumRow(6);
+	//p_anim->setValidFrame(0, 9);
+	////p_anim->setReverse(true);
+	//p_anim->setDuration(1);
+	//p_anim->setFog(fog);
+	//p_anim->Bind();
 	//p_anim->setType(1);
+	//p_anim->setWidth(2);
+	//p_anim->setHeight(2);
+	//p_anim->setDuration(1.0);
+	//p_anim->setTransparency(1.0);
+	////p_anim->setSampleCount(3, 3);
+	////p_anim->setSampleDist(0.001, 0.005);
 	//LARGE_INTEGER time_p_anim;
 	//QueryPerformanceCounter(&time_p_anim);
 	//p_anim->setStartTime(time_p_anim);

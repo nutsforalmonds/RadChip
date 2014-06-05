@@ -15,7 +15,8 @@ uniform float transparency;
 uniform int sample_x;
 uniform int sample_y;
 uniform float x_dist;
-uniform float y_dist;                                            
+uniform float y_dist;  
+uniform float blur_strength;                                          
                                                                                     
 in vec2 TexCoord;
 in vec3 world_pos;
@@ -27,10 +28,12 @@ void main()
     FragColor = texture2D(texUnit, TexCoord);                                     
     
     //glow
-    for(int i=-sample_x;i<sample_x+1;i++){
-    	for(int j=-sample_y;j<sample_y+1;j++){
-    		FragColor += texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist))/((2*sample_x+1)*(2*sample_y+1));
-    	}
+    if(sample_x!=0 || sample_y!=0){
+    	for(int i=-sample_x;i<sample_x+1;i++){
+	    	for(int j=-sample_y;j<sample_y+1;j++){
+	    		FragColor += texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist))/((2*sample_x+1)*(2*sample_y+1))*blur_strength;
+	    	}
+   		}
     }
 
     //apply fog

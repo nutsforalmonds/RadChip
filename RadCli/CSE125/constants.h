@@ -50,3 +50,5 @@
 #define DIR_1_END			17
 #define DIR_2_BEGIN			18
 #define DIR_2_END			23
+
+#define PPDL_INT_LENGTH     4

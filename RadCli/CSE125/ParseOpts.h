@@ -221,8 +221,8 @@ public:
 	{
 		std::vector<int> result;
 		std::string s = (*vec)[PPDL_MAT].first;
-		for (int um = 0; um < s.length(); um += 3){
-			result.push_back(atoi(s.substr(um,3).c_str()));
+		for (int um = 0; um < s.length(); um += PPDL_INT_LENGTH){
+			result.push_back(atoi(s.substr(um, PPDL_INT_LENGTH).c_str()));
 		}
 		return result;
 	}
