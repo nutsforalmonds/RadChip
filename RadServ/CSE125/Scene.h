@@ -188,9 +188,9 @@ public:
 	}
 
 	void moveElevators(){
-		if (counter == 1000){
+		if (counter2 == 1000){
 			counter3 = -counter3;
-			counter = 0;
+			counter2 = 0;
 		}
 		for (int i = 0; i < elevator.size(); ++i){
 			if (elevator[i]->getDirection() != 1){
@@ -226,7 +226,7 @@ public:
 			}
 			elevator[i]->removeAll();
 		}
-		counter++;
+		counter2++;
 	}
 	void collisionDetection(Octree* octree);
 	void collisionDetection(){
