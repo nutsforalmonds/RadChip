@@ -1310,6 +1310,16 @@ void Window::displayCallback(void)
 					cout <<"Total Wins: "<<  wins << endl;
 				}
 			}
+			else if (winner == 0 && (playerID % 2) == 1)
+			{
+				endScreen->draw(1);
+				if (!winCountToggle)
+				{
+					wins++;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
+			}
 			else
 			{
 				endScreen->draw(0);
