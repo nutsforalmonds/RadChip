@@ -1300,14 +1300,14 @@ void Window::displayCallback(void)
 		else if (myClientState->getState() == 5){
 
 			//ENDGAME
-			if (winner == 0 && (playerID % 2) == 0)
+			if (winner == 1 && (playerID % 2) == 0)
 			{
 				endScreen->draw(1);
 				if (!winCountToggle)
 				{
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout << wins << endl;
+					cout <<"Total Wins: "<<  wins << endl;
 				}
 			}
 			else
