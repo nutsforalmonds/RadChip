@@ -1727,7 +1727,7 @@ void server_update(int value){
 
 		std::fill_n(bVis, 5, true);
 		int pUpState = parseOpts->getPUpState(recvVec);
-		std::cout << pUpState << std::endl;
+		//std::cout << pUpState << std::endl;
 		if (pUpState & 1)
 			bVis[SPEEDUP] = false;
 		if (pUpState & 1 << 1)

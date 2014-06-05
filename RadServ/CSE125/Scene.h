@@ -387,7 +387,7 @@ public:
 							{
 								player[i]->getBoots()->setMoveSpeed(4);
  								player[i]->setPowerUp(SPEEDUP);
-								std::cout << "speed boost if" << std::endl;
+								//std::cout << "speed boost if" << std::endl;
 							}
 							else
 							{
@@ -405,7 +405,7 @@ public:
 								
 								player[i]->getBoots()->setMoveSpeed(4);
 								player[i]->setPowerUp(SPEEDUP);
-								std::cout << "speed boost else" << std::endl;
+								//std::cout << "speed boost else" << std::endl;
 							}
 							pUpCooldown[SPEEDUP] = POWERUP_DURATION;
 							player[i]->setPowerUpDuration(POWERUP_DURATION);
@@ -417,7 +417,7 @@ public:
 							{
 								player[i]->getWeapon()->setDamage(-4);
 								player[i]->setPowerUp(DOUBLEDAMAGE);
-								std::cout << "dmg if" << std::endl;
+								//std::cout << "dmg if" << std::endl;
 							}
 							else
 							{
@@ -434,8 +434,8 @@ public:
 
 								player[i]->getWeapon()->setDamage(-4);
 								player[i]->setPowerUp(DOUBLEDAMAGE);
-								std::cout << "dmg else" << std::endl;
-								std::cout << player[i]->getPowerUp() << std::endl;
+								//std::cout << "dmg else" << std::endl;
+								//std::cout << player[i]->getPowerUp() << std::endl;
 							}
 							pUpCooldown[DOUBLEDAMAGE] = POWERUP_DURATION;
 							player[i]->setPowerUpDuration(POWERUP_DURATION);

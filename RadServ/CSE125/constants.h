@@ -8,8 +8,8 @@
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
 #define PLATFORM_BEGIN      13     
-#define PLATFORM_END		14
-#define GLOBAL				15
+#define PLATFORM_END		17
+#define GLOBAL				18
 
 //player bit info
 #define SHOOTBIT			1

@@ -503,6 +503,7 @@ int main(int argc, char *argv[])
 		p3 += int_to_string(scene->getPlayerPowerUp(PLAYER3), 1);
 
 		pG = int_to_string(scene->getPUpState(), 2);
+		//std::cout << pG << std::endl;
 
 		//Trampoline status
 		if (scene->getPlayerOnTramp(PLAYER0))
