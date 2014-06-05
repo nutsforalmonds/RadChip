@@ -170,7 +170,7 @@ public:
 			despawnProjectile();
 			rechargeJump();
 			respawnObjs();
-			respawnTower();
+			//respawnTower();
 			removePowerUp();
 			moveElevators();
 		}
@@ -186,7 +186,7 @@ public:
 		despawnProjectile();
 		rechargeJump();
 		respawnObjs();
-		respawnTower();
+		//respawnTower();
 		removePowerUp();
 		moveElevators();
 	}
@@ -525,6 +525,30 @@ public:
 				}
 			}
 		}
+	}
+
+	//returns 3 if no winner yet, 0 for team 0 win, 1 for team 1 win
+	int checkTowerAlive()
+	{
+		int team0 = 0;
+		int team1 = 0;
+		for (int i = 0; i < tower.size(); i++)
+		{
+			if (tower[i]->getHealth() < 1)
+			{
+				if (tower[i]->getTeamID())
+					team1++;
+				else
+					team0++;
+			}
+		}
+		if (team1 == NUM_TOWERS / 2)
+			return 1;
+		else if (team0 == NUM_TOWERS / 2)
+			return 0;
+		else
+			return 3;
+
 	}
 
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){

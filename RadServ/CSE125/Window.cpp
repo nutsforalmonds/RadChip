@@ -588,6 +588,7 @@ int main(int argc, char *argv[])
 			scene->setPlatformDamaged(i, false);
 			//scene->setPlatformDead(i, false);
 		}
+		platform_status += std::to_string(scene->checkTowerAlive());
 		
 		//tower infos
 		string ts[NUM_TOWERS] = { "" };

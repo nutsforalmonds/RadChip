@@ -352,6 +352,9 @@ FMOD_VECTOR player1_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player2_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player3_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 
+bool gameOver;
+int winner;
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
 {
@@ -1292,7 +1295,12 @@ void Window::displayCallback(void)
 		}
 
 		else if (myClientState->getState() == 5){
-			endScreen->draw(0);
+
+			//ENDGAME
+			if ((playerID % 2) == 0)
+				endScreen->draw(1);
+			else
+				endScreen->draw(0);
 		}
 
 		else if (kill_count){
@@ -1763,6 +1771,14 @@ void server_update(int value){
 		if (pUpState & 1 << 3)
 			bVis[FARTHERSHOOT] = false;
 
+		winner = parseOpts->getWinState(recvVec);
+		gameOver = (winner == 3) ? 0 : 1;
+
+
+		if (gameOver)
+		{
+			myClientState->setState(5);
+		}
 	}
 
 
@@ -2056,6 +2072,11 @@ LARGE_INTEGER time_track;
 void keyboard(unsigned char key, int, int){
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+	
+	//if (gameOver)
+		//myClientState->setState(5);
+	
+
 	switch (myClientState->getState()){
 	case 0:
 		if (key == ' '){
@@ -2377,6 +2398,8 @@ void mouseFunc(int button, int state, int x, int y)
 {
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+//	if (gameOver)
+//		return;
 
 	oldX=x;
 	oldY=y;

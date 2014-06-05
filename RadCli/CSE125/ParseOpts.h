@@ -315,6 +315,14 @@ public:
 
 	}
 
+	int getWinState(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::string s = (*vec)[PLATFORM_STATUS].first;
+		std::string h;
+		h = s.c_str()[s.size() - 1];
+		return atoi(h.c_str());
+	}
+
 private:
 	//std::vector <std::pair<std::string, mat4>>& vec_;
 	bool shoot;
