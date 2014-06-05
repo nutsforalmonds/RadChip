@@ -39,10 +39,23 @@ public:
 				direction[0] = atoi((*vec)[i].first.substr(DIR_0_BEGIN, DIR_0_END + 1 - DIR_0_BEGIN).c_str()) / 100000.0-1;
 				direction[1] = atoi((*vec)[i].first.substr(DIR_1_BEGIN, DIR_1_END + 1 - DIR_1_BEGIN).c_str()) / 100000.0-1;
 				direction[2] = atoi((*vec)[i].first.substr(DIR_2_BEGIN, DIR_2_END + 1 - DIR_2_BEGIN).c_str()) / 100000.0-1;
-				//cout << "dirrrrr: " << direction[0] << " " << direction[1] << " " << direction[2] << endl;
 				tsi.push_back(TowerShootInfoClient(towerID,projectileID,direction));
 			}
 		}
+	}
+
+	bool getTowerDamaged(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		if ((*vec)[TOWER_MAT_BEGIN + towerID].first.c_str()[TOWER_DAMAGED] == 'D')
+			return true;
+		return false;
+	}
+	bool getTowerKill(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		if ((*vec)[TOWER_MAT_BEGIN + towerID].first.c_str()[TOWER_KILL] == 'K')
+			return true;
+		return false;
+	}
+	int getTowerHealth(std::vector <std::pair<std::string, mat4>>* vec, int towerID){
+		return atoi((*vec)[TOWER_MAT_BEGIN + towerID].first.substr(TOWER_HEALTH_BEGIN,TOWER_HEALTH_END+1-TOWER_HEALTH_BEGIN).c_str());
 	}
 
 	bool getShoot(std::vector <std::pair<std::string, mat4>>* vec, int pid, int& shootID)

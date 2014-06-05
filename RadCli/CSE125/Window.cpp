@@ -115,6 +115,8 @@ Sound* sound_3d_death2;
 Sound* sound_3d_tramp;
 Sound* sound_3d_tele;
 Sound* sound_3d_pick;
+Sound* sound_3d_tower_shoot;
+Sound* sound_3d_tower_explosion;
 Music* posTestMusic;
 
 std::vector<Object*> draw_list;
@@ -190,6 +192,9 @@ struct Mother{
 	ParticleAnimated* mother_of_p_anim;//blue fire
 	ParticleAnimated* mother_of_lightning;
 	ParticleAnimated* mother_of_tower_shoot_1;
+	ParticleAnimated* mother_of_tower_damage_1;
+	ParticleAnimated* mother_of_tower_explosion_1;
+	ParticleAnimated* mother_of_health_potion;
 }MOM;
 
 int texScreenWidth = 512;
@@ -220,6 +225,8 @@ int space_up = 1;
 int sprint_up = 10;
 
 //bool keyState[4];//up,down,left,right
+
+void initializeMOM();
 
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
@@ -356,7 +363,6 @@ struct timeval2 {
 	__int32    tv_sec;         /* seconds */
 	__int32    tv_usec;        /* microseconds */
 };
-
 
 void spawnDamageParticle(int id)
 {
@@ -526,15 +532,22 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
 	pjt->setDistance(20);
-
 	//Name and type
 	pjt->setName("Tower Projectile");
-	tower_projectile_list.push_back(pjt);
 	pjt->setSpeed(20);
 	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	pjt->setStartTime(ct);
+	tower_projectile_list.push_back(pjt);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_tower_shoot->setPosition(tpos);
+	sound_3d_tower_shoot->Play3D(View);
 }
 void despawnProjectile()
 {
@@ -579,6 +592,50 @@ void simulateProjectile(float t)
 	for (uint i = 0; i < tower_projectile_list.size(); i++){
 		tower_projectile_list[i]->preTrans(glm::translate(tower_projectile_list[i]->getVelocity()*t));
 	}
+}
+void towerDamage(int towerID){
+	ParticleAnimated* tower_dmg = new ParticleAnimated(*(MOM.mother_of_tower_damage_1));
+	tower_dmg->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0,0,0,1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tower_dmg->setStartTime(ct);
+	panim_list.push_back(tower_dmg);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_hit->setPosition(tpos);
+	sound_3d_hit->Play3D(View);
+}
+void towerKill(int towerID){
+	ParticleAnimated* tower_exp = new ParticleAnimated(*(MOM.mother_of_tower_explosion_1));
+	tower_exp->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tower_exp->setStartTime(ct);
+	panim_list.push_back(tower_exp);
+
+	ParticleAnimated* tower_exp_2 = new ParticleAnimated(*(MOM.mother_of_tower_damage_1));
+	tower_exp_2->setModelM(tower_list[towerID]->getModelM()*glm::translate(vec3(0, 3, 0) + 1.0f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	tower_exp_2->setValidFrame(0, 19);
+	tower_exp_2->setStartTime(ct);
+	tower_exp_2->setDelay(0.5);
+	tower_exp_2->setDuration(0.3);
+	tower_exp_2->setWidth(20.0);
+	tower_exp_2->setHeight(10.0);
+	panim_list.push_back(tower_exp_2);
+	//sound
+	vec4 pos = tower_list[towerID]->getModelM()*vec4(0, 0, 0, 1);
+	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
+	sound_3d_tower_explosion->setPosition(tpos);
+	sound_3d_tower_explosion->Play3D(View);
+}
+void powerUpAnimation(int playerID){
+	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
+	power_up->setModelM(player_list[playerID]->getModelM()*glm::translate(vec3(0,0.7,0) + 0.5f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - player_list[playerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	power_up->setStartTime(ct);
+	panim_list.push_back(power_up);
 }
 
 void Window::idleCallback(void)
@@ -1369,6 +1426,15 @@ void server_update(int value){
 		for (uint i = 0; i < tsi.size(); i++){
 			towerProjectileAttack(tsi[i].towerID, tsi[i].projectileID, tsi[i].direction);
 		}
+		for (int i = 0; i < NUM_TOWERS; i++){
+			if (parseOpts->getTowerDamaged(recvVec, i)){
+				towerDamage(i);
+			}
+			if (parseOpts->getTowerKill(recvVec, i)){
+				towerKill(i);
+			}
+			int tower_health = parseOpts->getTowerHealth(recvVec, i);
+		}
 
 		//despawn projectiles from hit
 		vector<int> ppdl = parseOpts->getPPDL(recvVec);
@@ -1549,6 +1615,7 @@ void server_update(int value){
 				sound_3d_pick->setPosition(player0_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player0_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER0);
+				powerUpAnimation(0);
 			}
 		}
 
@@ -1557,6 +1624,7 @@ void server_update(int value){
 				sound_3d_pick->setPosition(player1_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player1_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER1);
+				powerUpAnimation(1);
 			}
 		}
 
@@ -1565,6 +1633,7 @@ void server_update(int value){
 				sound_3d_pick->setPosition(player2_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player2_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER2);
+				powerUpAnimation(2);
 			}
 		}
 
@@ -1573,6 +1642,7 @@ void server_update(int value){
 				sound_3d_pick->setPosition(player3_sound_vec_lasterest);
 				sound_3d_pick->Play3D(View);
 				Player3_Powerup = parseOpts->getPPowerUp(recvVec, PLAYER3);
+				powerUpAnimation(3);
 			}
 		}
 
@@ -1879,6 +1949,20 @@ int main(int argc, char *argv[])
   posTestMusic->setVelocity(vt);
   posTestMusic->setMinDistance(5.0f);
   posTestMusic->setMaxDistance(10000.0f);
+
+  sound_3d_tower_shoot = new Sound(mySoundSystem, "Sound/tower_shoot.mp3", true);
+  sound_3d_tower_shoot->setVolume(0.5);
+  sound_3d_tower_shoot->setPosition(pt);
+  sound_3d_tower_shoot->setVelocity(vt);
+  sound_3d_tower_shoot->setMinDistance(5.0f);
+  sound_3d_tower_shoot->setMaxDistance(10000.0f);
+
+  sound_3d_tower_explosion = new Sound(mySoundSystem, "Sound/tower_explosion.wav", true);
+  sound_3d_tower_explosion->setVolume(0.75);
+  sound_3d_tower_explosion->setPosition(pt);
+  sound_3d_tower_explosion->setVelocity(vt);
+  sound_3d_tower_explosion->setMinDistance(5.0f);
+  sound_3d_tower_explosion->setMaxDistance(10000.0f);
 
   if (buf){
 	  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
@@ -2679,9 +2763,9 @@ void initialize(int argc, char *argv[])
 	
 	light[0].type=1;
 	light[0].pos = vec4(0,200,0,1);
-	light[0].specular = vec3(0.1,0.1,0.1);//0.1,0.1,0.1
-	light[0].diffuse = vec3(0.9, 0.9, 0.9);//0.9, 0.9, 0.9
-	light[0].ambient = vec3(0.35, 0.35, 0.35);//0.35, 0.35, 0.35
+	light[0].specular = vec3(0.2,0.2,0.2);//0.1,0.1,0.1
+	light[0].diffuse = vec3(1.1, 1.1, 1.1);//0.9, 0.9, 0.9
+	light[0].ambient = vec3(0.45, 0.45, 0.45);//0.35, 0.35, 0.35
 	light[0].dir = vec4(0,-1,0,1);
 	light[0].spotCutOff = cos(10.0/180*M_PI);
 	LightView = glm::lookAt(vec3(light[0].pos), vec3(0, 0, 0), vec3(1, 0, 0));
@@ -2749,75 +2833,7 @@ void initialize(int argc, char *argv[])
 	lightning_generator.setDt(0.1);//lightning generation per 0.1 seconds
 	lightning_generator.setSize(400);//size of the map
 
-	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
-	MOM.mother_of_wrench = new Mesh();
-	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
-	MOM.mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_wrench->setShadowTex(shadow_map_id);
-	MOM.mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
-	MOM.mother_of_wrench->setShininess(30);
-	MOM.mother_of_wrench->setFog(fog);
-
-	MOM.mother_of_banana = new Mesh();
-	MOM.mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
-	MOM.mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_banana->setShadowTex(shadow_map_id);
-	MOM.mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
-	MOM.mother_of_banana->setShininess(30);
-	MOM.mother_of_banana->setFog(fog);
-
-	MOM.mother_of_nut = new Mesh();
-	MOM.mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
-	MOM.mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
-	MOM.mother_of_nut->setShadowTex(shadow_map_id);
-	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
-	MOM.mother_of_nut->setShininess(30);
-	MOM.mother_of_nut->setFog(fog);
-
-	MOM.mother_of_p_anim = new ParticleAnimated();
-	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
-	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_p_anim->setWidth(2.0f);
-	MOM.mother_of_p_anim->setHeight(2.0f);
-	MOM.mother_of_p_anim->setNumColumn(5);
-	MOM.mother_of_p_anim->setNumRow(4);
-	MOM.mother_of_p_anim->setValidFrame(0, 19);
-	MOM.mother_of_p_anim->setDuration(1);
-	MOM.mother_of_p_anim->setFog(fog);
-	MOM.mother_of_p_anim->Bind();
-
-	MOM.mother_of_lightning = new ParticleAnimated();
-	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
-	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_lightning->setWidth(2.0f);
-	MOM.mother_of_lightning->setHeight(2.0f);
-	MOM.mother_of_lightning->setNumColumn(10);
-	MOM.mother_of_lightning->setNumRow(1);
-	MOM.mother_of_lightning->setValidFrame(0, 9);
-	MOM.mother_of_lightning->setDuration(1);
-	MOM.mother_of_lightning->setType(0);
-	MOM.mother_of_lightning->setFog(fog);
-	MOM.mother_of_lightning->Bind();
-
-	MOM.mother_of_tower_shoot_1 = new ParticleAnimated();
-	MOM.mother_of_tower_shoot_1->Init("img/sprite_sheets/light_003.png", "PNG");
-	MOM.mother_of_tower_shoot_1->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_tower_shoot_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_tower_shoot_1->setWidth(4.0f);
-	MOM.mother_of_tower_shoot_1->setHeight(4.0f);
-	MOM.mother_of_tower_shoot_1->setNumColumn(5);
-	MOM.mother_of_tower_shoot_1->setNumRow(6);
-	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
-	MOM.mother_of_tower_shoot_1->setDuration(1);
-	MOM.mother_of_tower_shoot_1->setType(1);
-	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
-	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
-	MOM.mother_of_tower_shoot_1->setTransparency(0.8);
-	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
-	MOM.mother_of_tower_shoot_1->setFog(fog);
-	MOM.mother_of_tower_shoot_1->Bind();
+	initializeMOM();
 
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
@@ -3869,5 +3885,129 @@ void printLoadingString(string s){
 	glutSwapBuffers();
 }
 
+void initializeMOM(){
+	//mother of all wrenches. initialize once cause loading mesh is slow. All other wrenches are the copies of mother
+	MOM.mother_of_wrench = new Mesh();
+	MOM.mother_of_wrench->LoadMesh("Model/newWrench_animated.dae", false);
+	MOM.mother_of_wrench->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_wrench->setShadowTex(shadow_map_id);
+	MOM.mother_of_wrench->setAdjustM(glm::translate(vec3(0.0, 0.5, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	MOM.mother_of_wrench->setShininess(30);
+	MOM.mother_of_wrench->setFog(fog);
 
+	MOM.mother_of_banana = new Mesh();
+	MOM.mother_of_banana->LoadMesh("Model/banana_animated.dae", false);
+	MOM.mother_of_banana->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_banana->setShadowTex(shadow_map_id);
+	MOM.mother_of_banana->setAdjustM(glm::translate(vec3(0.0, 0.0, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.1, 0.1, 0.1)));
+	MOM.mother_of_banana->setShininess(30);
+	MOM.mother_of_banana->setFog(fog);
+
+	MOM.mother_of_nut = new Mesh();
+	MOM.mother_of_nut->LoadMesh("Model/nut_animated.dae", false);
+	MOM.mother_of_nut->setShader(sdrCtl.getShader("basic_model"));
+	MOM.mother_of_nut->setShadowTex(shadow_map_id);
+	MOM.mother_of_nut->setAdjustM(glm::translate(vec3(0.0, -0.5, 0.5))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.20, 0.20, 0.20)));
+	MOM.mother_of_nut->setShininess(30);
+	MOM.mother_of_nut->setFog(fog);
+
+	MOM.mother_of_p_anim = new ParticleAnimated();
+	MOM.mother_of_p_anim->Init("img/sprite_sheets/effect_002.png", "PNG");
+	MOM.mother_of_p_anim->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_p_anim->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_p_anim->setWidth(2.0f);
+	MOM.mother_of_p_anim->setHeight(2.0f);
+	MOM.mother_of_p_anim->setNumColumn(5);
+	MOM.mother_of_p_anim->setNumRow(4);
+	MOM.mother_of_p_anim->setValidFrame(0, 19);
+	MOM.mother_of_p_anim->setDuration(1);
+	MOM.mother_of_p_anim->setFog(fog);
+	MOM.mother_of_p_anim->Bind();
+
+	MOM.mother_of_lightning = new ParticleAnimated();
+	MOM.mother_of_lightning->Init("img/sprite_sheets/lightning.png", "PNG");
+	MOM.mother_of_lightning->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_lightning->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_lightning->setWidth(2.0f);
+	MOM.mother_of_lightning->setHeight(2.0f);
+	MOM.mother_of_lightning->setNumColumn(10);
+	MOM.mother_of_lightning->setNumRow(1);
+	MOM.mother_of_lightning->setValidFrame(0, 9);
+	MOM.mother_of_lightning->setDuration(1);
+	MOM.mother_of_lightning->setType(0);
+	MOM.mother_of_lightning->setFog(fog);
+	MOM.mother_of_lightning->Bind();
+
+	MOM.mother_of_tower_shoot_1 = new ParticleAnimated();
+	MOM.mother_of_tower_shoot_1->Init("img/sprite_sheets/light_003.png", "PNG");
+	MOM.mother_of_tower_shoot_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_shoot_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_shoot_1->setWidth(4.0f);
+	MOM.mother_of_tower_shoot_1->setHeight(4.0f);
+	MOM.mother_of_tower_shoot_1->setNumColumn(5);
+	MOM.mother_of_tower_shoot_1->setNumRow(6);
+	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
+	MOM.mother_of_tower_shoot_1->setDuration(1);
+	MOM.mother_of_tower_shoot_1->setType(1);
+	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setFog(fog);
+	MOM.mother_of_tower_shoot_1->Bind();
+
+	MOM.mother_of_tower_damage_1 = new ParticleAnimated();
+	MOM.mother_of_tower_damage_1->Init("img/sprite_sheets/fire_003.png", "PNG");
+	MOM.mother_of_tower_damage_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_damage_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_damage_1->setWidth(4.0f);
+	MOM.mother_of_tower_damage_1->setHeight(4.0f);
+	MOM.mother_of_tower_damage_1->setNumColumn(5);
+	MOM.mother_of_tower_damage_1->setNumRow(8);
+	MOM.mother_of_tower_damage_1->setValidFrame(20, 39);
+	MOM.mother_of_tower_damage_1->setDuration(1);
+	MOM.mother_of_tower_damage_1->setType(0);
+	//MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
+	//MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_damage_1->setTransparency(0.9);
+	//MOM.mother_of_tower_damage_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_damage_1->setFog(fog);
+	MOM.mother_of_tower_damage_1->Bind();
+
+	MOM.mother_of_tower_explosion_1 = new ParticleAnimated();
+	MOM.mother_of_tower_explosion_1->Init("img/sprite_sheets/light_004.png", "PNG");
+	MOM.mother_of_tower_explosion_1->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tower_explosion_1->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_tower_explosion_1->setWidth(14.0f);
+	MOM.mother_of_tower_explosion_1->setHeight(14.0f);
+	MOM.mother_of_tower_explosion_1->setNumColumn(5);
+	MOM.mother_of_tower_explosion_1->setNumRow(5);
+	MOM.mother_of_tower_explosion_1->setValidFrame(0, 24);
+	MOM.mother_of_tower_explosion_1->setDuration(0.8);
+	MOM.mother_of_tower_explosion_1->setType(0);
+	MOM.mother_of_tower_explosion_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_explosion_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_explosion_1->setTransparency(0.9);
+	MOM.mother_of_tower_explosion_1->setBlurStrength(0.3);
+	MOM.mother_of_tower_explosion_1->setFog(fog);
+	MOM.mother_of_tower_explosion_1->Bind();
+
+	MOM.mother_of_health_potion = new ParticleAnimated();
+	MOM.mother_of_health_potion->Init("img/sprite_sheets/heal_003.png", "PNG");
+	MOM.mother_of_health_potion->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_health_potion->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_health_potion->setWidth(2.0f);
+	MOM.mother_of_health_potion->setHeight(2.0f);
+	MOM.mother_of_health_potion->setNumColumn(5);
+	MOM.mother_of_health_potion->setNumRow(4);
+	MOM.mother_of_health_potion->setValidFrame(0, 19);
+	MOM.mother_of_health_potion->setDuration(0.5);
+	MOM.mother_of_health_potion->setType(0);
+	//MOM.mother_of_health_potion->setSampleCount(3, 3);
+	//MOM.mother_of_health_potion->setSampleDist(0.002, 0.002);
+	MOM.mother_of_health_potion->setTransparency(1.0);
+	//MOM.mother_of_health_potion->setBlurStrength(0.3);
+	MOM.mother_of_health_potion->setFog(fog);
+	MOM.mother_of_health_potion->Bind();
+}
 

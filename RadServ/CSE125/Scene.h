@@ -51,6 +51,8 @@ public:
 	Scene(){
 		for (int i = 0; i < NUM_TOWERS; i++){
 			tower_shoot_check[i] = false;
+			tower_damaged[i] = false;
+			tower_kill[i] = false;
 		}
 		tower_shoot_counter = 0;
 		camM.push_back(mat4(1.0));
@@ -168,6 +170,7 @@ public:
 			despawnProjectile();
 			rechargeJump();
 			respawnPlayer();
+			respawnTower();
 			removePowerUp();
 			moveElevators();
 		}
@@ -183,6 +186,7 @@ public:
 		despawnProjectile();
 		rechargeJump();
 		respawnPlayer();
+		respawnTower();
 		removePowerUp();
 		moveElevators();
 	}
@@ -615,6 +619,8 @@ public:
 	void resolveTowerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < tower.size(); i++){
+			if (tower[i]->getHealth() < 1)
+				continue;
 			tower[i]->addVelocity(gravity*extra_speed);
 			tower[i]->postTrans(glm::translate(tower[i]->getVelocity()*t));
 		}
@@ -726,6 +732,28 @@ public:
 			}
 		}
 	}
+	void respawnTower()
+	{
+		Tower * holder;
+		//int id;
+		for (uint i = 0; i < tower.size(); i++)
+		{
+			if (tower[i]->getHealth() < 1)
+			{
+				holder = tower[i];
+				holder->setModelM(holder->getModelM()*glm::translate(vec3(0, -20, 0)));
+
+				if (holder->getRespawn() < 1)
+				{
+					holder->putHealth(20);
+					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
+					holder->setVelocity(vec3(0, 20, 0));
+				}
+				else
+					holder->setRespawn(holder->getRespawn() - 1);
+			}
+		}
+	}
 	void collisionDetectionProjectile(){
 		//player-projectile detection
 		for (uint i = 0; i < projectile.size(); i++)
@@ -764,7 +792,7 @@ public:
 		{
 			for (uint j = 0; j < tower.size(); j++)
 			{
-				if (projectile[i]->getTeamID() == tower[j]->getTeamID())
+				if (tower[j]->getHealth()<1 || projectile[i]->getTeamID() == tower[j]->getTeamID())
 					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = tower[j]->getAABB();
@@ -886,11 +914,13 @@ public:
 	}
 	void damageTower(int targetId, int playerId)
 	{
+		tower_damaged[targetId] = true;
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getTowerObj(targetId);
 		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		if (targetHolder->getHealth() < 1)
 		{
+			tower_kill[targetId] = true;
 			int dist, spd, dmg;
 			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
 			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
@@ -1010,7 +1040,7 @@ public:
 		LARGE_INTEGER ct;
 		QueryPerformanceCounter(&ct);
 		for (uint i = 0; i < tower.size(); i++){
-			if (tower[i]->checkShoot(ct)){
+			if (tower[i]->getHealth()>0 && tower[i]->checkShoot(ct)){
 				int pid;
 				float min_dist=10000;
 				for (uint k = 0; k < player.size(); k++){
@@ -1124,17 +1154,14 @@ public:
 	{
 		return playerDamaged[i];
 	}
-
 	void setPlayerDamaged(int i, bool b)
 	{
 		playerDamaged[i] = b;
 	}
-
 	bool getPlayerDead(int i)
 	{
 		return playerDead[i];
 	}
-
 	void setPlayerDead(int i, bool b)
 	{
 		playerDead[i] = b;
@@ -1148,7 +1175,6 @@ public:
 		}
 		return c;
 	}
-
 	boost::array<mat4, 5> getElevatorMats(){
 		boost::array<mat4, 5> c;
 		for (uint i = 0; i < elevator.size(); i++){
@@ -1156,7 +1182,6 @@ public:
 		}
 		return c;
 	}
-
 	boost::array<mat4, 4> getPlayerCams(){
 		boost::array<mat4, 4> m;
 		assert(player.size() == 4);
@@ -1189,6 +1214,27 @@ public:
 	}
 	vector<int> getTowerProjectileDespawnList(){ return despon_tower_projectile_list; }
 	void clearTowerProjectileDespawnList(){ despon_tower_projectile_list.clear(); }
+	bool* getTowerShootCheck(){ return tower_shoot_check; }
+	void clearTowerShootCheck(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_shoot_check[i] = false;
+		}
+	}
+	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
+	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
+	bool* getTowerDamaged(){ return tower_damaged; }
+	void clearTowerDamaged(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_damaged[i] = false;
+		}
+	}
+	bool* getTowerKill(){ return tower_kill; }
+	void clearTowerKill(){
+		for (int i = 0; i < NUM_TOWERS; i++){
+			tower_kill[i] = false;
+		}
+	}
+	int getTowerHealth(int towerID){ return tower[towerID]->getHealth(); }
 	void initialize(){
 
 		MD5Model* md50 = new MD5Model();
@@ -1246,6 +1292,7 @@ public:
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(20);
 		tw0->setShootSpeed(20);
+		tw0->setHealth(20);
 		tw0->setDamage(-1);
 		tw0->setType("Model");
 		tw0->setName("Tower Model0");
@@ -1260,6 +1307,7 @@ public:
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(20);
 		tw1->setShootSpeed(20);
+		tw1->setHealth(20);
 		tw1->setDamage(-1);
 		tw1->setType("Model");
 		tw1->setName("Tower Model0");
@@ -1274,6 +1322,7 @@ public:
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(20);
 		tw2->setShootSpeed(20);
+		tw2->setHealth(20);
 		tw2->setDamage(-1);
 		tw2->setType("Model");
 		tw2->setName("Tower Model1");
@@ -1288,6 +1337,7 @@ public:
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(20);
 		tw3->setShootSpeed(20);
+		tw3->setHealth(20);
 		tw3->setDamage(-1);
 		tw3->setType("Model");
 		tw3->setName("Tower Model1");
@@ -1536,14 +1586,6 @@ public:
 		counter = 0;
 		projectile_counter = 0;
 	}
-	bool* getTowerShootCheck(){ return tower_shoot_check; }
-	void clearTowerShootCheck(){
-		for (int i = 0; i < NUM_TOWERS; i++){
-			tower_shoot_check[i] = false;
-		}
-	}
-	int getLastTowerShootID(int tid){ return tower[tid]->getLastShootID(); }
-	vec3 getLastTowerShootDir(int tid){ return tower[tid]->getLastShootDir(); }
 
 protected:
 	int counter2;
@@ -1574,6 +1616,8 @@ protected:
 	vector<TowerShootInfo> tower_shoot;
 	int tower_shoot_counter;
 	bool tower_shoot_check[NUM_TOWERS];
+	bool tower_damaged[NUM_TOWERS];//only last valid simulation
+	bool tower_kill[NUM_TOWERS];//only last valid simulation
 
 	Object * pPtr;
 };

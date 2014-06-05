@@ -40,6 +40,7 @@
 #define PLAYER3				3
 
 //tower 
+#define NUM_TOWERS			4
 #define TOWERSHOOTBIT		0
 #define TOWER_ID			1
 #define TOWER_SHOOT_ID_BEGIN	2
@@ -50,5 +51,9 @@
 #define DIR_1_END			17
 #define DIR_2_BEGIN			18
 #define DIR_2_END			23
+#define TOWER_DAMAGED		24
+#define TOWER_KILL			25
+#define TOWER_HEALTH_BEGIN	26
+#define TOWER_HEALTH_END	29
 
 #define PPDL_INT_LENGTH     4

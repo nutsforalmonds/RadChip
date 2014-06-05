@@ -72,6 +72,7 @@ public:
 		start_frame = other.start_frame;
 		end_frame = other.end_frame;
 		reverse = other.reverse;
+		delay = other.delay;
 		return *this;
 	}
 
@@ -85,6 +86,8 @@ public:
 	}
 
 	void draw(){
+		if (row < 0)
+			return;
 		shader->setUniform(uniformLoc[0], Projection);
 		shader->setUniform(uniformLoc[1], View);
 		shader->setUniform(uniformLoc[2], vec3((glm::inverse(View)*vec4(0, 0, 0, 1))));
@@ -175,13 +178,17 @@ public:
 
 	bool update(){
 		QueryPerformanceCounter(&current);
-		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart;
+		double anim_time = ((double)current.QuadPart - (double)start_time.QuadPart) / (double)freq.QuadPart - delay;
 		if (anim_time > duration){
 			return false;
 		}
+		if (anim_time < 0){
+			row = column = -1;
+			return true;
+		}
 
-		double seg_time = duration / (end_frame-start_frame+1);
 		int block_ID;
+		double seg_time = duration / (end_frame-start_frame+1);
 		if (reverse){
 			block_ID = end_frame - (int)floor(anim_time / seg_time);
 		}
@@ -200,6 +207,7 @@ public:
 	void setSampleCount(int x, int y){ sample_x = x; sample_y = y; }
 	void setSampleDist(float x, float y){ x_dist = x; y_dist = y; }
 	void setBlurStrength(float s){ blur_strength = s; }
+	void setDelay(double delay){ this->delay = delay; }
 
 private:
 	GLuint m_VB;
@@ -223,6 +231,7 @@ private:
 	int start_frame, end_frame;
 	bool reverse = false;
 	float blur_strength = 1;
+	double delay=0;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */

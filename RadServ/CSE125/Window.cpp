@@ -565,10 +565,13 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		string ts[4] = { "" };
+		//tower infos
+		string ts[NUM_TOWERS] = { "" };
 		if (sendddddddddddedededed){
 			bool* shoot_check = scene->getTowerShootCheck();
-			for (uint i = 0; i < 4; i++){
+			bool* tower_damage_check = scene->getTowerDamaged();
+			bool* tower_kill_check = scene->getTowerKill();
+			for (uint i = 0; i < NUM_TOWERS; i++){
 				if (shoot_check[i]){//tower shot during last simulation
 					ts[i] += "T";
 					ts[i] += to_string(i);
@@ -576,14 +579,10 @@ int main(int argc, char *argv[])
 					ts[i] += int_to_string(scene->getLastTowerShootID(i), 4);
 					vec3 dir = scene->getLastTowerShootDir(i);
 					ts[i] += int_to_string((int)(100000 * (1 + dir[0])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[0])), 6) << endl;
 					ts[i] += int_to_string((int)(100000 * (1 + dir[1])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[1])), 6) << endl;
 					ts[i] += int_to_string((int)(100000 * (1 + dir[2])), 6);
-					//cout << int_to_string((int)(100000 * (1 + dir[2])), 6) << endl;
 					assert(ts[i].length() == 24);
-				}
-				else{
+				}else{
 					ts[i] += "t";
 					ts[i] += to_string(i);
 					assert(ts[i].length() == 2);
@@ -593,9 +592,23 @@ int main(int argc, char *argv[])
 					ts[i] += "000000";
 					assert(ts[i].length() == 24);
 				}
+				if (tower_damage_check[i]){//check if tower is damaged during last simulation
+					ts[i] += "D";
+				}else{
+					ts[i] += "d";
+				}
+				if (tower_kill_check[i]){//check if tower is killed during last simulation
+					ts[i] += "K";
+				}else{
+					ts[i] += "k";
+				}
+				ts[i] += int_to_string(scene->getTowerHealth(i), 4);
+				assert(ts[i].length() == 30);
 			}
 			scene->clearTowerShoot();
 			scene->clearTowerShootCheck();
+			scene->clearTowerDamaged();
+			scene->clearTowerKill();
 		}
 
 
