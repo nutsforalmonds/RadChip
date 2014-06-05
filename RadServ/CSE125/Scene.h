@@ -1608,7 +1608,7 @@ protected:
 	vector<bool> playerDead;
 	bool playerOnTramp[4];
 	bool playerOnTele[4];
-	int pUpCooldown[5];
+	int pUpCooldown[6];
 	int counter;
 	int projectile_counter;
 	vector<int> despon_player_projectile_list;

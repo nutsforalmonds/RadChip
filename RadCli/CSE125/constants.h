@@ -57,3 +57,10 @@
 #define TOWER_HEALTH_END	29
 
 #define PPDL_INT_LENGTH     4
+
+
+#define ORIGINX				100
+#define ORIGINY				0
+#define ORIGINZ				100
+
+#define PERIMETER_WALL_HEIGHT 5
