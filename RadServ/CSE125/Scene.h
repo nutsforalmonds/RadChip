@@ -95,7 +95,7 @@ public:
 	int getPlayerHealth(int playerID)
 	{
 		pPtr = getPlayerObj(playerID);
-		return pPtr->getHealth();
+		return pPtr->getMaxHealth();
 	}
 
 	int getPlayerKills(int playerID)
@@ -396,7 +396,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -426,7 +426,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									break;
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -445,7 +445,7 @@ public:
 						{
 							if (player[i]->getPowerUp() == NOPOWER)
 							{
-								player[i]->setHealth(4);
+								player[i]->setTempHealth(4);
 								player[i]->setPowerUp(HEALTHBOOST);
 							}
 							else
@@ -482,7 +482,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									break;
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -509,7 +509,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -707,7 +707,7 @@ public:
 					else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 						player[i]->getWeapon()->setDamage(-1);
 					else if (player[i]->getPowerUp() == HEALTHBOOST)
-						player[i]->setHealth(-4);
+						player[i]->setTempHealth(0);
 					else if (player[i]->getPowerUp() == FASTERSHOOT)
 						player[i]->getWeapon()->setSpeed(50);
 					else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -927,7 +927,10 @@ public:
 	{
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getPlayerObj(targetId);
-		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		if (targetHolder->getTempHealth() <= 0)
+			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		else
+			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
@@ -970,7 +973,11 @@ public:
 	{
 		Tower* tw = tower[towerID];
 		Object * targetHolder = getPlayerObj(targetId);
-		targetHolder->setHealth(tw->getDamage());
+		//targetHolder->setHealth(tw->getDamage());
+		if (targetHolder->getTempHealth() <= 0)
+			targetHolder->setHealth(tw->getDamage());
+		else
+			targetHolder->setTempHealth(targetHolder->getTempHealth() + tw->getDamage());
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
