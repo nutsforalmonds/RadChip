@@ -3317,6 +3317,46 @@ void initialize(int argc, char *argv[])
 	platform_09->setName("Test Platform");
 	stationary_list.push_back(platform_09);
 
+	//island to teleporter
+	Cube* platform_10 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+	//platform_09->setSpeed(5); 
+	platform_10->setKd(vec3(0.8, 0.8, 0.0));
+	platform_10->setKa(vec3(0.3, 0.3, 0.0));
+	platform_10->setKs(vec3(0.4, 0.4, 0.0));
+	platform_10->setShininess(100);
+	platform_10->setFog(fog);
+	platform_10->setReflectFactor(vec2(0.2, 0.5));
+	platform_10->setEta(0.5);
+	platform_10->setCubeMapUnit(3);
+	platform_10->setSpeed(5);
+	platform_10->postTrans(glm::translate(vec3(100.0, 18.0, 0.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_10->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_10->setShadowTex(shadow_map_id);
+	platform_10->setType("Cube");
+	platform_10->setName("Test Platform");
+	stationary_list.push_back(platform_10);
+
+	//island to teleporter
+	Cube* platform_11 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+	//platform_09->setSpeed(5); 
+	platform_11->setKd(vec3(0.8, 0.8, 0.0));
+	platform_11->setKa(vec3(0.3, 0.3, 0.0));
+	platform_11->setKs(vec3(0.4, 0.4, 0.0));
+	platform_11->setShininess(100);
+	platform_11->setFog(fog);
+	platform_11->setReflectFactor(vec2(0.2, 0.5));
+	platform_11->setEta(0.5);
+	platform_11->setCubeMapUnit(3);
+	platform_11->setSpeed(5);
+	platform_11->postTrans(glm::translate(vec3(-100.0, 18.0, 0.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_11->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_11->setShadowTex(shadow_map_id);
+	platform_11->setType("Cube");
+	platform_11->setName("Test Platform");
+	stationary_list.push_back(platform_11);
+
 	//Trampoline 
 	Cube* tramp_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_01->setKd(vec3(0.0, 0.0, 0.0));
@@ -3343,12 +3383,28 @@ void initialize(int argc, char *argv[])
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
 	tele_01->setEta(0.5);
 	tele_01->setCubeMapUnit(3);
-	tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+	tele_01->postTrans(glm::translate(vec3(114, 18.0, 0)));
 	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_01->setShadowTex(shadow_map_id);
 	tele_01->setType("Teleporter");
 	tele_01->setName("Test Teleporter");
 	stationary_list.push_back(tele_01);
+
+	Cube* tele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tele_02->setKd(vec3(1.0, 1.0, 1.0));
+	tele_02->setKa(vec3(1.0, 1.0, 1.0));
+	tele_02->setKs(vec3(1.0, 1.0, 1.0));
+	tele_02->setShininess(100);
+	tele_02->setFog(fog);
+	tele_02->setReflectFactor(vec2(0.2, 0.5));
+	tele_02->setEta(0.5);
+	tele_02->setCubeMapUnit(3);
+	tele_02->postTrans(glm::translate(vec3(-114, 18.0, 0)));
+	tele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tele_02->setShadowTex(shadow_map_id);
+	tele_02->setType("Teleporter");
+	tele_02->setName("Test Teleporter");
+	stationary_list.push_back(tele_02);
 
 	Cube* ele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	ele_01->setKd(vec3(1.0, 1.0, 1.0));

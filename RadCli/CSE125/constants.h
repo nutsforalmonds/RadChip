@@ -9,7 +9,7 @@
 #define CAM_MAT_END			11
 #define PPDL_MAT			12
 #define PLAT_MAT_BEGIN	    13
-#define PLAT_MAT_END		14
+#define PLAT_MAT_END		17
 //#define PPDL_MAT			16
 
 // string indexes

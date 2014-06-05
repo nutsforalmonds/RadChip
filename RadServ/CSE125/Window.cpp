@@ -172,31 +172,31 @@ void handle_key_state(int pid, int keyState){
 		return;
 	if (keyState & 1){ //'a'
 		//cout << "move left" << endl;
-		scene->setHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelHMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 1){ //'d'
 		//cout << "move right" << endl;
-		scene->setHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelHMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 2){ //'w'
 		//cout << "move up" << endl;
-		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelVMove(pid, ((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 3){ //'s'
 		//cout << "move down" << endl;
-		scene->setVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->setVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	else{
-		scene->cancelVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed());
+		scene->cancelVMove(pid, -((scene->getPlayer(playerID))->getBoots())->getMoveSpeed()/2);
 	}
 	if (keyState & 1 << 4){ //' '
 		//cout << "jump" << endl;

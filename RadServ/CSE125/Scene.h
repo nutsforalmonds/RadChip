@@ -464,7 +464,7 @@ public:
 			playerOnTramp[obj1->getPlayerID()] = true;
 		}
 		if (!strcmp(obj2->getType().c_str(), "Teleporter") && onGround1){
-			obj1->preTrans(((Teleporter*)obj2)->getEndpoint());
+			obj1->setModelM(((Teleporter*)obj2)->getEndpoint());
 			playerOnTele[obj1->getPlayerID()] = true;
 		}
 		if (!strcmp(obj2->getType().c_str(), "Elevator") && onGround1){
@@ -1298,6 +1298,24 @@ public:
 		platform_09->setName("Test Platform");
 		addStationary(platform_09);
 
+		//island to teleporter 
+		Cube* platform_10 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+		//platform_01->setSpeed(5); 
+		platform_10->postTrans(glm::translate(vec3(100.0, 18.0, 0.0)));
+		platform_10->setAABB(AABB(vec3(-5.0, -0.5, -5), vec3(5.0, 0.5, 5)));
+		platform_10->setType("Cube");
+		platform_10->setName("Test Platform");
+		addStationary(platform_10);
+
+		//island to teleporter 
+		Cube* platform_11 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+		//platform_01->setSpeed(5); 
+		platform_11->postTrans(glm::translate(vec3(-100.0, 18.0, 0.0)));
+		platform_11->setAABB(AABB(vec3(-5.0, -0.5, -5), vec3(5.0, 0.5, 5)));
+		platform_11->setType("Cube");
+		platform_11->setName("Test Platform");
+		addStationary(platform_11);
+
 
 		//Trampoline 
 		Trampoline* tramp_01 = new Trampoline();
@@ -1312,12 +1330,22 @@ public:
 		//teleporter 
 		Teleporter* tele_01 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_01->postTrans(glm::translate(vec3(10, 8.0, 20)));
+		tele_01->postTrans(glm::translate(vec3(114, 18.0, 0)));
 		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_01->setEndpoint(glm::translate(vec3(0, 50.0, 0)));
+		tele_01->setEndpoint(glm::translate(vec3(-74, 20.0, 0)));
 		tele_01->setType("Teleporter");
 		tele_01->setName("Test Teleporter");
 		addStationary(tele_01);
+
+		//teleporter 
+		Teleporter* tele_02 = new Teleporter();
+		//platform_01->setSpeed(5); 
+		tele_02->postTrans(glm::translate(vec3(-114, 18.0, 0)));
+		tele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tele_02->setEndpoint(glm::translate(vec3(74, 20.0, 0)));
+		tele_02->setType("Teleporter");
+		tele_02->setName("Test Teleporter");
+		addStationary(tele_02);
 
 
 		Elevator* ele_01 = new Elevator();
