@@ -628,10 +628,18 @@ void towerKill(int towerID){
 	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
+
+	if (towerID < 2){
+		myUI->setTowers('c');
+	}
+	else if (towerID > 1)
+	{
+		myUI->setTowers('m');
+	}
 }
 void powerUpAnimation(int playerID){
 	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
-	power_up->setModelM(player_list[playerID]->getModelM()*glm::translate(vec3(0,0.7,0) + 0.5f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - player_list[playerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	power_up->setFollow(player_list[playerID], vec3(0, 1.2, 0), 0.6f, &View);
 	LARGE_INTEGER ct;
 	QueryPerformanceCounter(&ct);
 	power_up->setStartTime(ct);
@@ -2490,9 +2498,7 @@ void mouseFunc(int button, int state, int x, int y)
 				if (right_mouse_up){
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
-
 					testSound[SoundThrow]->Play();
-
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -4387,8 +4393,8 @@ void initializeMOM(){
 	MOM.mother_of_health_potion->Init("img/sprite_sheets/heal_003.png", "PNG");
 	MOM.mother_of_health_potion->setShader(sdrCtl.getShader("billboard_anim"));
 	MOM.mother_of_health_potion->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_health_potion->setWidth(2.0f);
-	MOM.mother_of_health_potion->setHeight(2.0f);
+	MOM.mother_of_health_potion->setWidth(4.0f);
+	MOM.mother_of_health_potion->setHeight(4.0f);
 	MOM.mother_of_health_potion->setNumColumn(5);
 	MOM.mother_of_health_potion->setNumRow(4);
 	MOM.mother_of_health_potion->setValidFrame(0, 19);

@@ -218,7 +218,7 @@ public:
 		life_frame = new UI_Panel(-0.3f, 0.3f, -0.2f, 0.2f);
 		life_frame->setColor(vec3(1.0, 0.0, 0.0));
 		life_frame->setShader(sdrCtl.getShader("basic_2D"));
-		life_frame->loadColorTex("img/UI_elements/healthBAR_2", "PNG");
+		life_frame->loadColorTex("img/UI_elements/healthBAR", "PNG");
 		life_frame->setTex(true);
 		life_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
@@ -259,54 +259,95 @@ public:
 		target_frame = new UI_Panel(-0.15f, 0.15f, -0.1, 0.1f);
 		target_frame->setColor(vec3(1.0, 0.0, 0.0));
 		target_frame->setShader(sdrCtl.getShader("basic_2D"));
-		target_frame->loadColorTex("img/UI_elements/healthBAR_2", "PNG");
+		target_frame->loadColorTex("img/UI_elements/healthBAR.png", "PNG");
 		target_frame->setTex(true);
 		target_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
 
 		//tower indicators in the top right and left coreners of the screen
 
-		m_tower1 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower1 = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
 		m_tower1->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower1->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower1->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower1->loadColorTex("img/UI_elements/octopus_icon.png", "PNG");
 		m_tower1->setTex(true);
-		m_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.55f, 0.45f, -1.0f)));
+		m_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.45f, 0.45f, -1.0f)));
 
-		m_tower2 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower2 = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower2->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower2->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower2->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower2->loadColorTex("img/UI_elements/octopus_icon.png", "PNG");
 		m_tower2->setTex(true);
-		m_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.60f, 0.45f, -1.0f)));
+		m_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.52f, 0.43f, -1.0f)));
 
-		m_tower3 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower3 = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower3->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower3->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower3->loadColorTex("img/UI_elements/minusSign.png", "PNG");
+		m_tower3->loadColorTex("img/UI_elements/octopus_icon.png", "PNG");
 		m_tower3->setTex(true);
-		m_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.65f, 0.45f, -1.0f)));
+		m_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.59f, 0.43f, -1.0f)));
 
-		c_tower1 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		m_tower1_dead = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
+		m_tower1_dead->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower1_dead->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower1_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower1_dead->setTex(true);
+		m_tower1_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.45f, 0.45f, -1.0f)));
+
+		m_tower2_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
+		m_tower2_dead->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower2_dead->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower2_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower2_dead->setTex(true);
+		m_tower2_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.52f, 0.43f, -1.0f)));
+
+		m_tower3_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
+		m_tower3_dead->setColor(vec3(1.0, 1.0, 1.0));
+		m_tower3_dead->setShader(sdrCtl.getShader("basic_2D"));
+		m_tower3_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower3_dead->setTex(true);
+		m_tower3_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.59f, 0.43f, -1.0f)));
+
+		c_tower1 = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
 		c_tower1->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower1->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower1->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower1->loadColorTex("img/UI_elements/triple_icon.png", "PNG");
 		c_tower1->setTex(true);
-		c_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.55f, 0.45f, -1.0f)));
+		c_tower1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.45f, 0.45f, -1.0f)));
 
-		c_tower2 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		c_tower2 = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		c_tower2->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower2->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower2->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower2->loadColorTex("img/UI_elements/triple_icon.png", "PNG");
 		c_tower2->setTex(true);
-		c_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.60f, 0.45f, -1.0f)));
+		c_tower2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.52f, 0.43f, -1.0f)));
 
-		c_tower3 = new UI_Panel(-0.01f, 0.01f, -0.01f, 0.01f);
+		c_tower3 = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		c_tower3->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower3->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower3->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower3->loadColorTex("img/UI_elements/triple_icon.png", "PNG");
 		c_tower3->setTex(true);
-		c_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.65f, 0.45f, -1.0f)));
+		c_tower3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.59f, 0.43f, -1.0f)));
+		
+		c_tower1_dead = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
+		c_tower1_dead->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower1_dead->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower1_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower1_dead->setTex(true);
+		c_tower1_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.45f, 0.45f, -1.0f)));
 
+		c_tower2_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
+		c_tower2_dead->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower2_dead->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower2_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower2_dead->setTex(true);
+		c_tower2_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.52f, 0.43f, -1.0f)));
+
+		c_tower3_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
+		c_tower3_dead->setColor(vec3(1.0, 1.0, 1.0));
+		c_tower3_dead->setShader(sdrCtl.getShader("basic_2D"));
+		c_tower3_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower3_dead->setTex(true);
+		c_tower3_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.59f, 0.43f, -1.0f)));
 
 	}
 	~UI(){
@@ -324,9 +365,16 @@ public:
 		m_tower1->		~UI_Panel();
 		m_tower2->	    ~UI_Panel();
 		m_tower3->	    ~UI_Panel();
+		m_tower1_dead-> ~UI_Panel();
+		m_tower2_dead->	~UI_Panel();
+		m_tower3_dead->	~UI_Panel();
+
 		c_tower1->		~UI_Panel();
 		c_tower2->	    ~UI_Panel();
 		c_tower3->	    ~UI_Panel();
+		c_tower1_dead-> ~UI_Panel();
+		c_tower2_dead->	~UI_Panel();
+		c_tower3_dead->	~UI_Panel();
 	}
 
 	int draw(){
@@ -344,35 +392,45 @@ public:
 		glDisable(GL_BLEND);
 		//glDepthMask(GL_TRUE);
 
-		drawEnemy();
+		//drawEnemy();
 
+		/*
 		overheatBar(shots, overheat, 2);
 
 		heat_back->draw();
 		heat_front->draw();
 		heat_frame->draw();
+		*/
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		switch (m_towers_left){
+		m_tower3->draw();
+		m_tower2->draw();
+		m_tower1->draw();
+
+		c_tower3->draw();
+		c_tower2->draw();
+		c_tower1->draw();
+
+		switch (m_towers_killed){
 		case 3:
-			m_tower3->draw();
+			m_tower1_dead->draw();
 		case 2:
-			m_tower2->draw();
+			m_tower2_dead->draw();
 		case 1:
-			m_tower1->draw();
+			m_tower3_dead->draw();
 		default:
 			break;
 		}
 
-		switch (c_towers_left){
+		switch (c_towers_killed){
 		case 3:
-			c_tower3->draw();
+			c_tower1_dead->draw();
 		case 2:
-			c_tower2->draw();
+			c_tower2_dead->draw();
 		case 1:
-			c_tower1->draw();
+			c_tower3_dead->draw();
 		default:
 			break;
 		}
@@ -555,11 +613,11 @@ public:
 
 	void setTowers(char team){
 		if (team == 'm'){
-			m_towers_left-- ;
+			m_towers_killed++ ;
 		}
 
 		else{
-			c_towers_left--;
+			c_towers_killed++;
 		}
 	}
 
@@ -591,9 +649,16 @@ private:
 	UI_Panel* m_tower1;
 	UI_Panel* m_tower2;
 	UI_Panel* m_tower3;
+	UI_Panel* m_tower1_dead;
+	UI_Panel* m_tower2_dead;
+	UI_Panel* m_tower3_dead;
+
 	UI_Panel* c_tower1;
 	UI_Panel* c_tower2;
 	UI_Panel* c_tower3;
+	UI_Panel* c_tower1_dead;
+	UI_Panel* c_tower2_dead;
+	UI_Panel* c_tower3_dead;
 	
 
 	float x1_life = -0.27f; //life
@@ -624,8 +689,8 @@ private:
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
 	float enemy_health_bar = x2_target - x1_target;
 
-	int c_towers_left = 3;
-	int m_towers_left = 3;
+	int c_towers_killed = 0;
+	int m_towers_killed = 0;
 
 	time_t over_de; //rate of decay of overheat bar
 
