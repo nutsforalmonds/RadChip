@@ -59,8 +59,13 @@
 #define PPDL_INT_LENGTH     4
 
 
+// base location
 #define ORIGINX				100
 #define ORIGINY				0
 #define ORIGINZ				100
 
+// base parameters
 #define PERIMETER_WALL_HEIGHT 5
+#define CENTER_TOWERPLAT_HEIGHT 20
+#define CENTER_PLAT_SPACING   10
+#define CENTER_PLAT_HEIGHT    15
