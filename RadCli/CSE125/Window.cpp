@@ -352,8 +352,11 @@ FMOD_VECTOR player1_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player2_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player3_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 
+//endgame stuff
 bool gameOver;
 int winner;
+int wins;
+bool winCountToggle = false;
 
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
@@ -1297,10 +1300,20 @@ void Window::displayCallback(void)
 		else if (myClientState->getState() == 5){
 
 			//ENDGAME
-			if ((playerID % 2) == 0)
+			if (winner == 0 && (playerID % 2) == 0)
+			{
 				endScreen->draw(1);
+				if (!winCountToggle)
+				{
+					wins++;
+					winCountToggle = !winCountToggle;
+					cout << wins << endl;
+				}
+			}
 			else
+			{
 				endScreen->draw(0);
+			}
 		}
 
 		else if (kill_count){
@@ -1773,7 +1786,7 @@ void server_update(int value){
 
 		winner = parseOpts->getWinState(recvVec);
 		gameOver = (winner == 3) ? 0 : 1;
-
+		
 
 		if (gameOver)
 		{
