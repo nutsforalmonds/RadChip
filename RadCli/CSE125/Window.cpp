@@ -1387,7 +1387,7 @@ void server_update(int value){
 
 		std::vector<std::pair<int, bool>> platformDamage = parseOpts->getPlatformDamage(recvVec);
 		std::vector<std::pair<int, bool>> platformDead = parseOpts->getPlatformDead(recvVec);
-		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
+		std::vector<std::pair<int, int>> platformHealth = parseOpts->getPlatformHealth(recvVec);
 		for (int i = 0; i < platformDead.size(); i++)
 		{
 			if (platformDead[i].second)
@@ -1401,9 +1401,10 @@ void server_update(int value){
 			}
 			if (platformDamage[i].second)
 			{
-				stationary_list[i]->setHealth(-1);
-				((Cube *)stationary_list[i])->setTransparency(stationary_list[i]->getHealth()/7);
+				stationary_list[platformDead[i].first]->setHealth(-1);
 			}
+
+			((Cube *)stationary_list[platformDead[i].first])->setTransparency(((float)platformHealth[i].second) / 7.00);
 			
 		}
 

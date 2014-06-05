@@ -42,9 +42,13 @@
 
 
 //indicies for platform status
-#define PLATFORM_INDEX		1
-#define PLATFORM_DAMAGE		2
-#define PLATFORM_DEAD		3
+#define PLINDEX_BEGIN		1
+#define PLINDEX_END			2
+#define PLATFORM_DAMAGE		3
+#define PLATFORM_DEAD		4
+#define PLHEALTH_BEGIN		5
+#define PLHEALTH_END		7
+
 
 //tower 
 #define TOWERSHOOTBIT			0

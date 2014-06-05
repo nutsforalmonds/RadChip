@@ -209,14 +209,22 @@ public:
 	{
 		std::vector<std::pair<int, bool>> result;
 		std::string s = (*vec)[PLATFORM_STATUS].first;
+		std::string index = "";
 		int printIndex = 0;
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length(); i += 4)
+		for (int i = 0; i < s.length(); i += 8)
 		{
+			index = "";
+
+			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			{
+				index += s.c_str()[j];
+			}
+
 			if (s.c_str()[i + PLATFORM_DAMAGE] == 'd')
-				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
+				result.push_back(std::make_pair(atoi(index.c_str()), true));
 			else
-				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
+				result.push_back(std::make_pair(atoi(index.c_str()), false));
 			printIndex++;
 		}
 		return result;
@@ -226,17 +234,50 @@ public:
 	{
 		std::vector<std::pair<int, bool>> result;
 		std::string s = (*vec)[PLATFORM_STATUS].first;
+		std::string index = "";
 
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length(); i += 4)
+		for (int i = 0; i < s.length(); i += 8)
 		{
+			index = "";
+			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			{
+				index += s.c_str()[j];
+			}
 			if (s.c_str()[i + PLATFORM_DEAD] == 'k')
-				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), true));
+				result.push_back(std::make_pair(atoi(index.c_str()), true));
 			else
-				result.push_back(std::make_pair(atoi(s.substr(i + PLATFORM_INDEX, 1).c_str()), false));
+				result.push_back(std::make_pair(atoi(index.c_str()), false));
 		}
-		 
 		return result;
+	}
+
+	std::vector<std::pair<int, int>> getPlatformHealth(std::vector <std::pair<std::string, mat4>>* vec)
+	{
+		std::string h = "";
+		std::string index = "";
+		std::vector<std::pair<int, int>> result;
+		std::string s = (*vec)[PLATFORM_STATUS].first;
+
+		//every platform status set is made up of p0dk, so this should iterate through every set
+		for (int i = 0; i < s.length(); i += 8)
+		{
+			index = "";
+			health = "";
+			for (int j = i + PLHEALTH_BEGIN; j <= i + PLHEALTH_END; j++)
+			{
+				health += s.c_str()[j];
+			}
+
+			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			{
+				index += s.c_str()[j];
+			}
+			result.push_back(std::make_pair(atoi(index.c_str()), atoi(health.c_str())));
+		}
+
+		return result;
+
 	}
 
 private:

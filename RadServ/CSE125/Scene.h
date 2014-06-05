@@ -745,7 +745,7 @@ public:
 			}
 		}
 
-		//player-projectile detection
+		//stationary-projectile detection
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			for (uint j = 0; j < stationary.size(); j++)
@@ -761,7 +761,9 @@ public:
 				}
 				if (collide){
 					if (stationary[j]->getIsPlatformDamage())
-						damageStationary(player[j]->getPlayerID(), projectile[i]->getPlayerID());
+					{
+						damageStationary(j, projectile[i]->getPlayerID());
+					}
 					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
@@ -1300,6 +1302,7 @@ public:
 		platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_02->setType("Cube");
 		platform_02->setName("Test Platform");
+		platform_02->setIsPlatformDamage(true);
 		addStationary(platform_02);
 
 		//2nd Bottom Side Step Platform
@@ -1309,6 +1312,7 @@ public:
 		platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 		platform_03->setType("Cube");
 		platform_03->setName("Test Platform");
+		platform_03->setIsPlatformDamage(true);
 		addStationary(platform_03);
 
 		//Platform Steps 1-1

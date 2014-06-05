@@ -636,7 +636,13 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < platformDamaged.size(); i++)
 		{	
 			if ((*stationaries)[i]->getIsPlatformDamage())
-				platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+			{
+				if (std::to_string(i).size() == 1)
+					platform_status += "p0" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+				else
+					platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
+				platform_status += "00" + std::to_string((*stationaries)[i]->getHealth());
+			}
 			//if (platformDamaged[i])
 			//	cout << platform_status << endl;
 			scene->setPlatformDamaged(i, false);
