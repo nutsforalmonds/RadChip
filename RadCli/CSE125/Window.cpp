@@ -195,6 +195,8 @@ struct Mother{
 	ParticleAnimated* mother_of_tower_damage_1;
 	ParticleAnimated* mother_of_tower_explosion_1;
 	ParticleAnimated* mother_of_health_potion;
+	ParticleAnimated* mother_of_red_arrow;
+	ParticleAnimated* mother_of_green_arrow;
 }MOM;
 
 int texScreenWidth = 512;
@@ -227,6 +229,7 @@ int sprint_up = 10;
 //bool keyState[4];//up,down,left,right
 
 void initializeMOM();
+void initializePlayerMark(int main_player_ID);
 
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
@@ -2436,6 +2439,7 @@ void mouseFunc(int button, int state, int x, int y)
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();
+						initializePlayerMark(playerID);
 						std::cout << "pid: " << playerID << std::endl;
 						//system("pause");
 					}
@@ -4349,7 +4353,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
 	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
-	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_shoot_1->setFog(fog);
 	MOM.mother_of_tower_shoot_1->Bind();
 
@@ -4364,10 +4368,10 @@ void initializeMOM(){
 	MOM.mother_of_tower_damage_1->setValidFrame(20, 39);
 	MOM.mother_of_tower_damage_1->setDuration(1);
 	MOM.mother_of_tower_damage_1->setType(0);
-	//MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
-	//MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_damage_1->setTransparency(0.9);
-	//MOM.mother_of_tower_damage_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_damage_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_damage_1->setFog(fog);
 	MOM.mother_of_tower_damage_1->Bind();
 
@@ -4406,5 +4410,82 @@ void initializeMOM(){
 	//MOM.mother_of_health_potion->setBlurStrength(0.3);
 	MOM.mother_of_health_potion->setFog(fog);
 	MOM.mother_of_health_potion->Bind();
+
+	MOM.mother_of_red_arrow = new ParticleAnimated();
+	MOM.mother_of_red_arrow->Init("img/enemySign.png", "PNG");
+	MOM.mother_of_red_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_red_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_red_arrow->setWidth(2.0f);
+	MOM.mother_of_red_arrow->setHeight(2.0f);
+	MOM.mother_of_red_arrow->setNumColumn(1);
+	MOM.mother_of_red_arrow->setNumRow(1);
+	MOM.mother_of_red_arrow->setValidFrame(0, 0);
+	MOM.mother_of_red_arrow->setDuration(1.0);
+	MOM.mother_of_red_arrow->setType(1);
+	//MOM.mother_of_red_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_red_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_red_arrow->setTransparency(0.9);
+	//MOM.mother_of_red_arrow->setBlurStrength(1.0);
+	MOM.mother_of_red_arrow->setFog(emptyFog);
+	MOM.mother_of_red_arrow->Bind();
+
+	MOM.mother_of_green_arrow = new ParticleAnimated();
+	MOM.mother_of_green_arrow->Init("img/friendSign.png", "PNG");
+	MOM.mother_of_green_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_green_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_green_arrow->setWidth(2.0f);
+	MOM.mother_of_green_arrow->setHeight(2.0f);
+	MOM.mother_of_green_arrow->setNumColumn(1);
+	MOM.mother_of_green_arrow->setNumRow(1);
+	MOM.mother_of_green_arrow->setValidFrame(0, 0);
+	MOM.mother_of_green_arrow->setDuration(1.0);
+	MOM.mother_of_green_arrow->setType(1);
+	//MOM.mother_of_green_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_green_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_green_arrow->setTransparency(0.9);
+	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
+	MOM.mother_of_green_arrow->setFog(emptyFog);
+	MOM.mother_of_green_arrow->Bind();
 }
 
+void initializePlayerMark(int main_player_ID){
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	float up = 3.0;
+	if (main_player_ID % 2){
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+	else{
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+}
