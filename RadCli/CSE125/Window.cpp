@@ -318,7 +318,7 @@ int m_pos = 0;
 int text_flag = 0;
 
 bool kill_count = false;
-float offset = 0.2;
+float offset = 0.2f;
 
 bool connected;
 std::string out;
@@ -481,7 +481,7 @@ void spawnDeathParticle(float x, float y, float z)
 	deathPart->setTime_Min(0.0);
 	deathPart->setTime(0.0);
 	deathPart->setBlastRadius(20.0);
-	deathPart->setExplosionVelocity(0.7);
+	deathPart->setExplosionVelocity(0.7f);
 	deathPart->setExplosionDecay(2.0);
 	deathPart->setFragStartColor(vec3(1.0, 0.2, 0.2));
 	deathPart->setFragEndColor(vec3(0.6, 0, 0));
@@ -880,9 +880,9 @@ void Window::idleCallback(void)
 				new_lightning->setWidth(10);
 				new_lightning->setHeight(200);
 				new_lightning->setDuration(0.5);
-				new_lightning->setTransparency(0.8);
+				new_lightning->setTransparency(0.8f);
 				new_lightning->setSampleCount(3, 3);
-				new_lightning->setSampleDist(0.001, 0.005);
+				new_lightning->setSampleDist(0.001f, 0.005f);
 				LARGE_INTEGER time_lightning;
 				QueryPerformanceCounter(&time_lightning);
 				new_lightning->setStartTime(time_lightning);
@@ -895,7 +895,7 @@ void Window::idleCallback(void)
 				p_anim->setWidth(10);
 				p_anim->setHeight(10);
 				p_anim->setSampleCount(3, 3);
-				p_anim->setSampleDist(0.005, 0.005);
+				p_anim->setSampleDist(0.005f, 0.005f);
 				LARGE_INTEGER time_p_anim;
 				QueryPerformanceCounter(&time_p_anim);
 				p_anim->setStartTime(time_p_anim);
@@ -1282,7 +1282,7 @@ void Window::displayCallback(void)
 		myMainMenu->draw();
 		//logo->draw();
 		
-		offset = .08;
+		offset = .08f;
 
 		if ((float)Window::width / (float)Window::height <= 1.5)
 		{
@@ -1804,7 +1804,7 @@ void server_update(int value){
 		std::vector<std::pair<int, int>> platformHealth = parseOpts->getPlatformHealth(recvVec);
 		//cout << stationary_list.size() << " " << platformDamage.size() << " " << platformDead.size() << " " << platformHealth.size() << endl;
 		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
-		for (int i = 0; i < platformDead.size(); i++)
+		for (uint i = 0; i < platformDead.size(); i++)
 		{
 			if (platformDead[i].second)
 			{
@@ -2655,7 +2655,7 @@ void server_update(int value){
 		// TODO make this happen based on remaining towers
 		if (baseOpen)
 		{
-			for (int i = 0; i < stationary_list.size(); i++)
+			for (uint i = 0; i < stationary_list.size(); i++)
 			{
 				if (strcmp(stationary_list[i]->getName().c_str(), "baset0") == 0)
 				((Cube*)stationary_list[i])->setTransparency(0.5);
@@ -2667,7 +2667,7 @@ void server_update(int value){
 				cam[i]->setCamM((*recvVec)[CAM_MAT_BEGIN + i].second);
 		}
 		
-		i++;
+		//i++;
 
 		if (p0f && (playerID != PLAYER0)){
 			sound_3d_Throw->setPosition(player0_sound_vec_curr);
@@ -3899,7 +3899,7 @@ void initialize(int argc, char *argv[])
 	skybox->setName("Skybox");
 	draw_list.push_back(skybox);
 
-	lightning_generator.setDt(0.1);//lightning generation per 0.1 seconds
+	lightning_generator.setDt(0.1f);//lightning generation per 0.1 seconds
 	lightning_generator.setSize(400);//size of the map
 
 	initializeMOM();
@@ -3951,7 +3951,7 @@ void initialize(int argc, char *argv[])
 	chipmonkOculusAnimController.setDefault(0);//stand is the default animation
 	AnimController chipmonk2AnimController;
 	chipmonk2AnimController.add(0 / 24.0, 5 / 24.0);//stand
-	chipmonk2AnimController.add(11 / 24.0, 19 / 24.0,1.2);//walk
+	chipmonk2AnimController.add((float)(11 / 24.0), (float)(19 / 24.0), 1.2f);//walk
 	chipmonk2AnimController.add(36 / 24.0, 9 / 24.0);//jump
 	chipmonk2AnimController.add(52 / 24.0, 10 / 24.0,2);//attack
 	chipmonk2AnimController.setDefault(0);//stand is the default animation
@@ -6052,7 +6052,7 @@ void initialize(int argc, char *argv[])
 
 
 
-	for (int i = 0; i < stationary_list.size(); i++)
+	for (uint i = 0; i < stationary_list.size(); i++)
 	{
 		stationary_list[i]->setAliveModelM(stationary_list[i]->getModelM());
 	}
@@ -6288,7 +6288,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setDuration(0.75);
 	MOM.mother_of_tower_shoot_1->setType(1);
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
-	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_shoot_1->setSampleDist(0.002f, 0.002f);
 	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
 	MOM.mother_of_tower_shoot_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_shoot_1->setFog(fog);
@@ -6306,8 +6306,8 @@ void initializeMOM(){
 	MOM.mother_of_tower_damage_1->setDuration(1);
 	MOM.mother_of_tower_damage_1->setType(0);
 	MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
-	MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
-	MOM.mother_of_tower_damage_1->setTransparency(0.9);
+	MOM.mother_of_tower_damage_1->setSampleDist(0.002f, 0.002f);
+	MOM.mother_of_tower_damage_1->setTransparency(0.9f);
 	MOM.mother_of_tower_damage_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_damage_1->setFog(fog);
 	MOM.mother_of_tower_damage_1->Bind();
@@ -6324,9 +6324,9 @@ void initializeMOM(){
 	MOM.mother_of_tower_explosion_1->setDuration(0.8);
 	MOM.mother_of_tower_explosion_1->setType(0);
 	MOM.mother_of_tower_explosion_1->setSampleCount(3, 3);
-	MOM.mother_of_tower_explosion_1->setSampleDist(0.002, 0.002);
-	MOM.mother_of_tower_explosion_1->setTransparency(0.9);
-	MOM.mother_of_tower_explosion_1->setBlurStrength(0.3);
+	MOM.mother_of_tower_explosion_1->setSampleDist(0.002f, 0.002f);
+	MOM.mother_of_tower_explosion_1->setTransparency(0.9f);
+	MOM.mother_of_tower_explosion_1->setBlurStrength(0.3f);
 	MOM.mother_of_tower_explosion_1->setFog(fog);
 	MOM.mother_of_tower_explosion_1->Bind();
 
@@ -6361,7 +6361,7 @@ void initializeMOM(){
 	MOM.mother_of_red_arrow->setType(1);
 	//MOM.mother_of_red_arrow->setSampleCount(5, 5);
 	//MOM.mother_of_red_arrow->setSampleDist(0.005, 0.005);
-	MOM.mother_of_red_arrow->setTransparency(0.9);
+	MOM.mother_of_red_arrow->setTransparency(0.9f);
 	//MOM.mother_of_red_arrow->setBlurStrength(1.0);
 	MOM.mother_of_red_arrow->setFog(emptyFog);
 	MOM.mother_of_red_arrow->Bind();
@@ -6379,7 +6379,7 @@ void initializeMOM(){
 	MOM.mother_of_green_arrow->setType(1);
 	//MOM.mother_of_green_arrow->setSampleCount(5, 5);
 	//MOM.mother_of_green_arrow->setSampleDist(0.005, 0.005);
-	MOM.mother_of_green_arrow->setTransparency(0.9);
+	MOM.mother_of_green_arrow->setTransparency(0.9f);
 	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
 	MOM.mother_of_green_arrow->setFog(emptyFog);
 	MOM.mother_of_green_arrow->Bind();
@@ -6396,9 +6396,9 @@ void initializeMOM(){
 	MOM.mother_of_tramp_effect->setDuration(1.0);
 	MOM.mother_of_tramp_effect->setType(1);
 	MOM.mother_of_tramp_effect->setSampleCount(3, 3);
-	MOM.mother_of_tramp_effect->setSampleDist(0.001, 0.001);
-	MOM.mother_of_tramp_effect->setTransparency(0.9);
-	MOM.mother_of_tramp_effect->setBlurStrength(0.3);
+	MOM.mother_of_tramp_effect->setSampleDist(0.001f, 0.001f);
+	MOM.mother_of_tramp_effect->setTransparency(0.9f);
+	MOM.mother_of_tramp_effect->setBlurStrength(0.3f);
 	MOM.mother_of_tramp_effect->setFog(fog);
 	MOM.mother_of_tramp_effect->Bind();
 
@@ -6414,8 +6414,8 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->setDuration(1.0);
 	MOM.mother_of_portal_effect->setType(1);
 	MOM.mother_of_portal_effect->setSampleCount(3, 3);
-	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
-	MOM.mother_of_portal_effect->setTransparency(0.8);
+	MOM.mother_of_portal_effect->setSampleDist(0.001f, 0.001f);
+	MOM.mother_of_portal_effect->setTransparency(0.8f);
 	MOM.mother_of_portal_effect->setBlurStrength(0.5);
 	MOM.mother_of_portal_effect->setFog(fog);
 	MOM.mother_of_portal_effect->Bind();
@@ -6432,8 +6432,8 @@ void initializeMOM(){
 	MOM.mother_of_orange_mark->setDuration(1.0);
 	MOM.mother_of_orange_mark->setType(1);
 	MOM.mother_of_orange_mark->setSampleCount(3, 3);
-	MOM.mother_of_orange_mark->setSampleDist(0.001, 0.001);
-	MOM.mother_of_orange_mark->setTransparency(0.8);
+	MOM.mother_of_orange_mark->setSampleDist(0.001f, 0.001f);
+	MOM.mother_of_orange_mark->setTransparency(0.8f);
 	MOM.mother_of_orange_mark->setBlurStrength(0.5);
 	MOM.mother_of_orange_mark->setFog(emptyFog);
 	MOM.mother_of_orange_mark->Bind();
@@ -6450,8 +6450,8 @@ void initializeMOM(){
 	MOM.mother_of_blue_mark->setDuration(1.0);
 	MOM.mother_of_blue_mark->setType(1);
 	MOM.mother_of_blue_mark->setSampleCount(3, 3);
-	MOM.mother_of_blue_mark->setSampleDist(0.001, 0.001);
-	MOM.mother_of_blue_mark->setTransparency(0.8);
+	MOM.mother_of_blue_mark->setSampleDist(0.001f, 0.001f);
+	MOM.mother_of_blue_mark->setTransparency(0.8f);
 	MOM.mother_of_blue_mark->setBlurStrength(0.5);
 	MOM.mother_of_blue_mark->setFog(emptyFog);
 	MOM.mother_of_blue_mark->Bind();
@@ -6468,8 +6468,8 @@ void initializeMOM(){
 	MOM.mother_of_force_field->setDuration(1.0);
 	MOM.mother_of_force_field->setType(1);
 	MOM.mother_of_force_field->setSampleCount(3, 3);
-	MOM.mother_of_force_field->setSampleDist(0.001, 0.001);
-	MOM.mother_of_force_field->setTransparency(0.8);
+	MOM.mother_of_force_field->setSampleDist(0.001f, 0.001f);
+	MOM.mother_of_force_field->setTransparency(0.8f);
 	MOM.mother_of_force_field->setBlurStrength(0.5);
 	MOM.mother_of_force_field->setFog(fog);
 	MOM.mother_of_force_field->Bind();
@@ -6480,7 +6480,7 @@ void initializePlayerMark(int main_player_ID){
 	QueryPerformanceCounter(&ct);
 	float up = 3.0;
 	if (main_player_ID % 2){
-		for (int i = 0; i < player_list.size(); i++){
+		for (uint i = 0; i < player_list.size(); i++){
 			if (i == main_player_ID)
 				continue;
 			if (i % 2){
@@ -6498,7 +6498,7 @@ void initializePlayerMark(int main_player_ID){
 		}
 	}
 	else{
-		for (int i = 0; i < player_list.size(); i++){
+		for (uint i = 0; i < player_list.size(); i++){
 			if (i == main_player_ID)
 				continue;
 			if (i % 2){

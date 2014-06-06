@@ -11,6 +11,8 @@
 #include <vector>
 #include "constants.h"
 #include "Structures.h"
+#include <Qt/QtGui/QImage> 
+#include <Qt/QtOpenGL/QGLWidget>
 
 
 
@@ -234,7 +236,7 @@ public:
 	{
 		std::vector<int> result;
 		std::string s = (*vec)[PPDL_MAT].first;
-		for (int um = 0; um < s.length(); um += PPDL_INT_LENGTH){
+		for (uint um = 0; um < s.length(); um += PPDL_INT_LENGTH){
 			result.push_back(atoi(s.substr(um, PPDL_INT_LENGTH).c_str()));
 		}
 		return result;
@@ -247,12 +249,12 @@ public:
 		std::string index = "";
 		int printIndex = 0;
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length() - 1; i += 8)
+		for (uint i = 0; i < s.length() - 1; i += 8)
 		{
 
 			index = "";
 
-			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			for (uint j = i + (uint)PLINDEX_BEGIN; j <= i + (uint)PLINDEX_END; j++)
 			{
 				index += s.c_str()[j];
 			}
@@ -274,11 +276,11 @@ public:
 		std::string index = "";
 
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length() - 1; i += 8)
+		for (uint i = 0; i < s.length() - 1; i += 8)
 		{
 
 			index = "";
-			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			for (uint j = i + (uint)PLINDEX_BEGIN; j <= i + (uint)PLINDEX_END; j++)
 			{
 				index += s.c_str()[j];
 			}
@@ -298,17 +300,17 @@ public:
 		std::string s = (*vec)[PLATFORM_STATUS].first;
 
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length() - 1; i += 8)
+		for (uint i = 0; i < s.length() - 1; i += 8)
 		{
 
 			index = "";
 			health = "";
-			for (int j = i + PLHEALTH_BEGIN; j <= i + PLHEALTH_END; j++)
+			for (uint j = i + (uint)PLHEALTH_BEGIN; j <= i + (uint)PLHEALTH_END; j++)
 			{
 				health += s.c_str()[j];
 			}
 
-			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
+			for (uint j = i + (uint)PLINDEX_BEGIN; j <= i + (uint)PLINDEX_END; j++)
 			{
 				index += s.c_str()[j];
 			}

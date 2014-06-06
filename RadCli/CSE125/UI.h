@@ -256,7 +256,7 @@ public:
 		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
 		target_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.5f, 0.3f, -1.0f)));
 
-		target_frame = new UI_Panel(-0.15f, 0.15f, -0.1, 0.1f);
+		target_frame = new UI_Panel(-0.15f, 0.15f, -0.1f, 0.1f);
 		target_frame->setColor(vec3(1.0, 0.0, 0.0));
 		target_frame->setShader(sdrCtl.getShader("basic_2D"));
 		target_frame->loadColorTex("img/UI_elements/healthBAR.png", "PNG");
@@ -831,13 +831,13 @@ public:
 
 	void teamColor(int t){
 		if (t == 0 || t == 2){
-			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
+			team_color = new UI_Panel(-0.28f, -0.19f, -0.035f, 0.05f);
 			team_color->setColor(vec3(0.0, 0.5, 0.0));
 			team_color->setShader(sdrCtl.getShader("basic_2D"));
 			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 		}
 		else{
-			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
+			team_color = new UI_Panel(-0.28f, -0.19f, -0.035f, 0.05f);
 			team_color->setColor(vec3(0.0, 0.6, 0.9));
 			team_color->setShader(sdrCtl.getShader("basic_2D"));
 			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
@@ -929,7 +929,7 @@ private:
 	int p_up = 0;
 	bool team_color_set = false;
 	float power_up_start = 0;
-	float cooldown = 7.7;
+	float cooldown = 7.7f;
 	int last_p = 0;
 	int p_ID;
 
@@ -1640,14 +1640,14 @@ class End_Screen
 public:
 	End_Screen()
 	{
-		victory = new UI_Panel(-0.9f, 0.9f, -0.3, 0.3);
+		victory = new UI_Panel(-0.9f, 0.9f, -0.3f, 0.3f);
 		victory->setColor(vec3(1.0, 0.0, 0.0));
 		victory->setShader(sdrCtl.getShader("basic_2D"));
 		victory->loadColorTex("img/UI_elements/victory.png", "PNG");
 		victory->setTex(true);
 		victory->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.05f, 0.0, -1.0f)));
 
-		defeat = new UI_Panel(-0.9f, 0.9f, -0.3, 0.3);
+		defeat = new UI_Panel(-0.9f, 0.9f, -0.3f, 0.3f);
 		defeat->setColor(vec3(1.0, 0.0, 0.0));
 		defeat->setShader(sdrCtl.getShader("basic_2D"));
 		defeat->loadColorTex("img/UI_elements/defeat.png", "PNG");

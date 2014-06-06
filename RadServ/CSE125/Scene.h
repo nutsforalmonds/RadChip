@@ -229,25 +229,25 @@ public:
 			counter3 = -counter3;
 			counter2 = 0;
 		}
-		for (int i = 0; i < elevator.size(); ++i){
+		for (uint i = 0; i < elevator.size(); ++i){
 			if (elevator[i]->getDirection() != 1){
 				if (elevator[i]->getDirection() == -1){
 					elevator[i]->preTrans(glm::translate(vec3(0, 0, -counter3)));
 					vector<Object*> elplayers = elevator[i]->getPlayers();
-					for (int j = 0; j < elplayers.size(); ++j)
+					for (uint j = 0; j < elplayers.size(); ++j)
 						elplayers[j]->preTrans(glm::translate(vec3(0, 0, -counter3)));
 				}
 				else {
 					elevator[i]->preTrans(glm::translate(vec3(0, 0, counter3)));
 					vector<Object*> elplayers = elevator[i]->getPlayers();
-					for (int j = 0; j < elplayers.size(); ++j)
+					for (uint j = 0; j < elplayers.size(); ++j)
 						elplayers[j]->preTrans(glm::translate(vec3(0, 0, counter3)));
 				}
 			}
 			else {
 				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
 				vector<Object*> elplayers = elevator[i]->getPlayers();
-				for (int j = 0; j < elplayers.size(); ++j)
+				for (uint j = 0; j < elplayers.size(); ++j)
 					elplayers[j]->preTrans(glm::translate(vec3(0, counter3, 0)));
 				/*
 				ofstream ofile;
@@ -394,14 +394,14 @@ public:
 		bool inX, inY, inZ;
 		AABB playerAABB;
 		vec3 powerUpPos;
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			playerAABB = player[i]->getAABB();
 			//iterate through list of power up types
-			for (int j = 0; j < powerUps.size(); j++)
+			for (uint j = 0; j < powerUps.size(); j++)
 			{
 				//iterate through all billboard positions for a given powerup, in case there are multiple copies of a type
-				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
+				for (uint l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
 					inX = (playerAABB.min[0] <= powerUpPos[0] + 2) && (powerUpPos[0] - 2 <= playerAABB.max[0]);
@@ -565,7 +565,7 @@ public:
 	{
 		int team0 = 0;
 		int team1 = 0;
-		for (int i = 0; i < tower.size(); i++)
+		for (uint i = 0; i < tower.size(); i++)
 		{
 			if (tower[i]->getHealth() < 1)
 			{
@@ -761,7 +761,7 @@ public:
 		if (pUpCooldown[FARTHERSHOOT] > 0)
 			pUpCooldown[FARTHERSHOOT] -= 1;
 
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			if (player[i]->getPowerUp() != 0)
 			{
@@ -825,7 +825,7 @@ public:
 			}
 		}
 
-		for (int i = 0; i < stationary.size(); i++)
+		for (uint i = 0; i < stationary.size(); i++)
 		{
 			if (stationary[i]->getIsPlatformDamage())
 			{
@@ -1505,7 +1505,7 @@ public:
 		md53->setAliveModelM(md53->getModelM());
 		addPlayer(md53);
 
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			playerDamaged.push_back(false);
 			playerDead.push_back(false);
@@ -1907,7 +1907,7 @@ public:
 		elevator.push_back(ele_04);
 
 		counter2 = 0;
-		counter3 = 0.05;
+		counter3 = 0.05f;
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 		//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
@@ -2361,7 +2361,7 @@ public:
 
 
 
-		for (int i = 0; i < stationary.size(); i++)
+		for (uint i = 0; i < stationary.size(); i++)
 		{
 			platformDamaged.push_back(false);
 			platformDead.push_back(false);
