@@ -625,11 +625,11 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(20);
+	pjt->setDistance(40);
 	//Name and type
 	pjt->setName("Tower Projectile");
-	pjt->setSpeed(20);
-	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setSpeed(40);
+	pjt->setVelocity(glm::normalize(direction)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
