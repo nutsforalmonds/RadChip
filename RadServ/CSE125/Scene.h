@@ -872,7 +872,7 @@ public:
 		{
 			for (uint j = 0; j < player.size(); j++)
 			{
-				if (projectile[i]->getTeamID() == player[j]->getTeamID())
+				if (player[j]->getHealth()<1 || projectile[i]->getTeamID() == player[j]->getTeamID())
 					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = player[j]->getAABB();
