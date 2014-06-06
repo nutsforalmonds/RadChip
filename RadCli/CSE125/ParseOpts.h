@@ -247,8 +247,9 @@ public:
 		std::string index = "";
 		int printIndex = 0;
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length(); i += 8)
+		for (int i = 0; i < s.length() - 1; i += 8)
 		{
+
 			index = "";
 
 			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
@@ -273,8 +274,9 @@ public:
 		std::string index = "";
 
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length(); i += 8)
+		for (int i = 0; i < s.length() - 1; i += 8)
 		{
+
 			index = "";
 			for (int j = i + PLINDEX_BEGIN; j <= i + PLINDEX_END; j++)
 			{
@@ -296,8 +298,9 @@ public:
 		std::string s = (*vec)[PLATFORM_STATUS].first;
 
 		//every platform status set is made up of p0dk, so this should iterate through every set
-		for (int i = 0; i < s.length(); i += 8)
+		for (int i = 0; i < s.length() - 1; i += 8)
 		{
+
 			index = "";
 			health = "";
 			for (int j = i + PLHEALTH_BEGIN; j <= i + PLHEALTH_END; j++)

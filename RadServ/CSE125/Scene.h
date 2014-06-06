@@ -678,7 +678,7 @@ public:
 			player[i]->addVelocity(gravity*extra_speed);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
-	}
+	} 
 	void resolveTowerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < tower.size(); i++){
@@ -2366,9 +2366,14 @@ public:
 			platformDamaged.push_back(false);
 			platformDead.push_back(false);
 		}
-
-
-
+		//cout << stationary.size() << " " << platformDamaged.size() << " " << platformDead.size() << endl;
+		//int test = 0;
+		//for (int i = 0; i < stationary.size(); i++)
+		//{
+		//	if (stationary[i]->getIsPlatformDamage())
+		//		test++;
+		//}
+		//cout << test << endl;
 
 
 

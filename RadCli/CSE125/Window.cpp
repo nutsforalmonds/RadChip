@@ -1731,6 +1731,7 @@ void server_update(int value){
 		std::vector<std::pair<int, bool>> platformDamage = parseOpts->getPlatformDamage(recvVec);
 		std::vector<std::pair<int, bool>> platformDead = parseOpts->getPlatformDead(recvVec);
 		std::vector<std::pair<int, int>> platformHealth = parseOpts->getPlatformHealth(recvVec);
+		//cout << stationary_list.size() << " " << platformDamage.size() << " " << platformDead.size() << " " << platformHealth.size() << endl;
 		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
 		for (int i = 0; i < platformDead.size(); i++)
 		{
