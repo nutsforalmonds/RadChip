@@ -4846,7 +4846,7 @@ void initialize(int argc, char *argv[])
 
 	// tower in the middle
 	Mesh* tower200 = new Mesh();
-	tower200->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
+	tower200->LoadMesh("Model/2Tower_6_bone.dae", false);
 	tower200->setShader(sdrCtl.getShader("basic_model"));
 	tower200->setShadowTex(shadow_map_id);
 	tower200->setAdjustM(glm::translate(vec3(0.0, 2.9, 0.0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.6, 0.6, 0.6)));
