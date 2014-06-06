@@ -1207,6 +1207,7 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	string s = "It was the best of times, it was the worst of times";
 	static time_t timer = clock();
 
 	if (clock() - timer >= CLOCKS_PER_SEC){
@@ -1402,6 +1403,7 @@ void Window::displayCallback(void)
 		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
 
 		myUI->draw();
+		myUI->drawPortrait(playerID, s);
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
@@ -1704,7 +1706,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0); 
+				myGameMenu->setDeath(PLAYER0);
 				dead[PLAYER0] = true;
 			}
 		}
@@ -1723,7 +1725,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player1_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0);
+				myGameMenu->setDeath(PLAYER1);
 				dead[PLAYER1] = true;
 			}
 		}
@@ -1742,7 +1744,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player2_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(2);
+				myGameMenu->setDeath(PLAYER2);
 				dead[PLAYER2] = true;
 			}
 		}
@@ -1761,7 +1763,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player3_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(3);
+				myGameMenu->setDeath(PLAYER3);
 				dead[PLAYER3] = true;
 			}
 		}
