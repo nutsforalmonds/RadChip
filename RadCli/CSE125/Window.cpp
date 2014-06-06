@@ -154,6 +154,8 @@ float nearClip = (float)0.1;
 float farClip = 1000.0;
 float fov = 55.0;
 
+ParticleAnimated* force_field[2];
+
 vec3 EyePoint = vec3(0,0,3);
 vec3 CenterPoint = vec3(0,0,0);
 mat4 Projection;
@@ -203,6 +205,7 @@ struct Mother{
 	ParticleAnimated* mother_of_portal_effect;
 	ParticleAnimated* mother_of_orange_mark;
 	ParticleAnimated* mother_of_blue_mark;
+	ParticleAnimated* mother_of_force_field;
 }MOM;
 
 int texScreenWidth = 512;
@@ -827,6 +830,15 @@ void Window::idleCallback(void)
 			}
 		}
 
+		for (uint i = 0; i < 2; i++){
+			if (!force_field[i]->update()){
+				force_field[i]->setStartTime(ct);
+				force_field[i]->update();
+			}
+		}
+
+		
+
 		//lightning
 		if (lightning_generator.generate(lightning_pos,3)){//generates 3 bolts per lightning generation
 			for (uint i = 0; i < lightning_pos.size(); i++){
@@ -1329,6 +1341,12 @@ void Window::displayCallback(void)
 			//FMOD_VECTOR pt = { temp.x, temp.y, temp.z };
 			//sound_3d_light->setPosition(pt);
 			//sound_3d_light->Play3D(View);
+		}
+		if (TowerHP[2]>0 || TowerHP[3]>0){
+			force_field[0]->draw();
+		}
+		if (TowerHP[0]>0 || TowerHP[1]>0){
+			force_field[1]->draw();
 		}
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
@@ -5045,6 +5063,11 @@ void initialize(int argc, char *argv[])
 	tower100->setFog(fog);
 	tower_list.push_back(tower100);
 
+	//force field effect
+	force_field[0] = new ParticleAnimated(*(MOM.mother_of_force_field));
+	force_field[0]->setFollow(tower100, vec3(0, 2, 0), 1, &View);
+	force_field[0]->setStartTime(ct);
+
 	//diag plat 0
 	Cube* platform_206 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
@@ -5463,6 +5486,13 @@ void initialize(int argc, char *argv[])
 	tower200->setShininess(30);
 	tower200->setFog(fog);
 	tower_list.push_back(tower200);
+
+	//force field effect
+	force_field[1] = new ParticleAnimated(*(MOM.mother_of_force_field));
+	force_field[1]->setFollow(tower200, vec3(0, 2, 0), 1, &View);
+	force_field[1]->setStartTime(ct);
+
+
 
 	//diag plat 0
 	Cube* platform_306 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
@@ -6134,6 +6164,24 @@ void initializeMOM(){
 	MOM.mother_of_blue_mark->setBlurStrength(0.5);
 	MOM.mother_of_blue_mark->setFog(emptyFog);
 	MOM.mother_of_blue_mark->Bind();
+
+	MOM.mother_of_force_field = new ParticleAnimated();
+	MOM.mother_of_force_field->Init("img/sprite_sheets/magic_007.png", "PNG");
+	MOM.mother_of_force_field->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_force_field->setPosition(vec3(0.0f, 1.3f, 0.0f));
+	MOM.mother_of_force_field->setWidth(8.0f);
+	MOM.mother_of_force_field->setHeight(8.0f);
+	MOM.mother_of_force_field->setNumColumn(5);
+	MOM.mother_of_force_field->setNumRow(4);
+	MOM.mother_of_force_field->setValidFrame(0, 19);
+	MOM.mother_of_force_field->setDuration(1.0);
+	MOM.mother_of_force_field->setType(1);
+	MOM.mother_of_force_field->setSampleCount(3, 3);
+	MOM.mother_of_force_field->setSampleDist(0.001, 0.001);
+	MOM.mother_of_force_field->setTransparency(0.8);
+	MOM.mother_of_force_field->setBlurStrength(0.5);
+	MOM.mother_of_force_field->setFog(fog);
+	MOM.mother_of_force_field->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){
