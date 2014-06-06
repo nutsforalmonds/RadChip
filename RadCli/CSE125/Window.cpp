@@ -636,8 +636,8 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	pjt->setDistance(30);
 	//Name and type
 	pjt->setName("Tower Projectile");
-	pjt->setSpeed(40);
-	pjt->setVelocity(glm::normalize(direction)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setSpeed(60);
+	pjt->setVelocity(glm::normalize(direction)*60.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
@@ -5856,7 +5856,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setNumColumn(5);
 	MOM.mother_of_tower_shoot_1->setNumRow(6);
 	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
-	MOM.mother_of_tower_shoot_1->setDuration(1);
+	MOM.mother_of_tower_shoot_1->setDuration(0.75);
 	MOM.mother_of_tower_shoot_1->setType(1);
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
 	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);

@@ -1515,9 +1515,9 @@ public:
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(40);
-		tw0->setShootSpeed(40);
+		tw0->setShootSpeed(60);
 		tw0->setHealth(20);
-		tw0->setDamage(-1);
+		tw0->setDamage(-3);
 		tw0->setType(MODEL);
 		tw0->setName("Tower Model0");
 		tw0->setTeamID(0);
@@ -1530,9 +1530,9 @@ public:
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(40);
-		tw1->setShootSpeed(40);
+		tw1->setShootSpeed(60);
 		tw1->setHealth(20);
-		tw1->setDamage(-1);
+		tw1->setDamage(-3);
 		tw1->setType(MODEL);
 		tw1->setName("Tower Model0");
 		tw1->setTeamID(0);
@@ -1545,9 +1545,9 @@ public:
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(40);
-		tw2->setShootSpeed(40);
+		tw2->setShootSpeed(60);
 		tw2->setHealth(20);
-		tw2->setDamage(-1);
+		tw2->setDamage(-3);
 		tw2->setType(MODEL);
 		tw2->setName("Tower Model1");
 		tw2->setTeamID(1);
@@ -1560,9 +1560,9 @@ public:
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(40);
-		tw3->setShootSpeed(40);
+		tw3->setShootSpeed(60);
 		tw3->setHealth(20);
-		tw3->setDamage(-1);
+		tw3->setDamage(-3);
 		tw3->setType(MODEL);
 		tw3->setName("Tower Model1");
 		tw3->setTeamID(1);
@@ -1577,9 +1577,9 @@ public:
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
 		tower100->setShootRange(40);
-		tower100->setShootSpeed(40);
+		tower100->setShootSpeed(60);
 		tower100->setHealth(20);
-		tower100->setDamage(-1);
+		tower100->setDamage(-3);
 		tower100->setType(MODEL);
 		tower100->setName("octo base");
 		tower100->setTeamID(1);
@@ -1596,9 +1596,9 @@ public:
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
 		tower200->setShootRange(40);
-		tower200->setShootSpeed(40);
+		tower200->setShootSpeed(60);
 		tower200->setHealth(20);
-		tower200->setDamage(-1);
+		tower200->setDamage(-3);
 		tower200->setType(MODEL);
 		tower200->setName("nut base");
 		tower200->setTeamID(0);
