@@ -3856,6 +3856,27 @@ void initialize(int argc, char *argv[])
 	platform_10->setAliveModelM(platform_10->getModelM());
 	stationary_list.push_back(platform_10);
 
+	//tower island
+	Cube* platform_10b = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+	//platform_09->setSpeed(5); 
+	platform_10b->setKd(vec3(0.8, 0.8, 0.0));
+	platform_10b->setKa(vec3(0.3, 0.3, 0.0));
+	platform_10b->setKs(vec3(0.4, 0.4, 0.0));
+	platform_10b->setShininess(100);
+	platform_10b->setFog(fog);
+	platform_10b->setReflectFactor(vec2(0.2, 0.5));
+	platform_10b->setEta(0.5);
+	platform_10b->setCubeMapUnit(3);
+	platform_10b->setSpeed(5);
+	platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 100.0)));
+	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_10b->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_10b->setShadowTex(shadow_map_id);
+	platform_10b->setType("Cube");
+	platform_10b->setName("Test Platform");
+	platform_10b->setAliveModelM(platform_10->getModelM());
+	stationary_list.push_back(platform_10b);
+
 	//2nd level
 	Cube* platform_11 = new Cube(-10.0, 10.0, -0.5, 0.5, -5, 5);
 	//platform_06->setSpeed(5); 
