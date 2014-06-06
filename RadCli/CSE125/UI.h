@@ -1552,8 +1552,9 @@ public:
 		selected_button->  ~UI_Panel();
 	}
 
-	int draw(int x)
+	int draw(int x, int wins)
 	{
+		char test[100];
 
 		glDisable(GL_DEPTH_TEST);
 
@@ -1572,6 +1573,10 @@ public:
 			selected_button->draw();
 		}
 
+		k = to_string(wins);
+
+		sprintf_s(test, "%s %s", "ROUNDS WON: ", k.c_str());
+		RenderString((Window::width / 2) - 120, Window::height / 2 - 96, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)test, vec3(1.0f, 1.0f, 0.0f));
 		glEnable(GL_DEPTH_TEST);
 
 		return 0;
@@ -1623,6 +1628,7 @@ private:
 	UI_Panel * defeat;
 	UI_Panel * button;
 	UI_Panel * selected_button;
+	string k;
 
 	bool drawButtonHighlight = false;
 };
