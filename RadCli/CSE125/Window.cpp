@@ -102,7 +102,7 @@ SoundSystem *mySoundSystem;
 Music *menuMusic;
 Music *gameMusic;
 Music *gameThunder;
-Sound* testSound[20];
+Sound* testSound[NumberOfSounds];
 Sound* gameThunder2;
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
@@ -195,6 +195,8 @@ struct Mother{
 	ParticleAnimated* mother_of_tower_damage_1;
 	ParticleAnimated* mother_of_tower_explosion_1;
 	ParticleAnimated* mother_of_health_potion;
+	ParticleAnimated* mother_of_red_arrow;
+	ParticleAnimated* mother_of_green_arrow;
 }MOM;
 
 int texScreenWidth = 512;
@@ -227,6 +229,7 @@ int sprint_up = 10;
 //bool keyState[4];//up,down,left,right
 
 void initializeMOM();
+void initializePlayerMark(int main_player_ID);
 
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
@@ -628,10 +631,18 @@ void towerKill(int towerID){
 	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
+
+	if (towerID < 2){
+		myUI->setTowers('c');
+	}
+	else if (towerID > 1)
+	{
+		myUI->setTowers('m');
+	}
 }
 void powerUpAnimation(int playerID){
 	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
-	power_up->setModelM(player_list[playerID]->getModelM()*glm::translate(vec3(0,0.7,0) + 0.5f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - player_list[playerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	power_up->setFollow(player_list[playerID], vec3(0, 1.2, 0), 0.6f, &View);
 	LARGE_INTEGER ct;
 	QueryPerformanceCounter(&ct);
 	power_up->setStartTime(ct);
@@ -1670,6 +1681,8 @@ void server_update(int value){
 			}
 		}
 
+		//display players current power up
+		myUI->setPowerUP(parseOpts->getPPowerUp(recvVec, playerID));
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){
@@ -2060,7 +2073,7 @@ void keyboard(unsigned char key, int, int){
 	case 0:
 		if (key == ' '){
 			if (space_up){
-				testSound[2]->Play();
+				//testSound[SoundVegeta]->Play();
 				//myClientState->setState(1);
 			}
 		}
@@ -2167,13 +2180,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				testSound[1]->Play();
+				testSound[SoundJumpOgg]->Play();
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			//testSound[2]->Play();
+			//testSound[SoundVegeta]->Play();
 			myDeathScreen->setDeathClock(clock());
 			myClientState->setState(3);
 		}
@@ -2317,7 +2330,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//	testSound[SoundJumpOgg]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -2393,7 +2406,7 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				if (!connected){
 					
 					//Player mats
@@ -2428,6 +2441,7 @@ void mouseFunc(int button, int state, int x, int y)
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();
+						initializePlayerMark(playerID);
 						std::cout << "pid: " << playerID << std::endl;
 						//system("pause");
 					}
@@ -2453,7 +2467,7 @@ void mouseFunc(int button, int state, int x, int y)
 				server_update(0);
 			}
 			else if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				Sleep(1250);
 				running = false;
 				exit(0);
@@ -2476,7 +2490,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[9]->Play();
+					testSound[SoundSlap]->Play();
 					///scene->basicAttack(playerID);
 
 					player_list[playerID]->setAnimOnce(3, time);
@@ -2490,9 +2504,7 @@ void mouseFunc(int button, int state, int x, int y)
 				if (right_mouse_up){
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
-
-					testSound[8]->Play();
-
+					testSound[SoundThrow]->Play();
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -2506,7 +2518,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-				//	testSound[5]->Play();
+				//	testSound[SoundPrePunch]->Play();
 				}
 				else
 				{
@@ -2536,11 +2548,11 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = myGameMenu->checkClick(newX, newY);
 			if (click == 1){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(1);
 			}
 			if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(0);
 				gameMusic->Stop();
 				//gameThunder->Stop();
@@ -2609,7 +2621,7 @@ void passiveMotionFunc(int x, int y){
 		sound = myMainMenu->checkHighlight(newX, newY);
 		if (sound){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2639,7 +2651,7 @@ void passiveMotionFunc(int x, int y){
 		sound2 = myGameMenu->checkHighlight(newX, newY);
 		if (sound2){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2656,7 +2668,7 @@ void passiveMotionFunc(int x, int y){
 		sound3 = myDeathScreen->checkHighlight(newX, newY);
 		if (sound3){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2674,7 +2686,7 @@ void passiveMotionFunc(int x, int y){
 		sound5 = endScreen->checkHighlight(newX, newY);
 		if (sound5){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2694,7 +2706,7 @@ void specialKeyboardFunc(int key, int x, int y){
 	case 1:
 		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 			if (sprint_up >= 10){
-			//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//	testSound[SoundJumpOgg1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				//scene->jump(playerID);
 			}
 			if (sprint_up > 0){
@@ -2860,7 +2872,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
-	myDeathScreen->setupSound(testSound[10]);
+	myDeathScreen->setupSound(testSound[SoundCount]);
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
@@ -4252,20 +4264,20 @@ int loadAudio(){
 		glutSwapBuffers();
 
 		testSound[i] = new Sound(mySoundSystem, path.c_str(), false);
-		if (i == 8 || i == 9){
+		if (i == SoundThrow || i == SoundSlap){
 			testSound[i]->setVolume(0.75);
 			testSound[i]->setVolume(0.75);
 		}
-		else if (i == 0 || i == 1){
+		else if (i == SoundJumpWav || i == SoundJumpOgg){
 			testSound[i]->setVolume(0.25);
 		}
-		else if (i == 10){
+		else if (i == SoundCount){
 			testSound[i]->setVolume(0.15);
 		}
 		else{
 			testSound[i]->setVolume(0.5);
 		}
-		sound_list.push_back(testSound[0]);
+		sound_list.push_back(testSound[i]);
 		printf("done!\n");
 
 		//Print to game window
@@ -4428,7 +4440,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
 	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
-	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_shoot_1->setFog(fog);
 	MOM.mother_of_tower_shoot_1->Bind();
 
@@ -4443,10 +4455,10 @@ void initializeMOM(){
 	MOM.mother_of_tower_damage_1->setValidFrame(20, 39);
 	MOM.mother_of_tower_damage_1->setDuration(1);
 	MOM.mother_of_tower_damage_1->setType(0);
-	//MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
-	//MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_damage_1->setTransparency(0.9);
-	//MOM.mother_of_tower_damage_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_damage_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_damage_1->setFog(fog);
 	MOM.mother_of_tower_damage_1->Bind();
 
@@ -4472,8 +4484,8 @@ void initializeMOM(){
 	MOM.mother_of_health_potion->Init("img/sprite_sheets/heal_003.png", "PNG");
 	MOM.mother_of_health_potion->setShader(sdrCtl.getShader("billboard_anim"));
 	MOM.mother_of_health_potion->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_health_potion->setWidth(2.0f);
-	MOM.mother_of_health_potion->setHeight(2.0f);
+	MOM.mother_of_health_potion->setWidth(4.0f);
+	MOM.mother_of_health_potion->setHeight(4.0f);
 	MOM.mother_of_health_potion->setNumColumn(5);
 	MOM.mother_of_health_potion->setNumRow(4);
 	MOM.mother_of_health_potion->setValidFrame(0, 19);
@@ -4485,5 +4497,82 @@ void initializeMOM(){
 	//MOM.mother_of_health_potion->setBlurStrength(0.3);
 	MOM.mother_of_health_potion->setFog(fog);
 	MOM.mother_of_health_potion->Bind();
+
+	MOM.mother_of_red_arrow = new ParticleAnimated();
+	MOM.mother_of_red_arrow->Init("img/enemySign.png", "PNG");
+	MOM.mother_of_red_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_red_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_red_arrow->setWidth(2.0f);
+	MOM.mother_of_red_arrow->setHeight(2.0f);
+	MOM.mother_of_red_arrow->setNumColumn(1);
+	MOM.mother_of_red_arrow->setNumRow(1);
+	MOM.mother_of_red_arrow->setValidFrame(0, 0);
+	MOM.mother_of_red_arrow->setDuration(1.0);
+	MOM.mother_of_red_arrow->setType(1);
+	//MOM.mother_of_red_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_red_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_red_arrow->setTransparency(0.9);
+	//MOM.mother_of_red_arrow->setBlurStrength(1.0);
+	MOM.mother_of_red_arrow->setFog(emptyFog);
+	MOM.mother_of_red_arrow->Bind();
+
+	MOM.mother_of_green_arrow = new ParticleAnimated();
+	MOM.mother_of_green_arrow->Init("img/friendSign.png", "PNG");
+	MOM.mother_of_green_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_green_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_green_arrow->setWidth(2.0f);
+	MOM.mother_of_green_arrow->setHeight(2.0f);
+	MOM.mother_of_green_arrow->setNumColumn(1);
+	MOM.mother_of_green_arrow->setNumRow(1);
+	MOM.mother_of_green_arrow->setValidFrame(0, 0);
+	MOM.mother_of_green_arrow->setDuration(1.0);
+	MOM.mother_of_green_arrow->setType(1);
+	//MOM.mother_of_green_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_green_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_green_arrow->setTransparency(0.9);
+	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
+	MOM.mother_of_green_arrow->setFog(emptyFog);
+	MOM.mother_of_green_arrow->Bind();
 }
 
+void initializePlayerMark(int main_player_ID){
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	float up = 3.0;
+	if (main_player_ID % 2){
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+	else{
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+}

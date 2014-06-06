@@ -63,7 +63,7 @@
             "frag": "Shaders/pe_system_anim.frag"
         }
     ],
-    "num_audio": 11,
+    "num_audio": 30,
     "audio": [
         {
             "name": "Jump Wav",
@@ -108,6 +108,82 @@
         {
             "name": "count",
             "path": "Sound/Countdown.mp3"
+        },
+        {
+            "name": "Defeat",
+            "path": "Sound/Defeat.wav"
+        },
+        {
+            "name": "DoubleKillE",
+            "path": "Sound/DoubleKillE.wav"
+        },
+        {
+            "name": "DoubleKillY",
+            "path": "Sound/DoubleKillY.wav"
+        },
+        {
+            "name": "FirstBlood",
+            "path": "Sound/FirstBlood.wav"
+        },
+        {
+            "name": "KillingSpreeE",
+            "path": "Sound/KillingSpreeE.wav"
+        },
+        {
+            "name": "KillingSpreeY",
+            "path": "Sound/KillingSpreeY.wav"
+        },
+        {
+            "name": "KillTurretH",
+            "path": "Sound/KillTurretH.wav"
+        },
+        {
+            "name": "KillTurretH2",
+            "path": "Sound/KillTurretH2.wav"
+        },
+        {
+            "name": "Qfirstblood",
+            "path": "Sound/Qfirstblood.mp3"
+        },
+        {
+            "name": "Qkillingspree",
+            "path": "Sound/Qkillingspree.mp3"
+        },
+        {
+            "name": "Qrampage",
+            "path": "Sound/Qrampage.mp3"
+        },
+        {
+            "name": "Qunstoppable",
+            "path": "Sound/Qunstoppable.mp3"
+        },
+        {
+            "name": "TurretAlmostKillEne",
+            "path": "Sound/TurretAlmostKillEne.wav"
+        },
+        {
+            "name": "TurretAlmostKillYour",
+            "path": "Sound/TurretAlmostKillYour.wav"
+        },
+        {
+            "name": "TurretAttackedYourT",
+            "path": "Sound/TurretAttackedYourT.wav"
+        },
+        {
+            "name": "TurretDieYourTeam",
+            "path": "Sound/TurretDieYourTeam.wav"
+        },
+        {
+            "name": "TurretHalfKillEnemy",
+            "path": "Sound/TurretHalfKillEnemy.wav"
+        },
+        {
+            "name": "TurretHalfKillYourT",
+            "path": "Sound/TurretHalfKillYourT.wav"
+        },
+        {
+            "name": "Victory",
+            "path": "Sound/Victory.wav"
         }
     ],
     "num_texture": 6,
