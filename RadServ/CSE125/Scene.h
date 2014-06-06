@@ -1624,6 +1624,15 @@ public:
 		platform_10->setName("Test Platform");
 		addStationary(platform_10);
 
+		//tower island
+		Cube* platform_10b = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+		//platform_01->setSpeed(5); 
+		platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 100.0)));
+		platform_10b->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
+		platform_10b->setType(CUBE);
+		platform_10b->setName("Test Platform");
+		addStationary(platform_10b);
+
 		//2nd level
 		Cube* platform_11 = new Cube(-10, 10, -0.5, 0.5, -5, 5);
 		//platform_01->setSpeed(5); 
@@ -1706,7 +1715,7 @@ public:
 		//platform_01->setSpeed(5); 
 		tramp_05->postTrans(glm::translate(vec3(-15, 6.0, 0)));
 		tramp_05->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tramp_05->setBoost(vec3(0, 60, 0));
+		tramp_05->setBoost(vec3(0, 30, 0));
 		tramp_05->setType(TRAMPOLINE);
 		tramp_05->setName("Test Trampoline");
 		addStationary(tramp_05);
@@ -1716,7 +1725,7 @@ public:
 		//platform_01->setSpeed(5); 
 		tramp_06->postTrans(glm::translate(vec3(15, 7.0, 0)));
 		tramp_06->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tramp_06->setBoost(vec3(0, 60, 0));
+		tramp_06->setBoost(vec3(0, 30, 0));
 		tramp_06->setType(TRAMPOLINE);
 		tramp_06->setName("Test Trampoline");
 		addStationary(tramp_06);
