@@ -201,6 +201,8 @@ struct Mother{
 	ParticleAnimated* mother_of_green_arrow;
 	ParticleAnimated* mother_of_tramp_effect;
 	ParticleAnimated* mother_of_portal_effect;
+	ParticleAnimated* mother_of_orange_mark;
+	ParticleAnimated* mother_of_blue_mark;
 }MOM;
 
 int texScreenWidth = 512;
@@ -3317,6 +3319,9 @@ void initialize(int argc, char *argv[])
 
 	initializeMOM();
 
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
 	//p_anim->setShader(sdrCtl.getShader("billboard_anim"));
@@ -3416,6 +3421,12 @@ void initialize(int argc, char *argv[])
 	tower0->setFog(fog);
 	tower_list.push_back(tower0);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower0 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower0->setFollow(tower0, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower0->setStartTime(ct);
+	panim_list.push_back(mark_tower0);
+
 	t0_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t0_ps_01->setShader(sdrCtl.getShader("pe_torus"));
 	t0_ps_01->setType("Particle_System");
@@ -3488,6 +3499,12 @@ void initialize(int argc, char *argv[])
 	tower1->setShininess(30);
 	tower1->setFog(fog);
 	tower_list.push_back(tower1);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower1 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower1->setFollow(tower1, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower1->setStartTime(ct);
+	panim_list.push_back(mark_tower1);
 
 	t1_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t1_ps_01->setShader(sdrCtl.getShader("pe_torus"));
@@ -3562,6 +3579,12 @@ void initialize(int argc, char *argv[])
 	tower2->setFog(fog);
 	tower_list.push_back(tower2);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower2 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower2->setFollow(tower2, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower2->setStartTime(ct);
+	panim_list.push_back(mark_tower2);
+
 	t2_ps_01 = new ParticleSystem(GL_POINTS);
 	t2_ps_01->setShader(sdrCtl.getShader("halo"));
 	t2_ps_01->setType("Particle_System");
@@ -3619,6 +3642,12 @@ void initialize(int argc, char *argv[])
 	tower3->setShininess(30);
 	tower3->setFog(fog);
 	tower_list.push_back(tower3);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower3 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower3->setFollow(tower3, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower3->setStartTime(ct);
+	panim_list.push_back(mark_tower3);
 
 	t3_ps_01 = new ParticleSystem(GL_POINTS);
 	t3_ps_01->setShader(sdrCtl.getShader("halo"));
@@ -4004,8 +4033,6 @@ void initialize(int argc, char *argv[])
 	//Trampoline effect
 	ParticleAnimated* tramp_effect_01 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
 	tramp_effect_01->setModelM(tramp_01->getModelM()*glm::translate(vec3(0, 1, 0)));
-	LARGE_INTEGER ct;
-	QueryPerformanceCounter(&ct);
 	tramp_effect_01->setStartTime(ct);
 	panim_list.push_back(tramp_effect_01);
 
@@ -5680,10 +5707,46 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->setType(1);
 	MOM.mother_of_portal_effect->setSampleCount(3, 3);
 	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
-	MOM.mother_of_portal_effect->setTransparency(0.5);
-	MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setTransparency(0.8);
+	MOM.mother_of_portal_effect->setBlurStrength(0.5);
 	MOM.mother_of_portal_effect->setFog(fog);
 	MOM.mother_of_portal_effect->Bind();
+
+	MOM.mother_of_orange_mark = new ParticleAnimated();
+	MOM.mother_of_orange_mark->Init("img/sprite_sheets/cast_001.png", "PNG");
+	MOM.mother_of_orange_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_orange_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_orange_mark->setWidth(4.0f);
+	MOM.mother_of_orange_mark->setHeight(4.0f);
+	MOM.mother_of_orange_mark->setNumColumn(5);
+	MOM.mother_of_orange_mark->setNumRow(4);
+	MOM.mother_of_orange_mark->setValidFrame(0, 19);
+	MOM.mother_of_orange_mark->setDuration(1.0);
+	MOM.mother_of_orange_mark->setType(1);
+	MOM.mother_of_orange_mark->setSampleCount(3, 3);
+	MOM.mother_of_orange_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_orange_mark->setTransparency(0.8);
+	MOM.mother_of_orange_mark->setBlurStrength(0.5);
+	MOM.mother_of_orange_mark->setFog(emptyFog);
+	MOM.mother_of_orange_mark->Bind();
+
+	MOM.mother_of_blue_mark = new ParticleAnimated();
+	MOM.mother_of_blue_mark->Init("img/sprite_sheets/cast_004.png", "PNG");
+	MOM.mother_of_blue_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_blue_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_blue_mark->setWidth(4.0f);
+	MOM.mother_of_blue_mark->setHeight(4.0f);
+	MOM.mother_of_blue_mark->setNumColumn(5);
+	MOM.mother_of_blue_mark->setNumRow(4);
+	MOM.mother_of_blue_mark->setValidFrame(0, 19);
+	MOM.mother_of_blue_mark->setDuration(1.0);
+	MOM.mother_of_blue_mark->setType(1);
+	MOM.mother_of_blue_mark->setSampleCount(3, 3);
+	MOM.mother_of_blue_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_blue_mark->setTransparency(0.8);
+	MOM.mother_of_blue_mark->setBlurStrength(0.5);
+	MOM.mother_of_blue_mark->setFog(emptyFog);
+	MOM.mother_of_blue_mark->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){
