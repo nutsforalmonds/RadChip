@@ -1894,7 +1894,7 @@ void server_update(int value){
 			if (!dead[PLAYER0])
 			{
 				if (Player0_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
 					SoundEventsIcon.push_back(PLAYER0);
 					SoundEventsString.push_back("Player 1 Shut Down!");
 				}
@@ -1918,7 +1918,7 @@ void server_update(int value){
 			if (!dead[PLAYER1])
 			{
 				if (Player1_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
 					SoundEventsIcon.push_back(PLAYER1);
 					SoundEventsString.push_back("Player 2 Shut Down!");
 				}
@@ -1942,7 +1942,7 @@ void server_update(int value){
 			if (!dead[PLAYER2])
 			{
 				if (Player2_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
 					SoundEventsIcon.push_back(PLAYER2);
 					SoundEventsString.push_back("Player 3 Shut Down!");
 				}
@@ -1966,7 +1966,7 @@ void server_update(int value){
 			if (!dead[PLAYER3])
 			{
 				if (Player3_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
 					SoundEventsIcon.push_back(PLAYER3);
 					SoundEventsString.push_back("Player 4 Shut Down!");
 				}
@@ -2150,7 +2150,6 @@ void server_update(int value){
 		
 		if ((Player0_KillSpree > Player0_KillSpreeLast) && (Player0_KillSpree > 2)){
 			SoundEventsIcon.push_back(PLAYER0);
-			SoundEventsString.push_back("Player 1 Killing Spree!");
 			if (Player0_KillSpree > 8){
 				Player0_KillSpree = 8;
 			}
@@ -2159,22 +2158,28 @@ void server_update(int value){
 			{
 				switch (Player0_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 1 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 1 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
 					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 1 is Dominating!");
 					break;
 				case 7:
 					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 1 is God Like!");
 					break;
 				case 8:
 					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 1 is Legendary!");
 					break;
 				default:
 					break;
@@ -2183,21 +2188,27 @@ void server_update(int value){
 			else if (playerID == PLAYER2){
 				switch (Player0_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 1 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 1 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 1 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 1 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 1 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
@@ -2207,21 +2218,27 @@ void server_update(int value){
 			else{
 				switch (Player0_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 1 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 1 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 1 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 1 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 1 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
@@ -2231,7 +2248,6 @@ void server_update(int value){
 		}
 		if ((Player1_KillSpree > Player1_KillSpreeLast) && (Player1_KillSpree > 2)){
 			SoundEventsIcon.push_back(PLAYER1);
-			SoundEventsString.push_back("Player 2 Killing Spree!");
 			if (Player1_KillSpree > 8){
 				Player1_KillSpree = 8;
 			}
@@ -2240,22 +2256,28 @@ void server_update(int value){
 			{
 				switch (Player1_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 2 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 2 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
 					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 2 is Dominating!");
 					break;
 				case 7:
 					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 2 is God Like!");
 					break;
 				case 8:
 					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 2 is Legendary!");
 					break;
 				default:
 					break;
@@ -2264,21 +2286,27 @@ void server_update(int value){
 			else if (playerID == PLAYER3){
 				switch (Player1_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 2 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 2 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 2 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 2 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 2 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
@@ -2288,21 +2316,27 @@ void server_update(int value){
 			else{
 				switch (Player1_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 2 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 2 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 2 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 2 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 2 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
@@ -2312,7 +2346,6 @@ void server_update(int value){
 		}
 		if ((Player2_KillSpree > Player2_KillSpreeLast) && (Player2_KillSpree > 2)){
 			SoundEventsIcon.push_back(PLAYER2);
-			SoundEventsString.push_back("Player 3 Killing Spree!");
 			if (Player2_KillSpree > 8){
 				Player2_KillSpree = 8;
 			}
@@ -2321,22 +2354,28 @@ void server_update(int value){
 			{
 				switch (Player2_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 3 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 3 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
 					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 3 is Dominating!");
 					break;
 				case 7:
 					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 3 is God Like!");
 					break;
 				case 8:
 					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 3 is Legendary!");
 					break;
 				default:
 					break;
@@ -2345,21 +2384,27 @@ void server_update(int value){
 			else if (playerID == PLAYER0){
 				switch (Player2_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 3 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 3 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 3 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 3 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 3 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
@@ -2369,21 +2414,27 @@ void server_update(int value){
 			else{
 				switch (Player2_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 3 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 3 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 3 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 3 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 3 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
@@ -2393,7 +2444,6 @@ void server_update(int value){
 		}
 		if ((Player3_KillSpree > Player3_KillSpreeLast) && (Player3_KillSpree > 2)){
 			SoundEventsIcon.push_back(PLAYER3);
-			SoundEventsString.push_back("Player 4 Killing Spree!");
 			if (Player3_KillSpree > 8){
 				Player3_KillSpree = 8;
 			}
@@ -2402,22 +2452,28 @@ void server_update(int value){
 			{
 				switch (Player3_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 4 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 4 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
 					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 4 is Dominating!");
 					break;
 				case 7:
 					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 4 is God Like!");
 					break;
 				case 8:
 					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 4 is Legendary!");
 					break;
 				default:
 					break;
@@ -2426,21 +2482,27 @@ void server_update(int value){
 			else if (playerID == PLAYER1){
 				switch (Player3_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 4 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 4 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 4 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 4 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 4 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
@@ -2450,21 +2512,27 @@ void server_update(int value){
 			else{
 				switch (Player3_KillSpree){
 				case 3:
+					SoundEventsString.push_back("Player 4 Killing Spree!");
 					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
+					SoundEventsString.push_back("Player 4 Rampage!");
 					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
 					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
+					SoundEventsString.push_back("Player 4 is Dominating!");
 					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
+					SoundEventsString.push_back("Player 4 is God Like!");
 					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
+					SoundEventsString.push_back("Player 4 is Legendary!");
 					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
