@@ -1,17 +1,17 @@
 
 // matrix indexes
-#define NUMOFVECS			19
+#define NUMOFVECS			21
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
-#define TOWER_MAT_END		7
-#define CAM_MAT_BEGIN		8
-#define CAM_MAT_END			11
-#define PPDL_MAT			12
-#define PLAT_MAT_BEGIN	    13
-#define PLAT_MAT_END		17
+#define TOWER_MAT_END		9
+#define CAM_MAT_BEGIN		10
+#define CAM_MAT_END			13
+#define PPDL_MAT			14
+#define PLAT_MAT_BEGIN	    15
+#define PLAT_MAT_END		19
 
-#define GLOBAL				18
+#define GLOBAL				20
 
 // string indexes
 #define SHOOTBIT			1
@@ -40,7 +40,7 @@
 #define PLAYER3				3
 
 //tower 
-#define NUM_TOWERS			4
+#define NUM_TOWERS			6
 #define TOWERSHOOTBIT		0
 #define TOWER_ID			1
 #define TOWER_SHOOT_ID_BEGIN	2
@@ -59,13 +59,19 @@
 #define PPDL_INT_LENGTH     4
 
 
-// base location
-#define ORIGINX				100
-#define ORIGINY				0
-#define ORIGINZ				100
+// base0 location
+#define ORIGINX0			100
+#define ORIGINY0			0
+#define ORIGINZ0			100
+
+// base1 location
+#define ORIGINX1			-100
+#define ORIGINY1			0
+#define ORIGINZ1			-100
 
 // base parameters
+#define PERIMETER_WALL_RADIUS 35
 #define PERIMETER_WALL_HEIGHT 5
-#define CENTER_TOWERPLAT_HEIGHT 20
+#define CENTER_TOWERPLAT_HEIGHT 15
 #define CENTER_PLAT_SPACING   10
-#define CENTER_PLAT_HEIGHT    15
+#define CENTER_PLAT_HEIGHT    10

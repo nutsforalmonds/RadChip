@@ -249,6 +249,8 @@ int main(int argc, char *argv[])
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
+	sendVec->push_back(std::make_pair("", mat4(0.0f)));
 
 	//Player Projectile Despawn List
 	sendVec->push_back(std::make_pair("", mat4(0.0f)));
@@ -370,7 +372,7 @@ int main(int argc, char *argv[])
 
 		scene->simulate(diff, (float)(1.0 / 100));
 		boost::array<mat4, 4> mp = scene->getPlayerMats();
-		boost::array<mat4, 4> mt = scene->getTowerMats();
+		boost::array<mat4, NUM_TOWERS> mt = scene->getTowerMats();
 		boost::array<mat4, 4> ca = scene->getPlayerCams();
 		boost::array<mat4, 5> ep = scene->getElevatorMats();
 
@@ -622,6 +624,8 @@ int main(int argc, char *argv[])
 		(*sendVec)[TOWER_MAT_BEGIN + 1] = std::make_pair(ts[1], mt[1]);
 		(*sendVec)[TOWER_MAT_BEGIN + 2] = std::make_pair(ts[2], mt[2]);
 		(*sendVec)[TOWER_MAT_BEGIN + 3] = std::make_pair(ts[3], mt[3]);
+		(*sendVec)[TOWER_MAT_BEGIN + 4] = std::make_pair(ts[4], mt[4]);
+		(*sendVec)[TOWER_MAT_BEGIN + 5] = std::make_pair(ts[5], mt[5]);
 
 		(*sendVec)[PPDL_MAT] = std::make_pair(ppdl_str, mat4(1.0));
 

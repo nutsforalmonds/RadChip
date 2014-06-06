@@ -3,13 +3,13 @@
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
-#define TOWER_MAT_END		7
-#define CAM_MAT_BEGIN		8
-#define CAM_MAT_END			11
-#define PPDL_MAT			12
-#define PLATFORM_BEGIN      13     
-#define PLATFORM_END		17
-#define GLOBAL				18
+#define TOWER_MAT_END		9
+#define CAM_MAT_BEGIN		10
+#define CAM_MAT_END			13
+#define PPDL_MAT			14
+#define PLATFORM_BEGIN      15     
+#define PLATFORM_END		19
+#define GLOBAL				10
 
 //player bit info
 #define SHOOTBIT			1
@@ -35,3 +35,20 @@
 #define RECVINDEXP1			4
 #define RECVINDEXP2			8
 #define RECVINDEXP3			12
+
+// base0 location
+#define ORIGINX0			100
+#define ORIGINY0			0
+#define ORIGINZ0			100
+
+// base1 location
+#define ORIGINX1			-100
+#define ORIGINY1			0
+#define ORIGINZ1			-100
+
+// base parameters
+#define PERIMETER_WALL_RADIUS 35
+#define PERIMETER_WALL_HEIGHT 5
+#define CENTER_TOWERPLAT_HEIGHT 15
+#define CENTER_PLAT_SPACING   10
+#define CENTER_PLAT_HEIGHT    10
