@@ -418,6 +418,8 @@ bool drawPortThingFuck = false;
 int portPlayer = NOT_A_PLAYER;
 string portString = "";
 
+bool endingFlag = false;
+
 int TowerHP[] = {20, 20, 20, 20, 20, 20};
 int TowerState[] = { 0, 0, 0, 0, 0, 0 };
 
@@ -1479,6 +1481,9 @@ void Window::displayCallback(void)
 					wins++;
 					myGameMenu->setRoundWon('c', wins);
 					winCountToggle = !winCountToggle;
+					SoundEvents.push_back(testSound[SoundVictory]);
+					SoundEventsIcon.push_back(NOT_A_PLAYER);
+					SoundEventsString.push_back("");
 					//cout << "Total Wins: " << wins << endl;
 				}
 			}
@@ -1490,6 +1495,9 @@ void Window::displayCallback(void)
 					wins++;
 					myGameMenu->setRoundWon('m', wins);
 					winCountToggle = !winCountToggle;
+					SoundEvents.push_back(testSound[SoundVictory]);
+					SoundEventsIcon.push_back(NOT_A_PLAYER);
+					SoundEventsString.push_back("");
 					//cout << "Total Wins: " << wins << endl;
 				}
 			}
@@ -1501,6 +1509,9 @@ void Window::displayCallback(void)
 					enemyWins++;
 					myGameMenu->setRoundWon('c', enemyWins);
 					winCountToggle = !winCountToggle;
+					SoundEvents.push_back(testSound[SoundDefeat]);
+					SoundEventsIcon.push_back(NOT_A_PLAYER);
+					SoundEventsString.push_back("");
 					//cout << "Total Wins: " << wins << endl;
 				}
 			}
@@ -1512,23 +1523,13 @@ void Window::displayCallback(void)
 					enemyWins++;
 					myGameMenu->setRoundWon('m', enemyWins);
 					winCountToggle = !winCountToggle;
+					SoundEvents.push_back(testSound[SoundDefeat]);
+					SoundEventsIcon.push_back(NOT_A_PLAYER);
+					SoundEventsString.push_back("");
 					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			endScreen->draw(displayWinner, wins);
-			if (displayWinner){
-				SoundEvents.push_back(testSound[SoundVictory]);
-				SoundEventsIcon.push_back(NOT_A_PLAYER);
-				SoundEventsString.push_back("");
-
-
-			}
-			else{
-				SoundEvents.push_back(testSound[SoundDefeat]);
-				SoundEventsIcon.push_back(NOT_A_PLAYER);
-				SoundEventsString.push_back("");
-
-			}
 		}
 
 		else if (kill_count){
