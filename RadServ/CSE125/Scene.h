@@ -964,6 +964,8 @@ public:
 		{
 			for (uint j = 0; j < stationary.size(); j++)
 			{
+				if (!stationary[j]->getIsPlatformDamage())
+					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = stationary[j]->getAABB();
 				bool collide = true;
@@ -974,10 +976,7 @@ public:
 					}
 				}
 				if (collide){
-					if (stationary[j]->getIsPlatformDamage())
-					{
-						damageStationary(j, projectile[i]->getPlayerID());
-					}
+					damageStationary(j, projectile[i]->getPlayerID());
 					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
