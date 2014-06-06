@@ -1401,7 +1401,7 @@ public:
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(PLAYER_SPEED);
-		md50->postTrans(glm::translate(vec3(-2, 5, -92)));
+		md50->postTrans(glm::translate(vec3(0, 100, -92)));
 		md50->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
@@ -1413,7 +1413,7 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(PLAYER_SPEED);
-		md51->postTrans(glm::translate(vec3(-2, 5, 92)));
+		md51->postTrans(glm::translate(vec3(0, 100, 92)));
 		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
@@ -1425,7 +1425,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(PLAYER_SPEED);
-		md52->postTrans(glm::translate(vec3(2, 5, -92)));
+		md52->postTrans(glm::translate(vec3(0, 100, -94)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md52->setType("Model");
@@ -1437,7 +1437,7 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(PLAYER_SPEED);
-		md53->postTrans(glm::translate(vec3(2, 5, 92)));
+		md53->postTrans(glm::translate(vec3(0, 100, 94)));
 		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
@@ -1573,7 +1573,7 @@ public:
 		//barricade on walkway 
 		Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
 		//platform_01->setSpeed(5); 
-		platform_05->postTrans(glm::translate(vec3(0.0, 15.0, 40.0)));
+		platform_05->postTrans(glm::translate(vec3(0.0, 18.0, 40.0)));
 		platform_05->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, .5)));
 		platform_05->setType("Cube");
 		platform_05->setName("Test Platform");
@@ -1600,7 +1600,7 @@ public:
 		//barricade on walkway 
 		Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
 		//platform_01->setSpeed(5); 
-		platform_08->postTrans(glm::translate(vec3(0.0, 15.0, -40.0)));
+		platform_08->postTrans(glm::translate(vec3(0.0, 18.0, -40.0)));
 		platform_08->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, 0.5)));
 		platform_08->setType("Cube");
 		platform_08->setName("Test Platform");
@@ -1624,14 +1624,41 @@ public:
 		platform_10->setName("Test Platform");
 		addStationary(platform_10);
 
-		//tower island
-		Cube* platform_11 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+		//2nd level
+		Cube* platform_11 = new Cube(-10, 10, -0.5, 0.5, -5, 5);
 		//platform_01->setSpeed(5); 
-		platform_11->postTrans(glm::translate(vec3(-60.0, 14.0,100.0)));
-		platform_11->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
+		platform_11->postTrans(glm::translate(vec3(0, 50.0, 15.0)));
+		platform_11->setAABB(AABB(vec3(-10, -0.5, -5), vec3(10, 0.5, 5)));
 		platform_11->setType("Cube");
 		platform_11->setName("Test Platform");
 		addStationary(platform_11);
+
+		//2nd level
+		Cube* platform_12 = new Cube(-10.0, 10.0, -0.5, 0.5, -5, 5);
+		//platform_01->setSpeed(5); 
+		platform_12->postTrans(glm::translate(vec3(0, 50.0, -15.0)));
+		platform_12->setAABB(AABB(vec3(-10, -0.5, -5), vec3(10, 0.5, 5)));
+		platform_12->setType("Cube");
+		platform_12->setName("Test Platform");
+		addStationary(platform_12);
+
+		//2nd level
+		Cube* platform_13 = new Cube(-5.0, 5.0, -0.5, 0.5, -20, 20);
+		//platform_01->setSpeed(5); 
+		platform_13->postTrans(glm::translate(vec3(15.0, 50.0, 0.0)));
+		platform_13->setAABB(AABB(vec3(-5, -0.5, -20), vec3(5, 0.5, 20)));
+		platform_13->setType("Cube");
+		platform_13->setName("Test Platform");
+		addStationary(platform_13);
+
+		//2nd level
+		Cube* platform_14 = new Cube(-5.0, 5.0, -0.5, 0.5, -20, 20);
+		//platform_01->setSpeed(5); 
+		platform_14->postTrans(glm::translate(vec3(-15.0, 50.0, 0.0)));
+		platform_14->setAABB(AABB(vec3(-5, -0.5, -20), vec3(5, 0.5, 20)));
+		platform_14->setType("Cube");
+		platform_14->setName("Test Platform");
+		addStationary(platform_14);
 
 
 		//Trampoline 
@@ -1673,6 +1700,27 @@ public:
 		tramp_04->setType("Trampoline");
 		tramp_04->setName("Test Trampoline");
 		addStationary(tramp_04);
+
+		//Trampoline 
+		Trampoline* tramp_05 = new Trampoline();
+		//platform_01->setSpeed(5); 
+		tramp_05->postTrans(glm::translate(vec3(-15, 6.0, 0)));
+		tramp_05->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tramp_05->setBoost(vec3(0, 60, 0));
+		tramp_05->setType("Trampoline");
+		tramp_05->setName("Test Trampoline");
+		addStationary(tramp_05);
+
+		//Trampoline 
+		Trampoline* tramp_06 = new Trampoline();
+		//platform_01->setSpeed(5); 
+		tramp_06->postTrans(glm::translate(vec3(15, 7.0, 0)));
+		tramp_06->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
+		tramp_06->setBoost(vec3(0, 60, 0));
+		tramp_06->setType("Trampoline");
+		tramp_06->setName("Test Trampoline");
+		addStationary(tramp_06);
+
 
 
 		//teleporter 
