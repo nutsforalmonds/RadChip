@@ -304,6 +304,7 @@ int m_pos = 0;
 int text_flag = 0;
 
 bool kill_count = false;
+float offset = 0.2;
 
 bool connected;
 std::string out;
@@ -1224,10 +1225,16 @@ void Window::displayCallback(void)
 		glEnable(GL_DEPTH_TEST);
 		*/
 		myMainMenu->draw();
-		logo->draw();
+		//logo->draw();
+		
+		offset = .08;
 
+		if ((float)Window::width / (float)Window::height <= 1.5)
+		{
+			offset = 0;
+		}
 		glDisable(GL_DEPTH_TEST);
-		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width) * (.7225 - offset), (Window::height) * .06, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:

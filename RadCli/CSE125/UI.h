@@ -846,10 +846,10 @@ class MainMenu
 {
 public:
 	MainMenu(){
-		menu = new UI_Panel(-0.9f, 0.9f, -0.5f, 0.5f);
+		menu = new UI_Panel(-0.60f, 0.60f, -0.53f, 0.53f);
 		menu->setColor(vec3(1.0, 0.0, 0.0));
 		menu->setShader(sdrCtl.getShader("basic_2D"));
-		menu->loadColorTex("img/back", "PNG");
+		menu->loadColorTex("img/UI_elements/new/frontPage.png", "PNG");
 		menu->setTex(true);
 		menu->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0f))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
@@ -863,51 +863,51 @@ public:
 		start_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		start_button->setColor(vec3(1.0, 0.0, 0.0));
 		start_button->setShader(sdrCtl.getShader("basic_2D"));
-		start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartOFF_1.png", "PNG");
+		start_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_StartOFF_1.png", "PNG");
 		start_button->setTex(true);
-		start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1f, -1.0f)));
+		start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.45f, -0.45f, -1.0f)));
 
 		exit_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		exit_button->setColor(vec3(1.0, 0.0, 0.0));
 		exit_button->setShader(sdrCtl.getShader("basic_2D"));
-		exit_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitOFF_1.png", "PNG");
+		exit_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_ExitOFF_1.png", "PNG");
 		exit_button->setTex(true);
-		exit_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
+		exit_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.08f, -0.45f, -1.0f)));
 
 		setting_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		setting_button->setColor(vec3(1.0, 0.0, 0.0));
 		setting_button->setShader(sdrCtl.getShader("basic_2D"));
-		setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsOFF.png", "PNG");
+		setting_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_SettingsOFF.png", "PNG");
 		setting_button->setTex(true);
-		setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
+		setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.173f, -0.45f, -1.0f)));
 
 		selected_start_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_start_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_start_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_start_button->loadColorTex("img/UI_elements/button_stainlessSteel_StartON_1.png", "PNG");
+		selected_start_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_StartON_1.png", "PNG");
 		selected_start_button->setTex(true);
-		selected_start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.1f, -1.0f)));
+		selected_start_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.45f, -0.45f, -1.0f)));
 
 		selected_end_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_end_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_end_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_end_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON.png", "PNG");
+		selected_end_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_ExitON.png", "PNG");
 		selected_end_button->setTex(true);
-		selected_end_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.3f, -1.0f)));
+		selected_end_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.08f, -0.45f, -1.0f)));
 
 		selected_setting_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_setting_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_setting_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_setting_button->loadColorTex("img/UI_elements/button_stainlessSteel_SettingsON.png", "PNG");
+		selected_setting_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_SettingsON.png", "PNG");
 		selected_setting_button->setTex(true);
-		selected_setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
+		selected_setting_button->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.173f, -0.45f, -1.0f)));
 
-		address_bar = new UI_Panel(-0.2f, 0.2f, -0.1f, 0.1f);
+		address_bar = new UI_Panel(-0.18f, 0.18f, -0.075f, 0.075f);
 		address_bar->setColor(vec3(1.0, 0.0, 0.0));
 		address_bar->setShader(sdrCtl.getShader("basic_2D"));
-		address_bar->loadColorTex("img/UI_elements/IP_adressBAR", "PNG");
+		address_bar->loadColorTex("img/UI_elements/new/IP_adressBAR", "PNG");
 		address_bar->setTex(true);
-		address_bar->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0f))*glm::translate(vec3(0.0f, 0.3f, -1.0f)));
+		address_bar->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0f))*glm::translate(vec3(0.38f, -0.45f, -1.0f)));
 	}
 	~MainMenu(){
 		menu->					  ~UI_Panel();
@@ -927,7 +927,7 @@ public:
 		glDisable(GL_DEPTH_TEST);
 
 		menu->draw();
-		game_name->draw();
+		//game_name->draw();
 		start_button->draw();
 		exit_button->draw();
 		setting_button->draw();
@@ -952,11 +952,17 @@ public:
 
 	int checkHighlight(float x, float y){
 
+		float newX = x + (x - .5)*(7.0 / 15.0);
+
+		if ((float)Window::width / (float)Window::height <= 1.5)
+		{
+			newX = x;
+		}
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.42) && (x < 0.57)){
+		if ((y > 0.90) && (y < 0.96)){
 
 			//Spot for first button
-			if ((y > 0.35) && (y < 0.47)){
+			if ((newX > 0.05) && (newX < 0.195)){
 				drawStartHighlight = true;
 				drawEndHighlight = false;
 				drawSettingHighlight = false;
@@ -966,7 +972,7 @@ public:
 			}
 
 			//Spot for second button
-			else if ((y > 0.53) && (y < 0.64)){
+			else if ((newX > 0.246) && (newX < 0.459)){
 				drawSettingHighlight = true;
 				drawEndHighlight = false;
 				drawStartHighlight = false;
@@ -976,7 +982,7 @@ public:
 			}
 
 			//Spot for third button
-			else if ((y > 0.71) && (y < 0.81))
+			else if ((newX > 0.518) && (newX < 0.612))
 			{
 				drawEndHighlight = true;
 				drawStartHighlight = false;
@@ -1004,27 +1010,33 @@ public:
 
 	int checkClick(float x, float y){
 
+		float newX = x + (x - .5)*(7.0 / 15.0);
+
+		if ((float)Window::width / (float)Window::height <= 1.5)
+		{
+			newX = x;
+		}
 		//Check the x bounds first cause all buttons are the same width
-		if ((x > 0.42) && (x < 0.57)){
+		if ((y > 0.90) && (y < 0.96)){
 
 			//Spot for first button
-			if ((y > 0.35) && (y < 0.47)){
-				return 1;
+			if ((newX > 0.05) && (newX < 0.195)){
+				return 1;//1
 			}
 
 			//Spot for second button
-			else if ((y > 0.53) && (y < 0.64)){
-				return 3;
+			else if ((newX > 0.246) && (newX < 0.459)){
+				return 3;//3
 			}
 
-			else if ((y > 0.71) && (y < 0.81))
+			else if ((newX > 0.518) && (newX < 0.612))
 			{
-				return 2;
+				return 2;//2
 			}
 
-			else if ((y > 0.19) && (y < 0.22))
+			else if ((newX > 0.718) && (newX < 0.92))
 			{
-				return 4;
+				return 4; //4
 			}
 
 			return 0;
