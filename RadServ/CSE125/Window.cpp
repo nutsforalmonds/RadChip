@@ -55,6 +55,7 @@ int playerID = -1;
 int numOfVecs = 4;
 int keyState = 0;
 bool player1shoot, player2shoot, player3shoot, player4shoot;
+int overCounter = 0;
 
 std::string str;
 gameState gs;
@@ -696,9 +697,13 @@ int main(int argc, char *argv[])
 		}
 		if (scene->getGameOver())
 		{
-			delete scene;
-			scene = new Scene();
-			scene->setGravity(vec3(0, -9.8, 0));
+			overCounter++;
+			if (overCounter > 10)
+			{
+				delete scene;
+				scene = new Scene();
+				scene->setGravity(vec3(0, -9.8, 0));
+			}
 		}
 	}
 	return 0;

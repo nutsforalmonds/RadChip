@@ -358,6 +358,7 @@ int winner;
 int wins;
 bool winCountToggle = false;
 bool playerReady = true;
+int displayWinner = 0;
 
 int powerUp = 0;
 
@@ -1308,23 +1309,22 @@ void Window::displayCallback(void)
 		}
 
 		else if (myClientState->getState() == 5){
-
 			//ENDGAME
 			if (winner == 1 && (playerID % 2) == 0)
 			{
-				endScreen->draw(1);
 				if (!winCountToggle)
 				{
+					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout <<"Total Wins: "<<  wins << endl;
+					cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else if (winner == 0 && (playerID % 2) == 1)
 			{
-				endScreen->draw(1);
 				if (!winCountToggle)
 				{
+					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
 					cout << "Total Wins: " << wins << endl;
@@ -1332,14 +1332,23 @@ void Window::displayCallback(void)
 			}
 			else  if (winner == 1 && (playerID % 2) == 1)
 			{
-				endScreen->draw(0);
-				cout << "Total Wins: " << wins << endl;
+				if (!winCountToggle)
+				{
+					displayWinner = 0;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
 			}
 			else  if (winner == 0 && (playerID % 2) == 0)
 			{
-				endScreen->draw(0);
-				cout << "Total Wins: " << wins << endl;
+				if (!winCountToggle)
+				{
+					displayWinner = 0;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
 			}
+			endScreen->draw(displayWinner);
 		}
 
 		else if (kill_count){
@@ -1815,18 +1824,17 @@ void server_update(int value){
 		winner = parseOpts->getWinState(recvVec);
 		if (playerReady)
 		{
-			gameOver = (winner == 3) ? 0 : 1;
-			playerReady = false;
-		}
-		else
-		{
-			gameOver = 0;
+			//if (!winCountToggle)
+				gameOver = (winner == 3) ? 0 : 1;
 		}
 		
 		if (gameOver)
 		{
 			myClientState->setState(5);
+			playerReady = false;
+
 		}
+		cout <<playerReady << " " << gameOver << endl;
 	}
 
 
@@ -2352,8 +2360,12 @@ void keyboard(unsigned char key, int, int){
 		}
 		break;
 	case 5:
+
 		if (key == 27){
+			//running = false;
 			myClientState->setState(1);
+			playerReady = true;
+			winCountToggle = false;
 		}
 	default:
 		break;
@@ -2640,8 +2652,10 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = endScreen->checkClick(newX, newY);
 			if (click == 1){
+				//running = false;
 				myClientState->setState(1);
 				playerReady = true;
+				winCountToggle = false;
 			}
 		}
 		break;
