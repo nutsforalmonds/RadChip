@@ -702,7 +702,7 @@ int main(int argc, char *argv[])
 		if (scene->getGameOver())
 		{
 			overCounter++;
-			keyState = 0;
+			//keyState = 0;
 			if (overCounter > 20)
 			{
 				delete scene;

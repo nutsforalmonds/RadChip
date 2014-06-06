@@ -199,6 +199,8 @@ struct Mother{
 	ParticleAnimated* mother_of_health_potion;
 	ParticleAnimated* mother_of_red_arrow;
 	ParticleAnimated* mother_of_green_arrow;
+	ParticleAnimated* mother_of_tramp_effect;
+	ParticleAnimated* mother_of_portal_effect;
 }MOM;
 
 int texScreenWidth = 512;
@@ -1471,6 +1473,7 @@ void Window::displayCallback(void)
 	glutSwapBuffers();
 }
 
+LARGE_INTEGER time_track;
 //LARGE_INTEGER asdf, jkl;
 void server_update(int value){
 	//This is where we would be doing the stuffs
@@ -2119,8 +2122,11 @@ void server_update(int value){
 		if (gameOver)
 		{
 			myClientState->setState(5);
+			keyState = 0;
 			playerReady = false;
-
+			QueryPerformanceCounter(&time_track);
+			double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		//cout << (*recvVec)[PLATFORM_STATUS].first  <<  " " << playerReady << " " << gameOver << endl;
 	}
@@ -2421,7 +2427,6 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-LARGE_INTEGER time_track;
 void keyboard(unsigned char key, int, int){
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
@@ -3987,12 +3992,20 @@ void initialize(int argc, char *argv[])
 	tramp_01->setReflectFactor(vec2(0.2, 0.5));
 	tramp_01->setEta(0.5);
 	tramp_01->setCubeMapUnit(3);
-	tramp_01->postTrans(glm::translate(vec3(20, 5.0, 65)));
+	tramp_01->postTrans(glm::translate(vec3(20, 5.0, 50)));
 	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_01->setShadowTex(shadow_map_id);
 	tramp_01->setType("Trampoline");
 	tramp_01->setName("Test Trampoline");
 	stationary_list.push_back(tramp_01);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_01 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_01->setModelM(tramp_01->getModelM()*glm::translate(vec3(0, 1, 0)));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tramp_effect_01->setStartTime(ct);
+	panim_list.push_back(tramp_effect_01);
 
 	//Trampoline 
 	Cube* tramp_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4004,12 +4017,18 @@ void initialize(int argc, char *argv[])
 	tramp_02->setReflectFactor(vec2(0.2, 0.5));
 	tramp_02->setEta(0.5);
 	tramp_02->setCubeMapUnit(3);
-	tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 65)));
+	tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 50)));
 	tramp_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_02->setShadowTex(shadow_map_id);
 	tramp_02->setType("Trampoline");
 	tramp_02->setName("Test Trampoline");
 	stationary_list.push_back(tramp_02);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_02 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_02->setModelM(tramp_02->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_02->setStartTime(ct);
+	panim_list.push_back(tramp_effect_02);
 
 	//Trampoline 
 	Cube* tramp_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4021,12 +4040,18 @@ void initialize(int argc, char *argv[])
 	tramp_03->setReflectFactor(vec2(0.2, 0.5));
 	tramp_03->setEta(0.5);
 	tramp_03->setCubeMapUnit(3);
-	tramp_03->postTrans(glm::translate(vec3(20, 5.0, -65)));
+	tramp_03->postTrans(glm::translate(vec3(20, 5.0, -50)));
 	tramp_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_03->setShadowTex(shadow_map_id);
 	tramp_03->setType("Trampoline");
 	tramp_03->setName("Test Trampoline");
 	stationary_list.push_back(tramp_03);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_03 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_03->setModelM(tramp_03->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_03->setStartTime(ct);
+	panim_list.push_back(tramp_effect_03);
 
 	//Trampoline 
 	Cube* tramp_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4038,12 +4063,19 @@ void initialize(int argc, char *argv[])
 	tramp_04->setReflectFactor(vec2(0.2, 0.5));
 	tramp_04->setEta(0.5);
 	tramp_04->setCubeMapUnit(3);
-	tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -65)));
+	tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -50)));
 	tramp_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_04->setShadowTex(shadow_map_id);
 	tramp_04->setType("Trampoline");
 	tramp_04->setName("Test Trampoline");
 	stationary_list.push_back(tramp_04);
+
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_04 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_04->setModelM(tramp_04->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_04->setStartTime(ct);
+	panim_list.push_back(tramp_effect_04);
 
 	/*//Trampoline 
 	Cube* tramp_05 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4062,6 +4094,12 @@ void initialize(int argc, char *argv[])
 	tramp_05->setName("Test Trampoline");
 	stationary_list.push_back(tramp_05);
 
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_05 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_05->setModelM(tramp_05->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_05->setStartTime(ct);
+	panim_list.push_back(tramp_effect_05);
+
 	//Trampoline 
 	Cube* tramp_06 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_06->setKd(vec3(0.0, 0.0, 0.0));
@@ -4077,7 +4115,13 @@ void initialize(int argc, char *argv[])
 	tramp_06->setShadowTex(shadow_map_id);
 	tramp_06->setType("Trampoline");
 	tramp_06->setName("Test Trampoline");
-	stationary_list.push_back(tramp_06);*/
+	stationary_list.push_back(tramp_06);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_06 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_06->setModelM(tramp_06->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_06->setStartTime(ct);
+	panim_list.push_back(tramp_effect_06);*/
 
 
 	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4096,6 +4140,12 @@ void initialize(int argc, char *argv[])
 	tele_01->setName("Test Teleporter");
 	stationary_list.push_back(tele_01);
 
+	//Tele effect
+	ParticleAnimated* tele_effect_01 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_01->setModelM(tele_01->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_01->setStartTime(ct);
+	panim_list.push_back(tele_effect_01);
+
 	Cube* tele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_02->setKd(vec3(1.0, .65, 0));
 	tele_02->setKa(vec3(1.0, .65, 0));
@@ -4111,6 +4161,12 @@ void initialize(int argc, char *argv[])
 	tele_02->setType("Teleporter");
 	tele_02->setName("Test Teleporter");
 	stationary_list.push_back(tele_02);
+
+	//Tele effect
+	ParticleAnimated* tele_effect_02 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_02->setModelM(tele_02->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_02->setStartTime(ct);
+	panim_list.push_back(tele_effect_02);
 
 	Cube* tele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_03->setKd(vec3(1.0, .65, 0));
@@ -4128,6 +4184,12 @@ void initialize(int argc, char *argv[])
 	tele_03->setName("Test Teleporter");
 	stationary_list.push_back(tele_03);
 
+	//Tele effect
+	ParticleAnimated* tele_effect_03 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_03->setModelM(tele_03->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_03->setStartTime(ct);
+	panim_list.push_back(tele_effect_03);
+
 	Cube* tele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_04->setKd(vec3(1.0, .65, 0));
 	tele_04->setKa(vec3(1.0, .65, 0));
@@ -4143,6 +4205,12 @@ void initialize(int argc, char *argv[])
 	tele_04->setType("Teleporter");
 	tele_04->setName("Test Teleporter");
 	stationary_list.push_back(tele_04);
+
+	//Tele effect
+	ParticleAnimated* tele_effect_04 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_04->setModelM(tele_04->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_04->setStartTime(ct);
+	panim_list.push_back(tele_effect_04);
 
 	Cube* ele_01 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_01->setKd(vec3(1.0, 1.0, 1.0));
@@ -5578,6 +5646,42 @@ void initializeMOM(){
 	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
 	MOM.mother_of_green_arrow->setFog(emptyFog);
 	MOM.mother_of_green_arrow->Bind();
+
+	MOM.mother_of_tramp_effect = new ParticleAnimated();
+	MOM.mother_of_tramp_effect->Init("img/sprite_sheets/wind_003.png", "PNG");
+	MOM.mother_of_tramp_effect->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tramp_effect->setPosition(vec3(0.0f, 1.3f, 0.0f));
+	MOM.mother_of_tramp_effect->setWidth(4.0f);
+	MOM.mother_of_tramp_effect->setHeight(4.0f);
+	MOM.mother_of_tramp_effect->setNumColumn(5);
+	MOM.mother_of_tramp_effect->setNumRow(6);
+	MOM.mother_of_tramp_effect->setValidFrame(0, 29);
+	MOM.mother_of_tramp_effect->setDuration(1.0);
+	MOM.mother_of_tramp_effect->setType(1);
+	MOM.mother_of_tramp_effect->setSampleCount(3, 3);
+	MOM.mother_of_tramp_effect->setSampleDist(0.001, 0.001);
+	MOM.mother_of_tramp_effect->setTransparency(0.9);
+	MOM.mother_of_tramp_effect->setBlurStrength(0.3);
+	MOM.mother_of_tramp_effect->setFog(fog);
+	MOM.mother_of_tramp_effect->Bind();
+
+	MOM.mother_of_portal_effect = new ParticleAnimated();
+	MOM.mother_of_portal_effect->Init("img/sprite_sheets/darkness_001.png", "PNG");
+	MOM.mother_of_portal_effect->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_portal_effect->setPosition(vec3(0.0f, 1.3f, 0.0f));
+	MOM.mother_of_portal_effect->setWidth(4.0f);
+	MOM.mother_of_portal_effect->setHeight(4.0f);
+	MOM.mother_of_portal_effect->setNumColumn(5);
+	MOM.mother_of_portal_effect->setNumRow(6);
+	MOM.mother_of_portal_effect->setValidFrame(0, 29);
+	MOM.mother_of_portal_effect->setDuration(1.0);
+	MOM.mother_of_portal_effect->setType(1);
+	MOM.mother_of_portal_effect->setSampleCount(3, 3);
+	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
+	MOM.mother_of_portal_effect->setTransparency(0.5);
+	MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setFog(fog);
+	MOM.mother_of_portal_effect->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){

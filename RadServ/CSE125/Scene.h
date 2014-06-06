@@ -1766,7 +1766,7 @@ public:
 		//base trampolines
 		Trampoline* tramp_01 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_01->postTrans(glm::translate(vec3(20, 5.0, 65)));
+		tramp_01->postTrans(glm::translate(vec3(20, 5.0, 50)));
 		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_01->setBoost(vec3(0, 60, 0));
 		tramp_01->setType(TRAMPOLINE);
@@ -1776,7 +1776,7 @@ public:
 		//base tramp
 		Trampoline* tramp_02 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 65)));
+		tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 50)));
 		tramp_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_02->setBoost(vec3(0, 60, 0));
 		tramp_02->setType(TRAMPOLINE);
@@ -1786,7 +1786,7 @@ public:
 		//base tramp 
 		Trampoline* tramp_03 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_03->postTrans(glm::translate(vec3(20, 5.0, -65)));
+		tramp_03->postTrans(glm::translate(vec3(20, 5.0, -50)));
 		tramp_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_03->setBoost(vec3(0, 60, 0));
 		tramp_03->setType(TRAMPOLINE);
@@ -1796,7 +1796,7 @@ public:
 		//base tramp
 		Trampoline* tramp_04 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -65)));
+		tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -50)));
 		tramp_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_04->setBoost(vec3(0, 60, 0));
 		tramp_04->setType(TRAMPOLINE);

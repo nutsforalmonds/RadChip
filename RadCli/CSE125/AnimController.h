@@ -64,6 +64,8 @@ public:
 	void unsetAnimLoop(int index, double end_time = 0.0){
 		if (currentLoop == index){
 			loopCounter--;
+			if (loopCounter < 0)
+				loopCounter = 0;
 			if (loopCounter == 0){
 				currentLoop = default_animation;
 				startTimeLoop = end_time;
