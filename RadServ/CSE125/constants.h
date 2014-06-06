@@ -38,14 +38,14 @@
 #define RECVINDEXP3			12
 
 // base0 location
-#define ORIGINX0			100
-#define ORIGINY0			0
-#define ORIGINZ0			100
+#define ORIGINX0			0
+#define ORIGINY0			10
+#define ORIGINZ0			130
 
 // base1 location
-#define ORIGINX1			-100
-#define ORIGINY1			0
-#define ORIGINZ1			-100
+#define ORIGINX1			0
+#define ORIGINY1			10
+#define ORIGINZ1			-130
 
 // base parameters
 #define PERIMETER_WALL_RADIUS 35
