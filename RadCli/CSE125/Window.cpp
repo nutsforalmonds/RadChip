@@ -2242,6 +2242,11 @@ int main(int argc, char *argv[])
   BuildPopupMenu();
   //glutAttachMenu(GLUT_MIDDLE_BUTTON);
 
+  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
+  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
+  Window::width = screen_width;
+  Window::height = screen_height;
+
   initialize(argc, argv);  
 
   //glutMainLoop();
