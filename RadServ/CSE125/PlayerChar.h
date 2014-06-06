@@ -2,11 +2,10 @@
 #define _PLAYERCHAR_H_
 
 #include "Mesh.h"
-#include "MD5Model.h"
 #include "Item.h"
 #include "RangeWeapon.h"
 
-class PlayerChar : public MD5Model
+class PlayerChar : public Object
 {
 public:
 	PlayerChar();
