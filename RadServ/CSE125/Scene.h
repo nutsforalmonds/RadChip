@@ -1258,7 +1258,7 @@ public:
 				int pid;
 				float min_dist=10000;
 				for (uint k = 0; k < player.size(); k++){
-					if (tower[i]->getTeamID() != player[k]->getTeamID()){
+					if (player[k]->getHealth()>0 && tower[i]->getTeamID() != player[k]->getTeamID()){
 						float dist = glm::distance(vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)), vec3(player[k]->getModelM()*vec4(0, 0, 0, 1)));
 						if (dist < tower[i]->getShootRange() && dist<min_dist){
 							pid = k;
