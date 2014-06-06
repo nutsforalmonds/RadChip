@@ -4136,6 +4136,12 @@ void initialize(int argc, char *argv[])
 	tele_01->setName("Test Teleporter");
 	stationary_list.push_back(tele_01);
 
+	//Tele effect
+	ParticleAnimated* tele_effect_01 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_01->setModelM(tele_01->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_01->setStartTime(ct);
+	panim_list.push_back(tele_effect_01);
+
 	Cube* tele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_02->setKd(vec3(1.0, .65, 0));
 	tele_02->setKa(vec3(1.0, .65, 0));
@@ -4151,6 +4157,12 @@ void initialize(int argc, char *argv[])
 	tele_02->setType("Teleporter");
 	tele_02->setName("Test Teleporter");
 	stationary_list.push_back(tele_02);
+
+	//Tele effect
+	ParticleAnimated* tele_effect_02 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_02->setModelM(tele_02->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_02->setStartTime(ct);
+	panim_list.push_back(tele_effect_02);
 
 	Cube* tele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_03->setKd(vec3(1.0, .65, 0));
@@ -4168,6 +4180,12 @@ void initialize(int argc, char *argv[])
 	tele_03->setName("Test Teleporter");
 	stationary_list.push_back(tele_03);
 
+	//Tele effect
+	ParticleAnimated* tele_effect_03 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_03->setModelM(tele_03->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_03->setStartTime(ct);
+	panim_list.push_back(tele_effect_03);
+
 	Cube* tele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_04->setKd(vec3(1.0, .65, 0));
 	tele_04->setKa(vec3(1.0, .65, 0));
@@ -4183,6 +4201,12 @@ void initialize(int argc, char *argv[])
 	tele_04->setType("Teleporter");
 	tele_04->setName("Test Teleporter");
 	stationary_list.push_back(tele_04);
+
+	//Tele effect
+	ParticleAnimated* tele_effect_04 = new ParticleAnimated(*(MOM.mother_of_portal_effect));
+	tele_effect_04->setModelM(tele_04->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tele_effect_04->setStartTime(ct);
+	panim_list.push_back(tele_effect_04);
 
 	Cube* ele_01 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_01->setKd(vec3(1.0, 1.0, 1.0));
@@ -5633,14 +5657,14 @@ void initializeMOM(){
 	MOM.mother_of_tramp_effect->setSampleCount(3, 3);
 	MOM.mother_of_tramp_effect->setSampleDist(0.001, 0.001);
 	MOM.mother_of_tramp_effect->setTransparency(0.9);
-	MOM.mother_of_tramp_effect->setBlurStrength(0.5);
+	MOM.mother_of_tramp_effect->setBlurStrength(0.3);
 	MOM.mother_of_tramp_effect->setFog(fog);
 	MOM.mother_of_tramp_effect->Bind();
 
 	MOM.mother_of_portal_effect = new ParticleAnimated();
 	MOM.mother_of_portal_effect->Init("img/sprite_sheets/darkness_001.png", "PNG");
 	MOM.mother_of_portal_effect->setShader(sdrCtl.getShader("billboard_anim"));
-	MOM.mother_of_portal_effect->setPosition(vec3(0.0f, 1.0f, 0.0f));
+	MOM.mother_of_portal_effect->setPosition(vec3(0.0f, 1.3f, 0.0f));
 	MOM.mother_of_portal_effect->setWidth(4.0f);
 	MOM.mother_of_portal_effect->setHeight(4.0f);
 	MOM.mother_of_portal_effect->setNumColumn(5);
@@ -5648,10 +5672,10 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->setValidFrame(0, 29);
 	MOM.mother_of_portal_effect->setDuration(1.0);
 	MOM.mother_of_portal_effect->setType(1);
-	//MOM.mother_of_portal_effect->setSampleCount(5, 5);
-	//MOM.mother_of_portal_effect->setSampleDist(0.005, 0.005);
-	MOM.mother_of_portal_effect->setTransparency(0.9);
-	//MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setSampleCount(3, 3);
+	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
+	MOM.mother_of_portal_effect->setTransparency(0.5);
+	MOM.mother_of_portal_effect->setBlurStrength(1.0);
 	MOM.mother_of_portal_effect->setFog(fog);
 	MOM.mother_of_portal_effect->Bind();
 }
