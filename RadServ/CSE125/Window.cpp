@@ -694,6 +694,12 @@ int main(int argc, char *argv[])
 		else{
 			//cout << diff << endl;
 		}
+		if (scene->getGameOver())
+		{
+			delete scene;
+			scene = new Scene();
+			scene->setGravity(vec3(0, -9.8, 0));
+		}
 	}
 	return 0;
 }

@@ -66,6 +66,7 @@ public:
 	}
 	~Object()
 	{
+
 	}
 	virtual void draw(){/* This is a placeholder*/ }
 

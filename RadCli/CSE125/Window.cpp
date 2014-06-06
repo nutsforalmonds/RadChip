@@ -357,6 +357,7 @@ bool gameOver;
 int winner;
 int wins;
 bool winCountToggle = false;
+bool playerReady = true;
 
 int powerUp = 0;
 
@@ -1329,9 +1330,15 @@ void Window::displayCallback(void)
 					cout << "Total Wins: " << wins << endl;
 				}
 			}
-			else
+			else  if (winner == 1 && (playerID % 2) == 1)
 			{
 				endScreen->draw(0);
+				cout << "Total Wins: " << wins << endl;
+			}
+			else  if (winner == 0 && (playerID % 2) == 0)
+			{
+				endScreen->draw(0);
+				cout << "Total Wins: " << wins << endl;
 			}
 		}
 
@@ -1806,9 +1813,16 @@ void server_update(int value){
 			bVis[FARTHERSHOOT] = false;
 
 		winner = parseOpts->getWinState(recvVec);
-		gameOver = (winner == 3) ? 0 : 1;
+		if (playerReady)
+		{
+			gameOver = (winner == 3) ? 0 : 1;
+			playerReady = false;
+		}
+		else
+		{
+			gameOver = 0;
+		}
 		
-
 		if (gameOver)
 		{
 			myClientState->setState(5);
@@ -2627,6 +2641,7 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = endScreen->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
+				playerReady = true;
 			}
 		}
 		break;

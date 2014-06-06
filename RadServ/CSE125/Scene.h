@@ -66,10 +66,42 @@ public:
 			delete stationary[i];
 		}
 		stationary.clear();
+		//for (uint i = 0; i<elevator.size(); i++){
+		//	delete elevator[i];
+		//}
+		//elevator.clear();
 		for (uint i = 0; i<player.size(); i++){
 			delete player[i];
 		}
 		player.clear();
+		for (uint i = 0; i<respawn.size(); i++){
+			delete respawn[i];
+		}
+		respawn.clear();
+		for (uint i = 0; i<tower.size(); i++){
+			delete tower[i];
+		}
+		tower.clear();
+		for (uint i = 0; i<skillShot.size(); i++){
+			delete skillShot[i];
+		}
+		skillShot.clear();
+		for (uint i = 0; i<virtualTower.size(); i++){
+			delete virtualTower[i];
+		}
+		virtualTower.clear();
+		for (uint i = 0; i<projectile.size(); i++){
+			delete projectile[i];
+		}
+		projectile.clear();
+		for (uint i = 0; i<tower_projectile.size(); i++){
+			delete tower_projectile[i];
+		}
+		tower_projectile.clear();
+		for (uint i = 0; i<powerUps.size(); i++){
+			delete powerUps[i];
+		}
+		powerUps.clear();
 	}
 
 	Object * getPlayerObj(int playerID)
@@ -543,9 +575,15 @@ public:
 			}
 		}
 		if (team1 == NUM_TOWERS / 2)
+		{
+			gameOver = true;
 			return 1;
+		}
 		else if (team0 == NUM_TOWERS / 2)
+		{
+			gameOver = true;
 			return 0;
+		}
 		else
 			return 3;
 
@@ -679,6 +717,10 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	bool getGameOver()
+	{
+		return gameOver;
+	}
 
 	vector<Object *> * getStationary()
 	{
@@ -959,18 +1001,6 @@ public:
 		if (targetHolder->getHealth() < 1)
 		{
 			playerDead[targetId] = true;
-			int dist, spd, dmg;
-			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
-			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
-			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
-			//restricting speed and distance
-			if (dist > MAX_DISTANCE)
-				dist = MAX_DISTANCE;
-			if (spd > MAX_SPEED)
-				spd = MAX_SPEED;
-			if (dmg < MAX_DAMAGE)
-				dmg = MAX_DAMAGE;
-			 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
 			//Window::removePlayerList((*targetHolder).getName());
@@ -1721,7 +1751,9 @@ public:
 
 		counter = 0;
 		projectile_counter = 0;
+		gameOver = false;
 	}
+
 
 protected:
 	int counter2;
@@ -1756,7 +1788,7 @@ protected:
 	bool tower_shoot_check[NUM_TOWERS];
 	bool tower_damaged[NUM_TOWERS];//only last valid simulation
 	bool tower_kill[NUM_TOWERS];//only last valid simulation
-
+	bool gameOver;
 	Object * pPtr;
 };
 
