@@ -698,11 +698,12 @@ int main(int argc, char *argv[])
 		if (scene->getGameOver())
 		{
 			overCounter++;
-			if (overCounter > 10)
+			if (overCounter > 20)
 			{
 				delete scene;
 				scene = new Scene();
 				scene->setGravity(vec3(0, -9.8, 0));
+				overCounter = 0;
 			}
 		}
 	}
