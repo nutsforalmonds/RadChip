@@ -1216,7 +1216,8 @@ public:
 					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
-					cubeT->setStartY(hold.max[2]);
+					cubeT->setStartY(hold.max[1]);
+					cubeT->setStartZ(hold.max[2]);
 					cubeT->setTeamID(tower[i]->getTeamID());
 					cubeT->setPlayerID(tower[i]->getPlayerID());
 
@@ -1246,7 +1247,7 @@ public:
 	}
 	void despawnProjectile()
 	{
-		//cout << projectile.size() << endl;
+		cout << tower_projectile.size() << endl;
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();
