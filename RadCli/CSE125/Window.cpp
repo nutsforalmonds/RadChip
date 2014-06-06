@@ -410,6 +410,15 @@ int Player3_DoubleKillTime = 0;
 
 bool FirstBloodTrigger = true;
 
+string doubleKill = "DOUBLE KILL";
+string killingSpree = "KILLING SPREE";
+string rampage = "RAMPAGE";
+string unstoppable = "UNSTOPPABLE";
+string dominating = "DOMINATING";
+string godlike = "GODLIKE";
+string legendary = "LEGENDARY";
+string shut_down = "SHUTDOWN";
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
 {
