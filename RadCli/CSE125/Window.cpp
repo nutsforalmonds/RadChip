@@ -1257,9 +1257,9 @@ void Window::reshapeCallback(int w, int h)
 }
 void Window::displayCallback(void)
 {
-	unsigned char m_Test[] = "Look Ma! I'm printing!";
-	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
-	string s = "It was the best of times, it was the worst of times";
+	//unsigned char m_Test[] = "Look Ma! I'm printing!";
+	//unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	//string s = "It was the best of times, it was the worst of times";
 	static time_t timer = clock();
 
 	if (clock() - timer >= CLOCKS_PER_SEC){
@@ -1466,7 +1466,7 @@ void Window::displayCallback(void)
 		}
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
-		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
+		//RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
 
 		glEnable(GL_DEPTH_TEST);
 
@@ -3070,60 +3070,62 @@ void keyboard(unsigned char key, int, int){
 		break;
 	case 1:
 
-		if (key == 'a'){
+		if ((key == 'a') || (key == 'A')){
 			if (!(keyState & 1)){
 				keyState = keyState | 1;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 'd'){
+		if ((key == 'd') || (key == 'D')){
 			if (!(keyState & 1<<1)){
 				keyState = keyState | 1 << 1;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 'w'){
+		if ((key == 'w') || (key == 'W')){
 			if (!(keyState & 1<<2)){
 				keyState = keyState | 1 << 2;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
-		if (key == 's'){
+		if ((key == 's') || (key == 'S')){
 			if (!(keyState & 1<<3)){
 				keyState = keyState | 1 << 3;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
+		/*
 		if (key == 'W'){
 			if (!(keyState & 1<<5)){
 				keyState = keyState | 1 << 5;
 				player_list[playerID]->setAnimLoop(1, time);
 			}
 		}
+		*/
 
 		//This calls the player damaged effects
-		if (key == 'm'){
-			particle8->StartLoop();
-			Vibrate(65535, 65535, 500);
-		}
+		//if (key == 'm'){
+			//particle8->StartLoop();
+			//Vibrate(65535, 65535, 500);
+		//}
 
 		//This creates random explosion
-		if (key == 'n'){
-			createExplosion();
-		}
+		//if (key == 'n'){
+			//createExplosion();
+		//}
 
 		//This plays sound at <0,0,0>
-		if (key == 'i'){
+		//if (key == 'i'){
 		//	cout << posTestSound->getVolume() << "," << posTestSound->getMinDistance() << "," << posTestSound->getMaxDistance() << endl;
 
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
-			SoundEvents.push_back(testSound[SoundDoubleKillY]);
-			cout << "Adding a sound man!" << endl;
-		}
+			//SoundEvents.push_back(testSound[SoundDoubleKillY]);
+			//cout << "Adding a sound man!" << endl;
+	//	}
 		
-		if (key == 'o'){
-			//testSound[10]->Play();
+		if ((key == 'p') || (key == 'P')){
+			//createExplosion();
 		}
 		
 		if (key == 27){
@@ -3143,11 +3145,12 @@ void keyboard(unsigned char key, int, int){
 		}
 
 		//Added for sound debugging
-		if (key == 'f'){
+		//if (key == 'f'){
 			//testSound[SoundVegeta]->Play();
-			myDeathScreen->setDeathClock(clock());
-			myClientState->setState(3);
-		}
+			//myDeathScreen->setDeathClock(clock());
+			//myClientState->setState(3);
+		//}
+		/*
 		if (key == 13)
 		{
 			mat4 player = player_list[playerID]->getModelM();
@@ -3171,22 +3174,23 @@ void keyboard(unsigned char key, int, int){
 			//scene->addPlayer(cube6);
 
 		}
-
+		*/
 		if (key == 9)
 		{
 			kill_count = true;
 		}
 
-		if (key == 'p') //test for end screen
-		{
-			myClientState->setState(5);
-		}
+	//	if (key == 'p') //test for end screen
+	//	{
+	//		myClientState->setState(5);
+	//	}
 		if (key == 0x30)
 		{
 			draw_list.clear();
 			initialize(1, (char **)1);
 		}
 
+		/*
 		if (key == 'l'){
 			SelectFromMenu(MENU_LIGHTING);
 		}
@@ -3196,6 +3200,7 @@ void keyboard(unsigned char key, int, int){
 		if (key == 't'){
 			SelectFromMenu(MENU_TEXTURING);
 		}
+		*/
 
 		if (key == '1'){
 			light->diffuse += vec3(0.1, 0.1, 0.1);
@@ -3243,8 +3248,8 @@ void keyboard(unsigned char key, int, int){
 		break;
 	case 3:
 		if (key == 27){
-			running = false;
-			exit(0);
+			//running = false;
+			//exit(0);
 			myClientState->setState(1);
 		}
 		break;
@@ -3280,15 +3285,15 @@ void keyUp (unsigned char key, int x, int y) {
 		break;
 	case 1:
 
-		if (key == 'a'){
+		if ((key == 'a') || (key == 'A')){
 			keyState = keyState & ~1;
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
-		if (key == 'd'){
+		if ((key == 'd') || (key == 'D')){
 			keyState = keyState & ~(1 << 1);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
-		if (key == 'w'){
+		if ((key == 'w') || (key == 'W')){
 			// These vars need to become arrays for each player
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
@@ -3306,23 +3311,27 @@ void keyUp (unsigned char key, int x, int y) {
 			keyState = keyState & ~(1 << 2);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
-		if (key == 's'){
+		if ((key == 's') || (key == 'S')){
 			keyState = keyState & ~(1 << 3);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
+		/*
 		if (key == 'W'){
 			keyState = keyState & ~(1 << 5);
 			player_list[playerID]->unsetAnimLoop(1, time);
 		}
+		*/
 		if (key == ' '){
 			keyState = keyState & ~(1 << 4);
 			space_up = 1;
 		}
+		/*
 		if (key == 'l'){
 			alive = !alive;
 		}
+		*/
 		if (key == '9'){
-			baseOpen = true;
+		//	baseOpen = true;
 		}
 
 		if (key == 9)
