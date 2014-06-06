@@ -59,7 +59,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;freeglut.lib;glu32.lib;glew32.lib;QtCored4.lib;QtOpenGL4.lib;QtGui4.lib;assimpD.lib;DevIL.lib;ILU.lib;ILUT.lib;OpenAL32.lib;fmodex_vc.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;freeglut.lib;glu32.lib;glew32.lib;QtCored4.lib;QtOpenGL4.lib;QtGui4.lib;assimpD.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,9 +101,6 @@
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="JSON_Parse.h" />
     <ClInclude Include="LightningGenerator.h" />
-    <ClInclude Include="MD5Animation.h" />
-    <ClInclude Include="MD5Model.h" />
-    <ClInclude Include="MD5ModelLoaderPCH.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mesh_Static.h" />
     <ClInclude Include="Object.h" />
@@ -133,9 +130,6 @@
     <ClCompile Include="glslprogram.cpp" />
     <ClCompile Include="glutils.cpp" />
     <ClCompile Include="Helpers.cpp" />
-    <ClCompile Include="MD5Animation.cpp" />
-    <ClCompile Include="MD5Model.cpp" />
-    <ClCompile Include="MD5ModelLoaderPCH.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mesh_Static.cpp" />
     <ClCompile Include="ogldev_util.cpp" />

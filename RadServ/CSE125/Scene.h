@@ -7,7 +7,6 @@
 #include "Octree.h"
 #include "Projectile.h"
 #include "Window.h"
-#include "MD5Model.h"
 #include "Camera.h"
 #include "Ground.h"
 #include "billboard_list.h"
@@ -1399,7 +1398,7 @@ public:
 	int getTowerHealth(int towerID){ return tower[towerID]->getHealth(); }
 	void initialize(){
 
-		MD5Model* md50 = new MD5Model();
+		Cube* md50 = new Cube();
 		md50->setSpeed(PLAYER_SPEED);
 		md50->postTrans(glm::translate(vec3(0, 100, -92)));
 		md50->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
@@ -1411,7 +1410,7 @@ public:
 		md50->setAliveModelM(md50->getModelM());
 		addPlayer(md50);
 
-		MD5Model* md51 = new MD5Model();
+		Cube* md51 = new Cube();
 		md51->setSpeed(PLAYER_SPEED);
 		md51->postTrans(glm::translate(vec3(0, 100, 92)));
 		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
@@ -1423,7 +1422,7 @@ public:
 		md51->setAliveModelM(md51->getModelM());
 		addPlayer(md51);
 
-		MD5Model* md52 = new MD5Model();
+		Cube* md52 = new Cube();
 		md52->setSpeed(PLAYER_SPEED);
 		md52->postTrans(glm::translate(vec3(0, 100, -94)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
@@ -1435,7 +1434,7 @@ public:
 		md52->setAliveModelM(md52->getModelM());
 		addPlayer(md52);
 
-		MD5Model* md53 = new MD5Model();
+		Cube* md53 = new Cube();
 		md53->setSpeed(PLAYER_SPEED);
 		md53->postTrans(glm::translate(vec3(0, 100, 94)));
 		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));

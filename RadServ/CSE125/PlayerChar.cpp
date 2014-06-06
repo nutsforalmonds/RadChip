@@ -1,7 +1,7 @@
 #include "PlayerChar.h"
 
 PlayerChar::PlayerChar()
-: MD5Model()
+: Object()
 {
 	health = 7;
 	weapon = new RangeWeapon();
