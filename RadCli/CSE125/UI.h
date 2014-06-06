@@ -394,28 +394,28 @@ public:
 		p0_portrait->setShader(sdrCtl.getShader("basic_2D"));
 		p0_portrait->loadColorTex("img/UI_elements/new/portrait_chip.png", "PNG");
 		p0_portrait->setTex(true);
-		p0_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+		p0_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.3f, 0.2f, -1.0f)));
 
 		p1_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
 		p1_portrait->setColor(vec3(1.0, 1.0, 1.0));
 		p1_portrait->setShader(sdrCtl.getShader("basic_2D"));
 		p1_portrait->loadColorTex("img/UI_elements/new/portrait_gorilla.png", "PNG");
 		p1_portrait->setTex(true);
-		p1_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+		p1_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.3f, 0.2f, -1.0f)));
 
 		p2_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
 		p2_portrait->setColor(vec3(1.0, 1.0, 1.0));
 		p2_portrait->setShader(sdrCtl.getShader("basic_2D"));
 		p2_portrait->loadColorTex("img/UI_elements/new/portrait_oculus.png", "PNG");
 		p2_portrait->setTex(true);
-		p2_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+		p2_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.3f, 0.2f, -1.0f)));
 
 		p3_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
 		p3_portrait->setColor(vec3(1.0, 1.0, 1.0));
 		p3_portrait->setShader(sdrCtl.getShader("basic_2D"));
 		p3_portrait->loadColorTex("img/UI_elements/new/portrait_monkey.png", "PNG");
 		p3_portrait->setTex(true);
-		p3_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2, -1.0f)));
+		p3_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.3f, 0.2, -1.0f)));
 	}
 	~UI(){
 		life_back->		~UI_Panel();
