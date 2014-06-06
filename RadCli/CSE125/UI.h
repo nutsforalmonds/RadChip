@@ -352,35 +352,35 @@ public:
 		power_up_1 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
 		power_up_1->setColor(vec3(1.0, 1.0, 1.0));
 		power_up_1->setShader(sdrCtl.getShader("basic_2D"));
-		power_up_1->loadColorTex("img/boots.png", "PNG");
+		power_up_1->loadColorTex("img/UI_elements/new/boots.png", "PNG");
 		power_up_1->setTex(true);
 		power_up_1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
 		power_up_2 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
 		power_up_2->setColor(vec3(1.0, 1.0, 1.0));
 		power_up_2->setShader(sdrCtl.getShader("basic_2D"));
-		power_up_2->loadColorTex("img/dmgup.png", "PNG");
+		power_up_2->loadColorTex("img/UI_elements/new/dmgup.png", "PNG");
 		power_up_2->setTex(true);
 		power_up_2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
 		power_up_3 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
 		power_up_3->setColor(vec3(1.0, 1.0, 1.0));
 		power_up_3->setShader(sdrCtl.getShader("basic_2D"));
-		power_up_3->loadColorTex("img/heart.png", "PNG");
+		power_up_3->loadColorTex("img/UI_elements/new/heart.png", "PNG");
 		power_up_3->setTex(true);
 		power_up_3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
 		power_up_4 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
 		power_up_4->setColor(vec3(1.0, 1.0, 1.0));
 		power_up_4->setShader(sdrCtl.getShader("basic_2D"));
-		power_up_4->loadColorTex("img/projspd.png", "PNG");
+		power_up_4->loadColorTex("img/UI_elements/new/projspd.png", "PNG");
 		power_up_4->setTex(true);
 		power_up_4->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
 		power_up_5 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
 		power_up_5->setColor(vec3(1.0, 1.0, 1.0));
 		power_up_5->setShader(sdrCtl.getShader("basic_2D"));
-		power_up_5->loadColorTex("img/rngup.png", "PNG");
+		power_up_5->loadColorTex("img/UI_elements/new/rngup.png", "PNG");
 		power_up_5->setTex(true);
 		power_up_5->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
@@ -1100,7 +1100,7 @@ public:
 		frame = new UI_Panel(-0.5f, 0.5f, -0.25, 0.25);
 		frame->setColor(vec3(1.0, 1.0, 1.0));
 		frame->setShader(sdrCtl.getShader("basic_2D"));
-		frame->loadColorTex("img/UI_elements/glassPanel.png", "PNG");
+		frame->loadColorTex("img/UI_elements/new/glassPanel.png", "PNG");
 		frame->setTex(true);
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
@@ -1123,7 +1123,7 @@ public:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
-		//frame->draw();
+		frame->draw();
 
 		glDisable(GL_BLEND);
 
@@ -1304,7 +1304,7 @@ public:
 		frame = new UI_Panel(-0.5f, 0.5f, -0.5, 0.5);
 		frame->setColor(vec3(1.0, 0.0, 0.0));
 		frame->setShader(sdrCtl.getShader("basic_2D"));
-		frame->loadColorTex("img/UI_elements/glassPanel.png", "PNG");
+		frame->loadColorTex("img/UI_elements/new/glassPanel.png", "PNG");
 		frame->setTex(true);
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
 
