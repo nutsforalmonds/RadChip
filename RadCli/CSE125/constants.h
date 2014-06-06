@@ -89,7 +89,7 @@
 #define CENTER_PLAT_HEIGHT    10
 
 // sounds
-#define NumberOfSounds 30
+#define NumberOfSounds 47
 #define SoundJumpWav 0
 #define SoundJumpOgg 1
 #define SoundVegeta 2
@@ -120,4 +120,21 @@
 #define SoundTurretHalfKillEnemy 27
 #define SoundTurretHalfKillYourT 28
 #define SoundVictory 29
+#define SoundKillingSpree2E 30
+#define SoundKillingSpree3E 31
+#define SoundKillingSpree4E 32
+#define SoundKillingSpree5E 33
+#define SoundKillingSpree6E 34
+#define SoundKillingSpree2Y 35
+#define SoundKillingSpree3Y 36
+#define SoundKillingSpree4Y 37
+#define SoundKillingSpree5Y 38
+#define SoundKillingSpree6Y 39
+#define SoundKillingSpreeU 40
+#define SoundKillingSpree2U 41
+#define SoundKillingSpree3U 42
+#define SoundKillingSpree4U 43
+#define SoundKillingSpree5U 44
+#define SoundKillingSpree6U 45
+#define SoundShutdown 46
 

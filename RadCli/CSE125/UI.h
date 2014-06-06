@@ -388,6 +388,34 @@ public:
 		p_up_timer->setColor(vec3(1.0, 0.5, 0.0));
 		p_up_timer->setShader(sdrCtl.getShader("basic_2D"));
 		p_up_timer->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.3f, -1.0f)));
+
+		p0_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
+		p0_portrait->setColor(vec3(1.0, 1.0, 1.0));
+		p0_portrait->setShader(sdrCtl.getShader("basic_2D"));
+		p0_portrait->loadColorTex("img/UI_elements/new/portrait_chip.png", "PNG");
+		p0_portrait->setTex(true);
+		p0_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+
+		p1_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
+		p1_portrait->setColor(vec3(1.0, 1.0, 1.0));
+		p1_portrait->setShader(sdrCtl.getShader("basic_2D"));
+		p1_portrait->loadColorTex("img/UI_elements/new/portrait_gorilla.png", "PNG");
+		p1_portrait->setTex(true);
+		p1_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+
+		p2_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
+		p2_portrait->setColor(vec3(1.0, 1.0, 1.0));
+		p2_portrait->setShader(sdrCtl.getShader("basic_2D"));
+		p2_portrait->loadColorTex("img/UI_elements/new/portrait_oculus.png", "PNG");
+		p2_portrait->setTex(true);
+		p2_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2f, -1.0f)));
+
+		p3_portrait = new UI_Panel(-0.06f, 0.06f, -0.06f, 0.06f);
+		p3_portrait->setColor(vec3(1.0, 1.0, 1.0));
+		p3_portrait->setShader(sdrCtl.getShader("basic_2D"));
+		p3_portrait->loadColorTex("img/UI_elements/new/portrait_monkey.png", "PNG");
+		p3_portrait->setTex(true);
+		p3_portrait->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.2, -1.0f)));
 	}
 	~UI(){
 		life_back->		~UI_Panel();
@@ -424,6 +452,11 @@ public:
 		team_color->    ~UI_Panel();
 
 		p_up_timer->    ~UI_Panel();
+
+		p0_portrait->   ~UI_Panel();
+		p1_portrait->   ~UI_Panel();
+		p2_portrait->   ~UI_Panel();
+		p3_portrait->   ~UI_Panel();
 	}
 
 	int draw(){
@@ -538,6 +571,49 @@ public:
 		glDisable(GL_BLEND);
 
 		return 0;
+	}
+
+	int drawPortrait(int ID, string s){
+
+		char buf[200];
+		int offset;
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		switch (ID){
+		case 0:
+			p0_portrait->draw();
+			offset = -10;
+			break;
+		case 1:
+			p1_portrait->draw();
+			offset = 30;
+			break;
+		case 2:
+			p2_portrait->draw();
+			offset = 0;
+			break;
+		case 3:
+			p3_portrait->draw();
+			offset = 0;
+			break;
+		default:
+			offset = 0;
+			break;
+		}
+
+		glDisable(GL_BLEND);
+
+		glDisable(GL_DEPTH_TEST);
+
+		sprintf_s(buf, "%s", s.c_str());
+		RenderString((Window::width / 2) - 145 + offset, 5 * Window::height / 8 + 48, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+
+		glEnable(GL_DEPTH_TEST);
+
+		return 0;
+
 	}
 
 	int healthBar(float damage){
@@ -790,6 +866,11 @@ private:
 	UI_Panel* power_up_3;
 	UI_Panel* power_up_4;
 	UI_Panel* power_up_5;
+
+	UI_Panel* p0_portrait;
+	UI_Panel* p1_portrait;
+	UI_Panel* p2_portrait;
+	UI_Panel* p3_portrait;
 
 	UI_Panel* team_color;
 

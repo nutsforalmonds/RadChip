@@ -201,6 +201,8 @@ struct Mother{
 	ParticleAnimated* mother_of_green_arrow;
 	ParticleAnimated* mother_of_tramp_effect;
 	ParticleAnimated* mother_of_portal_effect;
+	ParticleAnimated* mother_of_orange_mark;
+	ParticleAnimated* mother_of_blue_mark;
 }MOM;
 
 int texScreenWidth = 512;
@@ -345,8 +347,7 @@ float nextBackgroundMusicTimeSec = 345.0;
 float currBackgroundMusicTimeSec = 345.0;
 
 float nextSoundEventTimeSec = 2.5;
-float currSoundEventTimeSec = 2.5;
-int NumSoundEvents = 0;
+float currSoundEventTimeSec = 0.0;
 
 vector<Sound*> SoundEvents;
 
@@ -485,16 +486,12 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		if (NumSoundEvents > 0){
+		if (!SoundEvents.empty()){
 			currSoundEventTimeSec += diff;
 			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
 				currSoundEventTimeSec = 0;
 				SoundEvents[0]->Play();
 				SoundEvents.erase(SoundEvents.begin());
-				NumSoundEvents--;
-				if (NumSoundEvents < 0){
-					NumSoundEvents = 0;
-				}
 			}
 		}
 	}
@@ -1207,6 +1204,7 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	string s = "It was the best of times, it was the worst of times";
 	static time_t timer = clock();
 
 	if (clock() - timer >= CLOCKS_PER_SEC){
@@ -1402,6 +1400,7 @@ void Window::displayCallback(void)
 		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
 
 		myUI->draw();
+		myUI->drawPortrait(playerID, s);
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
@@ -1697,6 +1696,9 @@ void server_update(int value){
 			//cout << "Killed 0" << endl;
 			if (!dead[PLAYER0])
 			{
+				if (Player0_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player0_KillSpree = 0;
 				Player0_KillSpreeLast = 0;
 				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
@@ -1704,7 +1706,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0); 
+				myGameMenu->setDeath(PLAYER0);
 				dead[PLAYER0] = true;
 			}
 		}
@@ -1716,6 +1718,9 @@ void server_update(int value){
 			//cout << "Killed 1" << endl;
 			if (!dead[PLAYER1])
 			{
+				if (Player1_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player1_KillSpree = 0;
 				Player1_KillSpreeLast = 0;
 				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
@@ -1723,7 +1728,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player1_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0);
+				myGameMenu->setDeath(PLAYER1);
 				dead[PLAYER1] = true;
 			}
 		}
@@ -1735,6 +1740,9 @@ void server_update(int value){
 			//cout << "Killed 2" << endl;
 			if (!dead[PLAYER2])
 			{
+				if (Player2_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player2_KillSpree = 0;
 				Player2_KillSpreeLast = 0;
 				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
@@ -1742,7 +1750,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player2_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(2);
+				myGameMenu->setDeath(PLAYER2);
 				dead[PLAYER2] = true;
 			}
 		}
@@ -1754,6 +1762,9 @@ void server_update(int value){
 			//cout << "Killed 3" << endl;
 			if (!dead[PLAYER3])
 			{
+				if (Player3_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player3_KillSpree = 0;
 				Player3_KillSpreeLast = 0;
 				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
@@ -1761,7 +1772,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player3_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(3);
+				myGameMenu->setDeath(PLAYER3);
 				dead[PLAYER3] = true;
 			}
 		}
@@ -1798,22 +1809,18 @@ void server_update(int value){
 			if (Player0_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player1_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player2_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player3_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 		}
 
@@ -1852,12 +1859,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -1870,12 +1875,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -1888,12 +1891,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -1906,12 +1907,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -1919,48 +1918,324 @@ void server_update(int value){
 			Player3_DoubleKillTime = 3000;
 		}
 
-		/*
-		if (Player0_KillSpree > Player0_KillSpreeLast){
+		
+		if ((Player0_KillSpree > Player0_KillSpreeLast) && (Player0_KillSpree > 2)){
+			if (Player0_KillSpree > 8){
+				Player0_KillSpree = 8;
+			}
 			Player0_KillSpreeLast = Player0_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER0) 
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER2){
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player1_KillSpree > Player1_KillSpreeLast){
+		if ((Player1_KillSpree > Player1_KillSpreeLast) && (Player1_KillSpree > 2)){
+			if (Player1_KillSpree > 8){
+				Player1_KillSpree = 8;
+			}
 			Player1_KillSpreeLast = Player1_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER1)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER3){
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player2_KillSpree > Player2_KillSpreeLast){
+		if ((Player2_KillSpree > Player2_KillSpreeLast) && (Player2_KillSpree > 2)){
+			if (Player2_KillSpree > 8){
+				Player2_KillSpree = 8;
+			}
 			Player2_KillSpreeLast = Player2_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER2)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER0){
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player3_KillSpree > Player3_KillSpreeLast){
+		if ((Player3_KillSpree > Player3_KillSpreeLast) && (Player3_KillSpree > 2)){
+			if (Player3_KillSpree > 8){
+				Player3_KillSpree = 8;
+			}
 			Player3_KillSpreeLast = Player3_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER3)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER1){
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		*/
+		
 		myGameMenu->setKills(0, Player0_KillCount);
 		myGameMenu->setKills(1, Player1_KillCount);
 		myGameMenu->setKills(2, Player2_KillCount);
@@ -2529,7 +2804,6 @@ void keyboard(unsigned char key, int, int){
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
 			SoundEvents.push_back(testSound[SoundDoubleKillY]);
-			NumSoundEvents++;
 			cout << "Adding a sound man!" << endl;
 		}
 		
@@ -3315,6 +3589,9 @@ void initialize(int argc, char *argv[])
 
 	initializeMOM();
 
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
 	//p_anim->setShader(sdrCtl.getShader("billboard_anim"));
@@ -3379,7 +3656,7 @@ void initialize(int argc, char *argv[])
 	player1->setAnimController(gorillaAnimController);
 	player1->setShader(sdrCtl.getShader("basic_model"));
 	player1->setShadowTex(shadow_map_id);
-	player1->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 0.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player1->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 	player1->setShininess(30);
 	player1->setFog(fog);
 	player_list.push_back(player1);
@@ -3399,7 +3676,7 @@ void initialize(int argc, char *argv[])
 	player3->setAnimController(monkeyAnimController);
 	player3->setShader(sdrCtl.getShader("basic_model"));
 	player3->setShadowTex(shadow_map_id);
-	player3->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 0.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player3->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 	player3->setShininess(30);
 	player3->setFog(fog);
 	player_list.push_back(player3);
@@ -3413,6 +3690,12 @@ void initialize(int argc, char *argv[])
 	tower0->setShininess(30);
 	tower0->setFog(fog);
 	tower_list.push_back(tower0);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower0 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower0->setFollow(tower0, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower0->setStartTime(ct);
+	panim_list.push_back(mark_tower0);
 
 	t0_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t0_ps_01->setShader(sdrCtl.getShader("pe_torus"));
@@ -3487,6 +3770,12 @@ void initialize(int argc, char *argv[])
 	tower1->setFog(fog);
 	tower_list.push_back(tower1);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower1 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower1->setFollow(tower1, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower1->setStartTime(ct);
+	panim_list.push_back(mark_tower1);
+
 	t1_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t1_ps_01->setShader(sdrCtl.getShader("pe_torus"));
 	t1_ps_01->setType("Particle_System");
@@ -3560,6 +3849,12 @@ void initialize(int argc, char *argv[])
 	tower2->setFog(fog);
 	tower_list.push_back(tower2);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower2 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower2->setFollow(tower2, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower2->setStartTime(ct);
+	panim_list.push_back(mark_tower2);
+
 	t2_ps_01 = new ParticleSystem(GL_POINTS);
 	t2_ps_01->setShader(sdrCtl.getShader("halo"));
 	t2_ps_01->setType("Particle_System");
@@ -3617,6 +3912,12 @@ void initialize(int argc, char *argv[])
 	tower3->setShininess(30);
 	tower3->setFog(fog);
 	tower_list.push_back(tower3);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower3 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower3->setFollow(tower3, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower3->setStartTime(ct);
+	panim_list.push_back(mark_tower3);
 
 	t3_ps_01 = new ParticleSystem(GL_POINTS);
 	t3_ps_01->setShader(sdrCtl.getShader("halo"));
@@ -4002,8 +4303,6 @@ void initialize(int argc, char *argv[])
 	//Trampoline effect
 	ParticleAnimated* tramp_effect_01 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
 	tramp_effect_01->setModelM(tramp_01->getModelM()*glm::translate(vec3(0, 1, 0)));
-	LARGE_INTEGER ct;
-	QueryPerformanceCounter(&ct);
 	tramp_effect_01->setStartTime(ct);
 	panim_list.push_back(tramp_effect_01);
 
@@ -5678,10 +5977,46 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->setType(1);
 	MOM.mother_of_portal_effect->setSampleCount(3, 3);
 	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
-	MOM.mother_of_portal_effect->setTransparency(0.5);
-	MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setTransparency(0.8);
+	MOM.mother_of_portal_effect->setBlurStrength(0.5);
 	MOM.mother_of_portal_effect->setFog(fog);
 	MOM.mother_of_portal_effect->Bind();
+
+	MOM.mother_of_orange_mark = new ParticleAnimated();
+	MOM.mother_of_orange_mark->Init("img/sprite_sheets/cast_001.png", "PNG");
+	MOM.mother_of_orange_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_orange_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_orange_mark->setWidth(4.0f);
+	MOM.mother_of_orange_mark->setHeight(4.0f);
+	MOM.mother_of_orange_mark->setNumColumn(5);
+	MOM.mother_of_orange_mark->setNumRow(4);
+	MOM.mother_of_orange_mark->setValidFrame(0, 19);
+	MOM.mother_of_orange_mark->setDuration(1.0);
+	MOM.mother_of_orange_mark->setType(1);
+	MOM.mother_of_orange_mark->setSampleCount(3, 3);
+	MOM.mother_of_orange_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_orange_mark->setTransparency(0.8);
+	MOM.mother_of_orange_mark->setBlurStrength(0.5);
+	MOM.mother_of_orange_mark->setFog(emptyFog);
+	MOM.mother_of_orange_mark->Bind();
+
+	MOM.mother_of_blue_mark = new ParticleAnimated();
+	MOM.mother_of_blue_mark->Init("img/sprite_sheets/cast_004.png", "PNG");
+	MOM.mother_of_blue_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_blue_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_blue_mark->setWidth(4.0f);
+	MOM.mother_of_blue_mark->setHeight(4.0f);
+	MOM.mother_of_blue_mark->setNumColumn(5);
+	MOM.mother_of_blue_mark->setNumRow(4);
+	MOM.mother_of_blue_mark->setValidFrame(0, 19);
+	MOM.mother_of_blue_mark->setDuration(1.0);
+	MOM.mother_of_blue_mark->setType(1);
+	MOM.mother_of_blue_mark->setSampleCount(3, 3);
+	MOM.mother_of_blue_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_blue_mark->setTransparency(0.8);
+	MOM.mother_of_blue_mark->setBlurStrength(0.5);
+	MOM.mother_of_blue_mark->setFog(emptyFog);
+	MOM.mother_of_blue_mark->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){
