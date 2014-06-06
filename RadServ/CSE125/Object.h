@@ -40,7 +40,7 @@ public:
 		powerUp = 0;
 		powerUpDuration = 0;
 	}
-	Object(string n, string t){
+	Object(string n, int t){
 		onElevator = false;
 		name = n;
 		type = t;
@@ -70,8 +70,8 @@ public:
 	}
 	virtual void draw(){/* This is a placeholder*/ }
 
-	void setType(string t){type = t;}
-	string getType(){return type;}
+	void setType(int t){type = t;}
+	int getType(){return type;}
 	void setName(string n){name = n;}
 	string getName(){return name;}
 
@@ -221,7 +221,7 @@ protected:
 	bool onElevator;
 	mat4 modelM;
 	mat4 Rotation;
-	string type;
+	int type;
 	string name;
 	AABB bBox;
 	vec3 velocity;//velocity in object space
