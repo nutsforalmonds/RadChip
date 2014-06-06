@@ -384,6 +384,7 @@ int wins;
 bool winCountToggle = false;
 bool playerReady = true;
 int displayWinner = 0;
+int enemyWins = 0;
 
 int powerUp = 0;
 int Player0_KillSpree = 0;
@@ -1453,6 +1454,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 1;
 					wins++;
+					myGameMenu->setRoundWon('c', wins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1463,6 +1465,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 1;
 					wins++;
+					myGameMenu->setRoundWon('m', wins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1472,6 +1475,8 @@ void Window::displayCallback(void)
 				if (!winCountToggle)
 				{
 					displayWinner = 0;
+					enemyWins++;
+					myGameMenu->setRoundWon('c', enemyWins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1481,6 +1486,8 @@ void Window::displayCallback(void)
 				if (!winCountToggle)
 				{
 					displayWinner = 0;
+					enemyWins++;
+					myGameMenu->setRoundWon('m', enemyWins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1497,6 +1504,8 @@ void Window::displayCallback(void)
 		else if (kill_count){
 			myGameMenu->killDraw();
 		}
+
+
 
 		break;
 	case 4:
