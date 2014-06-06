@@ -31,8 +31,8 @@ void main()
     if(sample_x!=0 || sample_y!=0){
     	for(int i=-sample_x;i<sample_x+1;i++){
 	    	for(int j=-sample_y;j<sample_y+1;j++){
-	    		vec4 add_on_color = texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist))/((2*sample_x+1)*(2*sample_y+1))*blur_strength;
-	    		add_on_color[3]=0;
+	    		vec4 add_on_color = texture2D(texUnit, TexCoord+vec2(i*x_dist,j*y_dist));
+	    		add_on_color = vec4(add_on_color.xyz*add_on_color[3] , add_on_color[3])*blur_strength/((2*sample_x+1)*(2*sample_y+1));
 	    		FragColor += add_on_color;
 	    	}
    		}
