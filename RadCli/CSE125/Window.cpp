@@ -3386,7 +3386,7 @@ void initialize(int argc, char *argv[])
 	player1->setAnimController(gorillaAnimController);
 	player1->setShader(sdrCtl.getShader("basic_model"));
 	player1->setShadowTex(shadow_map_id);
-	player1->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 0.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player1->setAdjustM(glm::translate(vec3(0.0, 1.05, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 	player1->setShininess(30);
 	player1->setFog(fog);
 	player_list.push_back(player1);
@@ -3406,7 +3406,7 @@ void initialize(int argc, char *argv[])
 	player3->setAnimController(monkeyAnimController);
 	player3->setShader(sdrCtl.getShader("basic_model"));
 	player3->setShadowTex(shadow_map_id);
-	player3->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 0.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
+	player3->setAdjustM(glm::translate(vec3(0.0, 1.35, 0.0))*glm::rotate(mat4(1.0), 180.0f, vec3(0, 1.0, 0))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0))*glm::scale(vec3(0.07, 0.07, 0.07)));
 	player3->setShininess(30);
 	player3->setFog(fog);
 	player_list.push_back(player3);
