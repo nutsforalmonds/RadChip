@@ -4109,7 +4109,7 @@ void initialize(int argc, char *argv[])
 	//island 
 	Cube* platform_02 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
-	platform_02->setKd(vec3(0.11, 0.67, 0.09));
+	platform_02->setKd(vec3(0.8, 0.0, 0.8));
 	platform_02->setKa(vec3(0.0, 0.0, 0.3));
 	platform_02->setKs(vec3(0.0, 0.0, 0.4));
 	platform_02->setShininess(100);
@@ -4130,9 +4130,9 @@ void initialize(int argc, char *argv[])
 	//island 
 	Cube* platform_03 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
-	platform_03->setKd(vec3(0.11, 0.67, 0.09));
-	platform_03->setKa(vec3(0.0, 0.2, 0.0));
-	platform_03->setKs(vec3(0.0, 0.3, 0.0));
+	platform_03->setKd(vec3(0.8, 0.0, 0.8));
+	platform_03->setKa(vec3(0.0, 0.0, 0.4));
+	platform_03->setKs(vec3(0.0, 0.0, 0.4));
 	platform_03->setShininess(100);
 	platform_03->setFog(fog);
 	platform_03->setReflectFactor(vec2(0.2, 0.5));
@@ -4152,8 +4152,8 @@ void initialize(int argc, char *argv[])
 	Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 42);
 	//platform_01->setSpeed(5); 
 	platform_04->setKd(vec3(0.8, 0.0, 0.8));
-	platform_04->setKa(vec3(0.3, 0.3, 0.0));
-	platform_04->setKs(vec3(0.4, 0.4, 0.0));
+	platform_04->setKa(vec3(0.0, 0.0, 0.4));
+	platform_04->setKs(vec3(0.0, 0.0, 0.4));
 	platform_04->setShininess(100);
 	platform_04->setFog(fog);
 	platform_04->setReflectFactor(vec2(0.2, 0.5));
