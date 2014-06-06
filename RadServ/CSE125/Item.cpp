@@ -10,6 +10,10 @@ int Item::getHealth()
 	return health;
 }
 
+Item::~Item(){
+
+}
+
 void Item::setHealth(int val)
 {
 	health = val;
