@@ -2650,6 +2650,7 @@ void keyboard(unsigned char key, int, int){
 
 		if (key == 27){
 			//running = false;
+			myUI->resetTowerKills();
 			myClientState->setState(1);
 			playerReady = true;
 			winCountToggle = false;
@@ -2946,6 +2947,7 @@ void mouseFunc(int button, int state, int x, int y)
 				myClientState->setState(1);
 				playerReady = true;
 				winCountToggle = false;
+				myUI->resetTowerKills();
 			}
 		}
 		break;
