@@ -1472,7 +1472,7 @@ public:
 		Cube* md51 = new Cube();
 		md51->setSpeed(PLAYER_SPEED);
 		md51->postTrans(glm::translate(vec3(0, 100, 92)));
-		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
+		md51->postRotate(glm::rotate(mat4(1.0), 0.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType(MODEL);
 		md51->setName("Player Model1");
@@ -1496,7 +1496,7 @@ public:
 		Cube* md53 = new Cube();
 		md53->setSpeed(PLAYER_SPEED);
 		md53->postTrans(glm::translate(vec3(0, 100, 94)));
-		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
+		md53->postRotate(glm::rotate(mat4(1.0), 0.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType(MODEL);
 		md53->setName("Player Model3");
