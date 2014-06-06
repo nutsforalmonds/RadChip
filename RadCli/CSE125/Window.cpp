@@ -5065,7 +5065,7 @@ void initialize(int argc, char *argv[])
 
 	//force field effect
 	force_field[0] = new ParticleAnimated(*(MOM.mother_of_force_field));
-	force_field[0]->setFollow(tower100, vec3(0, 2, 0), 1, &View);
+	force_field[0]->setFollow(tower100, vec3(0, 1.0, 0), 1, &View);
 	force_field[0]->setStartTime(ct);
 
 	//diag plat 0
@@ -5489,7 +5489,7 @@ void initialize(int argc, char *argv[])
 
 	//force field effect
 	force_field[1] = new ParticleAnimated(*(MOM.mother_of_force_field));
-	force_field[1]->setFollow(tower200, vec3(0, 2, 0), 1, &View);
+	force_field[1]->setFollow(tower200, vec3(0, 2.3, 0), 1, &View);
 	force_field[1]->setStartTime(ct);
 
 
