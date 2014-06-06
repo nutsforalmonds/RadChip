@@ -25,6 +25,7 @@ public:
 		onGround = true;
 		health = 7;
 		maxHealth = 7;
+		tempHealth = 0;
 		numJumps = 5;
 		respawnCounter = 0;
 		kills = 0;
@@ -47,6 +48,7 @@ public:
 		modelM = mat4(1.0);
 		onGround = true;
 		health = 7;
+		tempHealth = 0;
 		maxHealth = 7;
 		numJumps = 5;
 		respawnCounter = 0;
@@ -64,6 +66,7 @@ public:
 	}
 	~Object()
 	{
+
 	}
 	virtual void draw(){/* This is a placeholder*/ }
 
@@ -165,9 +168,8 @@ public:
 
 	int getHealth(){ return health; }
 
-	int getMaxHealth() { return maxHealth; }
+	int getMaxHealth() { return health + tempHealth; }
 
-	void setMaxHealth(int i) { maxHealth += i; }
 
 	void setHealth(int i){ health += i; }
 
@@ -211,6 +213,10 @@ public:
 	bool getIsPlatformDamage() { return isPlatformDamage; }
 	void setIsPlatformDamage(bool b) { isPlatformDamage = b; }
 
+	int getTempHealth(){ return tempHealth; }
+
+	void setTempHealth(int i){  tempHealth = i; }
+
 protected:
 	bool onElevator;
 	mat4 modelM;
@@ -240,4 +246,5 @@ protected:
 	bool isPlatformDamage;
 	int powerUp;
 	int powerUpDuration;
+	int tempHealth;
 };

@@ -55,6 +55,7 @@ int playerID = -1;
 int numOfVecs = 4;
 int keyState = 0;
 bool player1shoot, player2shoot, player3shoot, player4shoot;
+int overCounter = 0;
 
 std::string str;
 gameState gs;
@@ -590,6 +591,7 @@ int main(int argc, char *argv[])
 			scene->setPlatformDamaged(i, false);
 			//scene->setPlatformDead(i, false);
 		}
+		platform_status += std::to_string(scene->checkTowerAlive());
 		
 		//tower infos
 		string ts[NUM_TOWERS] = { "" };
@@ -696,6 +698,17 @@ int main(int argc, char *argv[])
 		}
 		else{
 			//cout << diff << endl;
+		}
+		if (scene->getGameOver())
+		{
+			overCounter++;
+			if (overCounter > 20)
+			{
+				delete scene;
+				scene = new Scene();
+				scene->setGravity(vec3(0, -9.8, 0));
+				overCounter = 0;
+			}
 		}
 	}
 	return 0;
