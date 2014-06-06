@@ -987,6 +987,30 @@ public:
 			}
 		}
 
+		//stationary-tower projectile detection
+		for (uint i = 0; i < tower_projectile.size(); i++){
+			for (uint j = 0; j < stationary.size(); j++){
+				AABB pBox = tower_projectile[i]->getAABB();
+				AABB sBox = stationary[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					if (stationary[j]->getIsPlatformDamage()){
+						damageStationary(j, tower_projectile[i]->getPlayerID());
+					}
+					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
+					delete tower_projectile[i];
+					tower_projectile.erase(tower_projectile.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
@@ -1458,8 +1482,8 @@ public:
 		tw0->postTrans(glm::translate(vec3(-70.0, 14.0, -100.0)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
-		tw0->setShootRange(20);
-		tw0->setShootSpeed(20);
+		tw0->setShootRange(40);
+		tw0->setShootSpeed(40);
 		tw0->setHealth(20);
 		tw0->setDamage(-1);
 		tw0->setType(MODEL);
@@ -1473,8 +1497,8 @@ public:
 		tw1->postTrans(glm::translate(vec3(70.0, 14.0, -100.0)));
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
-		tw1->setShootRange(20);
-		tw1->setShootSpeed(20);
+		tw1->setShootRange(40);
+		tw1->setShootSpeed(40);
 		tw1->setHealth(20);
 		tw1->setDamage(-1);
 		tw1->setType(MODEL);
@@ -1488,8 +1512,8 @@ public:
 		tw2->postTrans(glm::translate(vec3(70.0, 14, 100.0)));
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
-		tw2->setShootRange(20);
-		tw2->setShootSpeed(20);
+		tw2->setShootRange(40);
+		tw2->setShootSpeed(40);
 		tw2->setHealth(20);
 		tw2->setDamage(-1);
 		tw2->setType(MODEL);
@@ -1503,8 +1527,8 @@ public:
 		tw3->postTrans(glm::translate(vec3(-70.0, 14, 100.0)));
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
-		tw3->setShootRange(20);
-		tw3->setShootSpeed(20);
+		tw3->setShootRange(40);
+		tw3->setShootSpeed(40);
 		tw3->setHealth(20);
 		tw3->setDamage(-1);
 		tw3->setType(MODEL);
@@ -1520,8 +1544,8 @@ public:
 			ORIGINZ0)));
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
-		tower100->setShootRange(20);
-		tower100->setShootSpeed(20);
+		tower100->setShootRange(40);
+		tower100->setShootSpeed(40);
 		tower100->setHealth(20);
 		tower100->setDamage(-1);
 		tower100->setType(MODEL);
@@ -1539,8 +1563,8 @@ public:
 			ORIGINZ1)));
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
-		tower200->setShootRange(20);
-		tower200->setShootSpeed(20);
+		tower200->setShootRange(40);
+		tower200->setShootSpeed(40);
 		tower200->setHealth(20);
 		tower200->setDamage(-1);
 		tower200->setType(MODEL);

@@ -304,6 +304,7 @@ int m_pos = 0;
 int text_flag = 0;
 
 bool kill_count = false;
+float offset = 0.2;
 
 bool connected;
 std::string out;
@@ -624,11 +625,11 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(20);
+	pjt->setDistance(40);
 	//Name and type
 	pjt->setName("Tower Projectile");
-	pjt->setSpeed(20);
-	pjt->setVelocity(glm::normalize(direction)*20.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setSpeed(40);
+	pjt->setVelocity(glm::normalize(direction)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
@@ -1224,10 +1225,16 @@ void Window::displayCallback(void)
 		glEnable(GL_DEPTH_TEST);
 		*/
 		myMainMenu->draw();
-		logo->draw();
+		//logo->draw();
+		
+		offset = .08;
 
+		if ((float)Window::width / (float)Window::height <= 1.5)
+		{
+			offset = 0;
+		}
 		glDisable(GL_DEPTH_TEST);
-		RenderString((Window::width) * .41, (Window::height) * .78, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
+		RenderString((Window::width) * (.7225 - offset), (Window::height) * .06, GLUT_BITMAP_HELVETICA_18, ip_adress, vec3(1.0f, 1.0f, 1.0f));
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case 1:
@@ -2241,6 +2248,11 @@ int main(int argc, char *argv[])
 
   BuildPopupMenu();
   //glutAttachMenu(GLUT_MIDDLE_BUTTON);
+
+  int screen_width = glutGet(GLUT_WINDOW_WIDTH);
+  int screen_height = glutGet(GLUT_WINDOW_HEIGHT);
+  Window::width = screen_width;
+  Window::height = screen_height;
 
   initialize(argc, argv);  
 
