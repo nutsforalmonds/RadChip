@@ -68,7 +68,7 @@
             "frag": "Shaders/screen_texture.frag"
         }
     ],
-    "num_audio": 30,
+    "num_audio": 47,
     "audio": [
         {
             "name": "Jump Wav",
@@ -189,6 +189,74 @@
         {
             "name": "Victory",
             "path": "Sound/Victory.wav"
+        },
+        {
+            "name": "KillingSpree2E",
+            "path": "Sound/KillingSpree2E.wav"
+        },
+        {
+            "name": "KillingSpree3E",
+            "path": "Sound/KillingSpree3E.wav"
+        },
+        {
+            "name": "KillingSpree4E",
+            "path": "Sound/KillingSpree4E.wav"
+        },
+        {
+            "name": "KillingSpree5E",
+            "path": "Sound/KillingSpree5E.wav"
+        },
+        {
+            "name": "KillingSpree6E",
+            "path": "Sound/KillingSpree6E.wav"
+        },
+        {
+            "name": "KillingSpree2Y",
+            "path": "Sound/KillingSpree2Y.wav"
+        },
+        {
+            "name": "KillingSpree3Y",
+            "path": "Sound/KillingSpree3Y.wav"
+        },
+        {
+            "name": "KillingSpree4Y",
+            "path": "Sound/KillingSpree4Y.wav"
+        },
+        {
+            "name": "KillingSpree5Y",
+            "path": "Sound/KillingSpree5Y.wav"
+        },
+        {
+            "name": "KillingSpree6Y",
+            "path": "Sound/KillingSpree6Y.wav"
+        },
+        {
+            "name": "KillingSpreeU",
+            "path": "Sound/KillingSpreeU.wav"
+        },
+        {
+            "name": "KillingSpree2U",
+            "path": "Sound/KillingSpree2U.wav"
+        },
+        {
+            "name": "KillingSpree3U",
+            "path": "Sound/KillingSpree3U.wav"
+        },
+        {
+            "name": "KillingSpree4U",
+            "path": "Sound/KillingSpree4U.wav"
+        },
+        {
+            "name": "KillingSpree5U",
+            "path": "Sound/KillingSpree5U.wav"
+        },
+        {
+            "name": "KillingSpree6U",
+            "path": "Sound/KillingSpree6U.wav"
+        },
+        {
+            "name": "Shutdown",
+            "path": "Sound/Shutdown.wav"
         }
     ],
     "num_texture": 6,

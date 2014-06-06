@@ -347,8 +347,7 @@ float nextBackgroundMusicTimeSec = 345.0;
 float currBackgroundMusicTimeSec = 345.0;
 
 float nextSoundEventTimeSec = 2.5;
-float currSoundEventTimeSec = 2.5;
-int NumSoundEvents = 0;
+float currSoundEventTimeSec = 0.0;
 
 vector<Sound*> SoundEvents;
 
@@ -487,16 +486,12 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		if (NumSoundEvents > 0){
+		if (!SoundEvents.empty()){
 			currSoundEventTimeSec += diff;
 			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
 				currSoundEventTimeSec = 0;
 				SoundEvents[0]->Play();
 				SoundEvents.erase(SoundEvents.begin());
-				NumSoundEvents--;
-				if (NumSoundEvents < 0){
-					NumSoundEvents = 0;
-				}
 			}
 		}
 	}
@@ -1701,6 +1696,9 @@ void server_update(int value){
 			//cout << "Killed 0" << endl;
 			if (!dead[PLAYER0])
 			{
+				if (Player0_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player0_KillSpree = 0;
 				Player0_KillSpreeLast = 0;
 				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
@@ -1720,6 +1718,9 @@ void server_update(int value){
 			//cout << "Killed 1" << endl;
 			if (!dead[PLAYER1])
 			{
+				if (Player1_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player1_KillSpree = 0;
 				Player1_KillSpreeLast = 0;
 				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
@@ -1739,6 +1740,9 @@ void server_update(int value){
 			//cout << "Killed 2" << endl;
 			if (!dead[PLAYER2])
 			{
+				if (Player2_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player2_KillSpree = 0;
 				Player2_KillSpreeLast = 0;
 				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
@@ -1758,6 +1762,9 @@ void server_update(int value){
 			//cout << "Killed 3" << endl;
 			if (!dead[PLAYER3])
 			{
+				if (Player3_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player3_KillSpree = 0;
 				Player3_KillSpreeLast = 0;
 				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
@@ -1802,22 +1809,18 @@ void server_update(int value){
 			if (Player0_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player1_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player2_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player3_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 		}
 
@@ -1856,12 +1859,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -1874,12 +1875,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -1892,12 +1891,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -1910,12 +1907,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -1923,48 +1918,324 @@ void server_update(int value){
 			Player3_DoubleKillTime = 3000;
 		}
 
-		/*
-		if (Player0_KillSpree > Player0_KillSpreeLast){
+		
+		if ((Player0_KillSpree > Player0_KillSpreeLast) && (Player0_KillSpree > 2)){
+			if (Player0_KillSpree > 8){
+				Player0_KillSpree = 8;
+			}
 			Player0_KillSpreeLast = Player0_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER0) 
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER2){
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player1_KillSpree > Player1_KillSpreeLast){
+		if ((Player1_KillSpree > Player1_KillSpreeLast) && (Player1_KillSpree > 2)){
+			if (Player1_KillSpree > 8){
+				Player1_KillSpree = 8;
+			}
 			Player1_KillSpreeLast = Player1_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER1)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER3){
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player2_KillSpree > Player2_KillSpreeLast){
+		if ((Player2_KillSpree > Player2_KillSpreeLast) && (Player2_KillSpree > 2)){
+			if (Player2_KillSpree > 8){
+				Player2_KillSpree = 8;
+			}
 			Player2_KillSpreeLast = Player2_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER2)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER0){
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player3_KillSpree > Player3_KillSpreeLast){
+		if ((Player3_KillSpree > Player3_KillSpreeLast) && (Player3_KillSpree > 2)){
+			if (Player3_KillSpree > 8){
+				Player3_KillSpree = 8;
+			}
 			Player3_KillSpreeLast = Player3_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER3)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER1){
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		*/
+		
 		myGameMenu->setKills(0, Player0_KillCount);
 		myGameMenu->setKills(1, Player1_KillCount);
 		myGameMenu->setKills(2, Player2_KillCount);
@@ -2533,7 +2804,6 @@ void keyboard(unsigned char key, int, int){
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
 			SoundEvents.push_back(testSound[SoundDoubleKillY]);
-			NumSoundEvents++;
 			cout << "Adding a sound man!" << endl;
 		}
 		
