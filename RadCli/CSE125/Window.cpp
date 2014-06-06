@@ -3845,9 +3845,9 @@ void initialize(int argc, char *argv[])
 
 
 	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
-	tele_01->setKd(vec3(1.0, 1.0, 1.0));
-	tele_01->setKa(vec3(1.0, 1.0, 1.0));
-	tele_01->setKs(vec3(1.0, 1.0, 1.0));
+	tele_01->setKd(vec3(1.0, .65, 0));
+	tele_01->setKa(vec3(1.0, .65, 0));
+	tele_01->setKs(vec3(1.0, .65, 0));
 	tele_01->setShininess(100);
 	tele_01->setFog(fog);
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
@@ -3861,9 +3861,9 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(tele_01);
 
 	Cube* tele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
-	tele_02->setKd(vec3(1.0, 1.0, 1.0));
-	tele_02->setKa(vec3(1.0, 1.0, 1.0));
-	tele_02->setKs(vec3(1.0, 1.0, 1.0));
+	tele_02->setKd(vec3(1.0, .65, 0));
+	tele_02->setKa(vec3(1.0, .65, 0));
+	tele_02->setKs(vec3(1.0, .65, 0));
 	tele_02->setShininess(100);
 	tele_02->setFog(fog);
 	tele_02->setReflectFactor(vec2(0.2, 0.5));
@@ -3877,9 +3877,9 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(tele_02);
 
 	Cube* tele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
-	tele_03->setKd(vec3(1.0, 1.0, 1.0));
-	tele_03->setKa(vec3(1.0, 1.0, 1.0));
-	tele_03->setKs(vec3(1.0, 1.0, 1.0));
+	tele_03->setKd(vec3(1.0, .65, 0));
+	tele_03->setKa(vec3(1.0, .65, 0));
+	tele_03->setKs(vec3(1.0, .65, 0));
 	tele_03->setShininess(100);
 	tele_03->setFog(fog);
 	tele_03->setReflectFactor(vec2(0.2, 0.5));
@@ -3893,9 +3893,9 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(tele_03);
 
 	Cube* tele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
-	tele_04->setKd(vec3(1.0, 1.0, 1.0));
-	tele_04->setKa(vec3(1.0, 1.0, 1.0));
-	tele_04->setKs(vec3(1.0, 1.0, 1.0));
+	tele_04->setKd(vec3(1.0, .65, 0));
+	tele_04->setKa(vec3(1.0, .65, 0));
+	tele_04->setKs(vec3(1.0, .65, 0));
 	tele_04->setShininess(100);
 	tele_04->setFog(fog);
 	tele_04->setReflectFactor(vec2(0.2, 0.5));
