@@ -1168,7 +1168,7 @@ public:
 		cubeT->setCubeMapUnit(3);
 		cubeT->setSpeed(5);
 		//cubeT->postTrans(glm::translate(vec3(playerHolder[0] -2 + ((holder[0]) / 4), playerHolder[1], playerHolder[2] - (holder[2] / 4))));
-		cubeT->setModelM(player1*glm::translate(vec3(0, 1, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
+		cubeT->setModelM(player1*glm::translate(vec3(0, 2, 0)));//get the new cube matrix by translating the player0 matrix forward in player0 object space. This way the new matrix will inherit player0 oriantation 
 		cubeT->setAABB(AABB(vec3(-0.8, -0.8, -0.8), vec3(0.8, 0.8, 0.8)));
 		AABB hold = cubeT->getAABB();
 		cubeT->setStartX(hold.max[0]);
@@ -1247,16 +1247,19 @@ public:
 	}
 	void despawnProjectile()
 	{
+		//cout << projectile.size() << endl;
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();
 			float startY = projectile[i]->getStartY();
 			float startZ = projectile[i]->getStartZ();
 			AABB curr = projectile[i]->getAABB();
-			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2) + pow(curr.max[2] - startZ, 2));//Pythagorean Theorem
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[1] - startY, 2) + pow(curr.max[2] - startZ, 2));//Pythagorean Theorem
 
 
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
+			//cout << startY << " " << curr.max[1] << " " << curr.max[1] - startY << " " << distance << endl;
+			//cout << startZ << " " << curr.max[2] << " " << curr.max[2] - startZ << " " << distance << endl;
 			if (distance >= (*projectile[i]).getDistance())
 			{
 				////////////////////////////////////////////////Window::removeDrawList((*projectile[i]).getName());
@@ -1268,8 +1271,9 @@ public:
 		{
 			float startX = tower_projectile[i]->getStartX();
 			float startY = tower_projectile[i]->getStartY();
+			float startZ = tower_projectile[i]->getStartZ();
 			AABB curr = tower_projectile[i]->getAABB();
-			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[2] - startY, 2));//Pythagorean Theorem
+			int distance = sqrt(pow(curr.max[0] - startX, 2) + pow(curr.max[1] - startY, 2) + pow(curr.max[2] - startZ, 2));//Pythagorean Theorem
 
 
 			//cout << startX << " " << curr.max[0] << " " << curr.max[0] - startX << " " << distance << endl;
