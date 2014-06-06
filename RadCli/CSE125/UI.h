@@ -461,6 +461,7 @@ public:
 
 	int draw(){
 
+		char buf[100];
 		//Status Bars
 		if (team_color_set){
 			team_color->draw();
@@ -554,6 +555,14 @@ public:
 
 		glDisable(GL_BLEND);
 		
+		glDisable(GL_DEPTH_TEST);
+
+		if (team_color_set){
+			k = to_string(p_ID + 1);
+			sprintf_s(buf, "%s %s", "PLAYER", k.c_str());
+			RenderString((Window::width / 2) - 96, 7 * Window::height / 8 + 110, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+		}
+		glEnable(GL_DEPTH_TEST);
 		return 0;
 	}
 
@@ -834,6 +843,7 @@ public:
 			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 		}
 		
+		p_ID = t;
 		team_color_set = true;
 	}
 
@@ -921,7 +931,9 @@ private:
 	float power_up_start = 0;
 	float cooldown = 7.7;
 	int last_p = 0;
+	int p_ID;
 
+	string k;
 	time_t over_de; //rate of decay of overheat bar
 
 };
