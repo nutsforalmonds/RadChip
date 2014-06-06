@@ -1732,7 +1732,7 @@ void server_update(int value){
 		std::vector<std::pair<int, bool>> platformDead = parseOpts->getPlatformDead(recvVec);
 		std::vector<std::pair<int, int>> platformHealth = parseOpts->getPlatformHealth(recvVec);
 		//cout << stationary_list.size() << " " << platformDamage.size() << " " << platformDead.size() << " " << platformHealth.size() << endl;
-		//cout << (*recvVec)[PLATFORM_STATUS].first << endl;
+		cout << (*recvVec)[PLATFORM_STATUS].first << endl;
 		for (int i = 0; i < platformDead.size(); i++)
 		{
 			if (platformDead[i].second)
@@ -1748,12 +1748,12 @@ void server_update(int value){
 			{
 				stationary_list[platformDead[i].first]->setHealth(-1);
 			}
-			//cout << platformDead[i].first << " " << platformHealth[i].second<< " ";
+			cout << platformDead[i].first << " " << platformHealth[i].second<< " ";
 			((Cube *)stationary_list[platformDead[i].first])->setTransparency(((float)platformHealth[i].second) / 7.00);
 
 			//((Cube *)stationary_list[57])->setTransparency(0);
 		}
-		//cout << endl;
+		cout << endl;
 		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
 		mats[PLAYER1] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER1].second;
 		mats[PLAYER2] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER2].second;
