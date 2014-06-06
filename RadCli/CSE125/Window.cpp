@@ -408,6 +408,9 @@ int Player1_DoubleKillTime = 0;
 int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
 
+int TowerHP[] = {20, 20, 20, 20, 20, 20};
+int TowerState[] = { 0, 0, 0, 0, 0, 0 };
+
 bool FirstBloodTrigger = true;
 
 string doubleKill = "DOUBLE KILL";
@@ -1588,7 +1591,105 @@ void server_update(int value){
 			if (parseOpts->getTowerKill(recvVec, i)){
 				towerKill(i);
 			}
-			int tower_health = parseOpts->getTowerHealth(recvVec, i);
+			TowerHP[i] = parseOpts->getTowerHealth(recvVec, i);
+
+			if ((TowerHP[i] <= 0) && (TowerState[i] < TOWER_0_HP)){
+				//play tower dead
+				TowerState[i] = TOWER_0_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+					}
+					else{
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 2) && (TowerState[i] < TOWER_10P_HP)){
+				//play tower almost dead
+				TowerState[i] = TOWER_10P_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+					}
+					else{
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 10) && (TowerState[i] < TOWER_HALF_HP)){
+				//play tower half dead
+				TowerState[i] = TOWER_HALF_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+					}
+					else{
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 18) && (TowerState[i] < TOWER_90P_HP)){
+				//play tower hit
+				TowerState[i] = TOWER_90P_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+					}
+					else{
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+					}
+				}
+			}
+			
 		}
 
 		//despawn projectiles from hit

@@ -52,6 +52,22 @@
 
 
 //tower 
+#define TOWER_MAX_HP		20
+
+#define TOWER_FULL_HP		0
+#define TOWER_90P_HP		1
+#define TOWER_HALF_HP		2
+#define TOWER_10P_HP		3
+#define TOWER_0_HP			4
+
+#define TEAM_C_LEFT_TOWER   0
+#define TEAM_C_RIGHT_TOWER  1
+#define TEAM_C_MID_TOWER    5
+
+#define TEAM_M_LEFT_TOWER   2
+#define TEAM_M_RIGHT_TOWER  3
+#define TEAM_M_MID_TOWER    4
+
 #define NUM_TOWERS			6
 #define TOWERSHOOTBIT		0
 #define TOWER_ID			1
