@@ -1247,7 +1247,7 @@ public:
 	}
 	void despawnProjectile()
 	{
-		cout << tower_projectile.size() << endl;
+		//cout << tower_projectile.size() << endl;
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();
