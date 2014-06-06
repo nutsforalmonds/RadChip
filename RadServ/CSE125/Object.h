@@ -171,7 +171,11 @@ public:
 	int getMaxHealth() { return health + tempHealth; }
 
 
-	void setHealth(int i){ health += i; }
+	void setHealth(int i){
+		health += i; 
+		if (health < 0)
+			health = 0;
+	}
 
 	void putHealth(int i){ health = i; }
 

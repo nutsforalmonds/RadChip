@@ -576,6 +576,7 @@ int main(int argc, char *argv[])
 		vector<bool> platformDamaged = scene->getPlatformDamaged();
 		vector<bool> platformDead = scene->getPlatformDead();
 		vector<Object *> * stationaries = scene->getStationary();
+		int tes = 0;
 		for (int i = 0; i < platformDamaged.size(); i++)
 		{	
 			if ((*stationaries)[i]->getIsPlatformDamage())
@@ -585,6 +586,7 @@ int main(int argc, char *argv[])
 				else
 					platform_status += "p" + std::to_string(i) + (platformDamaged[i] ? "d" : "D") + (platformDead[i] ? "k" : "K");
 				platform_status += "00" + std::to_string((*stationaries)[i]->getHealth());
+				tes++;
 			}
 			//if (platformDamaged[i])
 			//	cout << platform_status << endl;
@@ -592,6 +594,7 @@ int main(int argc, char *argv[])
 			//scene->setPlatformDead(i, false);
 		}
 		platform_status += std::to_string(scene->checkTowerAlive());
+		//cout << tes << endl;
 		
 		//tower infos
 		string ts[NUM_TOWERS] = { "" };
