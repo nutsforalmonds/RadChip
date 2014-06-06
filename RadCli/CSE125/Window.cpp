@@ -4001,9 +4001,9 @@ void initialize(int argc, char *argv[])
 	elevator_list.push_back(platform_01);
 
 	//island 
-	Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
+	Cube* platform_02 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
-	platform_02->setKd(vec3(0.15, 0.15, 0.92));
+	platform_02->setKd(vec3(0.11, 0.67, 0.09));
 	platform_02->setKa(vec3(0.0, 0.0, 0.3));
 	platform_02->setKs(vec3(0.0, 0.0, 0.4));
 	platform_02->setShininess(100);
@@ -4012,7 +4012,7 @@ void initialize(int argc, char *argv[])
 	platform_02->setEta(0.5);
 	platform_02->setCubeMapUnit(3);
 	platform_02->setSpeed(5);
-	platform_02->postTrans(glm::translate(vec3(20, 14.0, 0)));
+	platform_02->postTrans(glm::translate(vec3(30, 14, 0)));
 	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_02->setShadowTex(shadow_map_id);
@@ -4022,7 +4022,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_02);
 
 	//island 
-	Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
+	Cube* platform_03 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
 	platform_03->setKd(vec3(0.11, 0.67, 0.09));
 	platform_03->setKa(vec3(0.0, 0.2, 0.0));
@@ -4033,7 +4033,7 @@ void initialize(int argc, char *argv[])
 	platform_03->setEta(0.5);
 	platform_03->setCubeMapUnit(3);
 	platform_03->setSpeed(5);
-	platform_03->postTrans(glm::translate(vec3(-20, 14.0, 0)));
+	platform_03->postTrans(glm::translate(vec3(-30, 14, 0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_03->setShadowTex(shadow_map_id);
@@ -4045,7 +4045,7 @@ void initialize(int argc, char *argv[])
 	//walkway 
 	Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 42);
 	//platform_01->setSpeed(5); 
-	platform_04->setKd(vec3(0.8, 0.8, 0.0));
+	platform_04->setKd(vec3(0.8, 0.0, 0.8));
 	platform_04->setKa(vec3(0.3, 0.3, 0.0));
 	platform_04->setKs(vec3(0.4, 0.4, 0.0));
 	platform_04->setShininess(100);
@@ -4304,7 +4304,7 @@ void initialize(int argc, char *argv[])
 	tramp_01->setReflectFactor(vec2(0.2, 0.5));
 	tramp_01->setEta(0.5);
 	tramp_01->setCubeMapUnit(3);
-	tramp_01->postTrans(glm::translate(vec3(20, 5.0, 50)));
+	tramp_01->postTrans(glm::translate(vec3(20, 5.0, 45)));
 	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_01->setShadowTex(shadow_map_id);
 	tramp_01->setType("Trampoline");
@@ -4327,7 +4327,7 @@ void initialize(int argc, char *argv[])
 	tramp_02->setReflectFactor(vec2(0.2, 0.5));
 	tramp_02->setEta(0.5);
 	tramp_02->setCubeMapUnit(3);
-	tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 50)));
+	tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 45)));
 	tramp_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_02->setShadowTex(shadow_map_id);
 	tramp_02->setType("Trampoline");
@@ -4350,7 +4350,7 @@ void initialize(int argc, char *argv[])
 	tramp_03->setReflectFactor(vec2(0.2, 0.5));
 	tramp_03->setEta(0.5);
 	tramp_03->setCubeMapUnit(3);
-	tramp_03->postTrans(glm::translate(vec3(20, 5.0, -50)));
+	tramp_03->postTrans(glm::translate(vec3(20, 5.0, -45)));
 	tramp_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_03->setShadowTex(shadow_map_id);
 	tramp_03->setType("Trampoline");
@@ -4373,7 +4373,7 @@ void initialize(int argc, char *argv[])
 	tramp_04->setReflectFactor(vec2(0.2, 0.5));
 	tramp_04->setEta(0.5);
 	tramp_04->setCubeMapUnit(3);
-	tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -50)));
+	tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -45)));
 	tramp_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_04->setShadowTex(shadow_map_id);
 	tramp_04->setType("Trampoline");
@@ -4443,7 +4443,7 @@ void initialize(int argc, char *argv[])
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
 	tele_01->setEta(0.5);
 	tele_01->setCubeMapUnit(3);
-	tele_01->postTrans(glm::translate(vec3(80, 14.0, 100)));
+	tele_01->postTrans(glm::translate(vec3(80, 14.0, 80)));
 	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_01->setShadowTex(shadow_map_id);
 	tele_01->setType("Teleporter");
@@ -4465,7 +4465,7 @@ void initialize(int argc, char *argv[])
 	tele_02->setReflectFactor(vec2(0.2, 0.5));
 	tele_02->setEta(0.5);
 	tele_02->setCubeMapUnit(3);
-	tele_02->postTrans(glm::translate(vec3(-80, 14.0, 100)));
+	tele_02->postTrans(glm::translate(vec3(-80, 14.0, 80)));
 	tele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_02->setShadowTex(shadow_map_id);
 	tele_02->setType("Teleporter");
@@ -4487,7 +4487,7 @@ void initialize(int argc, char *argv[])
 	tele_03->setReflectFactor(vec2(0.2, 0.5));
 	tele_03->setEta(0.5);
 	tele_03->setCubeMapUnit(3);
-	tele_03->postTrans(glm::translate(vec3(80, 14.0, -100)));
+	tele_03->postTrans(glm::translate(vec3(80, 14.0, -80)));
 	tele_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_03->setShadowTex(shadow_map_id);
 	tele_03->setType("Teleporter");
@@ -4509,7 +4509,7 @@ void initialize(int argc, char *argv[])
 	tele_04->setReflectFactor(vec2(0.2, 0.5));
 	tele_04->setEta(0.5);
 	tele_04->setCubeMapUnit(3);
-	tele_04->postTrans(glm::translate(vec3(-80, 14.0, -100)));
+	tele_04->postTrans(glm::translate(vec3(-80, 14.0, -80)));
 	tele_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_04->setShadowTex(shadow_map_id);
 	tele_04->setType("Teleporter");
@@ -4819,7 +4819,7 @@ void initialize(int argc, char *argv[])
 	//wall0
 	Cube* platform_201 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5);
-	platform_201->setKd(vec3(0.15, 0.15, 0.92));
+	platform_201->setKd(vec3(0.3, 0.3, 0.8));
 	platform_201->setKa(vec3(0.0, 0.0, 0.3));
 	platform_201->setKs(vec3(0.0, 0.0, 0.4));
 	platform_201->setShininess(100);
@@ -4841,7 +4841,7 @@ void initialize(int argc, char *argv[])
 	//wall1
 	Cube* platform_202 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_202->setKd(vec3(0.15, 0.15, 0.92));
+	platform_202->setKd(vec3(0.3, 0.3, 0.8));
 	platform_202->setKa(vec3(0.0, 0.0, 0.3));
 	platform_202->setKs(vec3(0.0, 0.0, 0.4));
 	platform_202->setShininess(100);
@@ -4863,7 +4863,7 @@ void initialize(int argc, char *argv[])
 	//wall2
 	Cube* platform_203 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_203->setKd(vec3(0.15, 0.15, 0.92));
+	platform_203->setKd(vec3(0.3, 0.3, 0.8));
 	platform_203->setKa(vec3(0.0, 0.0, 0.3));
 	platform_203->setKs(vec3(0.0, 0.0, 0.4));
 	platform_203->setShininess(100);
@@ -4885,7 +4885,7 @@ void initialize(int argc, char *argv[])
 	//wall3
 	Cube* platform_204 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_204->setKd(vec3(0.15, 0.15, 0.92));
+	platform_204->setKd(vec3(0.3, 0.3, 0.8));
 	platform_204->setKa(vec3(0.0, 0.0, 0.3));
 	platform_204->setKs(vec3(0.0, 0.0, 0.4));
 	platform_204->setShininess(100);
@@ -4907,7 +4907,7 @@ void initialize(int argc, char *argv[])
 	// inside middle
 	Cube* platform_205 = new Cube(-2, 2, -0.5, 0.5, -2, 2);
 	//platform_01->setSpeed(5); 
-	platform_205->setKd(vec3(0.15, 0.15, 0.92));
+	platform_205->setKd(vec3(0.3, 0.3, 0.8));
 	platform_205->setKa(vec3(0.0, 0.0, 0.3));
 	platform_205->setKs(vec3(0.0, 0.0, 0.4));
 	platform_205->setShininess(100);
@@ -4942,7 +4942,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 0
 	Cube* platform_206 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_206->setKd(vec3(0.15, 0.15, 0.92));
+	platform_206->setKd(vec3(0.3, 0.3, 0.8));
 	platform_206->setKa(vec3(0.0, 0.0, 0.3));
 	platform_206->setKs(vec3(0.0, 0.0, 0.4));
 	platform_206->setShininess(100);
@@ -4964,7 +4964,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 1
 	Cube* platform_207 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_207->setKd(vec3(0.15, 0.15, 0.92));
+	platform_207->setKd(vec3(0.3, 0.3, 0.8));
 	platform_207->setKa(vec3(0.0, 0.0, 0.3));
 	platform_207->setKs(vec3(0.0, 0.0, 0.4));
 	platform_207->setShininess(100);
@@ -4986,7 +4986,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 2
 	Cube* platform_208 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_208->setKd(vec3(0.15, 0.15, 0.92));
+	platform_208->setKd(vec3(0.3, 0.3, 0.8));
 	platform_208->setKa(vec3(0.0, 0.0, 0.3));
 	platform_208->setKs(vec3(0.0, 0.0, 0.4));
 	platform_208->setShininess(100);
@@ -5008,7 +5008,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 3
 	Cube* platform_209 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_209->setKd(vec3(0.15, 0.15, 0.92));
+	platform_209->setKd(vec3(0.3, 0.3, 0.8));
 	platform_209->setKa(vec3(0.0, 0.0, 0.3));
 	platform_209->setKs(vec3(0.0, 0.0, 0.4));
 	platform_209->setShininess(100);
@@ -5030,7 +5030,7 @@ void initialize(int argc, char *argv[])
 	//stairs0 top
 	Cube* platform_210 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_210->setKd(vec3(0.15, 0.15, 0.92));
+	platform_210->setKd(vec3(0.3, 0.3, 0.8));
 	platform_210->setKa(vec3(0.0, 0.0, 0.3));
 	platform_210->setKs(vec3(0.0, 0.0, 0.4));
 	platform_210->setShininess(100);
@@ -5052,7 +5052,7 @@ void initialize(int argc, char *argv[])
 	//stairs1
 	Cube* platform_211 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_211->setKd(vec3(0.15, 0.15, 0.92));
+	platform_211->setKd(vec3(0.3, 0.3, 0.8));
 	platform_211->setKa(vec3(0.0, 0.0, 0.3));
 	platform_211->setKs(vec3(0.0, 0.0, 0.4));
 	platform_211->setShininess(100);
@@ -5074,7 +5074,7 @@ void initialize(int argc, char *argv[])
 	//stairs2
 	Cube* platform_212 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_212->setKd(vec3(0.15, 0.15, 0.92));
+	platform_212->setKd(vec3(0.3, 0.3, 0.8));
 	platform_212->setKa(vec3(0.0, 0.0, 0.3));
 	platform_212->setKs(vec3(0.0, 0.0, 0.4));
 	platform_212->setShininess(100);
@@ -5096,7 +5096,7 @@ void initialize(int argc, char *argv[])
 	//stairs3
 	Cube* platform_213 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_213->setKd(vec3(0.15, 0.15, 0.92));
+	platform_213->setKd(vec3(0.3, 0.3, 0.8));
 	platform_213->setKa(vec3(0.0, 0.0, 0.3));
 	platform_213->setKs(vec3(0.0, 0.0, 0.4));
 	platform_213->setShininess(100);
@@ -5121,7 +5121,7 @@ void initialize(int argc, char *argv[])
 	//rampart0
 	Cube* platform_214 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_214->setKd(vec3(0.15, 0.15, 0.92));
+	platform_214->setKd(vec3(0.3, 0.3, 0.8));
 	platform_214->setKa(vec3(0.0, 0.0, 0.3));
 	platform_214->setKs(vec3(0.0, 0.0, 0.4));
 	platform_214->setShininess(100);
@@ -5143,7 +5143,7 @@ void initialize(int argc, char *argv[])
 	//rampart1
 	Cube* platform_215 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_215->setKd(vec3(0.15, 0.15, 0.92));
+	platform_215->setKd(vec3(0.3, 0.3, 0.8));
 	platform_215->setKa(vec3(0.0, 0.0, 0.3));
 	platform_215->setKs(vec3(0.0, 0.0, 0.4));
 	platform_215->setShininess(100);
@@ -5165,7 +5165,7 @@ void initialize(int argc, char *argv[])
 	//rampart2
 	Cube* platform_216 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_216->setKd(vec3(0.15, 0.15, 0.92));
+	platform_216->setKd(vec3(0.3, 0.3, 0.8));
 	platform_216->setKa(vec3(0.0, 0.0, 0.3));
 	platform_216->setKs(vec3(0.0, 0.0, 0.4));
 	platform_216->setShininess(100);
@@ -5187,7 +5187,7 @@ void initialize(int argc, char *argv[])
 	//rampart3
 	Cube* platform_217 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_217->setKd(vec3(0.15, 0.15, 0.92));
+	platform_217->setKd(vec3(0.3, 0.3, 0.8));
 	platform_217->setKa(vec3(0.0, 0.0, 0.3));
 	platform_217->setKs(vec3(0.0, 0.0, 0.4));
 	platform_217->setShininess(100);

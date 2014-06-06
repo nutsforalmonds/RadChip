@@ -1513,7 +1513,7 @@ public:
 
 		//triplet tower
 		Tower* tw0 = new Tower();
-		tw0->postTrans(glm::translate(vec3(-70.0, 14.0, -80.0)));
+		tw0->postTrans(glm::translate(vec3(-68, 14.0, -80)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(40);
@@ -1528,7 +1528,7 @@ public:
 
 		//triplet tower
 		Tower* tw1 = new Tower();
-		tw1->postTrans(glm::translate(vec3(70.0, 14.0, -80.0)));
+		tw1->postTrans(glm::translate(vec3(68, 14.0, -80)));
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(40);
@@ -1543,7 +1543,7 @@ public:
 
 		//pctopus tower
 		Tower* tw2 = new Tower();
-		tw2->postTrans(glm::translate(vec3(70.0, 14, 80.0)));
+		tw2->postTrans(glm::translate(vec3(68, 14, 80)));
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(40);
@@ -1558,7 +1558,7 @@ public:
 
 		//pctopus tower
 		Tower* tw3 = new Tower();
-		tw3->postTrans(glm::translate(vec3(-70.0, 14, 80.0)));
+		tw3->postTrans(glm::translate(vec3(-68, 14, 80)));
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(40);
@@ -1574,7 +1574,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower100 = new Tower();
 		tower100->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 1,
 			ORIGINZ0)));
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
@@ -1593,7 +1593,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower200 = new Tower();
 		tower200->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 1,
 			ORIGINZ1)));
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
@@ -1637,20 +1637,20 @@ public:
 		elevator.push_back(platform_01);
 
 		//island 
-		Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
+		Cube* platform_02 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 		//platform_01->setSpeed(5); 
-		platform_02->postTrans(glm::translate(vec3(20, 14, 0)));
-		platform_02->setAABB(AABB(vec3(-10, -0.5, -20), vec3(10, 0.5, 20)));
+		platform_02->postTrans(glm::translate(vec3(30, 14, 0)));
+		platform_02->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_02->setType(CUBE);
 		platform_02->setName("Test Platform");
 		platform_02->setIsPlatformDamage(false);
 		addStationary(platform_02);
 
 		//island 
-		Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
+		Cube* platform_03 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 		//platform_01->setSpeed(5); 
-		platform_03->postTrans(glm::translate(vec3(-20.0, 14.0, 0)));
-		platform_03->setAABB(AABB(vec3(-10, -0.5, -20), vec3(10, 0.5, 20)));
+		platform_03->postTrans(glm::translate(vec3(-30, 14, 0)));
+		platform_03->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_03->setType(CUBE);
 		platform_03->setName("Test Platform");
 		platform_03->setIsPlatformDamage(false);
@@ -1768,7 +1768,7 @@ public:
 		//base trampolines
 		Trampoline* tramp_01 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_01->postTrans(glm::translate(vec3(20, 5.0, 50)));
+		tramp_01->postTrans(glm::translate(vec3(20, 5.0, 45)));
 		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_01->setBoost(vec3(0, 60, 0));
 		tramp_01->setType(TRAMPOLINE);
@@ -1778,7 +1778,7 @@ public:
 		//base tramp
 		Trampoline* tramp_02 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 50)));
+		tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 45)));
 		tramp_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_02->setBoost(vec3(0, 60, 0));
 		tramp_02->setType(TRAMPOLINE);
@@ -1788,7 +1788,7 @@ public:
 		//base tramp 
 		Trampoline* tramp_03 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_03->postTrans(glm::translate(vec3(20, 5.0, -50)));
+		tramp_03->postTrans(glm::translate(vec3(20, 5.0, -45)));
 		tramp_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_03->setBoost(vec3(0, 60, 0));
 		tramp_03->setType(TRAMPOLINE);
@@ -1798,7 +1798,7 @@ public:
 		//base tramp
 		Trampoline* tramp_04 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -50)));
+		tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -45)));
 		tramp_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_04->setBoost(vec3(0, 60, 0));
 		tramp_04->setType(TRAMPOLINE);
@@ -1830,9 +1830,9 @@ public:
 		//teleporter 
 		Teleporter* tele_01 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_01->postTrans(glm::translate(vec3(80, 14.0, 100)));
+		tele_01->postTrans(glm::translate(vec3(80, 14.0, 80)));
 		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_01->setEndpoint(platform_10b->getModelM());
+		tele_01->setEndpoint(glm::translate(vec3(-65, 15, 85)));
 		tele_01->setType(TELEPORTER);
 		tele_01->setName("Test Teleporter");
 		addStationary(tele_01);
@@ -1840,9 +1840,9 @@ public:
 		//teleporter 
 		Teleporter* tele_02 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_02->postTrans(glm::translate(vec3(-80, 14.0, 100)));
+		tele_02->postTrans(glm::translate(vec3(-80, 14.0, 80)));
 		tele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_02->setEndpoint(platform_06->getModelM());
+		tele_02->setEndpoint(glm::translate(vec3(65, 15, 85)));
 		tele_02->setType(TELEPORTER);
 		tele_02->setName("Test Teleporter");
 		addStationary(tele_02);
@@ -1850,9 +1850,9 @@ public:
 		//teleporter 
 		Teleporter* tele_03 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_03->postTrans(glm::translate(vec3(80, 14.0, -100)));
+		tele_03->postTrans(glm::translate(vec3(80, 14.0, -80)));
 		tele_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_03->setEndpoint(platform_10->getModelM());
+		tele_03->setEndpoint(glm::translate(vec3(-65, 15, -85)));
 		tele_03->setType(TELEPORTER);
 		tele_03->setName("Test Teleporter");
 		addStationary(tele_03);
@@ -1860,9 +1860,9 @@ public:
 		//teleporter 
 		Teleporter* tele_04 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_04->postTrans(glm::translate(vec3(-80, 14.0, -100)));
+		tele_04->postTrans(glm::translate(vec3(-80, 14.0, -80)));
 		tele_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_04->setEndpoint(platform_09->getModelM());
+		tele_04->setEndpoint(glm::translate(vec3(65, 15, -85)));
 		tele_04->setType(TELEPORTER);
 		tele_04->setName("Test Teleporter");
 		addStationary(tele_04);
@@ -1942,7 +1942,7 @@ public:
 			ORIGINZ0)));
 		platform_200->setAABB(AABB(vec3(-PERIMETER_WALL_RADIUS, -0.5, -PERIMETER_WALL_RADIUS), vec3(PERIMETER_WALL_RADIUS, 0.5, PERIMETER_WALL_RADIUS)));
 		platform_200->setType(TELEPORTER);
-		platform_200->setEndpoint(glm::translate(vec3(0, 100, 10)));
+		platform_200->setEndpoint(glm::translate(vec3(0, 100, 12)));
 		platform_200->setName("Test Platform");
 		// don't draw for now so we can peek inside
 		//addStationary(platform_200);
@@ -2158,7 +2158,7 @@ public:
 			ORIGINZ1)));
 		platform_300->setAABB(AABB(vec3(-PERIMETER_WALL_RADIUS, -0.5, -PERIMETER_WALL_RADIUS), vec3(PERIMETER_WALL_RADIUS, 0.5, PERIMETER_WALL_RADIUS)));
 		platform_300->setType(TELEPORTER);
-		platform_300->setEndpoint(glm::translate(vec3(0, 0, 0)));
+		platform_300->setEndpoint(glm::translate(vec3(0, 100, -12)));
 		platform_300->setName("Test Platform");
 		// don't draw for now so we can peek inside
 		//addStationary(platform_300);
