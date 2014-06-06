@@ -1001,7 +1001,7 @@ public:
 				}
 				if (collide){
 					if (stationary[j]->getIsPlatformDamage()){
-						damageStationary(j, tower_projectile[i]->getPlayerID());
+						damageStationaryT(j, tower_projectile[i]->getPlayerID());
 					}
 					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
 					delete tower_projectile[i];
@@ -1132,6 +1132,24 @@ public:
 			stationary[targetId]->setModelM(stationary[targetId]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
 		}
 	}
+
+	void damageStationaryT(int targetId, int playerId)
+	{
+		Object * playerHolder = tower[playerId];
+		Object * targetHolder = stationary[targetId];
+		targetHolder->setHealth(((Tower*)playerHolder)->getDamage());
+		platformDamaged[targetId] = true;
+		if (targetHolder->getHealth() < 1)
+		{
+			platformDead[targetId] = true;
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			stationary[targetId]->setAliveModelM(stationary[targetId]->getModelM());
+			stationary[targetId]->setModelM(stationary[targetId]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+		}
+	}
 	
 
 	void basicAttack(int playerID)
@@ -1240,7 +1258,8 @@ public:
 					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
-					cubeT->setStartY(hold.max[2]);
+					cubeT->setStartY(hold.max[1]);
+					cubeT->setStartZ(hold.max[2]);
 					cubeT->setTeamID(tower[i]->getTeamID());
 					cubeT->setPlayerID(tower[i]->getPlayerID());
 
@@ -1270,7 +1289,7 @@ public:
 	}
 	void despawnProjectile()
 	{
-		//cout << projectile.size() << endl;
+		//cout << tower_projectile.size() << endl;
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();

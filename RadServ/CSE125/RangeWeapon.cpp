@@ -3,7 +3,7 @@
 RangeWeapon::RangeWeapon()
 : Weapon()
 {
-	distance = 40;
+	distance = 30;
 	speed = 50;
 	damage = -1;
 }

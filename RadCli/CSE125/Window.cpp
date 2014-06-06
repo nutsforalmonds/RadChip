@@ -625,7 +625,7 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(40);
+	pjt->setDistance(30);
 	//Name and type
 	pjt->setName("Tower Projectile");
 	pjt->setSpeed(40);
