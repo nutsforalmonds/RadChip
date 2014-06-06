@@ -408,6 +408,9 @@ int Player1_DoubleKillTime = 0;
 int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
 
+int TowerHP[] = {20, 20, 20, 20, 20, 20};
+int TowerState[] = { 0, 0, 0, 0, 0, 0 };
+
 bool FirstBloodTrigger = true;
 
 string doubleKill = "DOUBLE KILL";
@@ -636,8 +639,8 @@ void towerProjectileAttack(int towerID, int projectileID, vec3 direction){
 	pjt->setDistance(30);
 	//Name and type
 	pjt->setName("Tower Projectile");
-	pjt->setSpeed(40);
-	pjt->setVelocity(glm::normalize(direction)*40.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setSpeed(60);
+	pjt->setVelocity(glm::normalize(direction)*60.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(projectileID);
@@ -1433,7 +1436,7 @@ void Window::displayCallback(void)
 					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else if (winner == 0 && (playerID % 2) == 1)
@@ -1443,7 +1446,7 @@ void Window::displayCallback(void)
 					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else  if (winner == 1 && (playerID % 2) == 1)
@@ -1452,7 +1455,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 0;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else  if (winner == 0 && (playerID % 2) == 0)
@@ -1461,10 +1464,16 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 0;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			endScreen->draw(displayWinner, wins);
+			if (displayWinner){
+				SoundEvents.push_back(testSound[SoundVictory]);
+			}
+			else{
+				SoundEvents.push_back(testSound[SoundDefeat]);
+			}
 		}
 
 		else if (kill_count){
@@ -1588,7 +1597,104 @@ void server_update(int value){
 			if (parseOpts->getTowerKill(recvVec, i)){
 				towerKill(i);
 			}
-			int tower_health = parseOpts->getTowerHealth(recvVec, i);
+			TowerHP[i] = parseOpts->getTowerHealth(recvVec, i);
+			if ((TowerHP[i] <= 0) && (TowerState[i] < TOWER_0_HP)){
+				//play tower dead
+				TowerState[i] = TOWER_0_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+					}
+					else{
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 2) && (TowerState[i] < TOWER_10P_HP)){
+				//play tower almost dead
+				TowerState[i] = TOWER_10P_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+					}
+					else{
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 10) && (TowerState[i] < TOWER_HALF_HP)){
+				//play tower half dead
+				TowerState[i] = TOWER_HALF_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+					}
+					else{
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+					}
+				}
+			}
+			else if ((TowerHP[i] <= 18) && (TowerState[i] < TOWER_90P_HP)){
+				//play tower hit
+				TowerState[i] = TOWER_90P_HP;
+				if ((i == TEAM_C_LEFT_TOWER) || (i == TEAM_C_RIGHT_TOWER) || (i == TEAM_C_MID_TOWER)){
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+					}
+					else{
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+				}
+				else{
+					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
+						//Play enemy tower shit
+						//SoundEvents.push_back(testSound[SoundFirstBlood]);
+					}
+					else{
+						//Play your tower shit
+						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+					}
+				}
+			}
+			
 		}
 
 		//despawn projectiles from hit
@@ -2382,7 +2488,7 @@ void server_update(int value){
 			sound_3d_Throw->Play3D(View);
 		}
 
-		std::fill_n(bVis, 5, true);
+		std::fill_n(bVis, 6, true);
 		int pUpState = parseOpts->getPUpState(recvVec);
 		//std::cout << pUpState << std::endl;
 		if (pUpState & 1)
@@ -2393,8 +2499,10 @@ void server_update(int value){
 			bVis[HEALTHBOOST] = false;
 		if (pUpState & 1 << 3)
 			bVis[FASTERSHOOT] = false;
-		if (pUpState & 1 << 3)
+		if (pUpState & 1 << 4)
 			bVis[FARTHERSHOOT] = false;
+
+		//cout << bVis[FASTERSHOOT] << " " << bVis[FARTHERSHOOT] << (pUpState & 1 << 4) << endl;
 
 		winner = parseOpts->getWinState(recvVec);
 		if (playerReady)
@@ -4645,7 +4753,7 @@ void initialize(int argc, char *argv[])
 
 	m_billboardList5.Init("img/rngup.png", "PNG");
 	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+	m_billboardList5.AddBoard(vec3(0.0f, 10.0f, 0.0f));//Shot Rng up
 	m_billboardList5.BindBoards();
 
 	particle = new ParticleSystem(GL_POINTS);
@@ -5856,7 +5964,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setNumColumn(5);
 	MOM.mother_of_tower_shoot_1->setNumRow(6);
 	MOM.mother_of_tower_shoot_1->setValidFrame(0, 29);
-	MOM.mother_of_tower_shoot_1->setDuration(1);
+	MOM.mother_of_tower_shoot_1->setDuration(0.75);
 	MOM.mother_of_tower_shoot_1->setType(1);
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
 	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
