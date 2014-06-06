@@ -182,6 +182,8 @@ public:
 		if (pUpCooldown[FARTHERSHOOT] > 0)
 			ret = ret | 1 << 4;
 
+		//cout << pUpCooldown[FASTERSHOOT] << " " << pUpCooldown[FARTHERSHOOT] << endl;
+
 		return ret;
 	}
 
@@ -2390,7 +2392,7 @@ public:
 		powerUps.push_back(shotSpdUp);
 
 		BillboardList * shotRngUp = new BillboardList();
-		shotRngUp->AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+		shotRngUp->AddBoard(vec3(0.0f, 10.0f, 0.0f));//Shot Rng up
 		powerUps.push_back(shotRngUp);
 
 

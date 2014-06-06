@@ -2098,7 +2098,7 @@ void server_update(int value){
 			sound_3d_Throw->Play3D(View);
 		}
 
-		std::fill_n(bVis, 5, true);
+		std::fill_n(bVis, 6, true);
 		int pUpState = parseOpts->getPUpState(recvVec);
 		//std::cout << pUpState << std::endl;
 		if (pUpState & 1)
@@ -2109,8 +2109,10 @@ void server_update(int value){
 			bVis[HEALTHBOOST] = false;
 		if (pUpState & 1 << 3)
 			bVis[FASTERSHOOT] = false;
-		if (pUpState & 1 << 3)
+		if (pUpState & 1 << 4)
 			bVis[FARTHERSHOOT] = false;
+
+		//cout << bVis[FASTERSHOOT] << " " << bVis[FARTHERSHOOT] << (pUpState & 1 << 4) << endl;
 
 		winner = parseOpts->getWinState(recvVec);
 		if (playerReady)
@@ -4336,7 +4338,7 @@ void initialize(int argc, char *argv[])
 
 	m_billboardList5.Init("img/rngup.png", "PNG");
 	m_billboardList5.setShader(sdrCtl.getShader("billboard"));
-	m_billboardList5.AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+	m_billboardList5.AddBoard(vec3(0.0f, 10.0f, 0.0f));//Shot Rng up
 	m_billboardList5.BindBoards();
 
 	particle = new ParticleSystem(GL_POINTS);
