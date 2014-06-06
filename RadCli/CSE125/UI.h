@@ -289,21 +289,21 @@ public:
 		m_tower1_dead = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
 		m_tower1_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower1_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower1_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
+		m_tower1_dead->loadColorTex("img/UI_elements/octopus_icon_Off.png", "PNG");
 		m_tower1_dead->setTex(true);
 		m_tower1_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.45f, 0.45f, -1.0f)));
 
 		m_tower2_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower2_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower2_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower2_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
+		m_tower2_dead->loadColorTex("img/UI_elements/octopus_icon_Off.png", "PNG");
 		m_tower2_dead->setTex(true);
 		m_tower2_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.52f, 0.43f, -1.0f)));
 
 		m_tower3_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower3_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower3_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower3_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
+		m_tower3_dead->loadColorTex("img/UI_elements/octopus_icon_Off.png", "PNG");
 		m_tower3_dead->setTex(true);
 		m_tower3_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.59f, 0.43f, -1.0f)));
 
@@ -384,7 +384,10 @@ public:
 		power_up_5->setTex(true);
 		power_up_5->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
 
-
+		p_up_timer = new UI_Panel(x1_p_up, x2_p_up, y1_p_up, y2_p_up);
+		p_up_timer->setColor(vec3(1.0, 0.5, 0.0));
+		p_up_timer->setShader(sdrCtl.getShader("basic_2D"));
+		p_up_timer->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.3f, -1.0f)));
 	}
 	~UI(){
 		life_back->		~UI_Panel();
@@ -412,16 +415,24 @@ public:
 		c_tower2_dead->	~UI_Panel();
 		c_tower3_dead->	~UI_Panel();
 
-		power_up_1->      ~UI_Panel();
-		power_up_2->      ~UI_Panel();
-		power_up_3->      ~UI_Panel();
-		power_up_4->      ~UI_Panel();
-		power_up_5->      ~UI_Panel();
+		power_up_1->    ~UI_Panel();
+		power_up_2->    ~UI_Panel();
+		power_up_3->    ~UI_Panel();
+		power_up_4->    ~UI_Panel();
+		power_up_5->    ~UI_Panel();
+
+		team_color->    ~UI_Panel();
+
+		p_up_timer->    ~UI_Panel();
 	}
 
 	int draw(){
 
 		//Status Bars
+		if (team_color_set){
+			team_color->draw();
+		}
+
 		life_back->draw();	
 		life_front->draw();
 		
@@ -480,20 +491,31 @@ public:
 		switch (p_up){
 		case 5:
 			power_up_5->draw();
+			powerUpTimer(5);
+			p_up_timer->draw();
 			break;
 		case 4:
 			power_up_4->draw();
+			powerUpTimer(4);
+			p_up_timer->draw();
 			break;
 		case 3:
 			power_up_3->draw();
+			powerUpTimer(3);
+			p_up_timer->draw();
 			break;
 		case 2:
 			power_up_2->draw();
+			powerUpTimer(2);
+			p_up_timer->draw();
 			break;
 		case 1:
 			power_up_1->draw();
+			powerUpTimer(1);
+			p_up_timer->draw();
 			break;
 		default:
+			power_up_start = 0;
 			break;
 		}
 
@@ -666,6 +688,26 @@ public:
 	}
 
 	void setPowerUP(int p){ p_up = p;}
+	void powerUpTimer(int w){
+		float temp;
+
+		if (power_up_start == 0 || last_p != w){
+			power_up_start = (float)clock();
+			last_p = w;
+		}
+
+		temp = (((float)clock() - power_up_start) / (float)CLOCKS_PER_SEC) / cooldown;
+
+		p_up_timer->UI_Panel::~UI_Panel();
+
+		x2_p_up = p_up_bar*(1.0 - temp) + x1_p_up;
+
+		p_up_timer = new UI_Panel(x1_p_up, x2_p_up, y1_p_up, y2_p_up);
+		p_up_timer->setColor(vec3(1.0, 0.5, 0.0));
+		p_up_timer->setShader(sdrCtl.getShader("basic_2D"));
+		p_up_timer->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.3f, -1.0f)));
+
+	}
 
 	float getLess_Life(){ return less_life; }
 	void setLess_Life(float l){less_life = l;}
@@ -697,6 +739,23 @@ public:
 		heat_frame->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(y, 0.0f, -1.0f)));
 
 		x = -0.85f - y;
+	}
+
+	void teamColor(int t){
+		if (t == 0 || t == 2){
+			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
+			team_color->setColor(vec3(1.0, 0.8, 0.0));
+			team_color->setShader(sdrCtl.getShader("basic_2D"));
+			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
+		}
+		else{
+			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
+			team_color->setColor(vec3(0.0, 0.7, 1.0));
+			team_color->setShader(sdrCtl.getShader("basic_2D"));
+			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
+		}
+		
+		team_color_set = true;
 	}
 
 private:
@@ -731,6 +790,10 @@ private:
 	UI_Panel* power_up_3;
 	UI_Panel* power_up_4;
 	UI_Panel* power_up_5;
+
+	UI_Panel* team_color;
+
+	UI_Panel* p_up_timer;
 	
 
 	float x1_life = -0.19f; //life
@@ -748,6 +811,11 @@ private:
 	float y1_target = -0.0175f;
 	float y2_target = 0.03f;
 
+	float x1_p_up = -0.16f;
+	float x2_p_up = 0.16f;
+	float y1_p_up = -0.01f;
+	float y2_p_up = 0.01f;
+
 	float x = 0;
 	float y = 0;
 
@@ -759,8 +827,13 @@ private:
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
 	float enemy_health_bar = x2_target - x1_target;
+	float p_up_bar = x2_p_up - x1_p_up;
 
 	int p_up = 0;
+	bool team_color_set = false;
+	float power_up_start = 0;
+	float cooldown = 7.7;
+	int last_p = 0;
 
 	int c_towers_killed = 0;
 	int m_towers_killed = 0;

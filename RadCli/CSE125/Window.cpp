@@ -2725,6 +2725,7 @@ void mouseFunc(int button, int state, int x, int y)
 						io_service.run_one();
 						playerID = cli->pID();
 						initializePlayerMark(playerID);
+						myUI->teamColor(playerID);
 						std::cout << "pid: " << playerID << std::endl;
 						//system("pause");
 					}
