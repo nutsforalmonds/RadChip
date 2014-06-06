@@ -432,9 +432,9 @@ public:
 		temp = v*temp;
 		FMOD_VECTOR np = { temp.x, temp.y, temp.z };
 		system->play3DSound(me, volume, np, velocity, minDistance, maxDistance);
-		cout << "Me: "<< me << "Vol: " << volume << "Min: " << minDistance << "Max: " << maxDistance << endl;
-		cout << position.x << position.y << position.z << endl;
-		cout << velocity.x << velocity.y << velocity.z << endl;
+		//cout << "Me: "<< me << "Vol: " << volume << "Min: " << minDistance << "Max: " << maxDistance << endl;
+		//cout << position.x << position.y << position.z << endl;
+		//cout << velocity.x << velocity.y << velocity.z << endl;
 	}
 	
 	void setVolume(double v){

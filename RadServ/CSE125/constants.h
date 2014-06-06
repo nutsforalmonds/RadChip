@@ -53,3 +53,11 @@
 #define CENTER_TOWERPLAT_HEIGHT 15
 #define CENTER_PLAT_SPACING   10
 #define CENTER_PLAT_HEIGHT    10
+
+// object types
+#define CUBE 0
+#define MODEL 1
+#define GROUND 2
+#define ELEVATOR 3
+#define TELEPORTER 4
+#define TRAMPOLINE 5
