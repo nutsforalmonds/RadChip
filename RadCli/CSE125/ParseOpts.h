@@ -255,13 +255,14 @@ public:
 			{
 				index += s.c_str()[j];
 			}
-
+			//cout << atoi(index.c_str()) << " ";
 			if (s.c_str()[i + PLATFORM_DAMAGE] == 'd')
 				result.push_back(std::make_pair(atoi(index.c_str()), true));
 			else
 				result.push_back(std::make_pair(atoi(index.c_str()), false));
 			printIndex++;
 		}
+		//cout << endl;
 		return result;
 	}
 
