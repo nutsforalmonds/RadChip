@@ -722,10 +722,10 @@ void towerKill(int towerID){
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
 
-	if (towerID < 2 && towerID == 4){
+	if (towerID < 2 || towerID == 5){
 		myUI->setTowers('c');
 	}
-	else if (towerID > 1 && towerID == 4)
+	else if (towerID == 2 || towerID ==  3 || towerID == 4)
 	{
 		myUI->setTowers('m');
 	}
