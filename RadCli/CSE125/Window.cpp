@@ -201,6 +201,8 @@ struct Mother{
 	ParticleAnimated* mother_of_green_arrow;
 	ParticleAnimated* mother_of_tramp_effect;
 	ParticleAnimated* mother_of_portal_effect;
+	ParticleAnimated* mother_of_orange_mark;
+	ParticleAnimated* mother_of_blue_mark;
 }MOM;
 
 int texScreenWidth = 512;
@@ -345,8 +347,7 @@ float nextBackgroundMusicTimeSec = 345.0;
 float currBackgroundMusicTimeSec = 345.0;
 
 float nextSoundEventTimeSec = 2.5;
-float currSoundEventTimeSec = 2.5;
-int NumSoundEvents = 0;
+float currSoundEventTimeSec = 0.0;
 
 vector<Sound*> SoundEvents;
 
@@ -408,6 +409,15 @@ int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
 
 bool FirstBloodTrigger = true;
+
+string doubleKill = "DOUBLE KILL";
+string killingSpree = "KILLING SPREE";
+string rampage = "RAMPAGE";
+string unstoppable = "UNSTOPPABLE";
+string dominating = "DOMINATING";
+string godlike = "GODLIKE";
+string legendary = "LEGENDARY";
+string shut_down = "SHUTDOWN";
 
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
@@ -485,16 +495,12 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		if (NumSoundEvents > 0){
+		if (!SoundEvents.empty()){
 			currSoundEventTimeSec += diff;
 			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
 				currSoundEventTimeSec = 0;
 				SoundEvents[0]->Play();
 				SoundEvents.erase(SoundEvents.begin());
-				NumSoundEvents--;
-				if (NumSoundEvents < 0){
-					NumSoundEvents = 0;
-				}
 			}
 		}
 	}
@@ -1207,6 +1213,7 @@ void Window::displayCallback(void)
 {
 	unsigned char m_Test[] = "Look Ma! I'm printing!";
 	unsigned char m_Test2[] = "This is where the menu will go eventually. Press the SpaceBar to Enter the Game.";
+	string s = "It was the best of times, it was the worst of times";
 	static time_t timer = clock();
 
 	if (clock() - timer >= CLOCKS_PER_SEC){
@@ -1402,6 +1409,7 @@ void Window::displayCallback(void)
 		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
 
 		myUI->draw();
+		myUI->drawPortrait(playerID, s);
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
@@ -1697,6 +1705,9 @@ void server_update(int value){
 			//cout << "Killed 0" << endl;
 			if (!dead[PLAYER0])
 			{
+				if (Player0_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player0_KillSpree = 0;
 				Player0_KillSpreeLast = 0;
 				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
@@ -1704,7 +1715,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0); 
+				myGameMenu->setDeath(PLAYER0);
 				dead[PLAYER0] = true;
 			}
 		}
@@ -1716,6 +1727,9 @@ void server_update(int value){
 			//cout << "Killed 1" << endl;
 			if (!dead[PLAYER1])
 			{
+				if (Player1_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player1_KillSpree = 0;
 				Player1_KillSpreeLast = 0;
 				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
@@ -1723,7 +1737,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player1_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0);
+				myGameMenu->setDeath(PLAYER1);
 				dead[PLAYER1] = true;
 			}
 		}
@@ -1735,6 +1749,9 @@ void server_update(int value){
 			//cout << "Killed 2" << endl;
 			if (!dead[PLAYER2])
 			{
+				if (Player2_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player2_KillSpree = 0;
 				Player2_KillSpreeLast = 0;
 				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
@@ -1742,7 +1759,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player2_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(2);
+				myGameMenu->setDeath(PLAYER2);
 				dead[PLAYER2] = true;
 			}
 		}
@@ -1754,6 +1771,9 @@ void server_update(int value){
 			//cout << "Killed 3" << endl;
 			if (!dead[PLAYER3])
 			{
+				if (Player3_KillSpree > 2){
+					testSound[SoundShutdown]->Play();
+				}
 				Player3_KillSpree = 0;
 				Player3_KillSpreeLast = 0;
 				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
@@ -1761,7 +1781,7 @@ void server_update(int value){
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player3_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(3);
+				myGameMenu->setDeath(PLAYER3);
 				dead[PLAYER3] = true;
 			}
 		}
@@ -1798,22 +1818,18 @@ void server_update(int value){
 			if (Player0_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player1_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player2_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 			else if (Player3_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
-				NumSoundEvents++;
 			}
 		}
 
@@ -1852,12 +1868,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -1870,12 +1884,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -1888,12 +1900,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -1906,12 +1916,10 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-					NumSoundEvents++;
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -1919,48 +1927,324 @@ void server_update(int value){
 			Player3_DoubleKillTime = 3000;
 		}
 
-		/*
-		if (Player0_KillSpree > Player0_KillSpreeLast){
+		
+		if ((Player0_KillSpree > Player0_KillSpreeLast) && (Player0_KillSpree > 2)){
+			if (Player0_KillSpree > 8){
+				Player0_KillSpree = 8;
+			}
 			Player0_KillSpreeLast = Player0_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER0) 
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER2){
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player0_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player1_KillSpree > Player1_KillSpreeLast){
+		if ((Player1_KillSpree > Player1_KillSpreeLast) && (Player1_KillSpree > 2)){
+			if (Player1_KillSpree > 8){
+				Player1_KillSpree = 8;
+			}
 			Player1_KillSpreeLast = Player1_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER1)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER3){
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player1_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player2_KillSpree > Player2_KillSpreeLast){
+		if ((Player2_KillSpree > Player2_KillSpreeLast) && (Player2_KillSpree > 2)){
+			if (Player2_KillSpree > 8){
+				Player2_KillSpree = 8;
+			}
 			Player2_KillSpreeLast = Player2_KillSpree;
-			if (playerID == PLAYER0 || playerID == PLAYER2)
+			if (playerID == PLAYER2)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER0){
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player2_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		if (Player3_KillSpree > Player3_KillSpreeLast){
+		if ((Player3_KillSpree > Player3_KillSpreeLast) && (Player3_KillSpree > 2)){
+			if (Player3_KillSpree > 8){
+				Player3_KillSpree = 8;
+			}
 			Player3_KillSpreeLast = Player3_KillSpree;
-			if (playerID == PLAYER1 || playerID == PLAYER3)
+			if (playerID == PLAYER3)
 			{
-				testSound[SoundKillingSpreeY]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeU]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2U]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3U]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4U]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5U]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6U]->Play();
+					break;
+				default:
+					break;
+				}
+			}
+			else if (playerID == PLAYER1){
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeY]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2Y]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3Y]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4Y]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5Y]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6Y]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 			else{
-				testSound[SoundKillingSpreeE]->Play();
+				switch (Player3_KillSpree){
+				case 3:
+					testSound[SoundKillingSpreeE]->Play();
+					break;
+				case 4:
+					testSound[SoundKillingSpree2E]->Play();
+					break;
+				case 5:
+					testSound[SoundKillingSpree3E]->Play();
+					break;
+				case 6:
+					testSound[SoundKillingSpree4E]->Play();
+					break;
+				case 7:
+					testSound[SoundKillingSpree5E]->Play();
+					break;
+				case 8:
+					testSound[SoundKillingSpree6E]->Play();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		*/
+		
 		myGameMenu->setKills(0, Player0_KillCount);
 		myGameMenu->setKills(1, Player1_KillCount);
 		myGameMenu->setKills(2, Player2_KillCount);
@@ -2531,7 +2815,6 @@ void keyboard(unsigned char key, int, int){
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
 			SoundEvents.push_back(testSound[SoundDoubleKillY]);
-			NumSoundEvents++;
 			cout << "Adding a sound man!" << endl;
 		}
 		
@@ -3317,6 +3600,9 @@ void initialize(int argc, char *argv[])
 
 	initializeMOM();
 
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+
 	//ParticleAnimated* p_anim = new ParticleAnimated(*MOM.mother_of_p_anim);
 	//p_anim->Init("img/sprite_sheets/light_003.png", "PNG");
 	//p_anim->setShader(sdrCtl.getShader("billboard_anim"));
@@ -3416,6 +3702,12 @@ void initialize(int argc, char *argv[])
 	tower0->setFog(fog);
 	tower_list.push_back(tower0);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower0 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower0->setFollow(tower0, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower0->setStartTime(ct);
+	panim_list.push_back(mark_tower0);
+
 	t0_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t0_ps_01->setShader(sdrCtl.getShader("pe_torus"));
 	t0_ps_01->setType("Particle_System");
@@ -3488,6 +3780,12 @@ void initialize(int argc, char *argv[])
 	tower1->setShininess(30);
 	tower1->setFog(fog);
 	tower_list.push_back(tower1);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower1 = new ParticleAnimated(*(MOM.mother_of_orange_mark));
+	mark_tower1->setFollow(tower1, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower1->setStartTime(ct);
+	panim_list.push_back(mark_tower1);
 
 	t1_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
 	t1_ps_01->setShader(sdrCtl.getShader("pe_torus"));
@@ -3562,6 +3860,12 @@ void initialize(int argc, char *argv[])
 	tower2->setFog(fog);
 	tower_list.push_back(tower2);
 
+	//tower mark effect
+	ParticleAnimated* mark_tower2 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower2->setFollow(tower2, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower2->setStartTime(ct);
+	panim_list.push_back(mark_tower2);
+
 	t2_ps_01 = new ParticleSystem(GL_POINTS);
 	t2_ps_01->setShader(sdrCtl.getShader("halo"));
 	t2_ps_01->setType("Particle_System");
@@ -3619,6 +3923,12 @@ void initialize(int argc, char *argv[])
 	tower3->setShininess(30);
 	tower3->setFog(fog);
 	tower_list.push_back(tower3);
+
+	//tower mark effect
+	ParticleAnimated* mark_tower3 = new ParticleAnimated(*(MOM.mother_of_blue_mark));
+	mark_tower3->setFollow(tower3, vec3(0, 1.2, 0), 0.0f, &View);
+	mark_tower3->setStartTime(ct);
+	panim_list.push_back(mark_tower3);
 
 	t3_ps_01 = new ParticleSystem(GL_POINTS);
 	t3_ps_01->setShader(sdrCtl.getShader("halo"));
@@ -3691,7 +4001,7 @@ void initialize(int argc, char *argv[])
 	elevator_list.push_back(platform_01);
 
 	//island 
-	Cube* platform_02 = new Cube(0, 40, -0.5, 0.5, -20.0, 20.0);
+	Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
 	platform_02->setKd(vec3(0.15, 0.15, 0.92));
 	platform_02->setKa(vec3(0.0, 0.0, 0.3));
@@ -3702,7 +4012,7 @@ void initialize(int argc, char *argv[])
 	platform_02->setEta(0.5);
 	platform_02->setCubeMapUnit(3);
 	platform_02->setSpeed(5);
-	platform_02->postTrans(glm::translate(vec3(20.0, 14.0,0)));
+	platform_02->postTrans(glm::translate(vec3(20, 14.0, 0)));
 	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_02->setShadowTex(shadow_map_id);
@@ -3712,7 +4022,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_02);
 
 	//island 
-	Cube* platform_03 = new Cube(-40, 0, -0.5, 0.5, -20.0, 20.0);
+	Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -20, 20);
 	//platform_01->setSpeed(5); 
 	platform_03->setKd(vec3(0.11, 0.67, 0.09));
 	platform_03->setKa(vec3(0.0, 0.2, 0.0));
@@ -3723,7 +4033,7 @@ void initialize(int argc, char *argv[])
 	platform_03->setEta(0.5);
 	platform_03->setCubeMapUnit(3);
 	platform_03->setSpeed(5);
-	platform_03->postTrans(glm::translate(vec3(-20.0, 14.0,0)));
+	platform_03->postTrans(glm::translate(vec3(-20, 14.0, 0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_03->setShadowTex(shadow_map_id);
@@ -3744,7 +4054,7 @@ void initialize(int argc, char *argv[])
 	platform_04->setEta(0.5);
 	platform_04->setCubeMapUnit(3);
 	platform_04->setSpeed(5);
-	platform_04->postTrans(glm::translate(vec3(0.0, 14.0,20.0)));
+	platform_04->postTrans(glm::translate(vec3(0.0, 14.0, 20.0)));
 	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_04->setShadowTex(shadow_map_id);
 	platform_04->setType("Cube");
@@ -3753,7 +4063,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_04);
 
 	//barricade on walkway 
-	Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
+	/*Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
 	//platform_05->setSpeed(5); 
 	platform_05->setKd(vec3(0.0, 0.8, 0.8));
 	platform_05->setKa(vec3(0.0, 0.3, 0.3));
@@ -3771,28 +4081,7 @@ void initialize(int argc, char *argv[])
 	platform_05->setType("Cube");
 	platform_05->setName("Test Platform");
 	platform_05->setAliveModelM(platform_05->getModelM());
-	stationary_list.push_back(platform_05);
-
-	//tower island
-	Cube* platform_06 = new Cube(-20.0, 20.0, -0.5, 0.5, -20, 20);
-	//platform_06->setSpeed(5); 
-	platform_06->setKd(vec3(0.8, 0.0, 0.8));
-	platform_06->setKa(vec3(0.3, 0.0, 0.3));
-	platform_06->setKs(vec3(0.4, 0.0, 0.4));
-	platform_06->setShininess(100);
-	platform_06->setFog(fog);
-	platform_06->setReflectFactor(vec2(0.2, 0.5));
-	platform_06->setEta(0.5);
-	platform_06->setCubeMapUnit(3);
-	platform_06->setSpeed(5);
-	platform_06->postTrans(glm::translate(vec3(60.0, 14.0,100.0)));
-	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
-	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
-	platform_06->setShadowTex(shadow_map_id);
-	platform_06->setType("Cube");
-	platform_06->setName("Test Platform");
-	platform_06->setAliveModelM(platform_06->getModelM());
-	stationary_list.push_back(platform_06);
+	stationary_list.push_back(platform_05);*/
 
 	//walkway 
 	Cube* platform_07 = new Cube(-10.0, 10.0, -0.5, 0.5, -42, 10);
@@ -3806,7 +4095,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setEta(0.5);
 	platform_07->setCubeMapUnit(3);
 	platform_07->setSpeed(5);
-	platform_07->postTrans(glm::translate(vec3(0.0, 14.0,-20.0)));
+	platform_07->postTrans(glm::translate(vec3(0.0, 14.0, -20.0)));
 	//platform_07->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_07->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_07->setShadowTex(shadow_map_id);
@@ -3815,7 +4104,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setAliveModelM(platform_07->getModelM());
 	stationary_list.push_back(platform_07);
 
-	//barricade on walkway 
+	/*//barricade on walkway 
 	Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
 	//platform_08->setSpeed(5); 
 	platform_08->setKd(vec3(0.0, 0.8, 0.8));
@@ -3834,12 +4123,12 @@ void initialize(int argc, char *argv[])
 	platform_08->setType("Cube");
 	platform_08->setName("Test Platform");
 	platform_08->setAliveModelM(platform_08->getModelM());
-	stationary_list.push_back(platform_08);
+	stationary_list.push_back(platform_08);*/
 
 	//tower island
-	Cube* platform_09 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+	Cube* platform_09 = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 	//platform_09->setSpeed(5); 
-	platform_09->setKd(vec3(0.8, 0.8, 0.0));
+	platform_09->setKd(vec3(0.8, 0.8, 0.8));
 	platform_09->setKa(vec3(0.3, 0.3, 0.0));
 	platform_09->setKs(vec3(0.4, 0.4, 0.0));
 	platform_09->setShininess(100);
@@ -3848,7 +4137,7 @@ void initialize(int argc, char *argv[])
 	platform_09->setEta(0.5);
 	platform_09->setCubeMapUnit(3);
 	platform_09->setSpeed(5);
-	platform_09->postTrans(glm::translate(vec3(60.0, 14.0,-100.0)));
+	platform_09->postTrans(glm::translate(vec3(60.0, 14.0, -80.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_09->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_09->setShadowTex(shadow_map_id);
@@ -3858,9 +4147,9 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_09);
 
 	//tower island
-	Cube* platform_10 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+	Cube* platform_10 = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 	//platform_09->setSpeed(5); 
-	platform_10->setKd(vec3(0.8, 0.8, 0.0));
+	platform_10->setKd(vec3(0.8, 0.8, 0.8));
 	platform_10->setKa(vec3(0.3, 0.3, 0.0));
 	platform_10->setKs(vec3(0.4, 0.4, 0.0));
 	platform_10->setShininess(100);
@@ -3869,7 +4158,7 @@ void initialize(int argc, char *argv[])
 	platform_10->setEta(0.5);
 	platform_10->setCubeMapUnit(3);
 	platform_10->setSpeed(5);
-	platform_10->postTrans(glm::translate(vec3(-60.0, 14.0,-100.0)));
+	platform_10->postTrans(glm::translate(vec3(-60.0, 14.0, -80.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_10->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_10->setShadowTex(shadow_map_id);
@@ -3879,9 +4168,9 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_10);
 
 	//tower island
-	Cube* platform_10b = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+	Cube* platform_10b = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 	//platform_09->setSpeed(5); 
-	platform_10b->setKd(vec3(0.8, 0.8, 0.0));
+	platform_10b->setKd(vec3(0.8, 0.8, 0.8));
 	platform_10b->setKa(vec3(0.3, 0.3, 0.0));
 	platform_10b->setKs(vec3(0.4, 0.4, 0.0));
 	platform_10b->setShininess(100);
@@ -3890,7 +4179,7 @@ void initialize(int argc, char *argv[])
 	platform_10b->setEta(0.5);
 	platform_10b->setCubeMapUnit(3);
 	platform_10b->setSpeed(5);
-	platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 100.0)));
+	platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 80.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_10b->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_10b->setShadowTex(shadow_map_id);
@@ -3898,6 +4187,27 @@ void initialize(int argc, char *argv[])
 	platform_10b->setName("Test Platform");
 	platform_10b->setAliveModelM(platform_10->getModelM());
 	stationary_list.push_back(platform_10b);
+
+	//tower island
+	Cube* platform_06 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 10);
+	//platform_06->setSpeed(5); 
+	platform_06->setKd(vec3(0.8, 0.8, 0.8));
+	platform_06->setKa(vec3(0.3, 0.3, 0.0));
+	platform_06->setKs(vec3(0.4, 0.3, 0.0));
+	platform_06->setShininess(100);
+	platform_06->setFog(fog);
+	platform_06->setReflectFactor(vec2(0.2, 0.5));
+	platform_06->setEta(0.5);
+	platform_06->setCubeMapUnit(3);
+	platform_06->setSpeed(5);
+	platform_06->postTrans(glm::translate(vec3(60.0, 14.0, 80.0)));
+	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	platform_06->setShadowTex(shadow_map_id);
+	platform_06->setType("Cube");
+	platform_06->setName("Test Platform");
+	platform_06->setAliveModelM(platform_06->getModelM());
+	stationary_list.push_back(platform_06);
 
 	//2nd level
 	Cube* platform_11 = new Cube(-10.0, 10.0, -0.5, 0.5, -5, 5);
@@ -3994,7 +4304,7 @@ void initialize(int argc, char *argv[])
 	tramp_01->setReflectFactor(vec2(0.2, 0.5));
 	tramp_01->setEta(0.5);
 	tramp_01->setCubeMapUnit(3);
-	tramp_01->postTrans(glm::translate(vec3(80, 5.0, 35)));
+	tramp_01->postTrans(glm::translate(vec3(20, 5.0, 50)));
 	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_01->setShadowTex(shadow_map_id);
 	tramp_01->setType("Trampoline");
@@ -4004,8 +4314,6 @@ void initialize(int argc, char *argv[])
 	//Trampoline effect
 	ParticleAnimated* tramp_effect_01 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
 	tramp_effect_01->setModelM(tramp_01->getModelM()*glm::translate(vec3(0, 1, 0)));
-	LARGE_INTEGER ct;
-	QueryPerformanceCounter(&ct);
 	tramp_effect_01->setStartTime(ct);
 	panim_list.push_back(tramp_effect_01);
 
@@ -4019,7 +4327,7 @@ void initialize(int argc, char *argv[])
 	tramp_02->setReflectFactor(vec2(0.2, 0.5));
 	tramp_02->setEta(0.5);
 	tramp_02->setCubeMapUnit(3);
-	tramp_02->postTrans(glm::translate(vec3(-80, 5.0, 35)));
+	tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 50)));
 	tramp_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_02->setShadowTex(shadow_map_id);
 	tramp_02->setType("Trampoline");
@@ -4042,7 +4350,7 @@ void initialize(int argc, char *argv[])
 	tramp_03->setReflectFactor(vec2(0.2, 0.5));
 	tramp_03->setEta(0.5);
 	tramp_03->setCubeMapUnit(3);
-	tramp_03->postTrans(glm::translate(vec3(80, 5.0, -35)));
+	tramp_03->postTrans(glm::translate(vec3(20, 5.0, -50)));
 	tramp_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_03->setShadowTex(shadow_map_id);
 	tramp_03->setType("Trampoline");
@@ -4065,12 +4373,13 @@ void initialize(int argc, char *argv[])
 	tramp_04->setReflectFactor(vec2(0.2, 0.5));
 	tramp_04->setEta(0.5);
 	tramp_04->setCubeMapUnit(3);
-	tramp_04->postTrans(glm::translate(vec3(-80, 5.0, -35)));
+	tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -50)));
 	tramp_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_04->setShadowTex(shadow_map_id);
 	tramp_04->setType("Trampoline");
 	tramp_04->setName("Test Trampoline");
 	stationary_list.push_back(tramp_04);
+
 
 	//Trampoline effect
 	ParticleAnimated* tramp_effect_04 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
@@ -4078,7 +4387,7 @@ void initialize(int argc, char *argv[])
 	tramp_effect_04->setStartTime(ct);
 	panim_list.push_back(tramp_effect_04);
 
-	//Trampoline 
+	/*//Trampoline 
 	Cube* tramp_05 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_05->setKd(vec3(0.0, 0.0, 0.0));
 	tramp_05->setKa(vec3(0.0, 0.0, 0.0));
@@ -4122,7 +4431,7 @@ void initialize(int argc, char *argv[])
 	ParticleAnimated* tramp_effect_06 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
 	tramp_effect_06->setModelM(tramp_06->getModelM()*glm::translate(vec3(0, 1, 0)));
 	tramp_effect_06->setStartTime(ct);
-	panim_list.push_back(tramp_effect_06);
+	panim_list.push_back(tramp_effect_06);*/
 
 
 	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4134,7 +4443,7 @@ void initialize(int argc, char *argv[])
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
 	tele_01->setEta(0.5);
 	tele_01->setCubeMapUnit(3);
-	tele_01->postTrans(glm::translate(vec3(78, 14.0,122)));
+	tele_01->postTrans(glm::translate(vec3(80, 14.0, 100)));
 	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_01->setShadowTex(shadow_map_id);
 	tele_01->setType("Teleporter");
@@ -4156,7 +4465,7 @@ void initialize(int argc, char *argv[])
 	tele_02->setReflectFactor(vec2(0.2, 0.5));
 	tele_02->setEta(0.5);
 	tele_02->setCubeMapUnit(3);
-	tele_02->postTrans(glm::translate(vec3(-78, 14.0,122)));
+	tele_02->postTrans(glm::translate(vec3(-80, 14.0, 100)));
 	tele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_02->setShadowTex(shadow_map_id);
 	tele_02->setType("Teleporter");
@@ -4178,7 +4487,7 @@ void initialize(int argc, char *argv[])
 	tele_03->setReflectFactor(vec2(0.2, 0.5));
 	tele_03->setEta(0.5);
 	tele_03->setCubeMapUnit(3);
-	tele_03->postTrans(glm::translate(vec3(78, 14.0,-122)));
+	tele_03->postTrans(glm::translate(vec3(80, 14.0, -100)));
 	tele_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_03->setShadowTex(shadow_map_id);
 	tele_03->setType("Teleporter");
@@ -4200,7 +4509,7 @@ void initialize(int argc, char *argv[])
 	tele_04->setReflectFactor(vec2(0.2, 0.5));
 	tele_04->setEta(0.5);
 	tele_04->setCubeMapUnit(3);
-	tele_04->postTrans(glm::translate(vec3(-78, 14.0,-122)));
+	tele_04->postTrans(glm::translate(vec3(-80, 14.0, -100)));
 	tele_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_04->setShadowTex(shadow_map_id);
 	tele_04->setType("Teleporter");
@@ -4222,7 +4531,7 @@ void initialize(int argc, char *argv[])
 	ele_01->setReflectFactor(vec2(0.2, 0.5));
 	ele_01->setEta(0.5);
 	ele_01->setCubeMapUnit(3);
-	ele_01->postTrans(glm::translate(vec3(12, 14.0,38)));
+	ele_01->postTrans(glm::translate(vec3(12, 14.0, 38)));
 	ele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_01->setShadowTex(shadow_map_id);
 	ele_01->setType("Elevator");
@@ -4239,7 +4548,7 @@ void initialize(int argc, char *argv[])
 	ele_02->setReflectFactor(vec2(0.2, 0.5));
 	ele_02->setEta(0.5);
 	ele_02->setCubeMapUnit(3);
-	ele_02->postTrans(glm::translate(vec3(12, 14.0,38)));
+	ele_02->postTrans(glm::translate(vec3(12, 14.0, 38)));
 	ele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_02->setShadowTex(shadow_map_id);
 	ele_02->setType("Elevator");
@@ -4256,7 +4565,7 @@ void initialize(int argc, char *argv[])
 	ele_03->setReflectFactor(vec2(0.2, 0.5));
 	ele_03->setEta(0.5);
 	ele_03->setCubeMapUnit(3);
-	ele_03->postTrans(glm::translate(vec3(12, 14.0,38)));
+	ele_03->postTrans(glm::translate(vec3(12, 14.0, 38)));
 	ele_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_03->setShadowTex(shadow_map_id);
 	ele_03->setType("Elevator");
@@ -4273,7 +4582,7 @@ void initialize(int argc, char *argv[])
 	ele_04->setReflectFactor(vec2(0.2, 0.5));
 	ele_04->setEta(0.5);
 	ele_04->setCubeMapUnit(3);
-	ele_04->postTrans(glm::translate(vec3(12, 14.0,38)));
+	ele_04->postTrans(glm::translate(vec3(12, 14.0, 38)));
 	ele_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	ele_04->setShadowTex(shadow_map_id);
 	ele_04->setType("Elevator");
@@ -4719,7 +5028,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_209);
 
 	//stairs0 top
-	Cube* platform_210 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_210 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_210->setKd(vec3(0.15, 0.15, 0.92));
 	platform_210->setKa(vec3(0.0, 0.0, 0.3));
@@ -4731,8 +5040,8 @@ void initialize(int argc, char *argv[])
 	platform_210->setCubeMapUnit(3);
 	platform_210->setSpeed(5);
 	platform_210->postTrans(glm::translate(vec3(ORIGINX0,
-		ORIGINY0 + 15,
-		ORIGINZ0 - 30)));
+		ORIGINY0 + 17.5,
+		ORIGINZ0 - 45)));
 	//platform_210->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_210->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_210->setShadowTex(shadow_map_id);
@@ -4741,7 +5050,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_210);
 
 	//stairs1
-	Cube* platform_211 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_211 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_211->setKd(vec3(0.15, 0.15, 0.92));
 	platform_211->setKa(vec3(0.0, 0.0, 0.3));
@@ -4754,7 +5063,7 @@ void initialize(int argc, char *argv[])
 	platform_211->setSpeed(5);
 	platform_211->postTrans(glm::translate(vec3(ORIGINX0,
 		ORIGINY0 + 14,
-		ORIGINZ0 - 40)));
+		ORIGINZ0 - 55)));
 	//platform_211->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_211->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_211->setShadowTex(shadow_map_id);
@@ -4763,7 +5072,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_211);
 
 	//stairs2
-	Cube* platform_212 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_212 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_212->setKd(vec3(0.15, 0.15, 0.92));
 	platform_212->setKa(vec3(0.0, 0.0, 0.3));
@@ -4775,8 +5084,8 @@ void initialize(int argc, char *argv[])
 	platform_212->setCubeMapUnit(3);
 	platform_212->setSpeed(5);
 	platform_212->postTrans(glm::translate(vec3(ORIGINX0,
-		ORIGINY0 + 11,
-		ORIGINZ0 - 50)));
+		ORIGINY0 + 10.5,
+		ORIGINZ0 - 65)));
 	//platform_212->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_212->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_212->setShadowTex(shadow_map_id);
@@ -4785,7 +5094,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_212);
 
 	//stairs3
-	Cube* platform_213 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_213 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_213->setKd(vec3(0.15, 0.15, 0.92));
 	platform_213->setKa(vec3(0.0, 0.0, 0.3));
@@ -4797,8 +5106,8 @@ void initialize(int argc, char *argv[])
 	platform_213->setCubeMapUnit(3);
 	platform_213->setSpeed(5);
 	platform_213->postTrans(glm::translate(vec3(ORIGINX0,
-		ORIGINY0 + 8,
-		ORIGINZ0 - 60)));
+		ORIGINY0 + 7,
+		ORIGINZ0 - 75)));
 	//platform_213->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_213->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_213->setShadowTex(shadow_map_id);
@@ -5028,7 +5337,7 @@ void initialize(int argc, char *argv[])
 	platform_305->setSpeed(5);
 	platform_305->postTrans(glm::translate(vec3(ORIGINX1,
 		ORIGINY1 + CENTER_TOWERPLAT_HEIGHT,
-		ORIGINZ0)));
+		ORIGINZ1)));
 	//platform_305->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_305->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_305->setShadowTex(shadow_map_id);
@@ -5138,7 +5447,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_309);
 
 	//stairs0 top
-	Cube* platform_310 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_310 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_310->setKd(vec3(0.15, 0.15, 0.92));
 	platform_310->setKa(vec3(0.0, 0.0, 0.3));
@@ -5150,8 +5459,8 @@ void initialize(int argc, char *argv[])
 	platform_310->setCubeMapUnit(3);
 	platform_310->setSpeed(5);
 	platform_310->postTrans(glm::translate(vec3(ORIGINX1,
-		ORIGINY1 + 15,
-		ORIGINZ1 + 30)));
+		ORIGINY1 + 17.5,
+		ORIGINZ1 + 45)));
 	//platform_310->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_310->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_310->setShadowTex(shadow_map_id);
@@ -5160,7 +5469,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_310);
 
 	//stairs1
-	Cube* platform_311 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_311 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_311->setKd(vec3(0.15, 0.15, 0.92));
 	platform_311->setKa(vec3(0.0, 0.0, 0.3));
@@ -5173,7 +5482,7 @@ void initialize(int argc, char *argv[])
 	platform_311->setSpeed(5);
 	platform_311->postTrans(glm::translate(vec3(ORIGINX1,
 		ORIGINY1 + 14,
-		ORIGINZ1 + 40)));
+		ORIGINZ1 + 55)));
 	//platform_311->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_311->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_311->setShadowTex(shadow_map_id);
@@ -5182,7 +5491,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_311);
 
 	//stairs2
-	Cube* platform_312 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_312 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_312->setKd(vec3(0.15, 0.15, 0.92));
 	platform_312->setKa(vec3(0.0, 0.0, 0.3));
@@ -5194,8 +5503,8 @@ void initialize(int argc, char *argv[])
 	platform_312->setCubeMapUnit(3);
 	platform_312->setSpeed(5);
 	platform_312->postTrans(glm::translate(vec3(ORIGINX1,
-		ORIGINY1 + 11,
-		ORIGINZ1 + 50)));
+		ORIGINY1 + 10.5,
+		ORIGINZ1 + 65)));
 	//platform_312->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_312->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_312->setShadowTex(shadow_map_id);
@@ -5204,7 +5513,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(platform_312);
 
 	//stairs3
-	Cube* platform_313 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+	Cube* platform_313 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
 	platform_313->setKd(vec3(0.15, 0.15, 0.92));
 	platform_313->setKa(vec3(0.0, 0.0, 0.3));
@@ -5216,8 +5525,8 @@ void initialize(int argc, char *argv[])
 	platform_313->setCubeMapUnit(3);
 	platform_313->setSpeed(5);
 	platform_313->postTrans(glm::translate(vec3(ORIGINX1,
-		ORIGINY1 + 8,
-		ORIGINZ1 + 60)));
+		ORIGINY1 + 7,
+		ORIGINZ1 + 75)));
 	//platform_313->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0)));
 	platform_313->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_313->setShadowTex(shadow_map_id);
@@ -5679,10 +5988,46 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->setType(1);
 	MOM.mother_of_portal_effect->setSampleCount(3, 3);
 	MOM.mother_of_portal_effect->setSampleDist(0.001, 0.001);
-	MOM.mother_of_portal_effect->setTransparency(0.5);
-	MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setTransparency(0.8);
+	MOM.mother_of_portal_effect->setBlurStrength(0.5);
 	MOM.mother_of_portal_effect->setFog(fog);
 	MOM.mother_of_portal_effect->Bind();
+
+	MOM.mother_of_orange_mark = new ParticleAnimated();
+	MOM.mother_of_orange_mark->Init("img/sprite_sheets/cast_001.png", "PNG");
+	MOM.mother_of_orange_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_orange_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_orange_mark->setWidth(4.0f);
+	MOM.mother_of_orange_mark->setHeight(4.0f);
+	MOM.mother_of_orange_mark->setNumColumn(5);
+	MOM.mother_of_orange_mark->setNumRow(4);
+	MOM.mother_of_orange_mark->setValidFrame(0, 19);
+	MOM.mother_of_orange_mark->setDuration(1.0);
+	MOM.mother_of_orange_mark->setType(1);
+	MOM.mother_of_orange_mark->setSampleCount(3, 3);
+	MOM.mother_of_orange_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_orange_mark->setTransparency(0.8);
+	MOM.mother_of_orange_mark->setBlurStrength(0.5);
+	MOM.mother_of_orange_mark->setFog(emptyFog);
+	MOM.mother_of_orange_mark->Bind();
+
+	MOM.mother_of_blue_mark = new ParticleAnimated();
+	MOM.mother_of_blue_mark->Init("img/sprite_sheets/cast_004.png", "PNG");
+	MOM.mother_of_blue_mark->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_blue_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
+	MOM.mother_of_blue_mark->setWidth(4.0f);
+	MOM.mother_of_blue_mark->setHeight(4.0f);
+	MOM.mother_of_blue_mark->setNumColumn(5);
+	MOM.mother_of_blue_mark->setNumRow(4);
+	MOM.mother_of_blue_mark->setValidFrame(0, 19);
+	MOM.mother_of_blue_mark->setDuration(1.0);
+	MOM.mother_of_blue_mark->setType(1);
+	MOM.mother_of_blue_mark->setSampleCount(3, 3);
+	MOM.mother_of_blue_mark->setSampleDist(0.001, 0.001);
+	MOM.mother_of_blue_mark->setTransparency(0.8);
+	MOM.mother_of_blue_mark->setBlurStrength(0.5);
+	MOM.mother_of_blue_mark->setFog(emptyFog);
+	MOM.mother_of_blue_mark->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){
