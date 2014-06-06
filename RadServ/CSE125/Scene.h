@@ -964,8 +964,6 @@ public:
 		{
 			for (uint j = 0; j < stationary.size(); j++)
 			{
-				if (!stationary[j]->getIsPlatformDamage())
-					continue;
 				AABB pBox = projectile[i]->getAABB();
 				AABB sBox = stationary[j]->getAABB();
 				bool collide = true;
@@ -976,7 +974,10 @@ public:
 					}
 				}
 				if (collide){
-					damageStationary(j, projectile[i]->getPlayerID());
+					if (stationary[j]->getIsPlatformDamage())
+					{
+						damageStationary(j, projectile[i]->getPlayerID());
+					}
 					despon_player_projectile_list.push_back(projectile[i]->getShootID());
 					delete projectile[i];
 					projectile.erase(projectile.begin() + i);
@@ -989,6 +990,8 @@ public:
 		//stationary-tower projectile detection
 		for (uint i = 0; i < tower_projectile.size(); i++){
 			for (uint j = 0; j < stationary.size(); j++){
+				if (!stationary[j]->getIsPlatformDamage())
+					continue;
 				AABB pBox = tower_projectile[i]->getAABB();
 				AABB sBox = stationary[j]->getAABB();
 				bool collide = true;
@@ -999,9 +1002,7 @@ public:
 					}
 				}
 				if (collide){
-					if (stationary[j]->getIsPlatformDamage()){
-						damageStationaryT(j, tower_projectile[i]->getPlayerID());
-					}
+					damageStationaryT(j, tower_projectile[i]->getPlayerID());
 					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
 					delete tower_projectile[i];
 					tower_projectile.erase(tower_projectile.begin() + i);
