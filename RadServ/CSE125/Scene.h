@@ -1073,24 +1073,36 @@ public:
 	}
 	void damageTower(int targetId, int playerId)
 	{
-		tower_damaged[targetId] = true;
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getTowerObj(targetId);
-		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+
+		//if base tower id
+		if (targetId == 5)
+		{
+			//if side towers are dead
+			if (tower[0]->getHealth() < 1 && tower[1]->getHealth() < 1)
+			{
+				targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+				tower_damaged[targetId] = true;
+			}
+		}
+		else if (targetId == 4)
+		{
+			if (tower[2]->getHealth() < 1 && tower[3]->getHealth() < 1)
+			{
+				targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+				tower_damaged[targetId] = true;
+			}
+		}
+		else
+		{
+			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+			tower_damaged[targetId] = true;
+		}
+
 		if (targetHolder->getHealth() < 1)
 		{
 			tower_kill[targetId] = true;
-			int dist, spd, dmg;
-			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
-			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
-			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
-			//restricting speed and distance
-			if (dist > MAX_DISTANCE)
-				dist = MAX_DISTANCE;
-			if (spd > MAX_SPEED)
-				spd = MAX_SPEED;
-			if (dmg < MAX_DAMAGE)
-				dmg = MAX_DAMAGE;
 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
