@@ -192,7 +192,7 @@ public:
 			t -= sub;
 			resolvePlayerTransition(sub);
 			resolveProjectileTransition(sub);
-			resolveTowerTransition(sub);
+			//resolveTowerTransition(sub);
 		//	//octree here
 			towerProjectileAttack(sub);
 			collisionDetection();
@@ -208,7 +208,7 @@ public:
 		}
 		resolvePlayerTransition(t);
 		resolveProjectileTransition(t);
-		resolveTowerTransition(t);
+		//resolveTowerTransition(t);
 		////octree here
 		towerProjectileAttack(t);
 		collisionDetection();
@@ -304,7 +304,7 @@ public:
 			}
 			player[i]->touchGround(touchGround1);
 		}
-		collisionDetectionTower();
+		//collisionDetectionTower();
 	}
 
 	void collisionDetectionTower(){
