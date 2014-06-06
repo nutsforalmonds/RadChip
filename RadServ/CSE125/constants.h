@@ -9,7 +9,8 @@
 #define PPDL_MAT			14
 #define PLATFORM_BEGIN      15     
 #define PLATFORM_END		19
-#define GLOBAL				10
+#define GLOBAL				20
+#define PLATFORM_STATUS		21
 
 //player bit info
 #define SHOOTBIT			1

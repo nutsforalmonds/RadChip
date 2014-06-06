@@ -1,6 +1,7 @@
 
 // matrix indexes
-#define NUMOFVECS			21
+
+#define NUMOFVECS			22
 #define PLAYER_MAT_BEGIN	0
 #define PLAYER_MAT_END		3
 #define TOWER_MAT_BEGIN		4
@@ -12,6 +13,7 @@
 #define PLAT_MAT_END		19
 
 #define GLOBAL				20
+#define PLATFORM_STATUS		21
 
 // string indexes
 #define SHOOTBIT			1
@@ -38,6 +40,16 @@
 #define PLAYER1				1
 #define PLAYER2				2
 #define PLAYER3				3
+
+
+//indicies for platform status
+#define PLINDEX_BEGIN		1
+#define PLINDEX_END			2
+#define PLATFORM_DAMAGE		3
+#define PLATFORM_DEAD		4
+#define PLHEALTH_BEGIN		5
+#define PLHEALTH_END		7
+
 
 //tower 
 #define NUM_TOWERS			6
@@ -75,3 +87,37 @@
 #define CENTER_TOWERPLAT_HEIGHT 15
 #define CENTER_PLAT_SPACING   10
 #define CENTER_PLAT_HEIGHT    10
+
+// sounds
+#define NumberOfSounds 30
+#define SoundJumpWav 0
+#define SoundJumpOgg 1
+#define SoundVegeta 2
+#define SoundDiscFire 3
+#define SoundStrongPunch 4
+#define SoundPrePunch 5
+#define SoundMenuHover 6
+#define SoundMenuClick 7
+#define SoundThrow 8
+#define SoundSlap 9
+#define SoundCount 10
+#define SoundDefeat 11
+#define SoundDoubleKillE 12
+#define SoundDoubleKillY 13
+#define SoundFirstBlood 14
+#define SoundKillingSpreeE 15
+#define SoundKillingSpreeY 16
+#define SoundKillTurretH 17
+#define SoundKillTurretH2 18
+#define SoundQfirstblood 19
+#define SoundQkillingspree 20
+#define SoundQrampage 21
+#define SoundQunstoppable 22
+#define SoundTurretAlmostKillEne 23
+#define SoundTurretAlmostKillYour 24
+#define SoundTurretAttackedYourT 25
+#define SoundTurretDieYourTeam 26
+#define SoundTurretHalfKillEnemy 27
+#define SoundTurretHalfKillYourT 28
+#define SoundVictory 29
+

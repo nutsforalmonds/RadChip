@@ -102,7 +102,7 @@ SoundSystem *mySoundSystem;
 Music *menuMusic;
 Music *gameMusic;
 Music *gameThunder;
-Sound* testSound[20];
+Sound* testSound[NumberOfSounds];
 Sound* gameThunder2;
 FMOD_VECTOR myPosition;
 FMOD_VECTOR myVelocity;
@@ -195,6 +195,8 @@ struct Mother{
 	ParticleAnimated* mother_of_tower_damage_1;
 	ParticleAnimated* mother_of_tower_explosion_1;
 	ParticleAnimated* mother_of_health_potion;
+	ParticleAnimated* mother_of_red_arrow;
+	ParticleAnimated* mother_of_green_arrow;
 }MOM;
 
 int texScreenWidth = 512;
@@ -227,6 +229,7 @@ int sprint_up = 10;
 //bool keyState[4];//up,down,left,right
 
 void initializeMOM();
+void initializePlayerMark(int main_player_ID);
 
 void keyboard(unsigned char key, int, int);
 void keyUp (unsigned char key, int x, int y);
@@ -629,10 +632,18 @@ void towerKill(int towerID){
 	FMOD_VECTOR tpos = { pos.x, pos.y, pos.z };
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
+
+	if (towerID < 2){
+		myUI->setTowers('c');
+	}
+	else if (towerID > 1)
+	{
+		myUI->setTowers('m');
+	}
 }
 void powerUpAnimation(int playerID){
 	ParticleAnimated* power_up = new ParticleAnimated(*(MOM.mother_of_health_potion));
-	power_up->setModelM(player_list[playerID]->getModelM()*glm::translate(vec3(0,0.7,0) + 0.5f*glm::normalize(vec3(glm::inverse(View)*vec4(0, 0, 0, 1) - player_list[playerID]->getModelM()*vec4(0, 0, 0, 1)))));
+	power_up->setFollow(player_list[playerID], vec3(0, 1.2, 0), 0.6f, &View);
 	LARGE_INTEGER ct;
 	QueryPerformanceCounter(&ct);
 	power_up->setStartTime(ct);
@@ -1381,7 +1392,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 0!" << endl;
+			//cout << "FIRE 0!" << endl;
 			p0f = true;
 		}
 
@@ -1393,7 +1404,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 1!" << endl;
+			//cout << "FIRE 1!" << endl;
 			p1f = true;
 		}
 
@@ -1405,7 +1416,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 2!" << endl;
+			//cout << "FIRE 2!" << endl;
 			p2f = true;
 		}
 
@@ -1417,7 +1428,7 @@ void server_update(int value){
 			{
 				myUI->setShots(1);
 			}
-			cout << "FIRE 3!" << endl;
+			//cout << "FIRE 3!" << endl;
 			p3f = true;
 		}
 
@@ -1448,6 +1459,29 @@ void server_update(int value){
 					break;
 				}
 			}
+		}
+
+		std::vector<std::pair<int, bool>> platformDamage = parseOpts->getPlatformDamage(recvVec);
+		std::vector<std::pair<int, bool>> platformDead = parseOpts->getPlatformDead(recvVec);
+		std::vector<std::pair<int, int>> platformHealth = parseOpts->getPlatformHealth(recvVec);
+		for (int i = 0; i < platformDead.size(); i++)
+		{
+			if (platformDead[i].second)
+			{
+				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+			}
+			else
+			{
+				stationary_list[platformDead[i].first]->setModelM(stationary_list[platformDead[i].first]->getAliveModelM());
+				stationary_list[platformDead[i].first]->setHealth(7);
+			}
+			if (platformDamage[i].second)
+			{
+				stationary_list[platformDead[i].first]->setHealth(-1);
+			}
+
+			((Cube *)stationary_list[platformDead[i].first])->setTransparency(((float)platformHealth[i].second) / 7.00);
+			
 		}
 
 		mats[PLAYER0] = (*recvVec)[PLAYER_MAT_BEGIN + PLAYER0].second;
@@ -1600,6 +1634,7 @@ void server_update(int value){
 			alive = true;
 		}
 
+
 		// TODO link up health to UI
 		myUI->healthBar((float)parseOpts->getPHealth(recvVec, playerID)/max_health);
 
@@ -1647,6 +1682,8 @@ void server_update(int value){
 			}
 		}
 
+		//display players current power up
+		myUI->setPowerUP(parseOpts->getPPowerUp(recvVec, playerID));
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){
@@ -2052,7 +2089,7 @@ void keyboard(unsigned char key, int, int){
 	case 0:
 		if (key == ' '){
 			if (space_up){
-				testSound[2]->Play();
+				//testSound[SoundVegeta]->Play();
 				//myClientState->setState(1);
 			}
 		}
@@ -2159,13 +2196,13 @@ void keyboard(unsigned char key, int, int){
 			if (space_up){
 				space_up = 0;
 
-				testSound[1]->Play();
+				testSound[SoundJumpOgg]->Play();
 			}
 		}
 
 		//Added for sound debugging
 		if (key == 'f'){
-			//testSound[2]->Play();
+			//testSound[SoundVegeta]->Play();
 			myDeathScreen->setDeathClock(clock());
 			myClientState->setState(3);
 		}
@@ -2309,7 +2346,7 @@ void keyUp (unsigned char key, int x, int y) {
 			// and all this needs to move into the server
 			if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 				if (sprint_up >= 10){
-				//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+				//	testSound[SoundJumpOgg]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 					//scene->jump(playerID);
 				}
 				if (sprint_up > 0){
@@ -2388,7 +2425,7 @@ void mouseFunc(int button, int state, int x, int y)
 			int click = myMainMenu->checkClick(newX, newY);
 			if (click == 1){
 				myClientState->setState(1);
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				if (!connected){
 					
 					//Player mats
@@ -2423,6 +2460,7 @@ void mouseFunc(int button, int state, int x, int y)
 						io_service.run_one();
 						io_service.run_one();
 						playerID = cli->pID();
+						initializePlayerMark(playerID);
 						std::cout << "pid: " << playerID << std::endl;
 						//system("pause");
 					}
@@ -2448,7 +2486,7 @@ void mouseFunc(int button, int state, int x, int y)
 				server_update(0);
 			}
 			else if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				Sleep(1250);
 				running = false;
 				exit(0);
@@ -2471,7 +2509,7 @@ void mouseFunc(int button, int state, int x, int y)
 					left_mouse_up = 0;
 					mouseState = mouseState | 1;
 
-					testSound[9]->Play();
+					testSound[SoundSlap]->Play();
 					///scene->basicAttack(playerID);
 
 					player_list[playerID]->setAnimOnce(3, time);
@@ -2485,9 +2523,7 @@ void mouseFunc(int button, int state, int x, int y)
 				if (right_mouse_up){
 					right_mouse_up = 0;
 					mouseState = mouseState | 1 << 1;
-
-					testSound[8]->Play();
-
+					testSound[SoundThrow]->Play();
 					//projectileAttack(playerID, cam);
 					player_list[playerID]->setAnimOnce(3, time);
 				}
@@ -2501,7 +2537,7 @@ void mouseFunc(int button, int state, int x, int y)
 					middle_mouse_up = 0;
 					mouseState = mouseState | 1 << 2;
 
-				//	testSound[5]->Play();
+				//	testSound[SoundPrePunch]->Play();
 				}
 				else
 				{
@@ -2531,11 +2567,11 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = myGameMenu->checkClick(newX, newY);
 			if (click == 1){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(1);
 			}
 			if (click == 2){
-				testSound[7]->Play();
+				testSound[SoundMenuClick]->Play();
 				myClientState->setState(0);
 				gameMusic->Stop();
 				//gameThunder->Stop();
@@ -2604,7 +2640,7 @@ void passiveMotionFunc(int x, int y){
 		sound = myMainMenu->checkHighlight(newX, newY);
 		if (sound){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2634,7 +2670,7 @@ void passiveMotionFunc(int x, int y){
 		sound2 = myGameMenu->checkHighlight(newX, newY);
 		if (sound2){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2651,7 +2687,7 @@ void passiveMotionFunc(int x, int y){
 		sound3 = myDeathScreen->checkHighlight(newX, newY);
 		if (sound3){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2669,7 +2705,7 @@ void passiveMotionFunc(int x, int y){
 		sound5 = endScreen->checkHighlight(newX, newY);
 		if (sound5){
 			if (!inMenuBox){
-				testSound[6]->Play();
+				testSound[SoundMenuHover]->Play();
 			}
 			inMenuBox = true;
 		}
@@ -2689,7 +2725,7 @@ void specialKeyboardFunc(int key, int x, int y){
 	case 1:
 		if (glutGetModifiers() & GLUT_ACTIVE_SHIFT){
 			if (sprint_up >= 10){
-			//	testSound[1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
+			//	testSound[SoundJumpOgg1]->Play(FMOD_CHANNEL_FREE, 0, &channel);
 				//scene->jump(playerID);
 			}
 			if (sprint_up > 0){
@@ -2855,7 +2891,7 @@ void initialize(int argc, char *argv[])
 	myMainMenu = new MainMenu();
 	myGameMenu = new GameMenu();
 	myDeathScreen = new DeathScreen();
-	myDeathScreen->setupSound(testSound[10]);
+	myDeathScreen->setupSound(testSound[SoundCount]);
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
@@ -3261,12 +3297,12 @@ void initialize(int argc, char *argv[])
 	platform_01->setShadowTex(shadow_map_id);
 	platform_01->setType("Cube");
 	platform_01->setName("Test Platform");
-	//platform_01->setTransparency(0.5); 
+	platform_01->setAliveModelM(platform_01->getModelM());
 	stationary_list.push_back(platform_01);
 	elevator_list.push_back(platform_01);
 
 	//island 
-	Cube* platform_02 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+	Cube* platform_02 = new Cube(-10, 30, -0.5, 0.5, -20.0, 20.0);
 	//platform_01->setSpeed(5); 
 	platform_02->setKd(vec3(0.15, 0.15, 0.92));
 	platform_02->setKa(vec3(0.0, 0.0, 0.3));
@@ -3277,16 +3313,17 @@ void initialize(int argc, char *argv[])
 	platform_02->setEta(0.5);
 	platform_02->setCubeMapUnit(3);
 	platform_02->setSpeed(5);
-	platform_02->postTrans(glm::translate(vec3(74.0, 18.0, 0)));
+	platform_02->postTrans(glm::translate(vec3(20.0, 18.0, 0)));
 	//platform_02->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_02->setShadowTex(shadow_map_id);
 	platform_02->setType("Cube");
 	platform_02->setName("Test Platform");
+	platform_02->setAliveModelM(platform_02->getModelM());
 	stationary_list.push_back(platform_02);
 
 	//island 
-	Cube* platform_03 = new Cube(-10, 10, -0.5, 0.5, -40.0, 40.0);
+	Cube* platform_03 = new Cube(-30, 10, -0.5, 0.5, -20.0, 20.0);
 	//platform_01->setSpeed(5); 
 	platform_03->setKd(vec3(0.11, 0.67, 0.09));
 	platform_03->setKa(vec3(0.0, 0.2, 0.0));
@@ -3297,12 +3334,13 @@ void initialize(int argc, char *argv[])
 	platform_03->setEta(0.5);
 	platform_03->setCubeMapUnit(3);
 	platform_03->setSpeed(5);
-	platform_03->postTrans(glm::translate(vec3(-74.0, 18.0, 0)));
+	platform_03->postTrans(glm::translate(vec3(-20.0, 18.0, 0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_03->setShadowTex(shadow_map_id);
 	platform_03->setType("Cube");
 	platform_03->setName("Test Platform");
+	platform_03->setAliveModelM(platform_03->getModelM());
 	stationary_list.push_back(platform_03);
 
 	//walkway 
@@ -3318,11 +3356,11 @@ void initialize(int argc, char *argv[])
 	platform_04->setCubeMapUnit(3);
 	platform_04->setSpeed(5);
 	platform_04->postTrans(glm::translate(vec3(0.0, 18.0, 20.0)));
-	//platform_04->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_04->setShadowTex(shadow_map_id);
 	platform_04->setType("Cube");
 	platform_04->setName("Test Platform");
+	platform_04->setAliveModelM(platform_04->getModelM());
 	stationary_list.push_back(platform_04);
 
 	//barricade on walkway 
@@ -3343,10 +3381,11 @@ void initialize(int argc, char *argv[])
 	platform_05->setShadowTex(shadow_map_id);
 	platform_05->setType("Cube");
 	platform_05->setName("Test Platform");
+	platform_05->setAliveModelM(platform_05->getModelM());
 	stationary_list.push_back(platform_05);
 
-	//Platform Steps 1-3 
-	Cube* platform_06 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//tower island
+	Cube* platform_06 = new Cube(-20.0, 20.0, -0.5, 0.5, -20, 20);
 	//platform_06->setSpeed(5); 
 	platform_06->setKd(vec3(0.8, 0.0, 0.8));
 	platform_06->setKa(vec3(0.3, 0.0, 0.3));
@@ -3357,12 +3396,13 @@ void initialize(int argc, char *argv[])
 	platform_06->setEta(0.5);
 	platform_06->setCubeMapUnit(3);
 	platform_06->setSpeed(5);
-	platform_06->postTrans(glm::translate(vec3(0.0, 28.0, 60.0)));
+	platform_06->postTrans(glm::translate(vec3(60.0, 18.0, 100.0)));
 	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_06->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_06->setShadowTex(shadow_map_id);
 	platform_06->setType("Cube");
 	platform_06->setName("Test Platform");
+	platform_06->setAliveModelM(platform_06->getModelM());
 	stationary_list.push_back(platform_06);
 
 	//walkway 
@@ -3383,6 +3423,7 @@ void initialize(int argc, char *argv[])
 	platform_07->setShadowTex(shadow_map_id);
 	platform_07->setType("Cube");
 	platform_07->setName("Test Platform");
+	platform_07->setAliveModelM(platform_07->getModelM());
 	stationary_list.push_back(platform_07);
 
 	//barricade on walkway 
@@ -3403,10 +3444,11 @@ void initialize(int argc, char *argv[])
 	platform_08->setShadowTex(shadow_map_id);
 	platform_08->setType("Cube");
 	platform_08->setName("Test Platform");
+	platform_08->setAliveModelM(platform_08->getModelM());
 	stationary_list.push_back(platform_08);
 
-	//Platform Steps 2-3 
-	Cube* platform_09 = new Cube(-5.0, 5.0, -0.5, 0.5, -1.5, 1.5);
+	//tower island
+	Cube* platform_09 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_09->setSpeed(5); 
 	platform_09->setKd(vec3(0.8, 0.8, 0.0));
 	platform_09->setKa(vec3(0.3, 0.3, 0.0));
@@ -3417,16 +3459,17 @@ void initialize(int argc, char *argv[])
 	platform_09->setEta(0.5);
 	platform_09->setCubeMapUnit(3);
 	platform_09->setSpeed(5);
-	platform_09->postTrans(glm::translate(vec3(0.0, 28.0, -60.0)));
+	platform_09->postTrans(glm::translate(vec3(60.0, 18.0, -100.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_09->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_09->setShadowTex(shadow_map_id);
 	platform_09->setType("Cube");
 	platform_09->setName("Test Platform");
+	platform_09->setAliveModelM(platform_09->getModelM());
 	stationary_list.push_back(platform_09);
 
-	//island to teleporter
-	Cube* platform_10 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
+	//tower island
+	Cube* platform_10 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 	//platform_09->setSpeed(5); 
 	platform_10->setKd(vec3(0.8, 0.8, 0.0));
 	platform_10->setKa(vec3(0.3, 0.3, 0.0));
@@ -3437,32 +3480,34 @@ void initialize(int argc, char *argv[])
 	platform_10->setEta(0.5);
 	platform_10->setCubeMapUnit(3);
 	platform_10->setSpeed(5);
-	platform_10->postTrans(glm::translate(vec3(100.0, 18.0, 0.0)));
+	platform_10->postTrans(glm::translate(vec3(-60.0, 18.0, -100.0)));
 	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_10->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_10->setShadowTex(shadow_map_id);
 	platform_10->setType("Cube");
 	platform_10->setName("Test Platform");
+	platform_10->setAliveModelM(platform_10->getModelM());
 	stationary_list.push_back(platform_10);
 
-	//island to teleporter
-	Cube* platform_11 = new Cube(-5.0, 5.0, -0.5, 0.5, -5, 5);
-	//platform_09->setSpeed(5); 
-	platform_11->setKd(vec3(0.8, 0.8, 0.0));
-	platform_11->setKa(vec3(0.3, 0.3, 0.0));
-	platform_11->setKs(vec3(0.4, 0.4, 0.0));
+	//tower island
+	Cube* platform_11 = new Cube(-20.0, 20.0, -0.5, 0.5, -20, 20);
+	//platform_06->setSpeed(5); 
+	platform_11->setKd(vec3(0.8, 0.0, 0.8));
+	platform_11->setKa(vec3(0.3, 0.0, 0.3));
+	platform_11->setKs(vec3(0.4, 0.0, 0.4));
 	platform_11->setShininess(100);
 	platform_11->setFog(fog);
 	platform_11->setReflectFactor(vec2(0.2, 0.5));
 	platform_11->setEta(0.5);
 	platform_11->setCubeMapUnit(3);
 	platform_11->setSpeed(5);
-	platform_11->postTrans(glm::translate(vec3(-100.0, 18.0, 0.0)));
-	//platform_03->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
+	platform_11->postTrans(glm::translate(vec3(-60.0, 18.0, 100.0)));
+	//platform_06->setAABB(AABB(vec3(-1.5, -0.5, -5.0), vec3(1.5, 0.5, 5.0))); 
 	platform_11->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	platform_11->setShadowTex(shadow_map_id);
 	platform_11->setType("Cube");
 	platform_11->setName("Test Platform");
+	platform_11->setAliveModelM(platform_11->getModelM());
 	stationary_list.push_back(platform_11);
 
 	//Trampoline 
@@ -3475,12 +3520,63 @@ void initialize(int argc, char *argv[])
 	tramp_01->setReflectFactor(vec2(0.2, 0.5));
 	tramp_01->setEta(0.5);
 	tramp_01->setCubeMapUnit(3);
-	tramp_01->postTrans(glm::translate(vec3(20, 8.0, 20)));
+	tramp_01->postTrans(glm::translate(vec3(30, 5.0, 80)));
 	tramp_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tramp_01->setShadowTex(shadow_map_id);
 	tramp_01->setType("Trampoline");
 	tramp_01->setName("Test Trampoline");
 	stationary_list.push_back(tramp_01);
+
+	//Trampoline 
+	Cube* tramp_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tramp_02->setKd(vec3(0.0, 0.0, 0.0));
+	tramp_02->setKa(vec3(0.0, 0.0, 0.0));
+	tramp_02->setKs(vec3(0.0, 0.0, 0.0));
+	tramp_02->setShininess(100);
+	tramp_02->setFog(fog);
+	tramp_02->setReflectFactor(vec2(0.2, 0.5));
+	tramp_02->setEta(0.5);
+	tramp_02->setCubeMapUnit(3);
+	tramp_02->postTrans(glm::translate(vec3(-30, 5.0, 80)));
+	tramp_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tramp_02->setShadowTex(shadow_map_id);
+	tramp_02->setType("Trampoline");
+	tramp_02->setName("Test Trampoline");
+	stationary_list.push_back(tramp_02);
+
+	//Trampoline 
+	Cube* tramp_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tramp_03->setKd(vec3(0.0, 0.0, 0.0));
+	tramp_03->setKa(vec3(0.0, 0.0, 0.0));
+	tramp_03->setKs(vec3(0.0, 0.0, 0.0));
+	tramp_03->setShininess(100);
+	tramp_03->setFog(fog);
+	tramp_03->setReflectFactor(vec2(0.2, 0.5));
+	tramp_03->setEta(0.5);
+	tramp_03->setCubeMapUnit(3);
+	tramp_03->postTrans(glm::translate(vec3(30, 5.0, -80)));
+	tramp_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tramp_03->setShadowTex(shadow_map_id);
+	tramp_03->setType("Trampoline");
+	tramp_03->setName("Test Trampoline");
+	stationary_list.push_back(tramp_03);
+
+	//Trampoline 
+	Cube* tramp_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tramp_04->setKd(vec3(0.0, 0.0, 0.0));
+	tramp_04->setKa(vec3(0.0, 0.0, 0.0));
+	tramp_04->setKs(vec3(0.0, 0.0, 0.0));
+	tramp_04->setShininess(100);
+	tramp_04->setFog(fog);
+	tramp_04->setReflectFactor(vec2(0.2, 0.5));
+	tramp_04->setEta(0.5);
+	tramp_04->setCubeMapUnit(3);
+	tramp_04->postTrans(glm::translate(vec3(-30, 5.0, -80)));
+	tramp_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tramp_04->setShadowTex(shadow_map_id);
+	tramp_04->setType("Trampoline");
+	tramp_04->setName("Test Trampoline");
+	stationary_list.push_back(tramp_04);
 
 	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tele_01->setKd(vec3(1.0, 1.0, 1.0));
@@ -3491,7 +3587,7 @@ void initialize(int argc, char *argv[])
 	tele_01->setReflectFactor(vec2(0.2, 0.5));
 	tele_01->setEta(0.5);
 	tele_01->setCubeMapUnit(3);
-	tele_01->postTrans(glm::translate(vec3(114, 18.0, 0)));
+	tele_01->postTrans(glm::translate(vec3(78, 18.0, 122)));
 	tele_01->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_01->setShadowTex(shadow_map_id);
 	tele_01->setType("Teleporter");
@@ -3507,14 +3603,46 @@ void initialize(int argc, char *argv[])
 	tele_02->setReflectFactor(vec2(0.2, 0.5));
 	tele_02->setEta(0.5);
 	tele_02->setCubeMapUnit(3);
-	tele_02->postTrans(glm::translate(vec3(-114, 18.0, 0)));
+	tele_02->postTrans(glm::translate(vec3(-78, 18.0, 122)));
 	tele_02->setShader(sdrCtl.getShader("basic_reflect_refract"));
 	tele_02->setShadowTex(shadow_map_id);
 	tele_02->setType("Teleporter");
 	tele_02->setName("Test Teleporter");
 	stationary_list.push_back(tele_02);
 
-	Cube* ele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	Cube* tele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tele_03->setKd(vec3(1.0, 1.0, 1.0));
+	tele_03->setKa(vec3(1.0, 1.0, 1.0));
+	tele_03->setKs(vec3(1.0, 1.0, 1.0));
+	tele_03->setShininess(100);
+	tele_03->setFog(fog);
+	tele_03->setReflectFactor(vec2(0.2, 0.5));
+	tele_03->setEta(0.5);
+	tele_03->setCubeMapUnit(3);
+	tele_03->postTrans(glm::translate(vec3(78, 18.0, -122)));
+	tele_03->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tele_03->setShadowTex(shadow_map_id);
+	tele_03->setType("Teleporter");
+	tele_03->setName("Test Teleporter");
+	stationary_list.push_back(tele_03);
+
+	Cube* tele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	tele_04->setKd(vec3(1.0, 1.0, 1.0));
+	tele_04->setKa(vec3(1.0, 1.0, 1.0));
+	tele_04->setKs(vec3(1.0, 1.0, 1.0));
+	tele_04->setShininess(100);
+	tele_04->setFog(fog);
+	tele_04->setReflectFactor(vec2(0.2, 0.5));
+	tele_04->setEta(0.5);
+	tele_04->setCubeMapUnit(3);
+	tele_04->postTrans(glm::translate(vec3(-78, 18.0, -122)));
+	tele_04->setShader(sdrCtl.getShader("basic_reflect_refract"));
+	tele_04->setShadowTex(shadow_map_id);
+	tele_04->setType("Teleporter");
+	tele_04->setName("Test Teleporter");
+	stationary_list.push_back(tele_04);
+
+	Cube* ele_01 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_01->setKd(vec3(1.0, 1.0, 1.0));
 	ele_01->setKa(vec3(1.0, 1.0, 1.0));
 	ele_01->setKs(vec3(1.0, 1.0, 1.0));
@@ -3531,7 +3659,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(ele_01);
 	elevator_list.push_back(ele_01);
 
-	Cube* ele_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	Cube* ele_02 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_02->setKd(vec3(1.0, 1.0, 1.0));
 	ele_02->setKa(vec3(1.0, 1.0, 1.0));
 	ele_02->setKs(vec3(1.0, 1.0, 1.0));
@@ -3548,7 +3676,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(ele_02);
 	elevator_list.push_back(ele_02);
 
-	Cube* ele_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	Cube* ele_03 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_03->setKd(vec3(1.0, 1.0, 1.0));
 	ele_03->setKa(vec3(1.0, 1.0, 1.0));
 	ele_03->setKs(vec3(1.0, 1.0, 1.0));
@@ -3565,7 +3693,7 @@ void initialize(int argc, char *argv[])
 	stationary_list.push_back(ele_03);
 	elevator_list.push_back(ele_03);
 
-	Cube* ele_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
+	Cube* ele_04 = new Cube(-5.0, 5.0, -0.5, 0.5, -5.0, 5.0);
 	ele_04->setKd(vec3(1.0, 1.0, 1.0));
 	ele_04->setKa(vec3(1.0, 1.0, 1.0));
 	ele_04->setKs(vec3(1.0, 1.0, 1.0));
@@ -4675,20 +4803,20 @@ int loadAudio(){
 		glutSwapBuffers();
 
 		testSound[i] = new Sound(mySoundSystem, path.c_str(), false);
-		if (i == 8 || i == 9){
+		if (i == SoundThrow || i == SoundSlap){
 			testSound[i]->setVolume(0.75);
 			testSound[i]->setVolume(0.75);
 		}
-		else if (i == 0 || i == 1){
+		else if (i == SoundJumpWav || i == SoundJumpOgg){
 			testSound[i]->setVolume(0.25);
 		}
-		else if (i == 10){
+		else if (i == SoundCount){
 			testSound[i]->setVolume(0.15);
 		}
 		else{
 			testSound[i]->setVolume(0.5);
 		}
-		sound_list.push_back(testSound[0]);
+		sound_list.push_back(testSound[i]);
 		printf("done!\n");
 
 		//Print to game window
@@ -4851,7 +4979,7 @@ void initializeMOM(){
 	MOM.mother_of_tower_shoot_1->setSampleCount(3, 3);
 	MOM.mother_of_tower_shoot_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_shoot_1->setTransparency(1.0);
-	MOM.mother_of_tower_shoot_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_shoot_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_shoot_1->setFog(fog);
 	MOM.mother_of_tower_shoot_1->Bind();
 
@@ -4866,10 +4994,10 @@ void initializeMOM(){
 	MOM.mother_of_tower_damage_1->setValidFrame(20, 39);
 	MOM.mother_of_tower_damage_1->setDuration(1);
 	MOM.mother_of_tower_damage_1->setType(0);
-	//MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
-	//MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
+	MOM.mother_of_tower_damage_1->setSampleCount(3, 3);
+	MOM.mother_of_tower_damage_1->setSampleDist(0.002, 0.002);
 	MOM.mother_of_tower_damage_1->setTransparency(0.9);
-	//MOM.mother_of_tower_damage_1->setBlurStrength(0.5);
+	MOM.mother_of_tower_damage_1->setBlurStrength(1.0);
 	MOM.mother_of_tower_damage_1->setFog(fog);
 	MOM.mother_of_tower_damage_1->Bind();
 
@@ -4895,8 +5023,8 @@ void initializeMOM(){
 	MOM.mother_of_health_potion->Init("img/sprite_sheets/heal_003.png", "PNG");
 	MOM.mother_of_health_potion->setShader(sdrCtl.getShader("billboard_anim"));
 	MOM.mother_of_health_potion->setPosition(vec3(0.0f, 0.0f, 0.0f));
-	MOM.mother_of_health_potion->setWidth(2.0f);
-	MOM.mother_of_health_potion->setHeight(2.0f);
+	MOM.mother_of_health_potion->setWidth(4.0f);
+	MOM.mother_of_health_potion->setHeight(4.0f);
 	MOM.mother_of_health_potion->setNumColumn(5);
 	MOM.mother_of_health_potion->setNumRow(4);
 	MOM.mother_of_health_potion->setValidFrame(0, 19);
@@ -4908,5 +5036,82 @@ void initializeMOM(){
 	//MOM.mother_of_health_potion->setBlurStrength(0.3);
 	MOM.mother_of_health_potion->setFog(fog);
 	MOM.mother_of_health_potion->Bind();
+
+	MOM.mother_of_red_arrow = new ParticleAnimated();
+	MOM.mother_of_red_arrow->Init("img/enemySign.png", "PNG");
+	MOM.mother_of_red_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_red_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_red_arrow->setWidth(2.0f);
+	MOM.mother_of_red_arrow->setHeight(2.0f);
+	MOM.mother_of_red_arrow->setNumColumn(1);
+	MOM.mother_of_red_arrow->setNumRow(1);
+	MOM.mother_of_red_arrow->setValidFrame(0, 0);
+	MOM.mother_of_red_arrow->setDuration(1.0);
+	MOM.mother_of_red_arrow->setType(1);
+	//MOM.mother_of_red_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_red_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_red_arrow->setTransparency(0.9);
+	//MOM.mother_of_red_arrow->setBlurStrength(1.0);
+	MOM.mother_of_red_arrow->setFog(emptyFog);
+	MOM.mother_of_red_arrow->Bind();
+
+	MOM.mother_of_green_arrow = new ParticleAnimated();
+	MOM.mother_of_green_arrow->Init("img/friendSign.png", "PNG");
+	MOM.mother_of_green_arrow->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_green_arrow->setPosition(vec3(0.0f, 0.0f, 0.0f));
+	MOM.mother_of_green_arrow->setWidth(2.0f);
+	MOM.mother_of_green_arrow->setHeight(2.0f);
+	MOM.mother_of_green_arrow->setNumColumn(1);
+	MOM.mother_of_green_arrow->setNumRow(1);
+	MOM.mother_of_green_arrow->setValidFrame(0, 0);
+	MOM.mother_of_green_arrow->setDuration(1.0);
+	MOM.mother_of_green_arrow->setType(1);
+	//MOM.mother_of_green_arrow->setSampleCount(5, 5);
+	//MOM.mother_of_green_arrow->setSampleDist(0.005, 0.005);
+	MOM.mother_of_green_arrow->setTransparency(0.9);
+	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
+	MOM.mother_of_green_arrow->setFog(emptyFog);
+	MOM.mother_of_green_arrow->Bind();
 }
 
+void initializePlayerMark(int main_player_ID){
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	float up = 3.0;
+	if (main_player_ID % 2){
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+	else{
+		for (int i = 0; i < player_list.size(); i++){
+			if (i == main_player_ID)
+				continue;
+			if (i % 2){
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_red_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+			else{
+				ParticleAnimated* playerMark = new ParticleAnimated(*(MOM.mother_of_green_arrow));
+				playerMark->setFollow(player_list[i], vec3(0, up, 0), 0.0f, &View);
+				playerMark->setStartTime(ct);
+				panim_list.push_back(playerMark);
+			}
+		}
+	}
+}

@@ -93,7 +93,12 @@ public:
 		shader->setUniform(uniformLoc[2], vec3((glm::inverse(View)*vec4(0, 0, 0, 1))));
 		shader->setUniform(uniformLoc[3], width);
 		shader->setUniform(uniformLoc[4], height);
-		shader->setUniform(uniformLoc[5], getModelM());
+		if (follow){
+			shader->setUniform(uniformLoc[5], followee->getModelM()*glm::translate(vertTrans + displace*glm::normalize(vec3(glm::inverse(*view)*vec4(0, 0, 0, 1) - followee->getModelM()*vec4(0, 0, 0, 1)))));
+		}
+		else{
+			shader->setUniform(uniformLoc[5], getModelM());
+		}
 		shader->setUniform(uniformLoc[6], 0);
 		shader->setUniform(uniformLoc[7], column);
 		shader->setUniform(uniformLoc[8], row);
@@ -208,6 +213,13 @@ public:
 	void setSampleDist(float x, float y){ x_dist = x; y_dist = y; }
 	void setBlurStrength(float s){ blur_strength = s; }
 	void setDelay(double delay){ this->delay = delay; }
+	void setFollow(Object* followee, vec3 vertTrans, float displace, mat4* view ){
+		follow = true;
+		this->followee = followee;
+		this->vertTrans = vertTrans;
+		this->displace = displace;
+		this->view = view;
+	}
 
 private:
 	GLuint m_VB;
@@ -232,6 +244,11 @@ private:
 	bool reverse = false;
 	float blur_strength = 1;
 	double delay=0;
+	bool follow = false;
+	Object* followee;
+	vec3 vertTrans;
+	float displace;
+	mat4* view;
 };
 
 #endif	/* PARTICLE_ANIMATED_H */
