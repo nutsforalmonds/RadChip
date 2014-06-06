@@ -193,7 +193,7 @@ public:
 			resolveProjectileTransition(sub);
 			//resolveTowerTransition(sub);
 		//	//octree here
-			towerProjectileAttack(sub);
+			//towerProjectileAttack(sub);
 			collisionDetection();
 			collisionDetectionPlayer();
 			collisionDetectionProjectile();
@@ -209,7 +209,7 @@ public:
 		resolveProjectileTransition(t);
 		//resolveTowerTransition(t);
 		////octree here
-		towerProjectileAttack(t);
+		//towerProjectileAttack(t);
 		collisionDetection();
 		collisionDetectionPlayer();
 		collisionDetectionProjectile();

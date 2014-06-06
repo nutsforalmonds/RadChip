@@ -2119,6 +2119,7 @@ void server_update(int value){
 		if (gameOver)
 		{
 			myClientState->setState(5);
+			keyState = 0;
 			playerReady = false;
 
 		}
