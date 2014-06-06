@@ -338,6 +338,7 @@ float currBackgroundMusicTimeSec = 345.0;
 
 float nextSoundEventTimeSec = 2.5;
 float currSoundEventTimeSec = 2.5;
+int NumSoundEvents = 0;
 
 vector<Sound*> SoundEvents;
 
@@ -388,6 +389,8 @@ int Player0_DoubleKillTime = 0;
 int Player1_DoubleKillTime = 0;
 int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
+
+bool FirstBloodTrigger = true;
 
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
@@ -465,12 +468,16 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		currSoundEventTimeSec += diff;
-		if (nextSoundEventTimeSec <= currSoundEventTimeSec){
-			currSoundEventTimeSec = 0;
-			if (!SoundEvents.empty()){
+		if (NumSoundEvents > 0){
+			currSoundEventTimeSec += diff;
+			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
+				currSoundEventTimeSec = 0;
 				SoundEvents[0]->Play();
 				SoundEvents.erase(SoundEvents.begin());
+				NumSoundEvents--;
+				if (NumSoundEvents < 0){
+					NumSoundEvents = 0;
+				}
 			}
 		}
 	}
@@ -1387,16 +1394,6 @@ void Window::displayCallback(void)
 
 //LARGE_INTEGER asdf, jkl;
 void server_update(int value){
-	//QueryPerformanceCounter(&asdf);
-	//double fjfj = (double)((double)(asdf.QuadPart - jkl.QuadPart) / (double)freq.QuadPart * 1000);
-	//jkl = asdf;
-	//cout << fjfj << endl;
-
-	/*
-	diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
-	QueryPerformanceCounter(&loop_begin);
-	*/
-
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
@@ -1427,18 +1424,10 @@ void server_update(int value){
 			//cout << i << " : " << (*recvVec)[i].first.c_str() << endl;
 		//}
 	}
-	else
+	else{
 		recvValid = false;
-	
-	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 2: " << atoi(&((*recvVec)[2].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
+	}
 
-	//cout << "size: " << recvVec->size() << endl;
-	//for (int i = 0; i < 6; i++){
-	//	cout <<i<<" : "<< (*recvVec)[i].first.c_str()<<endl;
-	//}
 	bool p0f = false;
 	bool p1f = false;
 	bool p2f = false;
@@ -1721,6 +1710,29 @@ void server_update(int value){
 		Player2_KillCount = parseOpts->getPKills(recvVec, PLAYER2);
 		Player3_KillCount = parseOpts->getPKills(recvVec, PLAYER3);
 
+		if (FirstBloodTrigger){
+			if (Player0_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player1_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player2_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player3_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+		}
+
 		if (Player0_DoubleKillTime > 30){
 			Player0_DoubleKillTime -= 30;
 		}
@@ -1750,27 +1762,18 @@ void server_update(int value){
 		}
 
 		if (Player0_KillCount > Player0_KillCountLast){
-			if (Player0_DoubleKillTime){
+			if (Player0_DoubleKillTime || Player0_KillCount >= (Player0_KillCountLast + 2)){
 				//Play Double Kill Sound
 				if (playerID == PLAYER0 || playerID == PLAYER2)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player0_KillCount >= (Player0_KillCountLast + 2)){
-				if (playerID == PLAYER0 || playerID == PLAYER2)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -1778,26 +1781,17 @@ void server_update(int value){
 			Player0_DoubleKillTime = 3000;
 		}
 		if (Player1_KillCount > Player1_KillCountLast){
-			if (Player1_DoubleKillTime){
+			if (Player1_DoubleKillTime || (Player1_KillCount >= (Player1_KillCountLast + 2))){
 				if (playerID == PLAYER1 || playerID == PLAYER3)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player1_KillCount >= (Player1_KillCountLast + 2)){
-				if (playerID == PLAYER1 || playerID == PLAYER3)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -1805,26 +1799,17 @@ void server_update(int value){
 			Player1_DoubleKillTime = 3000;
 		}
 		if (Player2_KillCount > Player2_KillCountLast){
-			if (Player2_DoubleKillTime){
+			if (Player2_DoubleKillTime || (Player2_KillCount >= (Player2_KillCountLast + 2))){
 				if (playerID == PLAYER0 || playerID == PLAYER2)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player2_KillCount >= (Player2_KillCountLast + 2)){
-				if (playerID == PLAYER0 || playerID == PLAYER2)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -1832,26 +1817,17 @@ void server_update(int value){
 			Player2_DoubleKillTime = 3000;
 		}
 		if (Player3_KillCount > Player3_KillCountLast){
-			if (Player3_DoubleKillTime){
+			if (Player3_DoubleKillTime || (Player3_KillCount >= (Player3_KillCountLast + 2))){
 				if (playerID == PLAYER1 || playerID == PLAYER3)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player3_KillCount >= (Player3_KillCountLast + 2)){
-				if (playerID == PLAYER1 || playerID == PLAYER3)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -1986,8 +1962,6 @@ void server_update(int value){
 			sound_3d_tele->Play3D(View);
 		}
 
-
-
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
 		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
@@ -2013,8 +1987,6 @@ void server_update(int value){
 				((Cube*)stationary_list[i])->setTransparency(0.5);
 			}
 		}
-
-
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
@@ -2298,6 +2270,7 @@ int main(int argc, char *argv[])
 	  PlayBackgroundMusic(diff);
 	  PlayAnnouncerEvents(diff);
 
+
 	  glutMainLoopEvent();
 	  
 	  Window::idleCallback();
@@ -2444,6 +2417,7 @@ void keyboard(unsigned char key, int, int){
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
 			SoundEvents.push_back(testSound[SoundDoubleKillY]);
+			NumSoundEvents++;
 			cout << "Adding a sound man!" << endl;
 		}
 		
