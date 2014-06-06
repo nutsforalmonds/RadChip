@@ -333,6 +333,14 @@ int Vibrate_Frame_Num = 0;
 float nextThunderTimeSec = 90.0;
 float currThunderTimeSec = 90.0;
 
+float nextBackgroundMusicTimeSec = 345.0;
+float currBackgroundMusicTimeSec = 345.0;
+
+float nextSoundEventTimeSec = 2.5;
+float currSoundEventTimeSec = 2.5;
+
+vector<Sound*> SoundEvents;
+
 float nextPickupSound = 10.0;
 float currPickupSound = 0.0;
 
@@ -355,6 +363,31 @@ FMOD_VECTOR player0_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player1_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player2_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player3_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
+
+int Player0_KillSpree = 0;
+int Player1_KillSpree = 0;
+int Player2_KillSpree = 0;
+int Player3_KillSpree = 0;
+
+int Player0_KillSpreeLast = 0;
+int Player1_KillSpreeLast = 0;
+int Player2_KillSpreeLast = 0;
+int Player3_KillSpreeLast = 0;
+
+int Player0_KillCount = 0;
+int Player1_KillCount = 0;
+int Player2_KillCount = 0;
+int Player3_KillCount = 0;
+
+int Player0_KillCountLast = 0;
+int Player1_KillCountLast = 0;
+int Player2_KillCountLast = 0;
+int Player3_KillCountLast = 0;
+
+int Player0_DoubleKillTime = 0;
+int Player1_DoubleKillTime = 0;
+int Player2_DoubleKillTime = 0;
+int Player3_DoubleKillTime = 0;
 
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
@@ -411,6 +444,34 @@ void PlayThunderSound(float diff){
 		if (nextThunderTimeSec <= currThunderTimeSec){
 			currThunderTimeSec = 0;
 			gameThunder2->Play();
+		}
+	}
+}
+
+void PlayBackgroundMusic(float diff){
+	if (myClientState->getState() > 0){
+		currBackgroundMusicTimeSec += diff;
+		if (nextBackgroundMusicTimeSec <= currBackgroundMusicTimeSec){
+			currBackgroundMusicTimeSec = 0;
+			gameMusic->Stop();
+			delete gameMusic;
+			gameMusic = new Music(mySoundSystem, "Music/background_music.mp3", false);
+			gameMusic->setLoopCount(-1);
+			gameMusic->setVolume(0.9);
+			gameMusic->Play();
+		}
+	}
+}
+
+void PlayAnnouncerEvents(float diff){
+	if (myClientState->getState() > 0){
+		currSoundEventTimeSec += diff;
+		if (nextSoundEventTimeSec <= currSoundEventTimeSec){
+			currSoundEventTimeSec = 0;
+			if (!SoundEvents.empty()){
+				SoundEvents[0]->Play();
+				SoundEvents.erase(SoundEvents.begin());
+			}
 		}
 	}
 }
@@ -1560,12 +1621,14 @@ void server_update(int value){
 			//cout << "Killed 0" << endl;
 			if (!dead[PLAYER0])
 			{
+				Player0_KillSpree = 0;
+				Player0_KillSpreeLast = 0;
 				spawnDeathParticle(player0_sound_vec_lasterest.x, player0_sound_vec_lasterest.y, player0_sound_vec_lasterest.z);
 				sound_3d_death->setPosition(player0_sound_vec_lasterest);
 				sound_3d_death->Play3D(View);
 				sound_3d_death2->setPosition(player0_sound_vec_lasterest);
 				sound_3d_death2->Play3D(View);
-				myGameMenu->setDeath(0);
+				myGameMenu->setDeath(0); 
 				dead[PLAYER0] = true;
 			}
 		}
@@ -1577,6 +1640,8 @@ void server_update(int value){
 			//cout << "Killed 1" << endl;
 			if (!dead[PLAYER1])
 			{
+				Player1_KillSpree = 0;
+				Player1_KillSpreeLast = 0;
 				spawnDeathParticle(player1_sound_vec_lasterest.x, player1_sound_vec_lasterest.y, player1_sound_vec_lasterest.z);
 				sound_3d_death->setPosition(player1_sound_vec_lasterest);
 				sound_3d_death->Play3D(View);
@@ -1594,6 +1659,8 @@ void server_update(int value){
 			//cout << "Killed 2" << endl;
 			if (!dead[PLAYER2])
 			{
+				Player2_KillSpree = 0;
+				Player2_KillSpreeLast = 0;
 				spawnDeathParticle(player2_sound_vec_lasterest.x, player2_sound_vec_lasterest.y, player2_sound_vec_lasterest.z);
 				sound_3d_death->setPosition(player2_sound_vec_lasterest);
 				sound_3d_death->Play3D(View);
@@ -1611,6 +1678,8 @@ void server_update(int value){
 			//cout << "Killed 3" << endl;
 			if (!dead[PLAYER3])
 			{
+				Player3_KillSpree = 0;
+				Player3_KillSpreeLast = 0;
 				spawnDeathParticle(player3_sound_vec_lasterest.x, player3_sound_vec_lasterest.y, player3_sound_vec_lasterest.z);
 				sound_3d_death->setPosition(player3_sound_vec_lasterest);
 				sound_3d_death->Play3D(View);
@@ -1639,10 +1708,200 @@ void server_update(int value){
 		myUI->healthBar((float)parseOpts->getPHealth(recvVec, playerID)/max_health);
 
 		// TODO display kills somewhere
-		myGameMenu->setKills(0, parseOpts->getPKills(recvVec, PLAYER0));
-		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, PLAYER1));
-		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, PLAYER2));
-		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, PLAYER3));
+		Player0_KillCountLast = Player0_KillCount;
+		Player1_KillCountLast = Player1_KillCount;
+		Player2_KillCountLast = Player2_KillCount;
+		Player3_KillCountLast = Player3_KillCount;
+
+		Player0_KillCount = parseOpts->getPKills(recvVec, PLAYER0);
+		Player1_KillCount = parseOpts->getPKills(recvVec, PLAYER1);
+		Player2_KillCount = parseOpts->getPKills(recvVec, PLAYER2);
+		Player3_KillCount = parseOpts->getPKills(recvVec, PLAYER3);
+
+		if (Player0_DoubleKillTime > 30){
+			Player0_DoubleKillTime -= 30;
+		}
+		else{
+			Player0_DoubleKillTime = 0;
+		}
+
+		if (Player1_DoubleKillTime > 30){
+			Player1_DoubleKillTime -= 30;
+		}
+		else{
+			Player1_DoubleKillTime = 0;
+		}
+
+		if (Player2_DoubleKillTime > 30){
+			Player2_DoubleKillTime -= 30;
+		}
+		else{
+			Player2_DoubleKillTime = 0;
+		}
+
+		if (Player3_DoubleKillTime > 30){
+			Player3_DoubleKillTime -= 30;
+		}
+		else{
+			Player3_DoubleKillTime = 0;
+		}
+
+		if (Player0_KillCount > Player0_KillCountLast){
+			if (Player0_DoubleKillTime){
+				//Play Double Kill Sound
+				if (playerID == PLAYER0 || playerID == PLAYER2)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			else if (Player0_KillCount >= (Player0_KillCountLast + 2)){
+				if (playerID == PLAYER0 || playerID == PLAYER2)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			Player0_KillSpreeLast = Player0_KillSpree;
+			Player0_KillSpree += (Player0_KillCount - Player0_KillCountLast);
+			Player0_DoubleKillTime = 3000;
+		}
+		if (Player1_KillCount > Player1_KillCountLast){
+			if (Player1_DoubleKillTime){
+				if (playerID == PLAYER1 || playerID == PLAYER3)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			else if (Player1_KillCount >= (Player1_KillCountLast + 2)){
+				if (playerID == PLAYER1 || playerID == PLAYER3)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			Player1_KillSpreeLast = Player1_KillSpree;
+			Player1_KillSpree += (Player1_KillCount - Player1_KillCountLast);
+			Player1_DoubleKillTime = 3000;
+		}
+		if (Player2_KillCount > Player2_KillCountLast){
+			if (Player2_DoubleKillTime){
+				if (playerID == PLAYER0 || playerID == PLAYER2)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			else if (Player2_KillCount >= (Player2_KillCountLast + 2)){
+				if (playerID == PLAYER0 || playerID == PLAYER2)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			Player2_KillSpreeLast = Player2_KillSpree;
+			Player2_KillSpree += (Player2_KillCount - Player2_KillCountLast);
+			Player2_DoubleKillTime = 3000;
+		}
+		if (Player3_KillCount > Player3_KillCountLast){
+			if (Player3_DoubleKillTime){
+				if (playerID == PLAYER1 || playerID == PLAYER3)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			else if (Player3_KillCount >= (Player3_KillCountLast + 2)){
+				if (playerID == PLAYER1 || playerID == PLAYER3)
+				{
+					//testSound[SoundDoubleKillY]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+				}
+				else{
+					//testSound[SoundDoubleKillE]->Play();
+					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+				}
+			}
+			Player3_KillSpreeLast = Player3_KillSpree;
+			Player3_KillSpree += (Player3_KillCount - Player3_KillCountLast);
+			Player3_DoubleKillTime = 3000;
+		}
+
+		/*
+		if (Player0_KillSpree > Player0_KillSpreeLast){
+			Player0_KillSpreeLast = Player0_KillSpree;
+			if (playerID == PLAYER0 || playerID == PLAYER2)
+			{
+				testSound[SoundKillingSpreeY]->Play();
+			}
+			else{
+				testSound[SoundKillingSpreeE]->Play();
+			}
+		}
+		if (Player1_KillSpree > Player1_KillSpreeLast){
+			Player1_KillSpreeLast = Player1_KillSpree;
+			if (playerID == PLAYER1 || playerID == PLAYER3)
+			{
+				testSound[SoundKillingSpreeY]->Play();
+			}
+			else{
+				testSound[SoundKillingSpreeE]->Play();
+			}
+		}
+		if (Player2_KillSpree > Player2_KillSpreeLast){
+			Player2_KillSpreeLast = Player2_KillSpree;
+			if (playerID == PLAYER0 || playerID == PLAYER2)
+			{
+				testSound[SoundKillingSpreeY]->Play();
+			}
+			else{
+				testSound[SoundKillingSpreeE]->Play();
+			}
+		}
+		if (Player3_KillSpree > Player3_KillSpreeLast){
+			Player3_KillSpreeLast = Player3_KillSpree;
+			if (playerID == PLAYER1 || playerID == PLAYER3)
+			{
+				testSound[SoundKillingSpreeY]->Play();
+			}
+			else{
+				testSound[SoundKillingSpreeE]->Play();
+			}
+		}
+		*/
+		myGameMenu->setKills(0, Player0_KillCount);
+		myGameMenu->setKills(1, Player1_KillCount);
+		myGameMenu->setKills(2, Player2_KillCount);
+		myGameMenu->setKills(3, Player3_KillCount);
 
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup
@@ -2031,7 +2290,10 @@ int main(int argc, char *argv[])
 	  diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
 	  last = current;
 
+	  //Loop check functions for music
 	  PlayThunderSound(diff);
+	  PlayBackgroundMusic(diff);
+	  PlayAnnouncerEvents(diff);
 
 	  glutMainLoopEvent();
 	  
@@ -2178,6 +2440,8 @@ void keyboard(unsigned char key, int, int){
 
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
+			SoundEvents.push_back(testSound[SoundDoubleKillY]);
+			cout << "Adding a sound man!" << endl;
 		}
 		
 		if (key == 'o'){
@@ -2461,6 +2725,7 @@ void mouseFunc(int button, int state, int x, int y)
 						io_service.run_one();
 						playerID = cli->pID();
 						initializePlayerMark(playerID);
+						myUI->teamColor(playerID);
 						std::cout << "pid: " << playerID << std::endl;
 						//system("pause");
 					}

@@ -180,6 +180,12 @@ public:
 		chan->setPaused(false);
 	}
 
+	bool isMusicPlaying(FMOD::Channel *chan){
+		bool temp;
+		chan->isPlaying(&temp);
+		return temp;
+	}
+
 	void play3DMusic(FMOD::Channel *chan, FMOD_VECTOR pos, FMOD_VECTOR vel, float minD, float maxD){
 		chan->get3DAttributes(&pos, &vel);
 		chan->set3DMinMaxDistance(minD, maxD);
@@ -278,6 +284,10 @@ public:
 
 	void Play(){
 		system->playMusic(myChan);
+	}
+
+	bool isPlaying(){
+		return (system->isMusicPlaying(myChan));
 	}
 
 	void setPosition(FMOD_VECTOR pos){
