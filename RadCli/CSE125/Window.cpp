@@ -1834,7 +1834,7 @@ void server_update(int value){
 			playerReady = false;
 
 		}
-		cout <<playerReady << " " << gameOver << endl;
+		//cout <<playerReady << " " << gameOver << endl;
 	}
 
 
