@@ -1001,7 +1001,7 @@ public:
 				}
 				if (collide){
 					if (stationary[j]->getIsPlatformDamage()){
-						damageStationary(j, tower_projectile[i]->getPlayerID());
+						damageStationaryT(j, tower_projectile[i]->getPlayerID());
 					}
 					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
 					delete tower_projectile[i];
@@ -1120,6 +1120,24 @@ public:
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = stationary[targetId];
 		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		platformDamaged[targetId] = true;
+		if (targetHolder->getHealth() < 1)
+		{
+			platformDead[targetId] = true;
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			stationary[targetId]->setAliveModelM(stationary[targetId]->getModelM());
+			stationary[targetId]->setModelM(stationary[targetId]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+		}
+	}
+
+	void damageStationaryT(int targetId, int playerId)
+	{
+		Object * playerHolder = tower[playerId];
+		Object * targetHolder = stationary[targetId];
+		targetHolder->setHealth(((Tower*)playerHolder)->getDamage());
 		platformDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
