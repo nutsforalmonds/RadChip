@@ -1417,6 +1417,8 @@ void Window::displayCallback(void)
 		//particle6->draw(Projection, View);
 		//particle7->draw(Projection, View);
 		//particle8->draw();
+		
+		/*
 		t0_ps_01->draw(Projection, View);
 		t0_ps_02->draw(Projection, View);
 		t0_ps_03->draw(Projection, View);
@@ -1432,8 +1434,9 @@ void Window::displayCallback(void)
 		t3_ps_01->draw(Projection, View);
 		t3_ps_02->draw(Projection, View);
 		t3_ps_03->draw(Projection, View);
+		*/
 
-		testSystem->draw(Projection, View);
+		//testSystem->draw(Projection, View);
 		//damagePart->draw(Projection, View);
 
 
