@@ -494,7 +494,7 @@ public:
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
 									player[i]->getWeapon()->setDistance(40);
 
-								player[i]->setHealth(4);
+								player[i]->setTempHealth(4);
 								player[i]->setPowerUp(HEALTHBOOST);
 							}
 							pUpCooldown[HEALTHBOOST] = POWERUP_DURATION;
@@ -1022,7 +1022,7 @@ public:
 			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		else
 		{
-			targetHolder->setHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 
 		}
 		playerDamaged[targetId] = true;
