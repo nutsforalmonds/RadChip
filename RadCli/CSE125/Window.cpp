@@ -1598,7 +1598,6 @@ void server_update(int value){
 				towerKill(i);
 			}
 			TowerHP[i] = parseOpts->getTowerHealth(recvVec, i);
-
 			if ((TowerHP[i] <= 0) && (TowerState[i] < TOWER_0_HP)){
 				//play tower dead
 				TowerState[i] = TOWER_0_HP;

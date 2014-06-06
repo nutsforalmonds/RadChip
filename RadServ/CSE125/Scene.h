@@ -1518,7 +1518,7 @@ public:
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(40);
 		tw0->setShootSpeed(60);
-		tw0->setHealth(20);
+		tw0->putHealth(20);
 		tw0->setDamage(-3);
 		tw0->setType(MODEL);
 		tw0->setName("Tower Model0");
@@ -1533,7 +1533,7 @@ public:
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(40);
 		tw1->setShootSpeed(60);
-		tw1->setHealth(20);
+		tw1->putHealth(20);
 		tw1->setDamage(-3);
 		tw1->setType(MODEL);
 		tw1->setName("Tower Model0");
@@ -1548,7 +1548,7 @@ public:
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(40);
 		tw2->setShootSpeed(60);
-		tw2->setHealth(20);
+		tw2->putHealth(20);
 		tw2->setDamage(-3);
 		tw2->setType(MODEL);
 		tw2->setName("Tower Model1");
@@ -1563,7 +1563,7 @@ public:
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(40);
 		tw3->setShootSpeed(60);
-		tw3->setHealth(20);
+		tw3->putHealth(20);
 		tw3->setDamage(-3);
 		tw3->setType(MODEL);
 		tw3->setName("Tower Model1");
