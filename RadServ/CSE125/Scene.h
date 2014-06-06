@@ -1752,7 +1752,7 @@ public:
 		platform_202->postTrans(glm::translate(vec3(ORIGINX0 - PERIMETER_WALL_RADIUS,
 			ORIGINY0 + PERIMETER_WALL_HEIGHT,
 			ORIGINZ0)));
-		platform_202->setAABB(AABB(vec3(-0.5, -15, -25), vec3(0.5, 15, 25))); 
+		platform_202->setAABB(AABB(vec3(-0.5, -15, -PERIMETER_WALL_RADIUS), vec3(0.5, 15, PERIMETER_WALL_RADIUS)));
 		platform_202->setType("Cube");
 		platform_202->setName("Test Platform");
 		addStationary(platform_202);
@@ -1982,7 +1982,7 @@ public:
 		platform_302->postTrans(glm::translate(vec3(ORIGINX1 - PERIMETER_WALL_RADIUS,
 			ORIGINY1 + PERIMETER_WALL_HEIGHT,
 			ORIGINZ1)));
-		platform_302->setAABB(AABB(vec3(-0.5, -15, -25), vec3(0.5, 15, 25)));
+		platform_302->setAABB(AABB(vec3(-0.5, -15, -PERIMETER_WALL_RADIUS), vec3(0.5, 15, PERIMETER_WALL_RADIUS)));
 		platform_302->setType("Cube");
 		platform_302->setName("Test Platform");
 		addStationary(platform_302);
