@@ -842,7 +842,6 @@ private:
 
 };
 
-
 class MainMenu
 {
 public:

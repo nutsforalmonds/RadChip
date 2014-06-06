@@ -66,10 +66,42 @@ public:
 			delete stationary[i];
 		}
 		stationary.clear();
+		//for (uint i = 0; i<elevator.size(); i++){
+		//	delete elevator[i];
+		//}
+		//elevator.clear();
 		for (uint i = 0; i<player.size(); i++){
 			delete player[i];
 		}
 		player.clear();
+		for (uint i = 0; i<respawn.size(); i++){
+			delete respawn[i];
+		}
+		respawn.clear();
+		for (uint i = 0; i<tower.size(); i++){
+			delete tower[i];
+		}
+		tower.clear();
+		for (uint i = 0; i<skillShot.size(); i++){
+			delete skillShot[i];
+		}
+		skillShot.clear();
+		for (uint i = 0; i<virtualTower.size(); i++){
+			delete virtualTower[i];
+		}
+		virtualTower.clear();
+		for (uint i = 0; i<projectile.size(); i++){
+			delete projectile[i];
+		}
+		projectile.clear();
+		for (uint i = 0; i<tower_projectile.size(); i++){
+			delete tower_projectile[i];
+		}
+		tower_projectile.clear();
+		for (uint i = 0; i<powerUps.size(); i++){
+			delete powerUps[i];
+		}
+		powerUps.clear();
 	}
 
 	Object * getPlayerObj(int playerID)
@@ -95,7 +127,7 @@ public:
 	int getPlayerHealth(int playerID)
 	{
 		pPtr = getPlayerObj(playerID);
-		return pPtr->getHealth();
+		return pPtr->getMaxHealth();
 	}
 
 	int getPlayerKills(int playerID)
@@ -170,7 +202,7 @@ public:
 			despawnProjectile();
 			rechargeJump();
 			respawnObjs();
-			respawnTower();
+			//respawnTower();
 			removePowerUp();
 			moveElevators();
 		}
@@ -186,7 +218,7 @@ public:
 		despawnProjectile();
 		rechargeJump();
 		respawnObjs();
-		respawnTower();
+		//respawnTower();
 		removePowerUp();
 		moveElevators();
 	}
@@ -371,9 +403,9 @@ public:
 				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
-					inX = (playerAABB.min[0] <= powerUpPos[0] + 3) && (powerUpPos[0] - 3 <= playerAABB.max[0]);
-					inY = (playerAABB.min[1] <= powerUpPos[1] + 3) && (powerUpPos[1] - 3 <= playerAABB.max[1]);
-					inZ = (playerAABB.min[2] <= powerUpPos[2] + 3) && (powerUpPos[2] - 3 <= playerAABB.max[2]);
+					inX = (playerAABB.min[0] <= powerUpPos[0] + 2) && (powerUpPos[0] - 2 <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1] + 2) && (powerUpPos[1] - 2 <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2] + 2) && (powerUpPos[2] - 2 <= playerAABB.max[2]);
 
 					if (inX && inY && inZ)
 					{
@@ -396,7 +428,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -426,7 +458,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									break;
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -445,7 +477,7 @@ public:
 						{
 							if (player[i]->getPowerUp() == NOPOWER)
 							{
-								player[i]->setHealth(4);
+								player[i]->setTempHealth(4);
 								player[i]->setPowerUp(HEALTHBOOST);
 							}
 							else
@@ -482,7 +514,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									break;
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -509,7 +541,7 @@ public:
 								else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 									player[i]->getWeapon()->setDamage(-1);
 								else if (player[i]->getPowerUp() == HEALTHBOOST)
-									player[i]->setHealth(-4);
+									player[i]->setTempHealth(0);
 								else if (player[i]->getPowerUp() == FASTERSHOOT)
 									player[i]->getWeapon()->setSpeed(50);
 								else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -525,6 +557,36 @@ public:
 				}
 			}
 		}
+	}
+
+	//returns 3 if no winner yet, 0 for team 0 win, 1 for team 1 win
+	int checkTowerAlive()
+	{
+		int team0 = 0;
+		int team1 = 0;
+		for (int i = 0; i < tower.size(); i++)
+		{
+			if (tower[i]->getHealth() < 1)
+			{
+				if (tower[i]->getTeamID())
+					team1++;
+				else
+					team0++;
+			}
+		}
+		if (team1 == NUM_TOWERS / 2)
+		{
+			gameOver = true;
+			return 1;
+		}
+		else if (team0 == NUM_TOWERS / 2)
+		{
+			gameOver = true;
+			return 0;
+		}
+		else
+			return 3;
+
 	}
 
 	void fixCollision(Object* obj1, Object* obj2, AABB& box1, AABB& box2, bool& onGround1, bool& onGround2){
@@ -655,6 +717,10 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////// START OF PLAYER ACTIONS /////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	bool getGameOver()
+	{
+		return gameOver;
+	}
 
 	vector<Object *> * getStationary()
 	{
@@ -707,7 +773,7 @@ public:
 					else if (player[i]->getPowerUp() == DOUBLEDAMAGE)
 						player[i]->getWeapon()->setDamage(-1);
 					else if (player[i]->getPowerUp() == HEALTHBOOST)
-						player[i]->setHealth(-4);
+						player[i]->setTempHealth(0);
 					else if (player[i]->getPowerUp() == FASTERSHOOT)
 						player[i]->getWeapon()->setSpeed(50);
 					else if (player[i]->getPowerUp() == FARTHERSHOOT)
@@ -927,23 +993,14 @@ public:
 	{
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getPlayerObj(targetId);
-		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		if (targetHolder->getTempHealth() <= 0)
+			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		else
+			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
 			playerDead[targetId] = true;
-			int dist, spd, dmg;
-			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
-			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
-			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
-			//restricting speed and distance
-			if (dist > MAX_DISTANCE)
-				dist = MAX_DISTANCE;
-			if (spd > MAX_SPEED)
-				spd = MAX_SPEED;
-			if (dmg < MAX_DAMAGE)
-				dmg = MAX_DAMAGE;
-			 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
 			//Window::removePlayerList((*targetHolder).getName());
@@ -971,7 +1028,11 @@ public:
 	{
 		Tower* tw = tower[towerID];
 		Object * targetHolder = getPlayerObj(targetId);
-		targetHolder->setHealth(tw->getDamage());
+		//targetHolder->setHealth(tw->getDamage());
+		if (targetHolder->getTempHealth() <= 0)
+			targetHolder->setHealth(tw->getDamage());
+		else
+			targetHolder->setTempHealth(targetHolder->getTempHealth() + tw->getDamage());
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
@@ -2209,7 +2270,9 @@ public:
 
 		counter = 0;
 		projectile_counter = 0;
+		gameOver = false;
 	}
+
 
 protected:
 	int counter2;
@@ -2244,7 +2307,7 @@ protected:
 	bool tower_shoot_check[NUM_TOWERS];
 	bool tower_damaged[NUM_TOWERS];//only last valid simulation
 	bool tower_kill[NUM_TOWERS];//only last valid simulation
-
+	bool gameOver;
 	Object * pPtr;
 };
 

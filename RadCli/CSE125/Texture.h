@@ -15,6 +15,7 @@ public:
 	bool Load();
 	bool LoadCube(const char* FilePre, const char* FileSuf);
 	bool LoadDepthTexture(GLsizei width,GLsizei height);
+	bool LoadRenderTexture(GLsizei width, GLsizei height);
 
 	void Bind(GLenum TextureUnit);
 

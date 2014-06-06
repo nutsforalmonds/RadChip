@@ -83,6 +83,16 @@ bool Texture::LoadDepthTexture(GLsizei width, GLsizei height)
 	return true;
 }
 
+bool Texture::LoadRenderTexture(GLsizei width, GLsizei height){
+	glGenTextures(1, &m_textureObj);
+	glBindTexture(GL_TEXTURE_2D, m_textureObj);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	return true;
+}
+
 void Texture::Bind(GLenum TextureUnit)
 {
 	glActiveTexture(TextureUnit);

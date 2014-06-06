@@ -38,6 +38,7 @@
 #include "ParticleAnimated.h"
 #include "LightningGenerator.h"
 #include "BillboardProjectile.h"
+#include "Quad.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -73,6 +74,8 @@ long long m_currentTimeMillis;
 ParticleSystem2* testSystem;
 
 std::vector<ParticleSystem2*> explosion_list;
+
+Quad* screen_quad;
 
 enum {
 	MENU_LIGHTING = 1,
@@ -208,9 +211,11 @@ float cam_dx = 0;
 
 GLuint fboHandle;
 GLuint depth_fbo;
+GLuint render_fbo;
 GLsizei depth_texture_width = 2048;//4096
 GLsizei depth_texture_height = 2048;
 GLuint shadow_map_id = 10;//shadow map stored in GL_TEXTURE10
+GLuint render_tex_id = 11;//blur texture stored in GL_TEXTURE11
 
 string configBuf;
 
@@ -259,6 +264,7 @@ End_Screen * endScreen;
 Logo * logo;
 
 Texture * shadow;
+Texture * render_tex;
 char buf[255];
 int myFPS = 0;
 
@@ -338,6 +344,7 @@ float currBackgroundMusicTimeSec = 345.0;
 
 float nextSoundEventTimeSec = 2.5;
 float currSoundEventTimeSec = 2.5;
+int NumSoundEvents = 0;
 
 vector<Sound*> SoundEvents;
 
@@ -364,6 +371,15 @@ FMOD_VECTOR player1_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player2_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 FMOD_VECTOR player3_sound_vec_lasterest = { 0.0, 0.0, 0.0 };
 
+//endgame stuff
+bool gameOver;
+int winner;
+int wins;
+bool winCountToggle = false;
+bool playerReady = true;
+int displayWinner = 0;
+
+int powerUp = 0;
 int Player0_KillSpree = 0;
 int Player1_KillSpree = 0;
 int Player2_KillSpree = 0;
@@ -388,6 +404,8 @@ int Player0_DoubleKillTime = 0;
 int Player1_DoubleKillTime = 0;
 int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
+
+bool FirstBloodTrigger = true;
 
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
@@ -465,12 +483,16 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		currSoundEventTimeSec += diff;
-		if (nextSoundEventTimeSec <= currSoundEventTimeSec){
-			currSoundEventTimeSec = 0;
-			if (!SoundEvents.empty()){
+		if (NumSoundEvents > 0){
+			currSoundEventTimeSec += diff;
+			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
+				currSoundEventTimeSec = 0;
 				SoundEvents[0]->Play();
 				SoundEvents.erase(SoundEvents.begin());
+				NumSoundEvents--;
+				if (NumSoundEvents < 0){
+					NumSoundEvents = 0;
+				}
 			}
 		}
 	}
@@ -547,6 +569,13 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
+	int dist = 40;
+	float speed = 50.0;
+
+	if (powerUp == FASTERSHOOT)
+		speed = 70.0;
+	else if (powerUp == FARTHERSHOOT)
+		dist = 70;
 
 	Projectile* pjt = new Projectile(player_list.size());
 	if (playerID % 2){//monkey throws
@@ -571,7 +600,7 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(40);
+	pjt->setDistance(dist);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -583,7 +612,7 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	projectile_list.push_back(pjt);
 	pjt->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(vec3(holder)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(vec3(holder)*speed);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(shootID);
@@ -727,6 +756,7 @@ void Window::idleCallback(void)
 		break;
 	case 1:
 	case 2:
+	case 5:
 	case 3:
 		if (alive){
 			first_change = true;
@@ -871,7 +901,9 @@ void Window::idleCallback(void)
 		else if (myClientState->getState() == 3){
 			myDeathScreen->draw();
 		}
-
+		else if (myClientState->getState() == 5){
+			endScreen->draw(0);
+		}
 		simulateProjectile(dt);
 		despawnProjectile();
 
@@ -1232,12 +1264,14 @@ void Window::displayCallback(void)
 		//{
 		//	tower_projectile_list[i]->draw(LightProjection, LightView);
 		//}
-		
-		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		///////  2nd pass: render onto texture ////////////
+		glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, width, height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+		render_tex->Bind(GL_TEXTURE0 + render_tex_id);
 
 		for (uint i = 0; i < draw_list.size(); ++i)
 		{
@@ -1349,6 +1383,16 @@ void Window::displayCallback(void)
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		///////  3rd pass: render onto screen ////////////
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, width, height);
+		render_tex->Bind(GL_TEXTURE0 + render_tex_id);
+		screen_quad->draw();
+
+		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
+
 		myUI->draw();
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
@@ -1365,7 +1409,46 @@ void Window::displayCallback(void)
 		}
 
 		else if (myClientState->getState() == 5){
-			endScreen->draw(0);
+			//ENDGAME
+			if (winner == 1 && (playerID % 2) == 0)
+			{
+				if (!winCountToggle)
+				{
+					displayWinner = 1;
+					wins++;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
+			}
+			else if (winner == 0 && (playerID % 2) == 1)
+			{
+				if (!winCountToggle)
+				{
+					displayWinner = 1;
+					wins++;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
+			}
+			else  if (winner == 1 && (playerID % 2) == 1)
+			{
+				if (!winCountToggle)
+				{
+					displayWinner = 0;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
+			}
+			else  if (winner == 0 && (playerID % 2) == 0)
+			{
+				if (!winCountToggle)
+				{
+					displayWinner = 0;
+					winCountToggle = !winCountToggle;
+					cout << "Total Wins: " << wins << endl;
+				}
+			}
+			endScreen->draw(displayWinner);
 		}
 
 		else if (kill_count){
@@ -1384,16 +1467,6 @@ void Window::displayCallback(void)
 
 //LARGE_INTEGER asdf, jkl;
 void server_update(int value){
-	//QueryPerformanceCounter(&asdf);
-	//double fjfj = (double)((double)(asdf.QuadPart - jkl.QuadPart) / (double)freq.QuadPart * 1000);
-	//jkl = asdf;
-	//cout << fjfj << endl;
-
-	/*
-	diff = (double)(current.QuadPart - last.QuadPart) / (double)freq.QuadPart;
-	QueryPerformanceCounter(&loop_begin);
-	*/
-
 	//This is where we would be doing the stuffs
 	// Build send vectors and send
 	(*sendVec)[0] = std::make_pair(std::to_string(playerID), mat4((float)keyState));
@@ -1424,18 +1497,10 @@ void server_update(int value){
 			//cout << i << " : " << (*recvVec)[i].first.c_str() << endl;
 		//}
 	}
-	else
+	else{
 		recvValid = false;
-	
-	//std::cout << "pair 0: " << atoi(&((*recvVec)[0].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 1: " << atoi(&((*recvVec)[1].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 2: " << atoi(&((*recvVec)[2].first.c_str())[0]) << std::endl;
-	//std::cout << "pair 3: " << atoi(&((*recvVec)[3].first.c_str())[0]) << std::endl;
+	}
 
-	//cout << "size: " << recvVec->size() << endl;
-	//for (int i = 0; i < 6; i++){
-	//	cout <<i<<" : "<< (*recvVec)[i].first.c_str()<<endl;
-	//}
 	bool p0f = false;
 	bool p1f = false;
 	bool p2f = false;
@@ -1718,6 +1783,29 @@ void server_update(int value){
 		Player2_KillCount = parseOpts->getPKills(recvVec, PLAYER2);
 		Player3_KillCount = parseOpts->getPKills(recvVec, PLAYER3);
 
+		if (FirstBloodTrigger){
+			if (Player0_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player1_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player2_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+			else if (Player3_KillCount){
+				FirstBloodTrigger = false;
+				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				NumSoundEvents++;
+			}
+		}
+
 		if (Player0_DoubleKillTime > 30){
 			Player0_DoubleKillTime -= 30;
 		}
@@ -1747,27 +1835,18 @@ void server_update(int value){
 		}
 
 		if (Player0_KillCount > Player0_KillCountLast){
-			if (Player0_DoubleKillTime){
+			if (Player0_DoubleKillTime || Player0_KillCount >= (Player0_KillCountLast + 2)){
 				//Play Double Kill Sound
 				if (playerID == PLAYER0 || playerID == PLAYER2)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player0_KillCount >= (Player0_KillCountLast + 2)){
-				if (playerID == PLAYER0 || playerID == PLAYER2)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -1775,26 +1854,17 @@ void server_update(int value){
 			Player0_DoubleKillTime = 3000;
 		}
 		if (Player1_KillCount > Player1_KillCountLast){
-			if (Player1_DoubleKillTime){
+			if (Player1_DoubleKillTime || (Player1_KillCount >= (Player1_KillCountLast + 2))){
 				if (playerID == PLAYER1 || playerID == PLAYER3)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player1_KillCount >= (Player1_KillCountLast + 2)){
-				if (playerID == PLAYER1 || playerID == PLAYER3)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -1802,26 +1872,17 @@ void server_update(int value){
 			Player1_DoubleKillTime = 3000;
 		}
 		if (Player2_KillCount > Player2_KillCountLast){
-			if (Player2_DoubleKillTime){
+			if (Player2_DoubleKillTime || (Player2_KillCount >= (Player2_KillCountLast + 2))){
 				if (playerID == PLAYER0 || playerID == PLAYER2)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player2_KillCount >= (Player2_KillCountLast + 2)){
-				if (playerID == PLAYER0 || playerID == PLAYER2)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -1829,26 +1890,17 @@ void server_update(int value){
 			Player2_DoubleKillTime = 3000;
 		}
 		if (Player3_KillCount > Player3_KillCountLast){
-			if (Player3_DoubleKillTime){
+			if (Player3_DoubleKillTime || (Player3_KillCount >= (Player3_KillCountLast + 2))){
 				if (playerID == PLAYER1 || playerID == PLAYER3)
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					NumSoundEvents++;
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
-				}
-			}
-			else if (Player3_KillCount >= (Player3_KillCountLast + 2)){
-				if (playerID == PLAYER1 || playerID == PLAYER3)
-				{
-					//testSound[SoundDoubleKillY]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillY]);
-				}
-				else{
-					//testSound[SoundDoubleKillE]->Play();
-					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					NumSoundEvents++;
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -1902,6 +1954,8 @@ void server_update(int value){
 		myGameMenu->setKills(1, Player1_KillCount);
 		myGameMenu->setKills(2, Player2_KillCount);
 		myGameMenu->setKills(3, Player3_KillCount);
+
+		powerUp = parseOpts->getPPowerUp(recvVec, playerID);
 
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup
@@ -1983,8 +2037,6 @@ void server_update(int value){
 			sound_3d_tele->Play3D(View);
 		}
 
-
-
 		//cout << player_list[playerID]->getAABB().min[0] << " " << player_list[playerID]->getAABB().min[1] << " " << player_list[playerID]->getAABB().min[2] << " " << endl;
 
 		tower_list[0]->setModelM((*recvVec)[TOWER_MAT_BEGIN + 0].second);
@@ -2010,8 +2062,6 @@ void server_update(int value){
 				((Cube*)stationary_list[i])->setTransparency(0.5);
 			}
 		}
-
-
 
 		for (int i = 0; i < 4; i++){
 			if (i!=playerID)
@@ -2051,6 +2101,20 @@ void server_update(int value){
 		if (pUpState & 1 << 3)
 			bVis[FARTHERSHOOT] = false;
 
+		winner = parseOpts->getWinState(recvVec);
+		if (playerReady)
+		{
+			//if (!winCountToggle)
+				gameOver = (winner == 3) ? 0 : 1;
+		}
+		
+		if (gameOver)
+		{
+			myClientState->setState(5);
+			playerReady = false;
+
+		}
+		//cout << (*recvVec)[PLATFORM_STATUS].first  <<  " " << playerReady << " " << gameOver << endl;
 	}
 
 
@@ -2295,6 +2359,7 @@ int main(int argc, char *argv[])
 	  PlayBackgroundMusic(diff);
 	  PlayAnnouncerEvents(diff);
 
+
 	  glutMainLoopEvent();
 	  
 	  Window::idleCallback();
@@ -2347,6 +2412,11 @@ LARGE_INTEGER time_track;
 void keyboard(unsigned char key, int, int){
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+	
+	//if (gameOver)
+		//myClientState->setState(5);
+	
+
 	switch (myClientState->getState()){
 	case 0:
 		if (key == ' '){
@@ -2441,6 +2511,7 @@ void keyboard(unsigned char key, int, int){
 		//	posTestSound->Play3D(View);
 		//	cout << "Playing Sound!" << endl;
 			SoundEvents.push_back(testSound[SoundDoubleKillY]);
+			NumSoundEvents++;
 			cout << "Adding a sound man!" << endl;
 		}
 		
@@ -2576,8 +2647,12 @@ void keyboard(unsigned char key, int, int){
 		}
 		break;
 	case 5:
+
 		if (key == 27){
+			//running = false;
 			myClientState->setState(1);
+			playerReady = true;
+			winCountToggle = false;
 		}
 	default:
 		break;
@@ -2673,6 +2748,8 @@ void mouseFunc(int button, int state, int x, int y)
 {
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+//	if (gameOver)
+//		return;
 
 	oldX=x;
 	oldY=y;
@@ -2865,7 +2942,10 @@ void mouseFunc(int button, int state, int x, int y)
 			cout << "CLICK!" << newX << "," << newY << endl;
 			int click = endScreen->checkClick(newX, newY);
 			if (click == 1){
+				//running = false;
 				myClientState->setState(1);
+				playerReady = true;
+				winCountToggle = false;
 			}
 		}
 		break;
@@ -3059,7 +3139,6 @@ void setupShaders()
 }
 void initialize(int argc, char *argv[])
 {
-
 	myClientState = new ClientState();
 
 	QueryPerformanceFrequency(&freq);
@@ -3093,6 +3172,9 @@ void initialize(int argc, char *argv[])
 		printf("FMOD Init successful!\n");
 	}
 
+	//Window::width = glutGet(GLUT_WINDOW_WIDTH);
+	//Window::height = glutGet(GLUT_WINDOW_HEIGHT);
+
 	FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
 	FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
 	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
@@ -3117,6 +3199,22 @@ void initialize(int argc, char *argv[])
 		printf("FB error, status: 0x%x\n", Status);
 		system("pause");
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//render buffer initialization
+	glGenFramebuffers(1, &render_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_tex->getTexID(), 0);
+	GLuint depthBuf;
+	glGenRenderbuffers(1, &depthBuf);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Window::width, Window::height );
+	// Bind the depth buffer to the FBO
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf);
+	// Set the target for the fragment shader outputs
+	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, drawBufs);
+	// Unbind the framebuffer, and revert to default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
 	light[0].type=1;
@@ -3160,6 +3258,10 @@ void initialize(int argc, char *argv[])
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
+
+	screen_quad = new Quad();
+	screen_quad->setShader(sdrCtl.getShader("screen_texture"));
+	screen_quad->setTextureUnit(render_tex_id);
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("ground_tess"));
@@ -5026,8 +5128,6 @@ void initialize(int argc, char *argv[])
 
 }
 
-
-
 int loadAudio(){
 
 	/*
@@ -5139,8 +5239,11 @@ void loadTextures(){
 	
 	shadow = new Texture(GL_TEXTURE_2D);
 	shadow->LoadDepthTexture(depth_texture_width, depth_texture_height);
-	//shadow->LoadDepthTexture(Window::width, Window::height);
 	shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+
+	render_tex = new Texture(GL_TEXTURE_2D);
+	render_tex->LoadRenderTexture(Window::width, Window::height);
+	render_tex->Bind(GL_TEXTURE0 + render_tex_id);
 	
 }
 
