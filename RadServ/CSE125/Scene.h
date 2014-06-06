@@ -1518,7 +1518,7 @@ public:
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
 		tw0->setShootRange(40);
 		tw0->setShootSpeed(60);
-		tw0->setHealth(20);
+		tw0->putHealth(20);
 		tw0->setDamage(-3);
 		tw0->setType(MODEL);
 		tw0->setName("Tower Model0");
@@ -1533,7 +1533,7 @@ public:
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
 		tw1->setShootRange(40);
 		tw1->setShootSpeed(60);
-		tw1->setHealth(20);
+		tw1->putHealth(20);
 		tw1->setDamage(-3);
 		tw1->setType(MODEL);
 		tw1->setName("Tower Model0");
@@ -1548,7 +1548,7 @@ public:
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
 		tw2->setShootRange(40);
 		tw2->setShootSpeed(60);
-		tw2->setHealth(20);
+		tw2->putHealth(20);
 		tw2->setDamage(-3);
 		tw2->setType(MODEL);
 		tw2->setName("Tower Model1");
@@ -1563,7 +1563,7 @@ public:
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
 		tw3->setShootRange(40);
 		tw3->setShootSpeed(60);
-		tw3->setHealth(20);
+		tw3->putHealth(20);
 		tw3->setDamage(-3);
 		tw3->setType(MODEL);
 		tw3->setName("Tower Model1");
@@ -1574,7 +1574,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower100 = new Tower();
 		tower100->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 1,
+			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 0,
 			ORIGINZ0)));
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
@@ -1593,7 +1593,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower200 = new Tower();
 		tower200->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 1,
+			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 2,
 			ORIGINZ1)));
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
@@ -1632,7 +1632,6 @@ public:
 		platform_01->setType(ELEVATOR);
 		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
-		platform_01->setIsPlatformDamage(false);
 		addStationary(platform_01);
 		elevator.push_back(platform_01);
 
@@ -1643,7 +1642,6 @@ public:
 		platform_02->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_02->setType(CUBE);
 		platform_02->setName("Test Platform");
-		platform_02->setIsPlatformDamage(false);
 		addStationary(platform_02);
 
 		//island 
@@ -1653,7 +1651,6 @@ public:
 		platform_03->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_03->setType(CUBE);
 		platform_03->setName("Test Platform");
-		platform_03->setIsPlatformDamage(false);
 		addStationary(platform_03);
 
 		//walkway 
