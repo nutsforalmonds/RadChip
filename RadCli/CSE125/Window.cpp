@@ -1471,6 +1471,7 @@ void Window::displayCallback(void)
 	glutSwapBuffers();
 }
 
+LARGE_INTEGER time_track;
 //LARGE_INTEGER asdf, jkl;
 void server_update(int value){
 	//This is where we would be doing the stuffs
@@ -2121,7 +2122,9 @@ void server_update(int value){
 			myClientState->setState(5);
 			keyState = 0;
 			playerReady = false;
-
+			QueryPerformanceCounter(&time_track);
+			double time = (double)time_track.QuadPart / (double)freq.QuadPart;
+			player_list[playerID]->unsetAnimLoop(1, time);
 		}
 		//cout << (*recvVec)[PLATFORM_STATUS].first  <<  " " << playerReady << " " << gameOver << endl;
 	}
@@ -2422,7 +2425,6 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-LARGE_INTEGER time_track;
 void keyboard(unsigned char key, int, int){
 	QueryPerformanceCounter(&time_track);
 	double time = (double)time_track.QuadPart / (double)freq.QuadPart;
