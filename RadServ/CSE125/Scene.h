@@ -1401,7 +1401,7 @@ public:
 
 		MD5Model* md50 = new MD5Model();
 		md50->setSpeed(PLAYER_SPEED);
-		md50->postTrans(glm::translate(vec3(-2, 50, -92)));
+		md50->postTrans(glm::translate(vec3(-2, 5, -92)));
 		md50->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md50->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md50->setType("Model");
@@ -1413,7 +1413,7 @@ public:
 
 		MD5Model* md51 = new MD5Model();
 		md51->setSpeed(PLAYER_SPEED);
-		md51->postTrans(glm::translate(vec3(-2, 50, 92)));
+		md51->postTrans(glm::translate(vec3(-2, 5, 92)));
 		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType("Model");
@@ -1425,7 +1425,7 @@ public:
 
 		MD5Model* md52 = new MD5Model();
 		md52->setSpeed(PLAYER_SPEED);
-		md52->postTrans(glm::translate(vec3(2, 50, -92)));
+		md52->postTrans(glm::translate(vec3(2, 5, -92)));
 		md52->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md52->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md52->setType("Model");
@@ -1437,7 +1437,7 @@ public:
 
 		MD5Model* md53 = new MD5Model();
 		md53->setSpeed(PLAYER_SPEED);
-		md53->postTrans(glm::translate(vec3(2, 50, 92)));
+		md53->postTrans(glm::translate(vec3(2, 5, 92)));
 		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType("Model");
