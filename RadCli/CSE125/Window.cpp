@@ -727,6 +727,7 @@ void Window::idleCallback(void)
 		break;
 	case 1:
 	case 2:
+	case 5:
 	case 3:
 		if (alive){
 			first_change = true;
@@ -871,7 +872,9 @@ void Window::idleCallback(void)
 		else if (myClientState->getState() == 3){
 			myDeathScreen->draw();
 		}
-
+		else if (myClientState->getState() == 5){
+			endScreen->draw(0);
+		}
 		simulateProjectile(dt);
 		despawnProjectile();
 
