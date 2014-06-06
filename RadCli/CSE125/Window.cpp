@@ -62,12 +62,19 @@ ParticleSystem2* t0_ps_03;
 ParticleSystem2* t1_ps_01;
 ParticleSystem2* t1_ps_02;
 ParticleSystem2* t1_ps_03;
+ParticleSystem2* t4_ps_01;
+ParticleSystem2* t4_ps_02;
+ParticleSystem2* t4_ps_03;
+
 ParticleSystem* t2_ps_01;
 ParticleSystem* t2_ps_02;
 ParticleSystem* t2_ps_03;
 ParticleSystem* t3_ps_01;
 ParticleSystem* t3_ps_02;
 ParticleSystem* t3_ps_03;
+ParticleSystem* t5_ps_01;
+ParticleSystem* t5_ps_02;
+ParticleSystem* t5_ps_03;
 long long m_currentTimeMillis;
 
 ParticleSystem2* testSystem;
@@ -4147,6 +4154,69 @@ void initialize(int argc, char *argv[])
 	//t1_ps_03->setEmitterPosition();// Emitter position
 	t1_ps_03->setModelM(glm::translate(vec3(31.5, 6.5f, -31.5)));
 
+	t4_ps_01 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t4_ps_01->setShader(sdrCtl.getShader("pe_torus"));
+	t4_ps_01->setType("Particle_System");
+	t4_ps_01->setName("Particle_Test");
+	t4_ps_01->setLoopInf(true);
+	t4_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t4_ps_01->setFog(fog);
+	t4_ps_01->setBlastRadius(1.0f);// Blast radius
+	t4_ps_01->setExplosionVelocity(0.5f);// Explosion velocity
+	t4_ps_01->setExplosionDecay(10.0f);// Explosion decay
+	t4_ps_01->setFragStartSize(12.0f);// Fragment start size
+	t4_ps_01->setFragEndSize(1.0f);// Fragment end size
+	t4_ps_01->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t4_ps_01->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t4_ps_01->setTime_Step(0.1f);
+	t4_ps_01->setTime_Max(100.0);
+	t4_ps_01->setTime_Min(0.0);
+	t4_ps_01->setTime(0.0);
+	//t4_ps_01->setEmitterPosition();// Emitter position
+	t4_ps_01->setModelM(glm::translate(vec3(28.0, 6.5f, -30.0))*glm::rotate(mat4(1.0), 90.0f, vec3(0.0, 1.0, 0.0)));
+
+	t4_ps_02 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t4_ps_02->setShader(sdrCtl.getShader("pe_torus"));
+	t4_ps_02->setType("Particle_System");
+	t4_ps_02->setName("Particle_Test");
+	t4_ps_02->setLoopInf(true);
+	t4_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t4_ps_02->setFog(fog);
+	t4_ps_02->setBlastRadius(1.0f);// Blast radius
+	t4_ps_02->setExplosionVelocity(0.5f);// Explosion velocity
+	t4_ps_02->setExplosionDecay(10.0f);// Explosion decay
+	t4_ps_02->setFragStartSize(12.0f);// Fragment start size
+	t4_ps_02->setFragEndSize(1.0f);// Fragment end size
+	t4_ps_02->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t4_ps_02->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t4_ps_02->setTime_Step(0.1f);
+	t4_ps_02->setTime_Max(100.0);
+	t4_ps_02->setTime_Min(0.0);
+	t4_ps_02->setTime(33.0);
+	//t4_ps_02->setEmitterPosition();// Emitter position
+	t4_ps_02->setModelM(glm::translate(vec3(30.5, 6.5f, -28)));
+
+	t4_ps_03 = new ParticleSystem2((float)1.0, (float)0.25, (float)0.25, (float)4.0, (float)0.5, (float)0.0, (float)360.0, (float)0.0, (float)360.0, (float)0.0);
+	t4_ps_03->setShader(sdrCtl.getShader("pe_torus"));
+	t4_ps_03->setType("Particle_System");
+	t4_ps_03->setName("Particle_Test");
+	t4_ps_03->setLoopInf(true);
+	t4_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t4_ps_03->setFog(fog);
+	t4_ps_03->setBlastRadius(1.0f);// Blast radius
+	t4_ps_03->setExplosionVelocity(0.5f);// Explosion velocity
+	t4_ps_03->setExplosionDecay(10.0f);// Explosion decay
+	t4_ps_03->setFragStartSize(12.0f);// Fragment start size
+	t4_ps_03->setFragEndSize(1.0f);// Fragment end size
+	t4_ps_03->setFragStartColor(vec3(0.0, 0.5, 1.0));// Fragment start color
+	t4_ps_03->setFragEndColor(vec3(0.0, 0.125, 0.25));// Fragment end color
+	t4_ps_03->setTime_Step(0.1f);
+	t4_ps_03->setTime_Max(100.0);
+	t4_ps_03->setTime_Min(0.0);
+	t4_ps_03->setTime(66.0);
+	//t4_ps_03->setEmitterPosition();// Emitter position
+	t4_ps_03->setModelM(glm::translate(vec3(31.5, 6.5f, -31.5)));
+
 	Mesh* tower2 = new Mesh();
 	tower2->LoadMesh("Model/OctopusTower1_10_bone2.dae", false);
 	tower2->setShader(sdrCtl.getShader("basic_model"));
@@ -4274,6 +4344,54 @@ void initialize(int argc, char *argv[])
 	t3_ps_03->setTime((float)37.0);
 	t3_ps_03->setLoopInf(true);
 	t3_ps_03->setModelM(glm::translate(vec3(-30.0f, 7.3f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t5_ps_01 = new ParticleSystem(GL_POINTS);
+	t5_ps_01->setShader(sdrCtl.getShader("halo"));
+	t5_ps_01->setType("Particle_System");
+	t5_ps_01->setName("Particle_Test");
+	t5_ps_01->setK(1.0f);
+	t5_ps_01->setColor(vec3(1.0, 1.0, 1.0));
+	t5_ps_01->setShade(vec3(1.0, 1.0, 1.0));
+	t5_ps_01->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t5_ps_01->setFog(fog);
+	t5_ps_01->setTime_Step(0.25);
+	t5_ps_01->setTime_Max(53.0);
+	t5_ps_01->setTime_Min(5.0);
+	t5_ps_01->setTime((float)5.0);
+	t5_ps_01->setLoopInf(true);
+	t5_ps_01->setModelM(glm::translate(vec3(-30.0f, 7.3f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t5_ps_02 = new ParticleSystem(GL_POINTS);
+	t5_ps_02->setShader(sdrCtl.getShader("halo"));
+	t5_ps_02->setType("Particle_System");
+	t5_ps_02->setName("Particle_Test");
+	t5_ps_02->setK(1.0f);
+	t5_ps_02->setColor(vec3(1.0, 1.0, 1.0));
+	t5_ps_02->setShade(vec3(1.0, 1.0, 1.0));
+	t5_ps_02->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t5_ps_02->setFog(fog);
+	t5_ps_02->setTime_Step(0.25);
+	t5_ps_02->setTime_Max(53.0);
+	t5_ps_02->setTime_Min(5.0);
+	t5_ps_02->setTime((float)21.0);
+	t5_ps_02->setLoopInf(true);
+	t5_ps_02->setModelM(glm::translate(vec3(-30.0f, 7.3f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
+
+	t5_ps_03 = new ParticleSystem(GL_POINTS);
+	t5_ps_03->setShader(sdrCtl.getShader("halo"));
+	t5_ps_03->setType("Particle_System");
+	t5_ps_03->setName("Particle_Test");
+	t5_ps_03->setK(1.0f);
+	t5_ps_03->setColor(vec3(1.0, 1.0, 1.0));
+	t5_ps_03->setShade(vec3(1.0, 1.0, 1.0));
+	t5_ps_03->setTexture(GL_TEXTURE_2D, "img/smog.png", "PNG");
+	t5_ps_03->setFog(fog);
+	t5_ps_03->setTime_Step(0.25);
+	t5_ps_03->setTime_Max(53.0);
+	t5_ps_03->setTime_Min(5.0);
+	t5_ps_03->setTime((float)37.0);
+	t5_ps_03->setLoopInf(true);
+	t5_ps_03->setModelM(glm::translate(vec3(-30.0f, 7.3f, 30.0f))*glm::rotate(mat4(1.0), 90.0f, vec3(-1.0, 0, 0)));
 
 	//elevator 
 	Cube* platform_01 = new Cube(-10.0, 10.0, -0.5, 0.5, -10.0, 10.0);
