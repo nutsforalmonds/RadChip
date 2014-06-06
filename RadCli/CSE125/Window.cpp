@@ -358,6 +358,8 @@ int winner;
 int wins;
 bool winCountToggle = false;
 
+int powerUp = 0;
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 struct timezone2
 {
@@ -488,6 +490,13 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	vec4 holder = test*vec4(0, 0, -1, 0); //orientation of camera in object space
 	mat4 player1 = player_list[playerID]->getModelM();
 	vec4 playerHolder = player1*vec4(0, 0, 0, 1);
+	int dist = 40;
+	float speed = 50.0;
+
+	if (powerUp == FASTERSHOOT)
+		speed = 70.0;
+	else if (powerUp == FARTHERSHOOT)
+		dist = 70;
 
 	Projectile* pjt = new Projectile(player_list.size());
 	if (playerID % 2){//monkey throws
@@ -512,7 +521,7 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	AABB hold = pjt->getAABB();
 	pjt->setStartX(hold.max[0]);
 	pjt->setStartY(hold.max[2]);
-	pjt->setDistance(40);
+	pjt->setDistance(dist);
 	pjt->setShadowTex(shadow_map_id);
 
 	//Name and type
@@ -524,7 +533,7 @@ void projectileAttack(int playerID, Camera * cam, int shootID)
 	projectile_list.push_back(pjt);
 	pjt->setSpeed(50);
 	//cubeT->setHMove((holder[0] / 4));
-	pjt->setVelocity(vec3(holder)*50.0f);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
+	pjt->setVelocity(vec3(holder)*speed);// set object space velocity to camera oriantation in object space. Since camera always have the same xz oriantation as the object, xz oriantation wouldnt change when camera rotate.
 	//cubeT->setVMove(1);  //do this if you want the cube to not have vertical velocity. uncomment the above setVelocity.
 	//cout << holder[0] << ' ' << holder[1] << ' ' << holder[2] << ' ' << playerHolder[0] << ' ' << playerHolder[2] << endl;
 	pjt->setShootID(shootID);
@@ -1662,6 +1671,8 @@ void server_update(int value){
 		myGameMenu->setKills(1, parseOpts->getPKills(recvVec, PLAYER1));
 		myGameMenu->setKills(2, parseOpts->getPKills(recvVec, PLAYER2));
 		myGameMenu->setKills(3, parseOpts->getPKills(recvVec, PLAYER3));
+
+		powerUp = parseOpts->getPPowerUp(recvVec, playerID);
 
 		// TODO do something with power up status
 		// check consts.h for int that corresponds to powerup

@@ -371,9 +371,9 @@ public:
 				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
-					inX = (playerAABB.min[0] <= powerUpPos[0] + 3) && (powerUpPos[0] - 3 <= playerAABB.max[0]);
-					inY = (playerAABB.min[1] <= powerUpPos[1] + 3) && (powerUpPos[1] - 3 <= playerAABB.max[1]);
-					inZ = (playerAABB.min[2] <= powerUpPos[2] + 3) && (powerUpPos[2] - 3 <= playerAABB.max[2]);
+					inX = (playerAABB.min[0] <= powerUpPos[0] + 2) && (powerUpPos[0] - 2 <= playerAABB.max[0]);
+					inY = (playerAABB.min[1] <= powerUpPos[1] + 2) && (powerUpPos[1] - 2 <= playerAABB.max[1]);
+					inZ = (playerAABB.min[2] <= powerUpPos[2] + 2) && (powerUpPos[2] - 2 <= playerAABB.max[2]);
 
 					if (inX && inY && inZ)
 					{
