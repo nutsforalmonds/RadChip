@@ -801,8 +801,8 @@ public:
 					//Window::addPlayerList(holder);
 					//Window::respawnPlayer(holder->getName());
 					holder->putHealth(7);
-					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
-					holder->setVelocity(vec3(0, 20, 0));
+					holder->setModelM(holder->getAliveModelM());
+					//holder->setVelocity(vec3(0, 20, 0));
 					setPlayerDead(holder->getPlayerID(), false);
 					//cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << " " << player[i]->getHealth() << endl;
 
@@ -1018,8 +1018,11 @@ public:
 		Object * targetHolder = getPlayerObj(targetId);
 		if (targetHolder->getTempHealth() <= 0)
 			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
-		else if (targetHolder->getHealth() > 0)
-			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		else
+		{
+			targetHolder->setHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+
+		}
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
@@ -1065,7 +1068,6 @@ public:
 			{
 				if (player[i]->getPlayerID() == targetId)
 				{
-					player[i]->setAliveModelM(player[i]->getModelM());
 					///////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
