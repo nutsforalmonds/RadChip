@@ -199,6 +199,8 @@ struct Mother{
 	ParticleAnimated* mother_of_health_potion;
 	ParticleAnimated* mother_of_red_arrow;
 	ParticleAnimated* mother_of_green_arrow;
+	ParticleAnimated* mother_of_tramp_effect;
+	ParticleAnimated* mother_of_portal_effect;
 }MOM;
 
 int texScreenWidth = 512;
@@ -3994,6 +3996,14 @@ void initialize(int argc, char *argv[])
 	tramp_01->setName("Test Trampoline");
 	stationary_list.push_back(tramp_01);
 
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_01 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_01->setModelM(tramp_01->getModelM()*glm::translate(vec3(0, 1, 0)));
+	LARGE_INTEGER ct;
+	QueryPerformanceCounter(&ct);
+	tramp_effect_01->setStartTime(ct);
+	panim_list.push_back(tramp_effect_01);
+
 	//Trampoline 
 	Cube* tramp_02 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_02->setKd(vec3(0.0, 0.0, 0.0));
@@ -4010,6 +4020,12 @@ void initialize(int argc, char *argv[])
 	tramp_02->setType("Trampoline");
 	tramp_02->setName("Test Trampoline");
 	stationary_list.push_back(tramp_02);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_02 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_02->setModelM(tramp_02->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_02->setStartTime(ct);
+	panim_list.push_back(tramp_effect_02);
 
 	//Trampoline 
 	Cube* tramp_03 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4028,6 +4044,12 @@ void initialize(int argc, char *argv[])
 	tramp_03->setName("Test Trampoline");
 	stationary_list.push_back(tramp_03);
 
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_03 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_03->setModelM(tramp_03->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_03->setStartTime(ct);
+	panim_list.push_back(tramp_effect_03);
+
 	//Trampoline 
 	Cube* tramp_04 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_04->setKd(vec3(0.0, 0.0, 0.0));
@@ -4044,6 +4066,12 @@ void initialize(int argc, char *argv[])
 	tramp_04->setType("Trampoline");
 	tramp_04->setName("Test Trampoline");
 	stationary_list.push_back(tramp_04);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_04 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_04->setModelM(tramp_04->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_04->setStartTime(ct);
+	panim_list.push_back(tramp_effect_04);
 
 	//Trampoline 
 	Cube* tramp_05 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -4062,6 +4090,12 @@ void initialize(int argc, char *argv[])
 	tramp_05->setName("Test Trampoline");
 	stationary_list.push_back(tramp_05);
 
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_05 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_05->setModelM(tramp_05->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_05->setStartTime(ct);
+	panim_list.push_back(tramp_effect_05);
+
 	//Trampoline 
 	Cube* tramp_06 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
 	tramp_06->setKd(vec3(0.0, 0.0, 0.0));
@@ -4078,6 +4112,12 @@ void initialize(int argc, char *argv[])
 	tramp_06->setType("Trampoline");
 	tramp_06->setName("Test Trampoline");
 	stationary_list.push_back(tramp_06);
+
+	//Trampoline effect
+	ParticleAnimated* tramp_effect_06 = new ParticleAnimated(*(MOM.mother_of_tramp_effect));
+	tramp_effect_06->setModelM(tramp_06->getModelM()*glm::translate(vec3(0, 1, 0)));
+	tramp_effect_06->setStartTime(ct);
+	panim_list.push_back(tramp_effect_06);
 
 
 	Cube* tele_01 = new Cube(-2.0, 2.0, -0.5, 0.5, -2.0, 2.0);
@@ -5578,6 +5618,42 @@ void initializeMOM(){
 	//MOM.mother_of_green_arrow->setBlurStrength(1.0);
 	MOM.mother_of_green_arrow->setFog(emptyFog);
 	MOM.mother_of_green_arrow->Bind();
+
+	MOM.mother_of_tramp_effect = new ParticleAnimated();
+	MOM.mother_of_tramp_effect->Init("img/sprite_sheets/wind_003.png", "PNG");
+	MOM.mother_of_tramp_effect->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_tramp_effect->setPosition(vec3(0.0f, 1.3f, 0.0f));
+	MOM.mother_of_tramp_effect->setWidth(4.0f);
+	MOM.mother_of_tramp_effect->setHeight(4.0f);
+	MOM.mother_of_tramp_effect->setNumColumn(5);
+	MOM.mother_of_tramp_effect->setNumRow(6);
+	MOM.mother_of_tramp_effect->setValidFrame(0, 29);
+	MOM.mother_of_tramp_effect->setDuration(1.0);
+	MOM.mother_of_tramp_effect->setType(1);
+	MOM.mother_of_tramp_effect->setSampleCount(3, 3);
+	MOM.mother_of_tramp_effect->setSampleDist(0.001, 0.001);
+	MOM.mother_of_tramp_effect->setTransparency(0.9);
+	MOM.mother_of_tramp_effect->setBlurStrength(0.5);
+	MOM.mother_of_tramp_effect->setFog(fog);
+	MOM.mother_of_tramp_effect->Bind();
+
+	MOM.mother_of_portal_effect = new ParticleAnimated();
+	MOM.mother_of_portal_effect->Init("img/sprite_sheets/darkness_001.png", "PNG");
+	MOM.mother_of_portal_effect->setShader(sdrCtl.getShader("billboard_anim"));
+	MOM.mother_of_portal_effect->setPosition(vec3(0.0f, 1.0f, 0.0f));
+	MOM.mother_of_portal_effect->setWidth(4.0f);
+	MOM.mother_of_portal_effect->setHeight(4.0f);
+	MOM.mother_of_portal_effect->setNumColumn(5);
+	MOM.mother_of_portal_effect->setNumRow(6);
+	MOM.mother_of_portal_effect->setValidFrame(0, 29);
+	MOM.mother_of_portal_effect->setDuration(1.0);
+	MOM.mother_of_portal_effect->setType(1);
+	//MOM.mother_of_portal_effect->setSampleCount(5, 5);
+	//MOM.mother_of_portal_effect->setSampleDist(0.005, 0.005);
+	MOM.mother_of_portal_effect->setTransparency(0.9);
+	//MOM.mother_of_portal_effect->setBlurStrength(1.0);
+	MOM.mother_of_portal_effect->setFog(fog);
+	MOM.mother_of_portal_effect->Bind();
 }
 
 void initializePlayerMark(int main_player_ID){
