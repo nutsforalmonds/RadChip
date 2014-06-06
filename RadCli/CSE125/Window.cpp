@@ -6421,7 +6421,7 @@ void initializeMOM(){
 	MOM.mother_of_portal_effect->Bind();
 
 	MOM.mother_of_orange_mark = new ParticleAnimated();
-	MOM.mother_of_orange_mark->Init("img/sprite_sheets/cast_001.png", "PNG");
+	MOM.mother_of_orange_mark->Init("img/sprite_sheets/cast_006.png", "PNG");
 	MOM.mother_of_orange_mark->setShader(sdrCtl.getShader("billboard_anim"));
 	MOM.mother_of_orange_mark->setPosition(vec3(0.0f, 5.3f, 0.0f));
 	MOM.mother_of_orange_mark->setWidth(4.0f);
