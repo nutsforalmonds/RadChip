@@ -1018,7 +1018,7 @@ public:
 		Object * targetHolder = getPlayerObj(targetId);
 		if (targetHolder->getTempHealth() <= 0)
 			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
-		else
+		else if (targetHolder->getHealth() > 0)
 			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
