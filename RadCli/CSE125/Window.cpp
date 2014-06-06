@@ -4817,7 +4817,7 @@ void initialize(int argc, char *argv[])
 	//wall0
 	Cube* platform_201 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5);
-	platform_201->setKd(vec3(0.3, 0.3, 0.8));
+	platform_201->setKd(vec3(0.0, 0.6, 0.9));
 	platform_201->setKa(vec3(0.0, 0.0, 0.3));
 	platform_201->setKs(vec3(0.0, 0.0, 0.4));
 	platform_201->setShininess(100);
@@ -4839,7 +4839,7 @@ void initialize(int argc, char *argv[])
 	//wall1
 	Cube* platform_202 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_202->setKd(vec3(0.3, 0.3, 0.8));
+	platform_202->setKd(vec3(0.0, 0.6, 0.9));
 	platform_202->setKa(vec3(0.0, 0.0, 0.3));
 	platform_202->setKs(vec3(0.0, 0.0, 0.4));
 	platform_202->setShininess(100);
@@ -4861,7 +4861,7 @@ void initialize(int argc, char *argv[])
 	//wall2
 	Cube* platform_203 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_203->setKd(vec3(0.3, 0.3, 0.8));
+	platform_203->setKd(vec3(0.0, 0.6, 0.9));
 	platform_203->setKa(vec3(0.0, 0.0, 0.3));
 	platform_203->setKs(vec3(0.0, 0.0, 0.4));
 	platform_203->setShininess(100);
@@ -4883,7 +4883,7 @@ void initialize(int argc, char *argv[])
 	//wall3
 	Cube* platform_204 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_204->setKd(vec3(0.3, 0.3, 0.8));
+	platform_204->setKd(vec3(0.0, 0.6, 0.9));
 	platform_204->setKa(vec3(0.0, 0.0, 0.3));
 	platform_204->setKs(vec3(0.0, 0.0, 0.4));
 	platform_204->setShininess(100);
@@ -4905,7 +4905,7 @@ void initialize(int argc, char *argv[])
 	// inside middle
 	Cube* platform_205 = new Cube(-2, 2, -0.5, 0.5, -2, 2);
 	//platform_01->setSpeed(5); 
-	platform_205->setKd(vec3(0.3, 0.3, 0.8));
+	platform_205->setKd(vec3(0.0, 0.6, 0.9));
 	platform_205->setKa(vec3(0.0, 0.0, 0.3));
 	platform_205->setKs(vec3(0.0, 0.0, 0.4));
 	platform_205->setShininess(100);
@@ -4940,7 +4940,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 0
 	Cube* platform_206 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_206->setKd(vec3(0.3, 0.3, 0.8));
+	platform_206->setKd(vec3(0.0, 0.6, 0.9));
 	platform_206->setKa(vec3(0.0, 0.0, 0.3));
 	platform_206->setKs(vec3(0.0, 0.0, 0.4));
 	platform_206->setShininess(100);
@@ -4962,7 +4962,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 1
 	Cube* platform_207 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_207->setKd(vec3(0.3, 0.3, 0.8));
+	platform_207->setKd(vec3(0.0, 0.6, 0.9));
 	platform_207->setKa(vec3(0.0, 0.0, 0.3));
 	platform_207->setKs(vec3(0.0, 0.0, 0.4));
 	platform_207->setShininess(100);
@@ -4984,7 +4984,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 2
 	Cube* platform_208 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_208->setKd(vec3(0.3, 0.3, 0.8));
+	platform_208->setKd(vec3(0.0, 0.6, 0.9));
 	platform_208->setKa(vec3(0.0, 0.0, 0.3));
 	platform_208->setKs(vec3(0.0, 0.0, 0.4));
 	platform_208->setShininess(100);
@@ -5006,7 +5006,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 3
 	Cube* platform_209 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_209->setKd(vec3(0.3, 0.3, 0.8));
+	platform_209->setKd(vec3(0.0, 0.6, 0.9));
 	platform_209->setKa(vec3(0.0, 0.0, 0.3));
 	platform_209->setKs(vec3(0.0, 0.0, 0.4));
 	platform_209->setShininess(100);
@@ -5028,7 +5028,7 @@ void initialize(int argc, char *argv[])
 	//stairs0 top
 	Cube* platform_210 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_210->setKd(vec3(0.3, 0.3, 0.8));
+	platform_210->setKd(vec3(0.0, 0.6, 0.9));
 	platform_210->setKa(vec3(0.0, 0.0, 0.3));
 	platform_210->setKs(vec3(0.0, 0.0, 0.4));
 	platform_210->setShininess(100);
@@ -5050,7 +5050,7 @@ void initialize(int argc, char *argv[])
 	//stairs1
 	Cube* platform_211 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_211->setKd(vec3(0.3, 0.3, 0.8));
+	platform_211->setKd(vec3(0.0, 0.6, 0.9));
 	platform_211->setKa(vec3(0.0, 0.0, 0.3));
 	platform_211->setKs(vec3(0.0, 0.0, 0.4));
 	platform_211->setShininess(100);
@@ -5072,7 +5072,7 @@ void initialize(int argc, char *argv[])
 	//stairs2
 	Cube* platform_212 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_212->setKd(vec3(0.3, 0.3, 0.8));
+	platform_212->setKd(vec3(0.0, 0.6, 0.9));
 	platform_212->setKa(vec3(0.0, 0.0, 0.3));
 	platform_212->setKs(vec3(0.0, 0.0, 0.4));
 	platform_212->setShininess(100);
@@ -5094,7 +5094,7 @@ void initialize(int argc, char *argv[])
 	//stairs3
 	Cube* platform_213 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_213->setKd(vec3(0.3, 0.3, 0.8));
+	platform_213->setKd(vec3(0.0, 0.6, 0.9));
 	platform_213->setKa(vec3(0.0, 0.0, 0.3));
 	platform_213->setKs(vec3(0.0, 0.0, 0.4));
 	platform_213->setShininess(100);
@@ -5119,7 +5119,7 @@ void initialize(int argc, char *argv[])
 	//rampart0
 	Cube* platform_214 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_214->setKd(vec3(0.3, 0.3, 0.8));
+	platform_214->setKd(vec3(0.0, 0.6, 0.9));
 	platform_214->setKa(vec3(0.0, 0.0, 0.3));
 	platform_214->setKs(vec3(0.0, 0.0, 0.4));
 	platform_214->setShininess(100);
@@ -5141,7 +5141,7 @@ void initialize(int argc, char *argv[])
 	//rampart1
 	Cube* platform_215 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_215->setKd(vec3(0.3, 0.3, 0.8));
+	platform_215->setKd(vec3(0.0, 0.6, 0.9));
 	platform_215->setKa(vec3(0.0, 0.0, 0.3));
 	platform_215->setKs(vec3(0.0, 0.0, 0.4));
 	platform_215->setShininess(100);
@@ -5163,7 +5163,7 @@ void initialize(int argc, char *argv[])
 	//rampart2
 	Cube* platform_216 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_216->setKd(vec3(0.3, 0.3, 0.8));
+	platform_216->setKd(vec3(0.0, 0.6, 0.9));
 	platform_216->setKa(vec3(0.0, 0.0, 0.3));
 	platform_216->setKs(vec3(0.0, 0.0, 0.4));
 	platform_216->setShininess(100);
@@ -5185,7 +5185,7 @@ void initialize(int argc, char *argv[])
 	//rampart3
 	Cube* platform_217 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_217->setKd(vec3(0.3, 0.3, 0.8));
+	platform_217->setKd(vec3(0.0, 0.6, 0.9));
 	platform_217->setKa(vec3(0.0, 0.0, 0.3));
 	platform_217->setKs(vec3(0.0, 0.0, 0.4));
 	platform_217->setShininess(100);
@@ -5236,7 +5236,7 @@ void initialize(int argc, char *argv[])
 	//wall0
 	Cube* platform_301 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5);
-	platform_301->setKd(vec3(0.15, 0.15, 0.92));
+	platform_301->setKd(vec3(0.0, 0.5, 0.0));
 	platform_301->setKa(vec3(0.0, 0.0, 0.3));
 	platform_301->setKs(vec3(0.0, 0.0, 0.4));
 	platform_301->setShininess(100);
@@ -5258,7 +5258,7 @@ void initialize(int argc, char *argv[])
 	//wall1
 	Cube* platform_302 = new Cube(-0.5, 0.5, -15, 15, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_302->setKd(vec3(0.15, 0.15, 0.92));
+	platform_302->setKd(vec3(0.0, 0.5, 0.0));
 	platform_302->setKa(vec3(0.0, 0.0, 0.3));
 	platform_302->setKs(vec3(0.0, 0.0, 0.4));
 	platform_302->setShininess(100);
@@ -5280,7 +5280,7 @@ void initialize(int argc, char *argv[])
 	//wall2
 	Cube* platform_303 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_303->setKd(vec3(0.15, 0.15, 0.92));
+	platform_303->setKd(vec3(0.0, 0.5, 0.0));
 	platform_303->setKa(vec3(0.0, 0.0, 0.3));
 	platform_303->setKs(vec3(0.0, 0.0, 0.4));
 	platform_303->setShininess(100);
@@ -5302,7 +5302,7 @@ void initialize(int argc, char *argv[])
 	//wall3
 	Cube* platform_304 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -15, 15, -0.5, 0.5);
 	//platform_01->setSpeed(5); 
-	platform_304->setKd(vec3(0.15, 0.15, 0.92));
+	platform_304->setKd(vec3(0.0, 0.5, 0.0));
 	platform_304->setKa(vec3(0.0, 0.0, 0.3));
 	platform_304->setKs(vec3(0.0, 0.0, 0.4));
 	platform_304->setShininess(100);
@@ -5324,7 +5324,7 @@ void initialize(int argc, char *argv[])
 	// inside middle
 	Cube* platform_305 = new Cube(-2, 2, -0.5, 0.5, -2, 2);
 	//platform_01->setSpeed(5); 
-	platform_305->setKd(vec3(0.15, 0.15, 0.92));
+	platform_305->setKd(vec3(0.0, 0.5, 0.0));
 	platform_305->setKa(vec3(0.0, 0.0, 0.3));
 	platform_305->setKs(vec3(0.0, 0.0, 0.4));
 	platform_305->setShininess(100);
@@ -5359,7 +5359,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 0
 	Cube* platform_306 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_306->setKd(vec3(0.15, 0.15, 0.92));
+	platform_306->setKd(vec3(0.0, 0.5, 0.0));
 	platform_306->setKa(vec3(0.0, 0.0, 0.3));
 	platform_306->setKs(vec3(0.0, 0.0, 0.4));
 	platform_306->setShininess(100);
@@ -5381,7 +5381,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 1
 	Cube* platform_307 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_307->setKd(vec3(0.15, 0.15, 0.92));
+	platform_307->setKd(vec3(0.0, 0.5, 0.0));
 	platform_307->setKa(vec3(0.0, 0.0, 0.3));
 	platform_307->setKs(vec3(0.0, 0.0, 0.4));
 	platform_307->setShininess(100);
@@ -5403,7 +5403,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 2
 	Cube* platform_308 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_308->setKd(vec3(0.15, 0.15, 0.92));
+	platform_308->setKd(vec3(0.0, 0.5, 0.0));
 	platform_308->setKa(vec3(0.0, 0.0, 0.3));
 	platform_308->setKs(vec3(0.0, 0.0, 0.4));
 	platform_308->setShininess(100);
@@ -5425,7 +5425,7 @@ void initialize(int argc, char *argv[])
 	//diag plat 3
 	Cube* platform_309 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_309->setKd(vec3(0.15, 0.15, 0.92));
+	platform_309->setKd(vec3(0.0, 0.5, 0.0));
 	platform_309->setKa(vec3(0.0, 0.0, 0.3));
 	platform_309->setKs(vec3(0.0, 0.0, 0.4));
 	platform_309->setShininess(100);
@@ -5447,7 +5447,7 @@ void initialize(int argc, char *argv[])
 	//stairs0 top
 	Cube* platform_310 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_310->setKd(vec3(0.15, 0.15, 0.92));
+	platform_310->setKd(vec3(0.0, 0.5, 0.0));
 	platform_310->setKa(vec3(0.0, 0.0, 0.3));
 	platform_310->setKs(vec3(0.0, 0.0, 0.4));
 	platform_310->setShininess(100);
@@ -5469,7 +5469,7 @@ void initialize(int argc, char *argv[])
 	//stairs1
 	Cube* platform_311 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_311->setKd(vec3(0.15, 0.15, 0.92));
+	platform_311->setKd(vec3(0.0, 0.5, 0.0));
 	platform_311->setKa(vec3(0.0, 0.0, 0.3));
 	platform_311->setKs(vec3(0.0, 0.0, 0.4));
 	platform_311->setShininess(100);
@@ -5491,7 +5491,7 @@ void initialize(int argc, char *argv[])
 	//stairs2
 	Cube* platform_312 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_312->setKd(vec3(0.15, 0.15, 0.92));
+	platform_312->setKd(vec3(0.0, 0.5, 0.0));
 	platform_312->setKa(vec3(0.0, 0.0, 0.3));
 	platform_312->setKs(vec3(0.0, 0.0, 0.4));
 	platform_312->setShininess(100);
@@ -5513,7 +5513,7 @@ void initialize(int argc, char *argv[])
 	//stairs3
 	Cube* platform_313 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 	//platform_01->setSpeed(5); 
-	platform_313->setKd(vec3(0.15, 0.15, 0.92));
+	platform_313->setKd(vec3(0.0, 0.5, 0.0));
 	platform_313->setKa(vec3(0.0, 0.0, 0.3));
 	platform_313->setKs(vec3(0.0, 0.0, 0.4));
 	platform_313->setShininess(100);
@@ -5536,7 +5536,7 @@ void initialize(int argc, char *argv[])
 	//rampart0
 	Cube* platform_314 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_314->setKd(vec3(0.15, 0.15, 0.92));
+	platform_314->setKd(vec3(0.0, 0.5, 0.0));
 	platform_314->setKa(vec3(0.0, 0.0, 0.3));
 	platform_314->setKs(vec3(0.0, 0.0, 0.4));
 	platform_314->setShininess(100);
@@ -5558,7 +5558,7 @@ void initialize(int argc, char *argv[])
 	//rampart1
 	Cube* platform_315 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -3, 3);
 	//platform_01->setSpeed(5); 
-	platform_315->setKd(vec3(0.15, 0.15, 0.92));
+	platform_315->setKd(vec3(0.0, 0.5, 0.0));
 	platform_315->setKa(vec3(0.0, 0.0, 0.3));
 	platform_315->setKs(vec3(0.0, 0.0, 0.4));
 	platform_315->setShininess(100);
@@ -5580,7 +5580,7 @@ void initialize(int argc, char *argv[])
 	//rampart2
 	Cube* platform_316 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_316->setKd(vec3(0.15, 0.15, 0.92));
+	platform_316->setKd(vec3(0.0, 0.5, 0.0));
 	platform_316->setKa(vec3(0.0, 0.0, 0.3));
 	platform_316->setKs(vec3(0.0, 0.0, 0.4));
 	platform_316->setShininess(100);
@@ -5602,7 +5602,7 @@ void initialize(int argc, char *argv[])
 	//rampart3
 	Cube* platform_317 = new Cube(-3, 3, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
 	//platform_01->setSpeed(5); 
-	platform_317->setKd(vec3(0.15, 0.15, 0.92));
+	platform_317->setKd(vec3(0.0, 0.5, 0.0));
 	platform_317->setKa(vec3(0.0, 0.0, 0.3));
 	platform_317->setKs(vec3(0.0, 0.0, 0.4));
 	platform_317->setShininess(100);

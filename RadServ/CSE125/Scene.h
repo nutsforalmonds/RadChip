@@ -1572,7 +1572,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower100 = new Tower();
 		tower100->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 1,
+			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 0,
 			ORIGINZ0)));
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
@@ -1591,7 +1591,7 @@ public:
 		// TODO make this the boss tower
 		Tower* tower200 = new Tower();
 		tower200->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 1,
+			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 2,
 			ORIGINZ1)));
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
@@ -1630,7 +1630,6 @@ public:
 		platform_01->setType(ELEVATOR);
 		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
-		platform_01->setIsPlatformDamage(false);
 		addStationary(platform_01);
 		elevator.push_back(platform_01);
 
@@ -1641,7 +1640,6 @@ public:
 		platform_02->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_02->setType(CUBE);
 		platform_02->setName("Test Platform");
-		platform_02->setIsPlatformDamage(false);
 		addStationary(platform_02);
 
 		//island 
@@ -1651,7 +1649,6 @@ public:
 		platform_03->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_03->setType(CUBE);
 		platform_03->setName("Test Platform");
-		platform_03->setIsPlatformDamage(false);
 		addStationary(platform_03);
 
 		//walkway 
