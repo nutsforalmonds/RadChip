@@ -1071,28 +1071,28 @@ public:
 		quit = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		quit->setColor(vec3(1.0, 0.0, 0.0));
 		quit->setShader(sdrCtl.getShader("basic_2D"));
-		quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitOFF.png", "PNG");
+		quit->loadColorTex("img/UI_elements/new/button_stainlessSteel_QuitOFF.png", "PNG");
 		quit->setTex(true);
 		quit->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.3f, 0.0, -1.0f)));
 
 		resume = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		resume->setColor(vec3(1.0, 0.0, 0.0));
 		resume->setShader(sdrCtl.getShader("basic_2D"));
-		resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
+		resume->loadColorTex("img/UI_elements/new/button_stainlessSteel_ResumeOFF.png", "PNG");
 		resume->setTex(true);
 		resume->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.3f, 0.0, -1.0f)));
 
 		selected_resume = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_resume->setColor(vec3(1.0, 0.0, 0.0));
 		selected_resume->setShader(sdrCtl.getShader("basic_2D"));
-		selected_resume->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
+		selected_resume->loadColorTex("img/UI_elements/new/button_stainlessSteel_ResumeON.png", "PNG");
 		selected_resume->setTex(true);
 		selected_resume->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.3f, 0.0, -1.0f)));
 
 		selected_quit = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_quit->setColor(vec3(1.0, 0.0, 0.0));
 		selected_quit->setShader(sdrCtl.getShader("basic_2D"));
-		selected_quit->loadColorTex("img/UI_elements/button_stainlessSteel_QuitON.png", "PNG");
+		selected_quit->loadColorTex("img/UI_elements/new/button_stainlessSteel_QuitON.png", "PNG");
 		selected_quit->setTex(true);
 		selected_quit->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(-0.3f, 0.0, -1.0f)));
 
@@ -1123,7 +1123,7 @@ public:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		frame->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
-		frame->draw();
+		//frame->draw();
 
 		glDisable(GL_BLEND);
 
@@ -1290,14 +1290,14 @@ public:
 		respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		respawn->setColor(vec3(1.0, 0.0, 0.0));
 		respawn->setShader(sdrCtl.getShader("basic_2D"));
-		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ RespawnOff.png", "PNG");
+		respawn->loadColorTex("img/UI_elements/new/button_stainlessSteel_ RespawnOff.png", "PNG");
 		respawn->setTex(true);
 		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
 
 		selected_respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_respawn->setColor(vec3(1.0, 0.0, 0.0));
 		selected_respawn->setShader(sdrCtl.getShader("basic_2D"));
-		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ RespawnOn.png", "PNG");
+		selected_respawn->loadColorTex("img/UI_elements/new/button_stainlessSteel_ RespawnOn.png", "PNG");
 		selected_respawn->setTex(true);
 		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1, -1.0f)));
 
@@ -1543,14 +1543,14 @@ public:
 		button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		button->setColor(vec3(1.0, 0.0, 0.0));
 		button->setShader(sdrCtl.getShader("basic_2D"));
-		button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitOFF_1.png", "PNG");
+		button->loadColorTex("img/UI_elements/new/button_stainlessSteel_StartON_1.png", "PNG");
 		button->setTex(true);
 		button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
 
 		selected_button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_button->setColor(vec3(1.0, 0.0, 0.0));
 		selected_button->setShader(sdrCtl.getShader("basic_2D"));
-		selected_button->loadColorTex("img/UI_elements/button_stainlessSteel_ExitON", "PNG");
+		selected_button->loadColorTex("img/UI_elements/new/button_stainlessSteel_StartOFF_1.png", "PNG");
 		selected_button->setTex(true);
 		selected_button->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, -0.3, -1.0f)));
 
