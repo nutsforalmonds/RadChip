@@ -1681,6 +1681,8 @@ void server_update(int value){
 			}
 		}
 
+		//display players current power up
+		myUI->setPowerUP(parseOpts->getPPowerUp(recvVec, playerID));
 
 		// TODO bounces arrive
 		if (parseOpts->getTramp(recvVec, PLAYER0)){

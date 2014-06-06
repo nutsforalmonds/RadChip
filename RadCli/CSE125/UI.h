@@ -215,7 +215,7 @@ public:
 		//life_front->loadColorTex("img/UI_TEST.png", "PNG");
 		life_front->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 
-		life_frame = new UI_Panel(-0.3f, 0.3f, -0.2f, 0.2f);
+		life_frame = new UI_Panel(-0.3f, 0.3f, -0.15f, 0.15f);
 		life_frame->setColor(vec3(1.0, 0.0, 0.0));
 		life_frame->setShader(sdrCtl.getShader("basic_2D"));
 		life_frame->loadColorTex("img/UI_elements/healthBAR", "PNG");
@@ -289,21 +289,21 @@ public:
 		m_tower1_dead = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
 		m_tower1_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower1_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower1_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower1_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		m_tower1_dead->setTex(true);
 		m_tower1_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.45f, 0.45f, -1.0f)));
 
 		m_tower2_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower2_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower2_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower2_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower2_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		m_tower2_dead->setTex(true);
 		m_tower2_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.52f, 0.43f, -1.0f)));
 
 		m_tower3_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		m_tower3_dead->setColor(vec3(1.0, 1.0, 1.0));
 		m_tower3_dead->setShader(sdrCtl.getShader("basic_2D"));
-		m_tower3_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		m_tower3_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		m_tower3_dead->setTex(true);
 		m_tower3_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.59f, 0.43f, -1.0f)));
 
@@ -331,23 +331,59 @@ public:
 		c_tower1_dead = new UI_Panel(-0.05f, 0.05f, -0.05f, 0.05f);
 		c_tower1_dead->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower1_dead->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower1_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower1_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		c_tower1_dead->setTex(true);
 		c_tower1_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.45f, 0.45f, -1.0f)));
 
 		c_tower2_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		c_tower2_dead->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower2_dead->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower2_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower2_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		c_tower2_dead->setTex(true);
 		c_tower2_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.52f, 0.43f, -1.0f)));
 
 		c_tower3_dead = new UI_Panel(-0.03f, 0.03f, -0.03f, 0.03f);
 		c_tower3_dead->setColor(vec3(1.0, 1.0, 1.0));
 		c_tower3_dead->setShader(sdrCtl.getShader("basic_2D"));
-		c_tower3_dead->loadColorTex("img/UI_elements/plusSign.png", "PNG");
+		c_tower3_dead->loadColorTex("img/UI_elements/triple_icon_Off.png", "PNG");
 		c_tower3_dead->setTex(true);
 		c_tower3_dead->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.59f, 0.43f, -1.0f)));
+
+		power_up_1 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
+		power_up_1->setColor(vec3(1.0, 1.0, 1.0));
+		power_up_1->setShader(sdrCtl.getShader("basic_2D"));
+		power_up_1->loadColorTex("img/boots.png", "PNG");
+		power_up_1->setTex(true);
+		power_up_1->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
+
+		power_up_2 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
+		power_up_2->setColor(vec3(1.0, 1.0, 1.0));
+		power_up_2->setShader(sdrCtl.getShader("basic_2D"));
+		power_up_2->loadColorTex("img/dmgup.png", "PNG");
+		power_up_2->setTex(true);
+		power_up_2->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
+
+		power_up_3 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
+		power_up_3->setColor(vec3(1.0, 1.0, 1.0));
+		power_up_3->setShader(sdrCtl.getShader("basic_2D"));
+		power_up_3->loadColorTex("img/heart.png", "PNG");
+		power_up_3->setTex(true);
+		power_up_3->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
+
+		power_up_4 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
+		power_up_4->setColor(vec3(1.0, 1.0, 1.0));
+		power_up_4->setShader(sdrCtl.getShader("basic_2D"));
+		power_up_4->loadColorTex("img/projspd.png", "PNG");
+		power_up_4->setTex(true);
+		power_up_4->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
+
+		power_up_5 = new UI_Panel(-0.04f, 0.04f, -0.04f, 0.04f);
+		power_up_5->setColor(vec3(1.0, 1.0, 1.0));
+		power_up_5->setShader(sdrCtl.getShader("basic_2D"));
+		power_up_5->loadColorTex("img/rngup.png", "PNG");
+		power_up_5->setTex(true);
+		power_up_5->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(-0.2f, 0.3f, -1.0f)));
+
 
 	}
 	~UI(){
@@ -375,6 +411,12 @@ public:
 		c_tower1_dead-> ~UI_Panel();
 		c_tower2_dead->	~UI_Panel();
 		c_tower3_dead->	~UI_Panel();
+
+		power_up_1->      ~UI_Panel();
+		power_up_2->      ~UI_Panel();
+		power_up_3->      ~UI_Panel();
+		power_up_4->      ~UI_Panel();
+		power_up_5->      ~UI_Panel();
 	}
 
 	int draw(){
@@ -435,6 +477,26 @@ public:
 			break;
 		}
 
+		switch (p_up){
+		case 5:
+			power_up_5->draw();
+			break;
+		case 4:
+			power_up_4->draw();
+			break;
+		case 3:
+			power_up_3->draw();
+			break;
+		case 2:
+			power_up_2->draw();
+			break;
+		case 1:
+			power_up_1->draw();
+			break;
+		default:
+			break;
+		}
+
 		glDisable(GL_BLEND);
 		
 		return 0;
@@ -467,7 +529,7 @@ public:
 			if (x2_life <= x1_life || damage > 1)
 			{
 				//x2_life = x1_life;
-				x2_life = 0.275f;
+				x2_life = 0.26f;
 			}
 
 			life_front = new UI_Panel(x1_life, x2_life, y1_life, y2_life);
@@ -603,7 +665,7 @@ public:
 		return 0;
 	}
 
-
+	void setPowerUP(int p){ p_up = p;}
 
 	float getLess_Life(){ return less_life; }
 	void setLess_Life(float l){less_life = l;}
@@ -619,6 +681,10 @@ public:
 		else{
 			c_towers_killed++;
 		}
+	}
+	void resetTowerKills(){
+		m_towers_killed = 0;
+		c_towers_killed = 0;
 	}
 
 	void setOffSet(float w){ x += w; }
@@ -659,10 +725,16 @@ private:
 	UI_Panel* c_tower1_dead;
 	UI_Panel* c_tower2_dead;
 	UI_Panel* c_tower3_dead;
+
+	UI_Panel* power_up_1;
+	UI_Panel* power_up_2;
+	UI_Panel* power_up_3;
+	UI_Panel* power_up_4;
+	UI_Panel* power_up_5;
 	
 
-	float x1_life = -0.27f; //life
-	float x2_life = 0.275f;
+	float x1_life = -0.19f; //life
+	float x2_life = 0.26f;
 	float y1_life = -0.035f;
 	float y2_life = 0.06f;
 
@@ -684,10 +756,11 @@ private:
 	float less_life = 0;
 	float overheat = 0;
 	float shots = 0;
-	float damage_taken;
 	float health_bar_size = x2_life - x1_life;
 	float heat_bar_size = (-1)*y2_heat - y1_heat;
 	float enemy_health_bar = x2_target - x1_target;
+
+	int p_up = 0;
 
 	int c_towers_killed = 0;
 	int m_towers_killed = 0;
@@ -1133,14 +1206,14 @@ public:
 		respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		respawn->setColor(vec3(1.0, 0.0, 0.0));
 		respawn->setShader(sdrCtl.getShader("basic_2D"));
-		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeOFF.png", "PNG");
+		respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ RespawnOff.png", "PNG");
 		respawn->setTex(true);
 		respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1f, -1.0f)));
 
 		selected_respawn = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		selected_respawn->setColor(vec3(1.0, 0.0, 0.0));
 		selected_respawn->setShader(sdrCtl.getShader("basic_2D"));
-		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ResumeON.png", "PNG");
+		selected_respawn->loadColorTex("img/UI_elements/button_stainlessSteel_ RespawnOn.png", "PNG");
 		selected_respawn->setTex(true);
 		selected_respawn->setModelM(glm::scale(vec3(1.0f, 1.0f, 1.0))*glm::translate(vec3(0.0f, -0.1, -1.0f)));
 
@@ -1369,19 +1442,19 @@ class End_Screen
 public:
 	End_Screen()
 	{
-		victory = new UI_Panel(-0.3f, 0.3f, -0.1, 0.1);
+		victory = new UI_Panel(-0.9f, 0.9f, -0.3, 0.3);
 		victory->setColor(vec3(1.0, 0.0, 0.0));
 		victory->setShader(sdrCtl.getShader("basic_2D"));
 		victory->loadColorTex("img/UI_elements/victory.png", "PNG");
 		victory->setTex(true);
-		victory->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		victory->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.05f, 0.0, -1.0f)));
 
-		defeat = new UI_Panel(-0.3f, 0.3f, -0.1, 0.1);
+		defeat = new UI_Panel(-0.9f, 0.9f, -0.3, 0.3);
 		defeat->setColor(vec3(1.0, 0.0, 0.0));
 		defeat->setShader(sdrCtl.getShader("basic_2D"));
 		defeat->loadColorTex("img/UI_elements/defeat.png", "PNG");
 		defeat->setTex(true);
-		defeat->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.0, -1.0f)));
+		defeat->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.05f, 0.0, -1.0f)));
 
 		button = new UI_Panel(-0.15f, 0.15f, -0.05f, 0.05f);
 		button->setColor(vec3(1.0, 0.0, 0.0));
