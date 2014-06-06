@@ -598,6 +598,9 @@ public:
 			p3_portrait->draw();
 			offset = 0;
 			break;
+		case 4:
+			offset = 0;
+			break;
 		default:
 			offset = 0;
 			break;
@@ -910,14 +913,14 @@ private:
 	float enemy_health_bar = x2_target - x1_target;
 	float p_up_bar = x2_p_up - x1_p_up;
 
+	int c_towers_killed = 0;
+	int m_towers_killed = 0;
+
 	int p_up = 0;
 	bool team_color_set = false;
 	float power_up_start = 0;
 	float cooldown = 7.7;
 	int last_p = 0;
-
-	int c_towers_killed = 0;
-	int m_towers_killed = 0;
 
 	time_t over_de; //rate of decay of overheat bar
 
@@ -1246,8 +1249,9 @@ public:
 		//Chipmunk Team
 		k = to_string(kills[0] + kills[2]);
 		d = to_string(deaths[0] + deaths[2]);
-		sprintf_s(buf, "%s %s %s %s", "CHIPMUNK TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 220, 5 * Window::height / 8 - 24, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+		r = to_string(c_round_won);
+		sprintf_s(buf, "%s %s %s %s %s %s", "CHIPMUNK TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str(),"ROUNDS WON:", r.c_str());
+		RenderString((Window::width / 2) - 300, 5 * Window::height / 8 - 24, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
 
 		//Player 1 green chipmunk
 		k = to_string(kills[0]);
@@ -1265,8 +1269,9 @@ public:
 		//Monkey Team
 		k = to_string(kills[1] + kills[3]);
 		d = to_string(deaths[1] + deaths[3]);
-		sprintf_s(buf, "%s %s %s %s", "MONKEY TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str());
-		RenderString((Window::width / 2) - 200, 5 * Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
+		r = to_string(m_round_won);
+		sprintf_s(buf, "%s %s %s %s %s %s", "MONKEY TEAM KILLS:", k.c_str(), "DEATHS:", d.c_str(), "ROUNDS WON:", r.c_str());
+		RenderString((Window::width / 2) - 280, 5 * Window::height / 8 - 144, GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)buf, vec3(1.0f, 1.0f, 0.0f));
 
 		//Player 2 gorilla
 		k = to_string(kills[1]);
@@ -1287,6 +1292,17 @@ public:
 
 	void setDeath(int i){ deaths[i]++;}
 	void setKills(int i, int k){ kills[i] = k;}
+
+	void setRoundWon(char c, int r){
+		if (c == 'c')
+		{
+			c_round_won = r;
+		}
+		else
+		{
+			m_round_won = r;
+		}
+	}
 
 	int checkHighlight(float x, float y){
 
@@ -1360,6 +1376,11 @@ private:
 	int kills[4];
 	string k;
 	string d;
+	string r;;
+
+	int c_round_won = 0;
+	int m_round_won = 0;
+
 	bool drawStartHighlight;
 	bool drawEndHighlight;
 };

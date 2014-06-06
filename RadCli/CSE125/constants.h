@@ -40,6 +40,7 @@
 #define PLAYER1				1
 #define PLAYER2				2
 #define PLAYER3				3
+#define NOT_A_PLAYER		4
 
 
 //indicies for platform status

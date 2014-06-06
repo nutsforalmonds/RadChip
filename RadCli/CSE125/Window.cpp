@@ -353,6 +353,8 @@ float nextSoundEventTimeSec = 2.5;
 float currSoundEventTimeSec = 0.0;
 
 vector<Sound*> SoundEvents;
+vector<int> SoundEventsIcon;
+vector<std::string> SoundEventsString;
 
 float nextPickupSound = 10.0;
 float currPickupSound = 0.0;
@@ -384,6 +386,7 @@ int wins;
 bool winCountToggle = false;
 bool playerReady = true;
 int displayWinner = 0;
+int enemyWins = 0;
 
 int powerUp = 0;
 int Player0_KillSpree = 0;
@@ -410,6 +413,10 @@ int Player0_DoubleKillTime = 0;
 int Player1_DoubleKillTime = 0;
 int Player2_DoubleKillTime = 0;
 int Player3_DoubleKillTime = 0;
+
+bool drawPortThingFuck = false;
+int portPlayer = NOT_A_PLAYER;
+string portString = "";
 
 int TowerHP[] = {20, 20, 20, 20, 20, 20};
 int TowerState[] = { 0, 0, 0, 0, 0, 0 };
@@ -501,12 +508,27 @@ void PlayBackgroundMusic(float diff){
 
 void PlayAnnouncerEvents(float diff){
 	if (myClientState->getState() > 0){
-		if (!SoundEvents.empty()){
-			currSoundEventTimeSec += diff;
-			if (nextSoundEventTimeSec <= currSoundEventTimeSec){
-				currSoundEventTimeSec = 0;
+		currSoundEventTimeSec += diff;
+		if (nextSoundEventTimeSec <= currSoundEventTimeSec){
+			currSoundEventTimeSec = 0;
+			if (!SoundEvents.empty()){
+				
+				if (!SoundEventsIcon.empty() && !SoundEventsString.empty()){
+					drawPortThingFuck = true;
+					portPlayer = SoundEventsIcon[0];
+					portString = SoundEventsString[0];
+				}
+
 				SoundEvents[0]->Play();
+
 				SoundEvents.erase(SoundEvents.begin());
+				SoundEventsIcon.erase(SoundEventsIcon.begin());
+				SoundEventsString.erase(SoundEventsString.begin());
+			}
+			else{
+				drawPortThingFuck = false;
+				//SoundEventsIcon.clear();
+				//SoundEventsString.clear();
 			}
 		}
 	}
@@ -1430,7 +1452,9 @@ void Window::displayCallback(void)
 		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
 
 		myUI->draw();
-		myUI->drawPortrait(playerID, s);
+		if (drawPortThingFuck){
+			myUI->drawPortrait(portPlayer, portString);
+		}
 
 		RenderString(2.0f, Window::height - 20, GLUT_BITMAP_HELVETICA_18, (unsigned char*)buf, vec3(1.0f, 0.0f, 0.0f));
 		RenderString(4.0f, 4.0f, GLUT_BITMAP_HELVETICA_18, m_Test, vec3(0.0f, 0.0f, 1.0f));
@@ -1453,6 +1477,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 1;
 					wins++;
+					myGameMenu->setRoundWon('c', wins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1463,6 +1488,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 1;
 					wins++;
+					myGameMenu->setRoundWon('m', wins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1472,6 +1498,8 @@ void Window::displayCallback(void)
 				if (!winCountToggle)
 				{
 					displayWinner = 0;
+					enemyWins++;
+					myGameMenu->setRoundWon('c', enemyWins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1481,6 +1509,8 @@ void Window::displayCallback(void)
 				if (!winCountToggle)
 				{
 					displayWinner = 0;
+					enemyWins++;
+					myGameMenu->setRoundWon('m', enemyWins);
 					winCountToggle = !winCountToggle;
 					//cout << "Total Wins: " << wins << endl;
 				}
@@ -1488,15 +1518,24 @@ void Window::displayCallback(void)
 			endScreen->draw(displayWinner, wins);
 			if (displayWinner){
 				SoundEvents.push_back(testSound[SoundVictory]);
+				SoundEventsIcon.push_back(NOT_A_PLAYER);
+				SoundEventsString.push_back("");
+
+
 			}
 			else{
 				SoundEvents.push_back(testSound[SoundDefeat]);
+				SoundEventsIcon.push_back(NOT_A_PLAYER);
+				SoundEventsString.push_back("");
+
 			}
 		}
 
 		else if (kill_count){
 			myGameMenu->killDraw();
 		}
+
+
 
 		break;
 	case 4:
@@ -1623,6 +1662,8 @@ void server_update(int value){
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets was destroyed!");
 					}
 					else{
 						//Play enemy tower shit
@@ -1637,6 +1678,8 @@ void server_update(int value){
 					else{
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretDieYourTeam]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets was destroyed!");
 					}
 				}
 			}
@@ -1647,20 +1690,28 @@ void server_update(int value){
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is nearly destroyed!");
 					}
 					else{
 						//Play enemy tower shit
 						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of the enemy turrets is nearly destroyed!");
 					}
 				}
 				else{
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play enemy tower shit
 						SoundEvents.push_back(testSound[SoundTurretAlmostKillEne]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of the enemy turrets is nearly destroyed!");
 					}
 					else{
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretAlmostKillYour]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is nearly destroyed!");
 					}
 				}
 			}
@@ -1671,20 +1722,28 @@ void server_update(int value){
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is at half health!");
 					}
 					else{
 						//Play enemy tower shit
 						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of the enemy turrets is at half health!");
 					}
 				}
 				else{
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play enemy tower shit
 						SoundEvents.push_back(testSound[SoundTurretHalfKillEnemy]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of the enemy turrets is at half health!");
 					}
 					else{
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretHalfKillYourT]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is at half health!");
 					}
 				}
 			}
@@ -1695,6 +1754,8 @@ void server_update(int value){
 					if ((playerID == PLAYER0) || (playerID == PLAYER2)){
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is under attack!");
 					}
 					else{
 						//Play enemy tower shit
@@ -1709,6 +1770,8 @@ void server_update(int value){
 					else{
 						//Play your tower shit
 						SoundEvents.push_back(testSound[SoundTurretAttackedYourT]);
+						SoundEventsIcon.push_back(NOT_A_PLAYER);
+						SoundEventsString.push_back("One of your turrets is under attack!");
 					}
 				}
 			}
@@ -1831,7 +1894,9 @@ void server_update(int value){
 			if (!dead[PLAYER0])
 			{
 				if (Player0_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
+					SoundEventsIcon.push_back(PLAYER0);
+					SoundEventsString.push_back("Player 1 Shut Down!");
 				}
 				Player0_KillSpree = 0;
 				Player0_KillSpreeLast = 0;
@@ -1853,7 +1918,9 @@ void server_update(int value){
 			if (!dead[PLAYER1])
 			{
 				if (Player1_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
+					SoundEventsIcon.push_back(PLAYER1);
+					SoundEventsString.push_back("Player 2 Shut Down!");
 				}
 				Player1_KillSpree = 0;
 				Player1_KillSpreeLast = 0;
@@ -1875,7 +1942,9 @@ void server_update(int value){
 			if (!dead[PLAYER2])
 			{
 				if (Player2_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
+					SoundEventsIcon.push_back(PLAYER2);
+					SoundEventsString.push_back("Player 3 Shut Down!");
 				}
 				Player2_KillSpree = 0;
 				Player2_KillSpreeLast = 0;
@@ -1897,7 +1966,9 @@ void server_update(int value){
 			if (!dead[PLAYER3])
 			{
 				if (Player3_KillSpree > 2){
-					testSound[SoundShutdown]->Play();
+					SoundEvents.push_back(testSound[SoundShutdown]);
+					SoundEventsIcon.push_back(PLAYER3);
+					SoundEventsString.push_back("Player 4 Shut Down!");
 				}
 				Player3_KillSpree = 0;
 				Player3_KillSpreeLast = 0;
@@ -1943,18 +2014,26 @@ void server_update(int value){
 			if (Player0_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				SoundEventsIcon.push_back(PLAYER0);
+				SoundEventsString.push_back("Player 1 First Blood!");
 			}
 			else if (Player1_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				SoundEventsIcon.push_back(PLAYER1);
+				SoundEventsString.push_back("Player 2 First Blood!");
 			}
 			else if (Player2_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				SoundEventsIcon.push_back(PLAYER2);
+				SoundEventsString.push_back("Player 3 First Blood!");
 			}
 			else if (Player3_KillCount){
 				FirstBloodTrigger = false;
 				SoundEvents.push_back(testSound[SoundFirstBlood]);
+				SoundEventsIcon.push_back(PLAYER3);
+				SoundEventsString.push_back("Player 4 First Blood!");
 			}
 		}
 
@@ -1993,10 +2072,14 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					SoundEventsIcon.push_back(PLAYER0);
+					SoundEventsString.push_back("Player 1 Double Kill!");
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					SoundEventsIcon.push_back(PLAYER0);
+					SoundEventsString.push_back("Player 1 Double Kill!");
 				}
 			}
 			Player0_KillSpreeLast = Player0_KillSpree;
@@ -2009,10 +2092,14 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					SoundEventsIcon.push_back(PLAYER1);
+					SoundEventsString.push_back("Player 2 Double Kill!");
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					SoundEventsIcon.push_back(PLAYER1);
+					SoundEventsString.push_back("Player 2 Double Kill!");
 				}
 			}
 			Player1_KillSpreeLast = Player1_KillSpree;
@@ -2025,10 +2112,14 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					SoundEventsIcon.push_back(PLAYER2);
+					SoundEventsString.push_back("Player 3 Double Kill!");
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					SoundEventsIcon.push_back(PLAYER2);
+					SoundEventsString.push_back("Player 3 Double Kill!");
 				}
 			}
 			Player2_KillSpreeLast = Player2_KillSpree;
@@ -2041,10 +2132,14 @@ void server_update(int value){
 				{
 					//testSound[SoundDoubleKillY]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillY]);
+					SoundEventsIcon.push_back(PLAYER3);
+					SoundEventsString.push_back("Player 4 Double Kill!");
 				}
 				else{
 					//testSound[SoundDoubleKillE]->Play();
 					SoundEvents.push_back(testSound[SoundDoubleKillE]);
+					SoundEventsIcon.push_back(PLAYER3);
+					SoundEventsString.push_back("Player 4 Double Kill!");
 				}
 			}
 			Player3_KillSpreeLast = Player3_KillSpree;
@@ -2054,6 +2149,7 @@ void server_update(int value){
 
 		
 		if ((Player0_KillSpree > Player0_KillSpreeLast) && (Player0_KillSpree > 2)){
+			SoundEventsIcon.push_back(PLAYER0);
 			if (Player0_KillSpree > 8){
 				Player0_KillSpree = 8;
 			}
@@ -2062,22 +2158,28 @@ void server_update(int value){
 			{
 				switch (Player0_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeU]->Play();
+					SoundEventsString.push_back("Player 1 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2U]->Play();
+					SoundEventsString.push_back("Player 1 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3U]->Play();
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 1 is Dominating!");
 					break;
 				case 7:
-					testSound[SoundKillingSpree5U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 1 is God Like!");
 					break;
 				case 8:
-					testSound[SoundKillingSpree6U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 1 is Legendary!");
 					break;
 				default:
 					break;
@@ -2086,22 +2188,28 @@ void server_update(int value){
 			else if (playerID == PLAYER2){
 				switch (Player0_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeY]->Play();
+					SoundEventsString.push_back("Player 1 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2Y]->Play();
+					SoundEventsString.push_back("Player 1 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3Y]->Play();
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4Y]->Play();
+					SoundEventsString.push_back("Player 1 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5Y]->Play();
+					SoundEventsString.push_back("Player 1 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6Y]->Play();
+					SoundEventsString.push_back("Player 1 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
 					break;
@@ -2110,22 +2218,28 @@ void server_update(int value){
 			else{
 				switch (Player0_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeE]->Play();
+					SoundEventsString.push_back("Player 1 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2E]->Play();
+					SoundEventsString.push_back("Player 1 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3E]->Play();
+					SoundEventsString.push_back("Player 1 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4E]->Play();
+					SoundEventsString.push_back("Player 1 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5E]->Play();
+					SoundEventsString.push_back("Player 1 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6E]->Play();
+					SoundEventsString.push_back("Player 1 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
 					break;
@@ -2133,6 +2247,7 @@ void server_update(int value){
 			}
 		}
 		if ((Player1_KillSpree > Player1_KillSpreeLast) && (Player1_KillSpree > 2)){
+			SoundEventsIcon.push_back(PLAYER1);
 			if (Player1_KillSpree > 8){
 				Player1_KillSpree = 8;
 			}
@@ -2141,22 +2256,28 @@ void server_update(int value){
 			{
 				switch (Player1_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeU]->Play();
+					SoundEventsString.push_back("Player 2 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2U]->Play();
+					SoundEventsString.push_back("Player 2 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3U]->Play();
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 2 is Dominating!");
 					break;
 				case 7:
-					testSound[SoundKillingSpree5U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 2 is God Like!");
 					break;
 				case 8:
-					testSound[SoundKillingSpree6U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 2 is Legendary!");
 					break;
 				default:
 					break;
@@ -2165,22 +2286,28 @@ void server_update(int value){
 			else if (playerID == PLAYER3){
 				switch (Player1_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeY]->Play();
+					SoundEventsString.push_back("Player 2 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2Y]->Play();
+					SoundEventsString.push_back("Player 2 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3Y]->Play();
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4Y]->Play();
+					SoundEventsString.push_back("Player 2 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5Y]->Play();
+					SoundEventsString.push_back("Player 2 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6Y]->Play();
+					SoundEventsString.push_back("Player 2 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
 					break;
@@ -2189,22 +2316,28 @@ void server_update(int value){
 			else{
 				switch (Player1_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeE]->Play();
+					SoundEventsString.push_back("Player 2 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2E]->Play();
+					SoundEventsString.push_back("Player 2 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3E]->Play();
+					SoundEventsString.push_back("Player 2 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4E]->Play();
+					SoundEventsString.push_back("Player 2 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5E]->Play();
+					SoundEventsString.push_back("Player 2 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6E]->Play();
+					SoundEventsString.push_back("Player 2 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
 					break;
@@ -2212,6 +2345,7 @@ void server_update(int value){
 			}
 		}
 		if ((Player2_KillSpree > Player2_KillSpreeLast) && (Player2_KillSpree > 2)){
+			SoundEventsIcon.push_back(PLAYER2);
 			if (Player2_KillSpree > 8){
 				Player2_KillSpree = 8;
 			}
@@ -2220,22 +2354,28 @@ void server_update(int value){
 			{
 				switch (Player2_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeU]->Play();
+					SoundEventsString.push_back("Player 3 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2U]->Play();
+					SoundEventsString.push_back("Player 3 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3U]->Play();
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 3 is Dominating!");
 					break;
 				case 7:
-					testSound[SoundKillingSpree5U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 3 is God Like!");
 					break;
 				case 8:
-					testSound[SoundKillingSpree6U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 3 is Legendary!");
 					break;
 				default:
 					break;
@@ -2244,22 +2384,28 @@ void server_update(int value){
 			else if (playerID == PLAYER0){
 				switch (Player2_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeY]->Play();
+					SoundEventsString.push_back("Player 3 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2Y]->Play();
+					SoundEventsString.push_back("Player 3 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3Y]->Play();
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4Y]->Play();
+					SoundEventsString.push_back("Player 3 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5Y]->Play();
+					SoundEventsString.push_back("Player 3 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6Y]->Play();
+					SoundEventsString.push_back("Player 3 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
 					break;
@@ -2268,22 +2414,28 @@ void server_update(int value){
 			else{
 				switch (Player2_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeE]->Play();
+					SoundEventsString.push_back("Player 3 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2E]->Play();
+					SoundEventsString.push_back("Player 3 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3E]->Play();
+					SoundEventsString.push_back("Player 3 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4E]->Play();
+					SoundEventsString.push_back("Player 3 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5E]->Play();
+					SoundEventsString.push_back("Player 3 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6E]->Play();
+					SoundEventsString.push_back("Player 3 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
 					break;
@@ -2291,6 +2443,7 @@ void server_update(int value){
 			}
 		}
 		if ((Player3_KillSpree > Player3_KillSpreeLast) && (Player3_KillSpree > 2)){
+			SoundEventsIcon.push_back(PLAYER3);
 			if (Player3_KillSpree > 8){
 				Player3_KillSpree = 8;
 			}
@@ -2299,22 +2452,28 @@ void server_update(int value){
 			{
 				switch (Player3_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeU]->Play();
+					SoundEventsString.push_back("Player 4 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeU]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2U]->Play();
+					SoundEventsString.push_back("Player 4 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2U]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3U]->Play();
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3U]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree4U]);
+					SoundEventsString.push_back("Player 4 is Dominating!");
 					break;
 				case 7:
-					testSound[SoundKillingSpree5U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree5U]);
+					SoundEventsString.push_back("Player 4 is God Like!");
 					break;
 				case 8:
-					testSound[SoundKillingSpree6U]->Play();
+					SoundEvents.push_back(testSound[SoundKillingSpree6U]);
+					SoundEventsString.push_back("Player 4 is Legendary!");
 					break;
 				default:
 					break;
@@ -2323,22 +2482,28 @@ void server_update(int value){
 			else if (playerID == PLAYER1){
 				switch (Player3_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeY]->Play();
+					SoundEventsString.push_back("Player 4 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeY]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2Y]->Play();
+					SoundEventsString.push_back("Player 4 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2Y]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3Y]->Play();
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3Y]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4Y]->Play();
+					SoundEventsString.push_back("Player 4 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4Y]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5Y]->Play();
+					SoundEventsString.push_back("Player 4 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5Y]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6Y]->Play();
+					SoundEventsString.push_back("Player 4 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6Y]);
 					break;
 				default:
 					break;
@@ -2347,22 +2512,28 @@ void server_update(int value){
 			else{
 				switch (Player3_KillSpree){
 				case 3:
-					testSound[SoundKillingSpreeE]->Play();
+					SoundEventsString.push_back("Player 4 Killing Spree!");
+					SoundEvents.push_back(testSound[SoundKillingSpreeE]);
 					break;
 				case 4:
-					testSound[SoundKillingSpree2E]->Play();
+					SoundEventsString.push_back("Player 4 Rampage!");
+					SoundEvents.push_back(testSound[SoundKillingSpree2E]);
 					break;
 				case 5:
-					testSound[SoundKillingSpree3E]->Play();
+					SoundEventsString.push_back("Player 4 is Unstoppable!");
+					SoundEvents.push_back(testSound[SoundKillingSpree3E]);
 					break;
 				case 6:
-					testSound[SoundKillingSpree4E]->Play();
+					SoundEventsString.push_back("Player 4 is Dominating!");
+					SoundEvents.push_back(testSound[SoundKillingSpree4E]);
 					break;
 				case 7:
-					testSound[SoundKillingSpree5E]->Play();
+					SoundEventsString.push_back("Player 4 is God Like!");
+					SoundEvents.push_back(testSound[SoundKillingSpree5E]);
 					break;
 				case 8:
-					testSound[SoundKillingSpree6E]->Play();
+					SoundEventsString.push_back("Player 4 is Legendary!");
+					SoundEvents.push_back(testSound[SoundKillingSpree6E]);
 					break;
 				default:
 					break;
@@ -5066,7 +5237,7 @@ void initialize(int argc, char *argv[])
 
 	//force field effect
 	force_field[0] = new ParticleAnimated(*(MOM.mother_of_force_field));
-	force_field[0]->setFollow(tower100, vec3(0, 2, 0), 1, &View);
+	force_field[0]->setFollow(tower100, vec3(0, 1.0, 0), 1, &View);
 	force_field[0]->setStartTime(ct);
 
 	//diag plat 0
@@ -5490,7 +5661,7 @@ void initialize(int argc, char *argv[])
 
 	//force field effect
 	force_field[1] = new ParticleAnimated(*(MOM.mother_of_force_field));
-	force_field[1]->setFollow(tower200, vec3(0, 2, 0), 1, &View);
+	force_field[1]->setFollow(tower200, vec3(0, 2.3, 0), 1, &View);
 	force_field[1]->setStartTime(ct);
 
 
