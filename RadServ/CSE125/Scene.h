@@ -1513,6 +1513,43 @@ public:
 		tw3->setPlayerID(3);
 		addTower(tw3);
 
+		// TODO make this the boss tower
+		Tower* tower100 = new Tower();
+		tower100->postTrans(glm::translate(vec3(ORIGINX0,
+			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINZ0)));
+		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tower100->setInterval(1.0);//shoot every 1 second if target exists
+		tower100->setShootRange(20);
+		tower100->setShootSpeed(20);
+		tower100->setHealth(20);
+		tower100->setDamage(-1);
+		tower100->setType(MODEL);
+		tower100->setName("octo base");
+		tower100->setTeamID(1);
+		tower100->setPlayerID(4);
+
+		addTower(tower100);
+
+
+		// TODO make this the boss tower
+		Tower* tower200 = new Tower();
+		tower200->postTrans(glm::translate(vec3(ORIGINX1,
+			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINZ1)));
+		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
+		tower200->setInterval(1.0);//shoot every 1 second if target exists
+		tower200->setShootRange(20);
+		tower200->setShootSpeed(20);
+		tower200->setHealth(20);
+		tower200->setDamage(-1);
+		tower200->setType(MODEL);
+		tower200->setName("nut base");
+		tower200->setTeamID(0);
+		tower200->setPlayerID(5);
+
+		addTower(tower200);
+
 		Ground* ground = new Ground();
 		ground->loadColorTex("img/moon_tex/moon_COLOR.png", "PNG");
 		ground->loadDispTex("img/moon_tex/moon_DISP.png", "PNG");
@@ -1903,25 +1940,6 @@ public:
 		platform_205->setName("Test Platform");
 		addStationary(platform_205);
 
-		// tower in the middle
-		// TODO make this the boss tower
-		Tower* tower100 = new Tower();
-		tower100->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT + 2.9,
-			ORIGINZ0)));
-		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
-		tower100->setInterval(1.0);//shoot every 1 second if target exists
-		tower100->setShootRange(20);
-		tower100->setShootSpeed(20);
-		tower100->setHealth(20);
-		tower100->setDamage(-1);
-		tower100->setType(MODEL);
-		tower100->setName("Tower Model100");
-		tower100->setTeamID(0);
-		tower100->setPlayerID(4);
-
-		addTower(tower100);
-
 
 		//diag plat 0
 		Cube* platform_206 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
@@ -2132,25 +2150,6 @@ public:
 		platform_305->setType(CUBE);
 		platform_305->setName("Test Platform");
 		addStationary(platform_305);
-
-		// tower in the middle
-		// TODO make this the boss tower
-		Tower* tower200 = new Tower();
-		tower200->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT + 2.9,
-			ORIGINZ1)));
-		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
-		tower200->setInterval(1.0);//shoot every 1 second if target exists
-		tower200->setShootRange(20);
-		tower200->setShootSpeed(20);
-		tower200->setHealth(20);
-		tower200->setDamage(-1);
-		tower200->setType(MODEL);
-		tower200->setName("Tower Model1");
-		tower200->setTeamID(1);
-		tower200->setPlayerID(5);
-
-		addTower(tower200);
 
 		//diag plat 0
 		Cube* platform_306 = new Cube(-5, 5, -0.5, 0.5, -5, 5);
