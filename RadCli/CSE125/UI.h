@@ -823,13 +823,13 @@ public:
 	void teamColor(int t){
 		if (t == 0 || t == 2){
 			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
-			team_color->setColor(vec3(1.0, 0.8, 0.0));
+			team_color->setColor(vec3(0.0, 0.5, 0.0));
 			team_color->setShader(sdrCtl.getShader("basic_2D"));
 			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 		}
 		else{
 			team_color = new UI_Panel(-0.28, -0.19, -0.035f, 0.05f);
-			team_color->setColor(vec3(0.0, 0.7, 1.0));
+			team_color->setColor(vec3(0.0, 0.6, 0.9));
 			team_color->setShader(sdrCtl.getShader("basic_2D"));
 			team_color->setModelM(glm::scale(vec3(1.0, 1.0, 1.0))*glm::translate(vec3(0.0f, 0.42f, -1.0f)));
 		}
