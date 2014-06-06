@@ -1,6 +1,6 @@
 {
     "map_name": "Test 1",
-    "num_shaders": 12,
+    "num_shaders": 13,
     "shaders": [
         {
             "name": "basic_skybox",
@@ -61,6 +61,11 @@
             "name": "pe_system_anim",
             "vert": "Shaders/pe_system_anim.vert",
             "frag": "Shaders/pe_system_anim.frag"
+        },
+		{
+            "name": "screen_texture",
+            "vert": "Shaders/screen_texture.vert",
+            "frag": "Shaders/screen_texture.frag"
         }
     ],
     "num_audio": 30,

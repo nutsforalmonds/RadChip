@@ -38,6 +38,7 @@
 #include "ParticleAnimated.h"
 #include "LightningGenerator.h"
 #include "BillboardProjectile.h"
+#include "Quad.h"
 
 #include "gameState.h"
 #include "CXBOXController.h"
@@ -73,6 +74,8 @@ long long m_currentTimeMillis;
 ParticleSystem2* testSystem;
 
 std::vector<ParticleSystem2*> explosion_list;
+
+Quad* screen_quad;
 
 enum {
 	MENU_LIGHTING = 1,
@@ -208,9 +211,11 @@ float cam_dx = 0;
 
 GLuint fboHandle;
 GLuint depth_fbo;
+GLuint render_fbo;
 GLsizei depth_texture_width = 2048;//4096
 GLsizei depth_texture_height = 2048;
 GLuint shadow_map_id = 10;//shadow map stored in GL_TEXTURE10
+GLuint render_tex_id = 11;//blur texture stored in GL_TEXTURE11
 
 string configBuf;
 
@@ -259,6 +264,7 @@ End_Screen * endScreen;
 Logo * logo;
 
 Texture * shadow;
+Texture * render_tex;
 char buf[255];
 int myFPS = 0;
 
@@ -1242,12 +1248,14 @@ void Window::displayCallback(void)
 		//{
 		//	tower_projectile_list[i]->draw(LightProjection, LightView);
 		//}
-		
-		///////  2nd pass: render onto screen ////////////
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		///////  2nd pass: render onto texture ////////////
+		glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, width, height);
 		shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+		render_tex->Bind(GL_TEXTURE0 + render_tex_id);
 
 		for (uint i = 0; i < draw_list.size(); ++i)
 		{
@@ -1358,6 +1366,16 @@ void Window::displayCallback(void)
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		///////  3rd pass: render onto screen ////////////
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, width, height);
+		render_tex->Bind(GL_TEXTURE0 + render_tex_id);
+		screen_quad->draw();
+
+		///////////////////////////////////////////////// UI Divide /////////////////////////////////////////////////////////
 
 		myUI->draw();
 
@@ -3036,7 +3054,6 @@ void setupShaders()
 }
 void initialize(int argc, char *argv[])
 {
-
 	myClientState = new ClientState();
 
 	QueryPerformanceFrequency(&freq);
@@ -3070,6 +3087,9 @@ void initialize(int argc, char *argv[])
 		printf("FMOD Init successful!\n");
 	}
 
+	//Window::width = glutGet(GLUT_WINDOW_WIDTH);
+	//Window::height = glutGet(GLUT_WINDOW_HEIGHT);
+
 	FMOD_VECTOR myPosition = { 0.0f, 0.0f, 0.0f };
 	FMOD_VECTOR myVelocity = { 0.0f, 0.0f, 0.0f };
 	mySoundSystem->setListenerPosVel(myPosition, myVelocity);
@@ -3094,6 +3114,22 @@ void initialize(int argc, char *argv[])
 		printf("FB error, status: 0x%x\n", Status);
 		system("pause");
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//render buffer initialization
+	glGenFramebuffers(1, &render_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_tex->getTexID(), 0);
+	GLuint depthBuf;
+	glGenRenderbuffers(1, &depthBuf);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Window::width, Window::height );
+	// Bind the depth buffer to the FBO
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf);
+	// Set the target for the fragment shader outputs
+	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, drawBufs);
+	// Unbind the framebuffer, and revert to default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
 	light[0].type=1;
@@ -3137,6 +3173,10 @@ void initialize(int argc, char *argv[])
 	settings = new Settings();
 	endScreen = new End_Screen();
 	logo = new Logo();
+
+	screen_quad = new Quad();
+	screen_quad->setShader(sdrCtl.getShader("screen_texture"));
+	screen_quad->setTextureUnit(render_tex_id);
 
 	ground = new Ground();
 	ground->setShader(sdrCtl.getShader("ground_tess"));
@@ -5003,8 +5043,6 @@ void initialize(int argc, char *argv[])
 
 }
 
-
-
 int loadAudio(){
 
 	/*
@@ -5116,8 +5154,11 @@ void loadTextures(){
 	
 	shadow = new Texture(GL_TEXTURE_2D);
 	shadow->LoadDepthTexture(depth_texture_width, depth_texture_height);
-	//shadow->LoadDepthTexture(Window::width, Window::height);
 	shadow->Bind(GL_TEXTURE0 + shadow_map_id);
+
+	render_tex = new Texture(GL_TEXTURE_2D);
+	render_tex->LoadRenderTexture(Window::width, Window::height);
+	render_tex->Bind(GL_TEXTURE0 + render_tex_id);
 	
 }
 
