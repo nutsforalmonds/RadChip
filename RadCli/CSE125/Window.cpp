@@ -723,10 +723,10 @@ void towerKill(int towerID){
 	sound_3d_tower_explosion->setPosition(tpos);
 	sound_3d_tower_explosion->Play3D(View);
 
-	if (towerID < 2){
+	if (towerID < 2 && towerID == 4){
 		myUI->setTowers('c');
 	}
-	else if (towerID > 1)
+	else if (towerID > 1 && towerID == 4)
 	{
 		myUI->setTowers('m');
 	}
@@ -902,7 +902,7 @@ void Window::idleCallback(void)
 			myDeathScreen->draw();
 		}
 		else if (myClientState->getState() == 5){
-			endScreen->draw(0);
+			endScreen->draw(0, wins);
 		}
 		simulateProjectile(dt);
 		despawnProjectile();
@@ -1448,7 +1448,7 @@ void Window::displayCallback(void)
 					cout << "Total Wins: " << wins << endl;
 				}
 			}
-			endScreen->draw(displayWinner);
+			endScreen->draw(displayWinner, wins);
 		}
 
 		else if (kill_count){
