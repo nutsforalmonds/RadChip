@@ -1436,7 +1436,7 @@ void Window::displayCallback(void)
 					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else if (winner == 0 && (playerID % 2) == 1)
@@ -1446,7 +1446,7 @@ void Window::displayCallback(void)
 					displayWinner = 1;
 					wins++;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else  if (winner == 1 && (playerID % 2) == 1)
@@ -1455,7 +1455,7 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 0;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			else  if (winner == 0 && (playerID % 2) == 0)
@@ -1464,10 +1464,16 @@ void Window::displayCallback(void)
 				{
 					displayWinner = 0;
 					winCountToggle = !winCountToggle;
-					cout << "Total Wins: " << wins << endl;
+					//cout << "Total Wins: " << wins << endl;
 				}
 			}
 			endScreen->draw(displayWinner, wins);
+			if (displayWinner){
+				SoundEvents.push_back(testSound[SoundVictory]);
+			}
+			else{
+				SoundEvents.push_back(testSound[SoundDefeat]);
+			}
 		}
 
 		else if (kill_count){
