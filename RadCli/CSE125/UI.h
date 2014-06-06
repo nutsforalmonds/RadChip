@@ -598,6 +598,9 @@ public:
 			p3_portrait->draw();
 			offset = 0;
 			break;
+		case 4:
+			offset = 0;
+			break;
 		default:
 			offset = 0;
 			break;
